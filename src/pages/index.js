@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export async function getServerSideProps() {
   return { props: { initialData: null } };
@@ -9,7 +9,22 @@ export default function Home({ initialData }) {
   const [data, setData] = useState(initialData);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(() => Number(localStorage.getItem('countdown')) || 0);
   const format = v => `${v >= 0 ? ' ' : '-'}${Math.abs(v).toFixed(2)}`.padStart(8);
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown(c => {
+          const newCount = c - 1;
+          localStorage.setItem('countdown', newCount);
+          if (newCount <= 0) localStorage.removeItem('countdown');
+          return newCount;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [countdown]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,6 +39,8 @@ export default function Home({ initialData }) {
       });
       if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch');
       setData(await res.json());
+      setCountdown(15);
+      localStorage.setItem('countdown', 15);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -33,6 +50,7 @@ export default function Home({ initialData }) {
 
   return (
     <div className="container">
+      <title>Wallet PnL Viewer</title>
       <h1>Wallet PnL Viewer</h1>
       <form onSubmit={handleSubmit}>
         <input
@@ -43,8 +61,8 @@ export default function Home({ initialData }) {
           className="input"
           disabled={loading}
         />
-        <button type="submit" className="button" disabled={loading}>
-          {loading ? 'Loading...' : 'Fetch Data'}
+        <button type="submit" className="button" disabled={loading || countdown > 0}>
+          {loading ? 'Loading...' : countdown > 0 ? `Wait ${countdown}s` : 'Fetch Data'}
         </button>
       </form>
 
@@ -52,7 +70,7 @@ export default function Home({ initialData }) {
       {error && <p className="error">{error}</p>}
       {data && (
         <>
-          <h2>Total PnL: <span className={data.totalPnL >= 0 ? 'positive' : 'negative'}>${format(data.totalPnL)}</span></h2>
+          <h2>Total PnL: <span className={data.totalPnL > 0 ? 'positive' : data.totalPnL < 0 ? 'negative' : 'zero'}>${format(data.totalPnL)}</span></h2>
           <hr />
           {data.positions.map((pos, i) => (
             <div key={i} className="position">
@@ -65,10 +83,10 @@ export default function Home({ initialData }) {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>Yield</td><td className={pos.yield >= 0 ? 'positive' : 'negative'}>{format(pos.yield)}</td></tr>
-                  <tr><td>Compounded</td><td className={pos.compounded >= 0 ? 'positive' : 'negative'}>{format(pos.compounded)}</td></tr>
-                  <tr><td>Debt</td><td className={pos.debt >= 0 ? 'positive' : 'negative'}>{format(pos.debt)}</td></tr>
-                  <tr><td>PnL</td><td className={pos.pnl >= 0 ? 'positive' : 'negative'}>{format(pos.pnl)}</td></tr>
+                  <tr><td>Yield</td><td className={pos.yield > 0 ? 'positive' : pos.yield < 0 ? 'negative' : 'zero'}>{format(pos.yield)}</td></tr>
+                  <tr><td>Compounded</td><td className={pos.compounded > 0 ? 'positive' : pos.compounded < 0 ? 'negative' : 'zero'}>{format(pos.compounded)}</td></tr>
+                  <tr><td>Debt</td><td className={pos.debt > 0 ? 'positive' : pos.debt < 0 ? 'negative' : 'zero'}>{format(pos.debt)}</td></tr>
+                  <tr><td>PnL</td><td className={pos.pnl > 0 ? 'positive' : pos.pnl < 0 ? 'negative' : 'zero'}>{format(pos.pnl)}</td></tr>
                 </tbody>
               </table>
             </div>
