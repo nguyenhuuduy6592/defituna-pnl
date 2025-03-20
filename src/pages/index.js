@@ -9,8 +9,13 @@ export default function Home({ initialData }) {
   const [data, setData] = useState(initialData);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [countdown, setCountdown] = useState(() => Number(localStorage.getItem('countdown')) || 0);
+  const [countdown, setCountdown] = useState(0);
   const format = v => `${v >= 0 ? ' ' : '-'}${Math.abs(v).toFixed(2)}`.padStart(8);
+
+  useEffect(() => {
+    const storedCountdown = Number(localStorage.getItem('countdown')) || 0;
+    setCountdown(storedCountdown);
+  }, []);
 
   useEffect(() => {
     if (countdown > 0) {
@@ -74,7 +79,7 @@ export default function Home({ initialData }) {
           <hr />
           {data.positions.map((pos, i) => (
             <div key={i} className="position">
-              <h3>Position {i + 1}: {pos.pair}</h3>
+              <h3>Position {i + 1}: {pos.pair} (<span className={pos.state === 'open' ? 'positive' : 'negative'}>{pos.state}</span>)</h3>
               <table className="table">
                 <thead>
                   <tr>

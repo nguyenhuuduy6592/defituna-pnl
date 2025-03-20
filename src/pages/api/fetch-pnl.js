@@ -9,6 +9,7 @@ async function fetchPnLData(walletAddress) {
     tokens[b] ??= await fetch(`${baseUrl}/mints/${b}`).then(r => r.json()).then(r => r.data.symbol);
     return {
       pair: `${tokens[a]}/${tokens[b]}`,
+      state: d.state,
       yield: d.yield_a.usd + d.yield_b.usd,
       compounded: d.compounded_yield_a.usd + d.compounded_yield_b.usd,
       debt: d.loan_funds_b.usd - d.current_loan_b.usd,
@@ -20,10 +21,8 @@ async function fetchPnLData(walletAddress) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-  
   const { walletAddress } = req.body;
   if (!walletAddress) return res.status(400).json({ error: 'Wallet address required' });
-
   try {
     const data = await fetchPnLData(walletAddress);
     res.status(200).json(data);
