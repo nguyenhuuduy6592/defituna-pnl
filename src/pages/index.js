@@ -36,8 +36,8 @@ export default ({ data: initData }) => {
   }, [countdown]);
 
   useEffect(() => {
-    localStorage.setItem('currency', isSol ? 'sol' : 'usd');
-  }, [isSol]);
+    if (data) localStorage.setItem('currency', isSol ? 'sol' : 'usd');
+  }, [isSol, data]);
 
   const handleSubmit = async e => {
     e.preventDefault();
