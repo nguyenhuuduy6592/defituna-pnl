@@ -18,6 +18,7 @@ export default ({ data: initData }) => {
   useEffect(() => {
     setSavedWallets(JSON.parse(localStorage.getItem('wallets')) || []);
     setCountdown(Number(localStorage.getItem('countdown')) || 0);
+    setIsSol(localStorage.getItem('currency') !== 'usd');
   }, []);
 
   useEffect(() => {
@@ -33,6 +34,10 @@ export default ({ data: initData }) => {
       return () => clearInterval(timer);
     }
   }, [countdown]);
+
+  useEffect(() => {
+    localStorage.setItem('currency', isSol ? 'sol' : 'usd');
+  }, [isSol]);
 
   const handleSubmit = async e => {
     e.preventDefault();
