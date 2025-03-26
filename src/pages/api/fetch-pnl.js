@@ -59,10 +59,18 @@ async function fetchPnL(wallet) {
     
     const tokenA = tokens[a] || `${a.slice(0, 4)}...${a.slice(-4)}`;
     const tokenB = tokens[b] || `${b.slice(0, 4)}...${b.slice(-4)}`;
+
+    // Calculate position duration - Solana slots started from 2020
+    const SLOT_TIME = 0.4; // Solana slot time in seconds
+    const INITIAL_TIMESTAMP = new Date('2020-01-01').getTime() / 1000;
+    const updatedAtSlot = parseInt(d.updated_at_slot);
+    const positionTimestamp = INITIAL_TIMESTAMP + (updatedAtSlot * SLOT_TIME);
+    const positionAge = Math.floor((Date.now()/1000 - positionTimestamp) / (60 * 60 * 24));
     
     return {
       pair: `${tokenA}/${tokenB}`,
       state: d.state,
+      age: positionAge,
       yield: (d.yield_a.usd + d.yield_b.usd) / solPrice,
       compounded: (d.compounded_yield_a.usd + d.compounded_yield_b.usd) / solPrice,
       debt: (d.loan_funds_b.usd - d.current_loan_b.usd) / solPrice,

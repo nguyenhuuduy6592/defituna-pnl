@@ -92,6 +92,18 @@ h1, h2, h3 { color: #333 }
 .negative { color: $negative }
 .zero { color: $zero }
 
+.state-open {
+  color: #4CAF50;  // green
+}
+
+.state-closed {
+  color: #9E9E9E;  // grey
+}
+
+.state-liquidated {
+  color: #F44336;  // red
+}
+
 .refresh-controls {
   margin: 15px 0;
   padding: 10px;
