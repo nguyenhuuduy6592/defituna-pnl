@@ -27,14 +27,29 @@ async function fetchPnL(wallet) {
     uniqueMints.add(pool.token_b_mint);
   });
   
-  // Fetch all token data in parallel
+  // Fetch all token data in parallel with error handling
   const tokenPromises = Array.from(uniqueMints).map(mint => 
-    fetch(`${baseUrl}/mints/${mint}`).then(r => r.json())
+    fetch(`${baseUrl}/mints/${mint}`)
+      .then(r => r.json())
+      .then(response => ({
+        success: true,
+        data: response.data
+      }))
+      .catch(error => ({
+        success: false,
+        mint
+      }))
   );
   
   const tokenResponses = await Promise.all(tokenPromises);
+  
   tokenResponses.forEach(response => {
-    tokens[response.data.address] = response.data.symbol;
+    if (response.success && response.data) {
+      tokens[response.data.mint] = response.data.symbol;
+    } else if (!response.success) {
+      const mint = response.mint;
+      tokens[mint] = `${mint.slice(0, 4)}...${mint.slice(-4)}`;
+    }
   });
   
   // Process positions with already loaded data
@@ -42,8 +57,11 @@ async function fetchPnL(wallet) {
     const pool = pools[d.pool];
     const { token_a_mint: a, token_b_mint: b } = pool;
     
+    const tokenA = tokens[a] || `${a.slice(0, 4)}...${a.slice(-4)}`;
+    const tokenB = tokens[b] || `${b.slice(0, 4)}...${b.slice(-4)}`;
+    
     return {
-      pair: `${tokens[a]}/${tokens[b]}`,
+      pair: `${tokenA}/${tokenB}`,
       state: d.state,
       yield: (d.yield_a.usd + d.yield_b.usd) / solPrice,
       compounded: (d.compounded_yield_a.usd + d.compounded_yield_b.usd) / solPrice,
@@ -66,7 +84,6 @@ export default async (req, res) => {
   try {
     res.status(200).json(await fetchPnL(walletAddress));
   } catch (error) {
-    console.error('Error:', error);
     res.status(500).json({ error: 'Failed to fetch data' });
   }
 };
