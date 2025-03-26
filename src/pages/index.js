@@ -129,12 +129,12 @@ export default ({ data: initData }) => {
             loading={loading}
           />
           
-          <Alerts
+          {/* <Alerts
             alerts={alerts}
             settings={alertSettings}
             updateSettings={updateAlertSettings}
             clearAlerts={clearAlerts}
-          />
+          /> */}
         </>
       )}
       

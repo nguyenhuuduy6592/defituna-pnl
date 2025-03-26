@@ -11,6 +11,13 @@
 .alertsHeader {
   @include flex-between;
   margin-bottom: spacing(md);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: spacing(sm);
+  cursor: pointer;
 
   h3 {
     margin: 0;
@@ -46,6 +53,19 @@
     &.clearButton {
       color: color(negative);
     }
+  }
+}
+
+.alertsContent {
+  transition: max-height 0.3s ease-out, opacity 0.2s ease-out;
+  max-height: 1000px;
+  opacity: 1;
+  overflow: hidden;
+
+  &.collapsed {
+    max-height: 0;
+    opacity: 0;
+    margin: 0;
   }
 }
 
@@ -108,7 +128,6 @@
   gap: spacing(sm);
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
 .alertMessage {
@@ -126,4 +145,6 @@
   font-size: 12px;
   width: 12px;
   text-align: center;
+  cursor: pointer;
+  user-select: none;
 }
