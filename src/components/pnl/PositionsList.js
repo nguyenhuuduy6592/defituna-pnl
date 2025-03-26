@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import styles from './PositionsList.module.scss';
 
-export const PositionsList = ({ positions, isSol }) => {
+export const PositionsList = memo(({ positions, isSol }) => {
   const formatNumber = (num) => {
     return num.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
   };
@@ -40,7 +41,7 @@ export const PositionsList = ({ positions, isSol }) => {
         </thead>
         <tbody>
           {positions.map((p, i) => (
-            <tr key={i}>
+            <tr key={`${p.pair}-${i}-${isSol}`}>
               <td>{p.pair}</td>
               <td className={getStateClass(p.state)}>{p.state}</td>
               <td className={styles.timestamp}>{formatDuration(p.age)}</td>
@@ -62,4 +63,4 @@ export const PositionsList = ({ positions, isSol }) => {
       </table>
     </div>
   );
-};
+});

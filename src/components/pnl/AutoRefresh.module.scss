@@ -13,7 +13,7 @@
 }
 
 .refreshToggle {
-  @include flex-center;
+  @include flex-start;
   flex-direction: column;
   gap: spacing(sm);
   
@@ -24,7 +24,7 @@
 }
 
 .autoRefreshLabel {
-  @include flex-center;
+  @include flex-start;
   gap: spacing(sm);
   cursor: pointer;
   color: text-color(primary);
@@ -53,11 +53,6 @@
 
 .refreshStatus {
   margin-top: spacing(sm);
-  text-align: center;
   font-size: font-size(sm);
   color: text-color(secondary);
-  
-  @include responsive(sm) {
-    text-align: right;
-  }
 }

@@ -3,9 +3,18 @@ import styles from './Alerts.module.scss';
 
 export const Alerts = ({ alerts, settings, updateSettings, clearAlerts }) => {
   const [showSettings, setShowSettings] = useState(false);
+  const [collapsedAlerts, setCollapsedAlerts] = useState([]);
 
   const handleSettingChange = (key, value) => {
     updateSettings({ [key]: key === 'enabled' ? value : Number(value) });
+  };
+
+  const toggleAlert = (alertId) => {
+    setCollapsedAlerts(prev => 
+      prev.includes(alertId) 
+        ? prev.filter(id => id !== alertId)
+        : [...prev, alertId]
+    );
   };
 
   return (
@@ -79,9 +88,13 @@ export const Alerts = ({ alerts, settings, updateSettings, clearAlerts }) => {
           alerts.map(alert => (
             <div 
               key={alert.id} 
-              className={`${styles.alertItem} ${styles[`alert${alert.type}`]}`}
+              className={`${styles.alertItem} ${styles[`alert${alert.type}`]} ${collapsedAlerts.includes(alert.id) ? styles.collapsed : ''}`}
+              onClick={() => toggleAlert(alert.id)}
             >
               <div className={styles.alertContent}>
+                <span className={styles.collapseIndicator}>
+                  {collapsedAlerts.includes(alert.id) ? '▸' : '▾'}
+                </span>
                 <span className={styles.alertMessage}>{alert.message}</span>
                 <span className={styles.alertTime}>
                   {new Date(alert.timestamp).toLocaleTimeString()}

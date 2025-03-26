@@ -86,6 +86,8 @@
   @include card;
   margin-bottom: spacing(sm);
   border-left: 4px solid;
+  cursor: pointer;
+  transition: all 0.3s ease;
 
   &:last-child {
     margin-bottom: 0;
@@ -94,11 +96,19 @@
   &.alertYield { border-left-color: #f6c23e; }
   &.alertPnl { border-left-color: #4e73df; }
   &.alertState { border-left-color: #1cc88a; }
+
+  &.collapsed {
+    max-height: 40px;
+    overflow: hidden;
+  }
 }
 
 .alertContent {
   @include flex-between;
   gap: spacing(sm);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .alertMessage {
@@ -110,4 +120,10 @@
   color: text-color(secondary);
   font-size: font-size(xs);
   white-space: nowrap;
+}
+
+.collapseIndicator {
+  font-size: 12px;
+  width: 12px;
+  text-align: center;
 }

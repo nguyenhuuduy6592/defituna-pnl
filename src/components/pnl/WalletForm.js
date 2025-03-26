@@ -1,7 +1,7 @@
 import { useRef } from 'react';
 import styles from './WalletForm.module.scss';
 
-export const WalletForm = ({
+export default function WalletForm({
   wallet,
   onWalletChange,
   onSubmit,
@@ -12,7 +12,7 @@ export const WalletForm = ({
   setShowDropdown,
   onRemoveWallet,
   onClearWallets
-}) => {
+}) {
   const inputRef = useRef(null);
 
   return (
@@ -46,4 +46,4 @@ export const WalletForm = ({
       </button>
     </form>
   );
-};
+}

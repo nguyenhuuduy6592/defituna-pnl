@@ -3,7 +3,7 @@ import { useWallet } from '../hooks/useWallet';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCountdown } from '../hooks/useCountdown';
 import { usePositionAlerts } from '../hooks/usePositionAlerts';
-import { WalletForm } from '../components/pnl/WalletForm';
+import WalletForm from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
 import { Alerts } from '../components/pnl/Alerts';
