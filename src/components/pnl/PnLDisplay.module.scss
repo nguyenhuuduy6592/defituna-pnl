@@ -3,7 +3,7 @@
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
+  padding: spacing(md);
   font-family: Arial, sans-serif;
 }
 
@@ -11,16 +11,70 @@
   color: #333;
 }
 
-.positive { color: $positive; }
-.negative { color: $negative; }
-.zero { color: $zero; }
+.positive { color: color(positive); }
+.negative { color: color(negative); }
+.zero { color: color(zero); }
 
 .solPrice {
-  margin-bottom: 15px;
+  margin-bottom: spacing(md);
 }
 
 .divider {
-  margin: 20px 0;
+  margin: spacing(md) 0;
   border: 0;
-  border-top: 1px solid $border;
+  border-top: 1px solid color(border);
+}
+
+.pnlContainer {
+  margin: spacing(md) 0;
+  padding: spacing(md);
+  background-color: bg-color(light);
+  border-radius: map-get($border-radius, sm);
+  border: 1px solid color(border);
+
+  @include responsive(md) {
+    padding: spacing(lg);
+  }
+}
+
+.pnlGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: spacing(md);
+  margin-top: spacing(sm);
+
+  @include responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include responsive(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.pnlItem {
+  @include card;
+
+  .label {
+    color: text-color(secondary);
+    font-size: font-size(sm);
+    margin-bottom: spacing(xs);
+  }
+
+  .value {
+    font-size: font-size(xl);
+    font-weight: bold;
+    color: text-color(primary);
+
+    &.positive { color: color(positive); }
+    &.negative { color: color(negative); }
+    &.zero { color: color(zero); }
+  }
+}
+
+.refreshTime {
+  margin-top: spacing(sm);
+  text-align: right;
+  font-size: font-size(xs);
+  color: text-color(secondary);
 }

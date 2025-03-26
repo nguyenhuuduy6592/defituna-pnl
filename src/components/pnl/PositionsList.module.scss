@@ -1,28 +1,84 @@
 @import '../../styles/variables.module.scss';
 
-.position {
-  margin: 20px 0;
+.positionsContainer {
+  margin: spacing(md) 0;
+  overflow-x: auto;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
+  background: bg-color(white);
+  box-shadow: 0 1px 3px color(shadow);
+  font-size: font-size(sm);
+  
+  @include responsive(md) {
+    font-size: font-size(base);
+  }
   
   th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    border: 1px solid color(border);
+    padding: spacing(sm);
     text-align: left;
   }
   
   th {
-    background: $bg-th;
+    background: bg-color(th);
+    font-weight: 600;
+    color: text-color(primary);
+    white-space: nowrap;
+  }
+
+  tr:nth-child(even) {
+    background: bg-color(light);
+  }
+
+  td {
+    color: text-color(primary);
   }
 }
 
-.positive { color: $positive; }
-.negative { color: $negative; }
-.zero { color: $zero; }
+.position {
+  margin: spacing(md) 0;
+}
 
-.stateOpen { color: #4CAF50; }
-.stateClosed { color: #9E9E9E; }
-.stateLiquidated { color: #F44336; }
+.noPositions {
+  text-align: center;
+  padding: spacing(md);
+  color: text-color(secondary);
+  background: bg-color(light);
+  border-radius: map-get($border-radius, sm);
+  margin: spacing(md) 0;
+  font-size: font-size(base);
+}
+
+// State colors
+%state-text {
+  font-weight: 500;
+}
+
+.stateOpen { 
+  @extend %state-text;
+  color: #4CAF50; 
+}
+
+.stateClosed { 
+  @extend %state-text;
+  color: text-color(disabled);
+}
+
+.stateLiquidated { 
+  @extend %state-text;
+  color: color(negative); 
+}
+
+// Value colors using the color function
+.positive { color: color(positive); }
+.negative { color: color(negative); }
+.zero { color: color(zero); }
+
+.timestamp {
+  color: text-color(secondary);
+  font-size: font-size(xs);
+  white-space: nowrap;
+}

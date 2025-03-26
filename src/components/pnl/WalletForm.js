@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import styles from './WalletForm.module.scss';
 
 export const WalletForm = ({
   wallet,
@@ -16,7 +17,7 @@ export const WalletForm = ({
 
   return (
     <form onSubmit={onSubmit}>
-      <div className="input-container">
+      <div className={styles.inputContainer}>
         <input
           ref={inputRef}
           type="text"
@@ -25,22 +26,22 @@ export const WalletForm = ({
           onFocus={() => setShowDropdown(true)}
           onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
           placeholder="Enter wallet address"
-          className="input"
+          className={styles.input}
           disabled={loading}
         />
         {showDropdown && savedWallets.length > 0 && (
-          <div className="dropdown">
+          <div className={styles.dropdown}>
             {savedWallets.map((w, i) => (
-              <div key={i} className="dropdown-item">
+              <div key={i} className={styles.dropdownItem}>
                 <span onClick={() => onWalletChange(w)}>{w}</span>
-                <span className="remove-icon" onClick={() => onRemoveWallet(w)}>✕</span>
+                <span className={styles.removeIcon} onClick={() => onRemoveWallet(w)}>✕</span>
               </div>
             ))}
-            <div className="dropdown-item clear-item" onClick={onClearWallets}>Clear List</div>
+            <div className={styles.clearItem} onClick={onClearWallets}>Clear List</div>
           </div>
         )}
       </div>
-      <button type="submit" className="button" disabled={loading || countdown > 0}>
+      <button type="submit" className={styles.button} disabled={loading || countdown > 0}>
         {loading ? 'Loading...' : countdown > 0 ? `Wait ${countdown}s` : 'Fetch Data'}
       </button>
     </form>

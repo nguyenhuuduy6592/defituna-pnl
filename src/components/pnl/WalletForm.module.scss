@@ -3,14 +3,18 @@
 .inputContainer {
   position: relative;
   display: inline-block;
-  width: 70%;
-  margin-right: 10px;
+  width: 100%;
+  margin-bottom: spacing(sm);
+
+  @include responsive(sm) {
+    width: 70%;
+    margin-right: spacing(sm);
+    margin-bottom: 0;
+  }
 
   .input {
-    padding: 8px;
-    width: 100%;
-    border: 1px solid $border;
-    border-radius: 4px;
+    @extend %input-base;
+    font-size: font-size(base);
   }
 
   .dropdown {
@@ -18,43 +22,54 @@
     top: 100%;
     left: 0;
     right: 0;
-    background: white;
-    border: 1px solid $border;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px $shadow;
+    @include card;
     max-height: 200px;
     overflow-y: auto;
     z-index: 10;
 
     .dropdownItem {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px;
+      @include flex-between;
+      padding: spacing(sm);
       cursor: pointer;
-      &:hover { background: $bg-light; }
+      font-size: font-size(base);
+      color: text-color(primary);
+      
+      &:hover { 
+        background: bg-color(light); 
+      }
 
       .removeIcon {
-        color: $negative;
+        color: color(negative);
         font-weight: bold;
-        margin-left: 10px;
+        margin-left: spacing(sm);
       }
     }
 
     .clearItem {
       text-align: center;
-      color: $primary;
+      color: color(primary);
       font-weight: bold;
+      font-size: font-size(sm);
     }
   }
 }
 
 .button {
-  padding: 8px 16px;
-  background: $primary;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover:not(:disabled) { background: $hover; }
-  &:disabled { background: $disabled; cursor: not-allowed; }
+  @extend %button-base;
+  background: color(primary);
+  color: bg-color(white);
+  font-size: font-size(base);
+  width: 100%;
+  
+  @include responsive(sm) {
+    width: auto;
+  }
+  
+  &:hover:not(:disabled) { 
+    background: color(hover); 
+  }
+  
+  &:disabled { 
+    background: color(disabled); 
+  }
 }

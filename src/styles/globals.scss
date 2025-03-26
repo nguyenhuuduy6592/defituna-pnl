@@ -1,303 +1,135 @@
-$primary: #0070f3;
-$hover: #005bb5;
-$disabled: #ccc;
-$positive: green;
-$negative: red;
-$zero: blue;
-$border: #ccc;
-$shadow: rgba(0,0,0,0.1);
-$bg-light: #f5f5f5;
-$bg-th: #f2f2f2;
+@import './variables.module.scss';
 
+// Reset and base styles
+html, 
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-size: font-size(base);
+  color: text-color(primary);
+  line-height: 1.5;
+  background: bg-color(white);
+}
+
+* {
+  box-sizing: border-box;
+  
+  &::before,
+  &::after {
+    box-sizing: border-box;
+  }
+}
+
+// Layout containers
 .container {
   max-width: 800px;
   margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
-
-h1, h2, h3 { color: #333 }
-
-.input-container {
-  position: relative;
-  display: inline-block;
-  width: 70%;
-  margin-right: 10px;
-
-  .input {
-    padding: 8px;
-    width: 100%;
-    border: 1px solid $border;
-    border-radius: 4px;
-  }
-
-  .dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid $border;
-    border-radius: 4px;
-    box-shadow: 0 2px 5px $shadow;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 10;
-
-    .dropdown-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px;
-      cursor: pointer;
-      &:hover { background: $bg-light }
-
-      .remove-icon {
-        color: $negative;
-        font-weight: bold;
-        margin-left: 10px;
-      }
-    }
-
-    .clear-item {
-      text-align: center;
-      color: $primary;
-      font-weight: bold;
-    }
-  }
-}
-
-.button {
-  padding: 8px 16px;
-  background: $primary;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  &:hover:not(:disabled) { background: $hover }
-  &:disabled { background: $disabled; cursor: not-allowed }
-}
-
-.loading { color: $primary; margin-top: 10px }
-.error { color: $negative; margin-top: 10px }
-.position { margin: 20px 0 }
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  th, td { border: 1px solid #ddd; padding: 8px; text-align: left }
-  th { background: $bg-th }
-}
-
-.positive { color: $positive }
-.negative { color: $negative }
-.zero { color: $zero }
-
-.state-open {
-  color: #4CAF50;  // green
-}
-
-.state-closed {
-  color: #9E9E9E;  // grey
-}
-
-.state-liquidated {
-  color: #F44336;  // red
-}
-
-.refresh-controls {
-  margin: 15px 0;
-  padding: 10px;
-  background-color: $bg-light;
-  border-radius: 4px;
-  border: 1px solid $border;
+  padding: spacing(md);
   
-  .refresh-toggle {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    
-    .auto-refresh-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      
-      input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-      }
-    }
-    
-    .interval-selector {
-      select {
-        padding: 5px;
-        border-radius: 4px;
-        border: 1px solid $border;
-        background-color: white;
-        cursor: pointer;
-        
-        &:focus {
-          outline: none;
-          border-color: $primary;
-        }
-      }
-    }
-  }
-  
-  .refresh-status {
-    margin-top: 8px;
-    font-size: 0.9em;
-    color: #666;
+  @include responsive(sm) {
+    padding: spacing(lg);
   }
 }
 
-.switch-container {
+// Typography
+h1 { 
+  font-size: font-size(xl) * 1.5;
+  margin-bottom: spacing(lg);
+}
+
+h2 { 
+  font-size: font-size(xl);
+  margin-bottom: spacing(md);
+}
+
+h3 { 
+  font-size: font-size(lg);
+  margin-bottom: spacing(md);
+}
+
+h4, h5, h6 { 
+  font-size: font-size(base);
+  margin-bottom: spacing(sm);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: text-color(primary);
+  margin-top: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+// Form elements
+input,
+select,
+textarea {
+  @extend %input-base;
+  font-size: font-size(base);
+  color: text-color(primary);
+
+  &::placeholder {
+    color: text-color(disabled);
+  }
+}
+
+button {
+  @extend %button-base;
+  font-size: font-size(base);
+}
+
+// Common status classes
+.loading { 
+  color: color(primary); 
+  margin-top: spacing(sm);
   display: flex;
   align-items: center;
-  margin: 20px 0;
-  gap: 10px;
+  gap: spacing(xs);
 
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-
-    input { opacity: 0; width: 0; height: 0 }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: $disabled;
-      transition: .4s;
-      border-radius: 24px;
-
-      &:before {
-        position: absolute;
-        content: "";
-        height: 20px;
-        width: 20px;
-        left: 2px;
-        bottom: 2px;
-        background: white;
-        transition: .4s;
-        border-radius: 50%;
-      }
-    }
-
-    input:checked + .slider { background: $primary }
-    input:checked + .slider:before { transform: translateX(26px) }
+  &::after {
+    content: "...";
   }
 }
 
-.alerts-container {
-  margin: 15px 0;
-  padding: 15px;
-  background-color: $bg-light;
-  border-radius: 4px;
-  border: 1px solid $border;
+.error { 
+  color: color(negative); 
+  margin-top: spacing(sm);
+  padding: spacing(sm);
+  border-radius: map-get($border-radius, sm);
+  background-color: rgba(color(negative), 0.1);
+}
 
-  .alerts-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+// Common utility classes
+.text-primary { color: text-color(primary); }
+.text-secondary { color: text-color(secondary); }
+.text-disabled { color: text-color(disabled); }
 
-    h3 {
-      margin: 0;
-    }
+.positive { color: color(positive); }
+.negative { color: color(negative); }
+.zero { color: color(zero); }
 
-    .alerts-controls {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+.bg-light { background-color: bg-color(light); }
+.bg-white { background-color: bg-color(white); }
 
-      label {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-      }
+// Spacing utilities
+.mt-sm { margin-top: spacing(sm); }
+.mt-md { margin-top: spacing(md); }
+.mt-lg { margin-top: spacing(lg); }
 
-      button {
-        padding: 5px 10px;
-        border-radius: 4px;
-        border: 1px solid $border;
-        background: white;
-        cursor: pointer;
+.mb-sm { margin-bottom: spacing(sm); }
+.mb-md { margin-bottom: spacing(md); }
+.mb-lg { margin-bottom: spacing(lg); }
 
-        &:hover {
-          background: $bg-light;
-        }
-
-        &.clear-button {
-          color: $negative;
-        }
-      }
-    }
-  }
-
-  .alerts-settings {
-    background: white;
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-
-    .setting-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      input[type="number"] {
-        width: 80px;
-        padding: 5px;
-        border-radius: 4px;
-        border: 1px solid $border;
-      }
-    }
-  }
-
-  .alerts-list {
-    max-height: 300px;
-    overflow-y: auto;
-
-    .no-alerts {
-      text-align: center;
-      color: #666;
-    }
-
-    .alert-item {
-      padding: 10px;
-      margin-bottom: 8px;
-      border-radius: 4px;
-      background: white;
-      border-left: 4px solid;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      &.alert-yield { border-left-color: #f6c23e; }
-      &.alert-pnl { border-left-color: #4e73df; }
-      &.alert-state { border-left-color: #1cc88a; }
-
-      .alert-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .alert-time {
-        color: #666;
-        font-size: 0.9em;
-        white-space: nowrap;
-      }
-    }
-  }
+// Accessibility
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

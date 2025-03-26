@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import styles from './Alerts.module.scss';
 
 export const Alerts = ({ alerts, settings, updateSettings, clearAlerts }) => {
   const [showSettings, setShowSettings] = useState(false);
@@ -8,10 +9,10 @@ export const Alerts = ({ alerts, settings, updateSettings, clearAlerts }) => {
   };
 
   return (
-    <div className="alerts-container">
-      <div className="alerts-header">
+    <div className={styles.alertsContainer}>
+      <div className={styles.alertsHeader}>
         <h3>Position Alerts</h3>
-        <div className="alerts-controls">
+        <div className={styles.alertsControls}>
           <label>
             <input
               type="checkbox"
@@ -21,14 +22,13 @@ export const Alerts = ({ alerts, settings, updateSettings, clearAlerts }) => {
             Enable Alerts
           </label>
           <button 
-            className="settings-button"
             onClick={() => setShowSettings(!showSettings)}
           >
             ⚙️ Settings
           </button>
           {alerts.length > 0 && (
             <button 
-              className="clear-button"
+              className={styles.clearButton}
               onClick={clearAlerts}
             >
               Clear All
@@ -38,8 +38,8 @@ export const Alerts = ({ alerts, settings, updateSettings, clearAlerts }) => {
       </div>
 
       {showSettings && (
-        <div className="alerts-settings">
-          <div className="setting-item">
+        <div className={styles.alertsSettings}>
+          <div className={styles.settingItem}>
             <label>Yield Change Threshold (%)</label>
             <input
               type="number"
@@ -49,7 +49,7 @@ export const Alerts = ({ alerts, settings, updateSettings, clearAlerts }) => {
               onChange={(e) => handleSettingChange('apyThreshold', e.target.value)}
             />
           </div>
-          <div className="setting-item">
+          <div className={styles.settingItem}>
             <label>PnL Change Threshold (%)</label>
             <input
               type="number"
@@ -59,7 +59,7 @@ export const Alerts = ({ alerts, settings, updateSettings, clearAlerts }) => {
               onChange={(e) => handleSettingChange('priceThreshold', e.target.value)}
             />
           </div>
-          <div className="setting-item">
+          <div className={styles.settingItem}>
             <label>Utilization Change Threshold (%)</label>
             <input
               type="number"
@@ -72,18 +72,18 @@ export const Alerts = ({ alerts, settings, updateSettings, clearAlerts }) => {
         </div>
       )}
 
-      <div className="alerts-list">
+      <div className={styles.alertsList}>
         {alerts.length === 0 ? (
-          <p className="no-alerts">No alerts to display</p>
+          <p className={styles.noAlerts}>No alerts to display</p>
         ) : (
           alerts.map(alert => (
             <div 
               key={alert.id} 
-              className={`alert-item alert-${alert.type}`}
+              className={`${styles.alertItem} ${styles[`alert${alert.type}`]}`}
             >
-              <div className="alert-content">
-                <span className="alert-message">{alert.message}</span>
-                <span className="alert-time">
+              <div className={styles.alertContent}>
+                <span className={styles.alertMessage}>{alert.message}</span>
+                <span className={styles.alertTime}>
                   {new Date(alert.timestamp).toLocaleTimeString()}
                 </span>
               </div>

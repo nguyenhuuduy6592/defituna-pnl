@@ -1,52 +1,63 @@
 @import '../../styles/variables.module.scss';
 
 .refreshControls {
-  margin: 15px 0;
-  padding: 10px;
-  background-color: $bg-light;
-  border-radius: 4px;
-  border: 1px solid $border;
+  margin: spacing(md) 0;
+  padding: spacing(sm);
+  background-color: bg-color(light);
+  border-radius: map-get($border-radius, sm);
+  border: 1px solid color(border);
+
+  @include responsive(sm) {
+    padding: spacing(md);
+  }
+}
+
+.refreshToggle {
+  @include flex-center;
+  flex-direction: column;
+  gap: spacing(sm);
   
-  .refreshToggle {
-    display: flex;
-    align-items: center;
-    gap: 15px;
+  @include responsive(sm) {
+    flex-direction: row;
+    gap: spacing(md);
+  }
+}
+
+.autoRefreshLabel {
+  @include flex-center;
+  gap: spacing(sm);
+  cursor: pointer;
+  color: text-color(primary);
+  font-size: font-size(base);
+  
+  input[type="checkbox"] {
+    width: spacing(md);
+    height: spacing(md);
+  }
+}
+
+.intervalSelector {
+  select {
+    @extend %input-base;
+    padding: spacing(xs) spacing(sm);
+    width: auto;
+    font-size: font-size(sm);
+    min-width: 120px;
     
-    .autoRefreshLabel {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      
-      input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-      }
-    }
-    
-    .intervalSelector {
-      select {
-        padding: 5px;
-        border-radius: 4px;
-        border: 1px solid $border;
-        background-color: white;
-        cursor: pointer;
-        
-        &:focus {
-          outline: none;
-          border-color: $primary;
-        }
-      }
+    &:focus {
+      outline: none;
+      border-color: color(primary);
     }
   }
-  
-  .refreshStatus {
-    margin-top: 8px;
-    font-size: 0.9em;
-    color: #666;
+}
 
-    .loadingText {
-      color: $primary;
-    }
+.refreshStatus {
+  margin-top: spacing(sm);
+  text-align: center;
+  font-size: font-size(sm);
+  color: text-color(secondary);
+  
+  @include responsive(sm) {
+    text-align: right;
   }
 }

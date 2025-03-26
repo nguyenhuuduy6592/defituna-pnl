@@ -1,3 +1,5 @@
+import styles from './PositionsList.module.scss';
+
 export const PositionsList = ({ positions, isSol }) => {
   const formatNumber = (num) => {
     return num.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
@@ -11,16 +13,20 @@ export const PositionsList = ({ positions, isSol }) => {
 
   const getStateClass = (state) => {
     switch (state) {
-      case 'open': return 'state-open';
-      case 'closed': return 'state-closed';
-      case 'liquidated': return 'state-liquidated';
+      case 'open': return styles.stateOpen;
+      case 'closed': return styles.stateClosed;
+      case 'liquidated': return styles.stateLiquidated;
       default: return '';
     }
   };
 
+  if (!positions || positions.length === 0) {
+    return <div className={styles.noPositions}>No positions found</div>;
+  }
+
   return (
-    <div className="position">
-      <table className="table">
+    <div className={styles.positionsContainer}>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th>Pair</th>
@@ -37,17 +43,17 @@ export const PositionsList = ({ positions, isSol }) => {
             <tr key={i}>
               <td>{p.pair}</td>
               <td className={getStateClass(p.state)}>{p.state}</td>
-              <td>{formatDuration(p.age)}</td>
-              <td className={p.yield > 0 ? 'positive' : p.yield < 0 ? 'negative' : 'zero'}>
+              <td className={styles.timestamp}>{formatDuration(p.age)}</td>
+              <td className={p.yield > 0 ? styles.positive : p.yield < 0 ? styles.negative : styles.zero}>
                 {formatNumber(p.yield)} {isSol ? 'SOL' : 'USD'}
               </td>
-              <td className={p.compounded > 0 ? 'positive' : p.compounded < 0 ? 'negative' : 'zero'}>
+              <td className={p.compounded > 0 ? styles.positive : p.compounded < 0 ? styles.negative : styles.zero}>
                 {formatNumber(p.compounded)} {isSol ? 'SOL' : 'USD'}
               </td>
-              <td className={p.debt > 0 ? 'positive' : p.debt < 0 ? 'negative' : 'zero'}>
+              <td className={p.debt > 0 ? styles.positive : p.debt < 0 ? styles.negative : styles.zero}>
                 {formatNumber(p.debt)} {isSol ? 'SOL' : 'USD'}
               </td>
-              <td className={p.pnl > 0 ? 'positive' : p.pnl < 0 ? 'negative' : 'zero'}>
+              <td className={p.pnl > 0 ? styles.positive : p.pnl < 0 ? styles.negative : styles.zero}>
                 {formatNumber(p.pnl)} {isSol ? 'SOL' : 'USD'}
               </td>
             </tr>

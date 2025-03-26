@@ -1,53 +1,64 @@
 @import '../../styles/variables.module.scss';
 
 .switchContainer {
-  display: flex;
-  align-items: center;
-  margin: 20px 0;
-  gap: 10px;
+  @include flex-center;
+  margin: spacing(md) 0;
+  gap: spacing(md);
+  color: text-color(primary);
+  font-size: font-size(base);
+}
 
-  .switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
+.switch {
+  $switch-width: 50px;
+  $switch-height: 24px;
+  $switch-padding: 2px;
+  
+  position: relative;
+  display: inline-block;
+  width: $switch-width;
+  height: $switch-height;
 
-    input { 
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+  input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 
-    .slider {
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: color(disabled);
+    transition: .4s;
+    border-radius: $switch-height;
+
+    &:before {
       position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: $disabled;
+      content: "";
+      height: $switch-height - ($switch-padding * 2);
+      width: $switch-height - ($switch-padding * 2);
+      left: $switch-padding;
+      bottom: $switch-padding;
+      background: bg-color(white);
       transition: .4s;
-      border-radius: 24px;
-
-      &:before {
-        position: absolute;
-        content: "";
-        height: 20px;
-        width: 20px;
-        left: 2px;
-        bottom: 2px;
-        background: white;
-        transition: .4s;
-        border-radius: 50%;
-      }
+      border-radius: 50%;
     }
+  }
 
-    input:checked + .slider {
-      background: $primary;
+  input:checked + .slider { 
+    background: color(primary);
+    
+    &:before { 
+      transform: translateX($switch-width - $switch-height); 
     }
+  }
+}
 
-    input:checked + .slider:before {
-      transform: translateX(26px);
-    }
+@include responsive(sm) {
+  .switchContainer {
+    font-size: font-size(lg);
   }
 }

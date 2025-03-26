@@ -1,5 +1,6 @@
 import { CurrencySwitch } from './CurrencySwitch';
 import { PositionsList } from './PositionsList';
+import styles from './PnLDisplay.module.scss';
 
 export const PnLDisplay = ({ data, isSol, setIsSol }) => {
   const formatValue = (val) => {
@@ -8,14 +9,21 @@ export const PnLDisplay = ({ data, isSol, setIsSol }) => {
   };
 
   return (
-    <>
+    <div className={styles.pnlContainer}>
       <CurrencySwitch isSol={isSol} setIsSol={setIsSol} />
-      <h2>Total PnL: <span className={data.totalPnL > 0 ? 'positive' : data.totalPnL < 0 ? 'negative' : 'zero'}>
-        {isSol ? `${formatValue(data.totalPnL)} SOL` : `$${formatValue(data.totalPnL)}`}
-      </span></h2>
-      <p>Current SOL Price: ${data.solPrice.toFixed(2)}</p>
-      <hr />
+      <div className={styles.pnlGrid}>
+        <div className={styles.pnlItem}>
+          <div className={styles.label}>Total PnL</div>
+          <div className={`${styles.value} ${data.totalPnL > 0 ? styles.positive : data.totalPnL < 0 ? styles.negative : styles.zero}`}>
+            {isSol ? `${formatValue(data.totalPnL)} SOL` : `$${formatValue(data.totalPnL)}`}
+          </div>
+        </div>
+        <div className={styles.pnlItem}>
+          <div className={styles.label}>Current SOL Price</div>
+          <div className={styles.value}>${data.solPrice.toFixed(2)}</div>
+        </div>
+      </div>
       <PositionsList positions={data.positions} isSol={isSol} formatValue={formatValue} />
-    </>
+    </div>
   );
 };

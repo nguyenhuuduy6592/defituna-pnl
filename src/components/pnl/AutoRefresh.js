@@ -1,3 +1,5 @@
+import styles from './AutoRefresh.module.scss';
+
 export const AutoRefresh = ({
   autoRefresh,
   setAutoRefresh,
@@ -7,9 +9,9 @@ export const AutoRefresh = ({
   loading
 }) => {
   return (
-    <div className="refresh-controls">
-      <div className="refresh-toggle">
-        <label className="auto-refresh-label">
+    <div className={styles.refreshControls}>
+      <div className={styles.refreshToggle}>
+        <label className={styles.autoRefreshLabel}>
           <input 
             type="checkbox" 
             checked={autoRefresh} 
@@ -19,7 +21,7 @@ export const AutoRefresh = ({
         </label>
         
         {autoRefresh && (
-          <div className="interval-selector">
+          <div className={styles.intervalSelector}>
             <select value={refreshInterval} onChange={onIntervalChange}>
               <option value="10">10 seconds</option>
               <option value="30">30 seconds</option>
@@ -30,9 +32,9 @@ export const AutoRefresh = ({
         )}
       </div>
       {autoRefresh && (
-        <div className="refresh-status">
+        <div className={styles.refreshStatus}>
           {loading ? 
-            <span className="loading-text">Refreshing data...</span> : 
+            <span>Refreshing data...</span> : 
             <span>Next refresh in {autoRefreshCountdown} seconds</span>
           }
         </div>

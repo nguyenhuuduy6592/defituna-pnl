@@ -1,23 +1,144 @@
-$primary: #0070f3;
-$hover: #005bb5;
-$disabled: #ccc;
-$positive: green;
-$negative: red;
-$zero: blue;
-$border: #ccc;
-$shadow: rgba(0,0,0,0.1);
-$bg-light: #f5f5f5;
-$bg-th: #f2f2f2;
+// Colors
+$colors: (
+  primary: #0070f3,
+  hover: #005bb5,
+  disabled: #ccc,
+  positive: green,
+  negative: red,
+  zero: blue,
+  border: #ccc,
+  shadow: rgba(0,0,0,0.1),
+  text: (
+    primary: #333,
+    secondary: #666,
+    disabled: #999
+  ),
+  bg: (
+    light: #f5f5f5,
+    th: #f2f2f2,
+    white: #ffffff
+  )
+);
 
+// Spacing
+$spacing: (
+  xs: 4px,
+  sm: 8px,
+  md: 16px,
+  lg: 24px,
+  xl: 32px
+);
+
+// Breakpoints
+$breakpoints: (
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px
+);
+
+// Border radius
+$border-radius: (
+  sm: 4px,
+  md: 8px,
+  lg: 16px
+);
+
+// Typography
+$font-sizes: (
+  xs: 0.75rem,   // 12px
+  sm: 0.875rem,  // 14px
+  base: 1rem,    // 16px
+  lg: 1.125rem,  // 18px
+  xl: 1.25rem    // 20px
+);
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin card {
+  background: white;
+  border-radius: map-get($border-radius, sm);
+  box-shadow: 0 2px 4px map-get($colors, shadow);
+  padding: map-get($spacing, md);
+}
+
+@mixin responsive($breakpoint) {
+  @media (min-width: map-get($breakpoints, $breakpoint)) {
+    @content;
+  }
+}
+
+// Functions
+@function color($key) {
+  @return map-get($colors, $key);
+}
+
+@function text-color($key) {
+  @return map-get(map-get($colors, text), $key);
+}
+
+@function bg-color($key) {
+  @return map-get(map-get($colors, bg), $key);
+}
+
+@function spacing($key) {
+  @return map-get($spacing, $key);
+}
+
+@function font-size($key) {
+  @return map-get($font-sizes, $key);
+}
+
+// Placeholders
+%button-base {
+  padding: spacing(sm) spacing(md);
+  border: none;
+  border-radius: map-get($border-radius, sm);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+%input-base {
+  padding: spacing(sm);
+  border: 1px solid color(border);
+  border-radius: map-get($border-radius, sm);
+  width: 100%;
+  
+  &:focus {
+    outline: none;
+    border-color: color(primary);
+  }
+}
+
+// Export for JavaScript usage
 :export {
-  primary: $primary;
-  hover: $hover;
-  disabled: $disabled;
-  positive: $positive;
-  negative: $negative;
-  zero: $zero;
-  border: $border;
-  shadow: $shadow;
-  bgLight: $bg-light;
-  bgTh: $bg-th;
+  primary: color(primary);
+  hover: color(hover);
+  disabled: color(disabled);
+  positive: color(positive);
+  negative: color(negative);
+  zero: color(zero);
+  border: color(border);
+  shadow: color(shadow);
+  bgLight: bg-color(light);
+  bgTh: bg-color(th);
+  textPrimary: text-color(primary);
+  textSecondary: text-color(secondary);
+  textDisabled: text-color(disabled);
+  bgWhite: bg-color(white);
 }
