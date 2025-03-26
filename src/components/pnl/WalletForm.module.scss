@@ -1,0 +1,60 @@
+@import '../../styles/variables.module.scss';
+
+.inputContainer {
+  position: relative;
+  display: inline-block;
+  width: 70%;
+  margin-right: 10px;
+
+  .input {
+    padding: 8px;
+    width: 100%;
+    border: 1px solid $border;
+    border-radius: 4px;
+  }
+
+  .dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid $border;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px $shadow;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10;
+
+    .dropdownItem {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      cursor: pointer;
+      &:hover { background: $bg-light; }
+
+      .removeIcon {
+        color: $negative;
+        font-weight: bold;
+        margin-left: 10px;
+      }
+    }
+
+    .clearItem {
+      text-align: center;
+      color: $primary;
+      font-weight: bold;
+    }
+  }
+}
+
+.button {
+  padding: 8px 16px;
+  background: $primary;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  &:hover:not(:disabled) { background: $hover; }
+  &:disabled { background: $disabled; cursor: not-allowed; }
+}

@@ -1,0 +1,23 @@
+$primary: #0070f3;
+$hover: #005bb5;
+$disabled: #ccc;
+$positive: green;
+$negative: red;
+$zero: blue;
+$border: #ccc;
+$shadow: rgba(0,0,0,0.1);
+$bg-light: #f5f5f5;
+$bg-th: #f2f2f2;
+
+:export {
+  primary: $primary;
+  hover: $hover;
+  disabled: $disabled;
+  positive: $positive;
+  negative: $negative;
+  zero: $zero;
+  border: $border;
+  shadow: $shadow;
+  bgLight: $bg-light;
+  bgTh: $bg-th;
+}

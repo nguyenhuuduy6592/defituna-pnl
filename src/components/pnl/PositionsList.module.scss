@@ -1,0 +1,28 @@
+@import '../../styles/variables.module.scss';
+
+.position {
+  margin: 20px 0;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  th {
+    background: $bg-th;
+  }
+}
+
+.positive { color: $positive; }
+.negative { color: $negative; }
+.zero { color: $zero; }
+
+.stateOpen { color: #4CAF50; }
+.stateClosed { color: #9E9E9E; }
+.stateLiquidated { color: #F44336; }

@@ -1,0 +1,26 @@
+@import '../../styles/variables.module.scss';
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.heading {
+  color: #333;
+}
+
+.positive { color: $positive; }
+.negative { color: $negative; }
+.zero { color: $zero; }
+
+.solPrice {
+  margin-bottom: 15px;
+}
+
+.divider {
+  margin: 20px 0;
+  border: 0;
+  border-top: 1px solid $border;
+}
