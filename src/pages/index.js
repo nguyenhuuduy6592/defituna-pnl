@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useWallet } from '../hooks/useWallet';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCountdown } from '../hooks/useCountdown';
+import { usePositionAlerts } from '../hooks/usePositionAlerts';
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
+import { Alerts } from '../components/pnl/Alerts';
 
 export async function getServerSideProps() {
   return { props: { data: null } };
@@ -65,6 +67,13 @@ export default ({ data: initData }) => {
     useCallback(() => fetchPnLData(wallet, true), [fetchPnLData, wallet])
   );
 
+  const {
+    alerts,
+    settings: alertSettings,
+    updateSettings: updateAlertSettings,
+    clearAlerts
+  } = usePositionAlerts(data?.positions, data?.solPrice);
+
   useEffect(() => {
     setIsSol(localStorage.getItem('currency') !== 'usd');
   }, []);
@@ -110,14 +119,23 @@ export default ({ data: initData }) => {
       />
       
       {data && (
-        <AutoRefresh
-          autoRefresh={autoRefresh}
-          setAutoRefresh={setAutoRefresh}
-          refreshInterval={refreshInterval}
-          onIntervalChange={handleIntervalChange}
-          autoRefreshCountdown={refreshCountdown}
-          loading={loading}
-        />
+        <>
+          <AutoRefresh
+            autoRefresh={autoRefresh}
+            setAutoRefresh={setAutoRefresh}
+            refreshInterval={refreshInterval}
+            onIntervalChange={handleIntervalChange}
+            autoRefreshCountdown={refreshCountdown}
+            loading={loading}
+          />
+          
+          <Alerts
+            alerts={alerts}
+            settings={alertSettings}
+            updateSettings={updateAlertSettings}
+            clearAlerts={clearAlerts}
+          />
+        </>
       )}
       
       {loading && <p className="loading">Loading...</p>}
