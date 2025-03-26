@@ -1,14 +1,47 @@
 async function fetchPnL(wallet) {
   const baseUrl = "https://api.defituna.com/api/v1";
-  const solPrice = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd")
-    .then(r => r.json()).then(r => r.solana.usd);
+  
+  // Use DeFi Tuna's oracle price endpoint instead of CoinGecko
+  const solPriceData = await fetch(`${baseUrl}/oracle-prices/So11111111111111111111111111111111111111112`)
+    .then(r => r.json());
+  const solPrice = parseFloat(solPriceData.data.price) / Math.pow(10, solPriceData.data.decimals);
+  
   const { data } = await fetch(`${baseUrl}/users/${wallet}/tuna-positions`).then(r => r.json());
   const pools = {}, tokens = {};
-  const positions = await Promise.all(data.map(async d => {
-    pools[d.pool] ??= await fetch(`${baseUrl}/pools/${d.pool}`).then(r => r.json()).then(r => r.data);
-    const { token_a_mint: a, token_b_mint: b } = pools[d.pool];
-    tokens[a] ??= await fetch(`${baseUrl}/mints/${a}`).then(r => r.json()).then(r => r.data.symbol);
-    tokens[b] ??= await fetch(`${baseUrl}/mints/${b}`).then(r => r.json()).then(r => r.data.symbol);
+  
+  // Preload all pools data in parallel instead of sequentially
+  const uniquePools = [...new Set(data.map(d => d.pool))];
+  const poolsData = await Promise.all(
+    uniquePools.map(pool => fetch(`${baseUrl}/pools/${pool}`).then(r => r.json()))
+  );
+  
+  // Map pool addresses to their data
+  poolsData.forEach(response => {
+    pools[response.data.address] = response.data;
+  });
+  
+  // Get all unique token mints
+  const uniqueMints = new Set();
+  Object.values(pools).forEach(pool => {
+    uniqueMints.add(pool.token_a_mint);
+    uniqueMints.add(pool.token_b_mint);
+  });
+  
+  // Fetch all token data in parallel
+  const tokenPromises = Array.from(uniqueMints).map(mint => 
+    fetch(`${baseUrl}/mints/${mint}`).then(r => r.json())
+  );
+  
+  const tokenResponses = await Promise.all(tokenPromises);
+  tokenResponses.forEach(response => {
+    tokens[response.data.address] = response.data.symbol;
+  });
+  
+  // Process positions with already loaded data
+  const positions = data.map(d => {
+    const pool = pools[d.pool];
+    const { token_a_mint: a, token_b_mint: b } = pool;
+    
     return {
       pair: `${tokens[a]}/${tokens[b]}`,
       state: d.state,
@@ -17,8 +50,13 @@ async function fetchPnL(wallet) {
       debt: (d.loan_funds_b.usd - d.current_loan_b.usd) / solPrice,
       pnl: d.pnl.usd / solPrice
     };
-  }));
-  return { totalPnL: positions.reduce((sum, p) => sum + p.pnl, 0), positions, solPrice };
+  });
+  
+  return { 
+    totalPnL: positions.reduce((sum, p) => sum + p.pnl, 0), 
+    positions, 
+    solPrice 
+  };
 }
 
 export default async (req, res) => {
