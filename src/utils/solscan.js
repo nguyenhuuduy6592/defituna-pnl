@@ -27,16 +27,28 @@ export async function getPositionAge(address) {
 
     // Convert to appropriate unit
     if (ageInSeconds >= 24 * 60 * 60) {
-      // >= 1 day, show in days
+      // >= 1 day, show days and hours
       const ageInDays = Math.floor(ageInSeconds / (24 * 60 * 60));
+      const remainingHours = Math.floor((ageInSeconds % (24 * 60 * 60)) / 3600);
+      if (remainingHours > 0) {
+        return `${ageInDays} day${ageInDays === 1 ? "" : "s"} ${remainingHours} hour${remainingHours === 1 ? "" : "s"}`;
+      }
       return `${ageInDays} day${ageInDays === 1 ? "" : "s"}`;
     } else if (ageInSeconds >= 60 * 60) {
-      // >= 1 hour but < 1 day, show in hours
+      // >= 1 hour, show hours and minutes
       const ageInHours = Math.floor(ageInSeconds / (60 * 60));
+      const remainingMinutes = Math.floor((ageInSeconds % (60 * 60)) / 60);
+      if (remainingMinutes > 0) {
+        return `${ageInHours} hour${ageInHours === 1 ? "" : "s"} ${remainingMinutes} minute${remainingMinutes === 1 ? "" : "s"}`;
+      }
       return `${ageInHours} hour${ageInHours === 1 ? "" : "s"}`;
     } else if (ageInSeconds >= 60) {
-      // >= 1 minute but < 1 hour, show in minutes
+      // >= 1 minute, show minutes and seconds
       const ageInMinutes = Math.floor(ageInSeconds / 60);
+      const remainingSeconds = Math.floor(ageInSeconds % 60);
+      if (remainingSeconds > 0) {
+        return `${ageInMinutes} minute${ageInMinutes === 1 ? "" : "s"} ${remainingSeconds} second${remainingSeconds === 1 ? "" : "s"}`;
+      }
       return `${ageInMinutes} minute${ageInMinutes === 1 ? "" : "s"}`;
     } else {
       // < 1 minute, show in seconds

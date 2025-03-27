@@ -123,16 +123,22 @@ export async function getTransactionAge(address) {
       const seconds = age % 60;
       
       if (days > 0) {
-        return `${days}d`;  // If we have days, only show days
+        if (hours > 0) {
+          return `${days}d ${hours}h`.trim();  // Show days and hours
+        }
+        return `${days}d`;
       }
       if (hours > 0) {
-        return `${hours}h`;  // If we have hours, only show hours
+        return `${hours}h ${minutes}m`.trim();  // Show hours and minutes
       }
       if (minutes > 0) {
-        return `${minutes}m`;  // If we have minutes, only show minutes
+        if (seconds > 0) {
+          return `${minutes}m ${seconds}s`.trim();  // Show minutes and seconds
+        }
+        return `${minutes}m`;
       }
       if (seconds > 0) {
-        return `${seconds}s`;  // If we have seconds, only show seconds
+        return `${seconds}s`;
       }
       
       return '0s';  // Default case if all values are 0
