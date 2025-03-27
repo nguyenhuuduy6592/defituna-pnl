@@ -1,7 +1,34 @@
 // Only import the web3 utility
 import { getTransactionAges } from '../../utils/solanaweb3';
 
+// Debug logging for environment variables
+const logEnvironmentInfo = () => {
+  console.log('Environment Debug Info:');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('HELIUS_API_KEY exists:', !!process.env.HELIUS_API_KEY);
+  console.log('HELIUS_RPC_URL exists:', !!process.env.HELIUS_RPC_URL);
+  console.log('API_BASE_URL exists:', !!process.env.API_BASE_URL);
+  
+  // Log partial key for verification (first 4 chars)
+  if (process.env.HELIUS_API_KEY) {
+    console.log('HELIUS_API_KEY prefix:', process.env.HELIUS_API_KEY.substring(0, 4));
+  }
+  
+  // Log RPC URL domain for verification
+  if (process.env.HELIUS_RPC_URL) {
+    try {
+      const url = new URL(process.env.HELIUS_RPC_URL);
+      console.log('HELIUS_RPC_URL domain:', url.hostname);
+    } catch (e) {
+      console.log('HELIUS_RPC_URL parse error:', e.message);
+    }
+  }
+};
+
 async function getAges(positions) {
+  // Log environment info at the start of each request
+  logEnvironmentInfo();
+
   if (!positions || !Array.isArray(positions) || positions.length === 0) {
     console.error('Invalid positions array:', positions);
     return [];
@@ -15,16 +42,23 @@ async function getAges(positions) {
       return positions.map(() => 'Unknown');
     }
 
+    console.log('Fetching ages for positions:', validPositions.length);
+
     // Use Helius RPC with batch processing
     const ages = await getTransactionAges(validPositions.map(p => p.address));
+    
+    console.log('Successfully fetched ages for positions:', ages.size);
     
     // Map results back to all positions
     return positions.map(pos => {
       if (!pos || !pos.address) return 'Unknown';
-      return ages.get(pos.address) || 'Unknown';
+      const age = ages.get(pos.address) || 'Unknown';
+      console.log(`Position ${pos.address.slice(0, 6)}... age:`, age);
+      return age;
     });
   } catch (error) {
     console.error('Error getting ages:', error);
+    console.error('Error stack:', error.stack);
     return positions.map(() => 'Unknown');
   }
 }

@@ -13,10 +13,13 @@ async function fetchWithRetry(body, retries = 0) {
   try {
     const apiKey = process.env.HELIUS_API_KEY;
     if (!apiKey) {
+      console.error('[fetchWithRetry] Helius API key not configured');
       throw new Error('Helius API key not configured');
     }
 
     const rpcEndpoint = `${process.env.HELIUS_RPC_URL}/?api-key=${apiKey}`;
+    console.log(`[fetchWithRetry] Attempt ${retries + 1}/${MAX_RETRIES}`);
+    
     const response = await fetch(rpcEndpoint, {
       method: 'POST',
       headers: {
@@ -25,16 +28,30 @@ async function fetchWithRetry(body, retries = 0) {
       body: JSON.stringify(body)
     });
     
+    // Log response status
+    console.log(`[fetchWithRetry] Response status: ${response.status}`);
+    
     if (response.status === 429 && retries < MAX_RETRIES) {
       const backoffDelay = Math.pow(2, retries) * 1000;
+      console.log(`[fetchWithRetry] Rate limited, retrying in ${backoffDelay}ms`);
       await delay(backoffDelay);
       return fetchWithRetry(body, retries + 1);
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`[fetchWithRetry] Error response: ${errorText}`);
+      throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
     }
     
     return response;
   } catch (error) {
+    console.error(`[fetchWithRetry] Error:`, error);
+    console.error(`[fetchWithRetry] Stack:`, error.stack);
+    
     if (retries < MAX_RETRIES) {
       const backoffDelay = Math.pow(2, retries) * 1000;
+      console.log(`[fetchWithRetry] Retrying in ${backoffDelay}ms`);
       await delay(backoffDelay);
       return fetchWithRetry(body, retries + 1);
     }
@@ -44,7 +61,7 @@ async function fetchWithRetry(body, retries = 0) {
 
 export async function getTransactionAge(address) {
   if (!address) {
-    console.error('Invalid address provided:', address);
+    console.error('[getTransactionAge] Invalid address provided:', address);
     return 'Unknown';
   }
 
@@ -52,12 +69,15 @@ export async function getTransactionAge(address) {
   if (ageCache.has(address)) {
     const cached = ageCache.get(address);
     if (Date.now() - cached.timestamp < CACHE_DURATION) {
+      console.log(`[getTransactionAge] Cache hit for ${address}`);
       return cached.age;
     }
+    console.log(`[getTransactionAge] Cache expired for ${address}`);
     ageCache.delete(address);
   }
 
   try {
+    console.log(`[getTransactionAge] Fetching age for address: ${address}`);
     const getAge = async () => {
       const signaturesResponse = await fetchWithRetry({
         jsonrpc: '2.0',
@@ -72,16 +92,18 @@ export async function getTransactionAge(address) {
       const signaturesData = await signaturesResponse.json();
       
       if (signaturesData.error) {
-        console.error('RPC error:', signaturesData.error);
+        console.error('[getTransactionAge] RPC error:', signaturesData.error);
         throw new Error(signaturesData.error.message);
       }
 
       const { result } = signaturesData;
       
       if (!result || result.length === 0) {
+        console.log(`[getTransactionAge] No transactions found for ${address}`);
         throw new Error('No transactions found');
       }
 
+      console.log(`[getTransactionAge] Found ${result.length} transactions for ${address}`);
       const oldestSignature = result[result.length - 1].signature;
 
       const txResponse = await fetchWithRetry({
@@ -97,6 +119,7 @@ export async function getTransactionAge(address) {
       const txData = await txResponse.json();
       const { result: txResult } = txData;
       if (!txResult || !txResult.blockTime) {
+        console.error('[getTransactionAge] Transaction details not found:', txData);
         throw new Error('Transaction details not found');
       }
 
@@ -120,6 +143,8 @@ export async function getTransactionAge(address) {
         ageString = `${seconds}s`;
       }
 
+      console.log(`[getTransactionAge] Calculated age for ${address}: ${ageString}`);
+
       // Cache the result with timestamp
       ageCache.set(address, { age: ageString, timestamp: Date.now() });
       return ageString;
@@ -127,13 +152,15 @@ export async function getTransactionAge(address) {
 
     return await getAge();
   } catch (error) {
-    console.error('Error fetching transaction age:', error);
+    console.error('[getTransactionAge] Error:', error);
+    console.error('[getTransactionAge] Stack:', error.stack);
     return 'Unknown';
   }
 }
 
 // Function to process multiple positions in batches
 export async function getTransactionAges(addresses) {
+  console.log(`[getTransactionAges] Processing ${addresses.length} addresses in batches of ${BATCH_SIZE}`);
   const results = new Map();
   const batches = [];
   
@@ -142,8 +169,11 @@ export async function getTransactionAges(addresses) {
     batches.push(addresses.slice(i, i + BATCH_SIZE));
   }
   
+  console.log(`[getTransactionAges] Split into ${batches.length} batches`);
+  
   // Process each batch sequentially
   for (const batch of batches) {
+    console.log(`[getTransactionAges] Processing batch of ${batch.length} addresses`);
     const batchResults = await Promise.all(
       batch.map(address => getTransactionAge(address))
     );
@@ -153,5 +183,6 @@ export async function getTransactionAges(addresses) {
     });
   }
   
+  console.log(`[getTransactionAges] Completed processing all batches. Results size: ${results.size}`);
   return results;
 }
