@@ -47,7 +47,7 @@ export default ({ data: initData }) => {
       setError(null);
       
       if (!isAutoRefresh) {
-        startFetchCooldown(15);
+        startFetchCooldown(30);
         addWallet(walletAddress);
       }
     } catch (err) {

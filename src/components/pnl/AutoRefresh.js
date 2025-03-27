@@ -23,7 +23,6 @@ export const AutoRefresh = ({
         {autoRefresh && (
           <div className={styles.intervalSelector}>
             <select value={refreshInterval} onChange={onIntervalChange}>
-              <option value="10">10 seconds</option>
               <option value="30">30 seconds</option>
               <option value="60">1 minute</option>
               <option value="300">5 minutes</option>
