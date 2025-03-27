@@ -6,10 +6,11 @@ export const PositionsList = memo(({ positions, isSol }) => {
     return num.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
   };
 
-  const formatDuration = (days) => {
-    if (days === 0) return 'Today';
-    if (days === 1) return '1 day';
-    return `${days} days`;
+  const formatDuration = (ageString) => {
+    if (!ageString || ageString === 'Unknown') return 'Unknown';
+    
+    // Age string is already formatted (e.g. "5d", "2h", "30m", "45s")
+    return ageString;
   };
 
   const getStateClass = (state) => {

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import styles from './WalletForm.module.scss';
 
 export default function WalletForm({
@@ -14,9 +14,33 @@ export default function WalletForm({
   onClearWallets
 }) {
   const inputRef = useRef(null);
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    
+    // Clear previous error
+    setError('');
+
+    // Basic validation for Solana address (base58, 32-44 chars)
+    const trimmedWallet = wallet.trim();
+    if (!trimmedWallet) {
+      setError('Please enter a wallet address');
+      return;
+    }
+    
+    if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(trimmedWallet)) {
+      setError('Invalid Solana wallet address format');
+      return;
+    }
+
+    onSubmit(e);
+  };
 
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={handleSubmit}>
       <div className={styles.inputContainer}>
         <input
           ref={inputRef}
@@ -29,6 +53,7 @@ export default function WalletForm({
           className={styles.input}
           disabled={loading}
         />
+        {error && <div className={styles.error}>{error}</div>}
         {showDropdown && savedWallets.length > 0 && (
           <div className={styles.dropdown}>
             {savedWallets.map((w, i) => (

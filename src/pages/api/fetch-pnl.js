@@ -1,14 +1,73 @@
 import { getPositionAge } from '../../utils/solscan';
+import { getTransactionAges } from '../../utils/solanaweb3';
+
+async function getAges(positions) {
+  if (!positions || !Array.isArray(positions) || positions.length === 0) {
+    console.error('Invalid positions array:', positions);
+    return [];
+  }
+
+  try {
+    // Validate positions have the required address property
+    const validPositions = positions.filter(p => p && p.address);
+    if (validPositions.length === 0) {
+      console.error('No valid positions found with address property');
+      return positions.map(() => 'Unknown');
+    }
+
+    // Try Solana RPC first with batch processing
+    const ages = await getTransactionAges(validPositions.map(p => p.address));
+    
+    // For any positions that returned 'Unknown', fall back to solscan
+    const results = await Promise.all(
+      positions.map(async (pos) => {
+        if (!pos || !pos.address) return 'Unknown';
+        const age = ages.get(pos.address);
+        if (age === 'Unknown') {
+          return getPositionAge(pos.address);
+        }
+        return age;
+      })
+    );
+    
+    return results;
+  } catch (error) {
+    console.error('Error getting ages:', error);
+    // Final fallback to solscan for all positions
+    return Promise.all(
+      positions.map(pos => pos && pos.address ? getPositionAge(pos.address) : 'Unknown')
+    );
+  }
+}
 
 async function fetchPnL(wallet) {
+  if (!wallet) {
+    throw new Error('Wallet address is required');
+  }
+
   const baseUrl = "https://api.defituna.com/api/v1";
   
   // Use DeFi Tuna's oracle price endpoint instead of CoinGecko
   const solPriceData = await fetch(`${baseUrl}/oracle-prices/So11111111111111111111111111111111111111112`)
-    .then(r => r.json());
+    .then(r => r.json())
+    .catch(error => {
+      console.error('Error fetching SOL price:', error);
+      throw new Error('Failed to fetch SOL price');
+    });
+
   const solPrice = parseFloat(solPriceData.data.price) / Math.pow(10, solPriceData.data.decimals);
   
-  const { data } = await fetch(`${baseUrl}/users/${wallet}/tuna-positions`).then(r => r.json());
+  const response = await fetch(`${baseUrl}/users/${wallet}/tuna-positions`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch positions: ${response.status} ${response.statusText}`);
+  }
+  
+  const { data } = await response.json();
+  if (!data || !Array.isArray(data)) {
+    console.error('Invalid positions data received:', data);
+    throw new Error('Invalid positions data received from API');
+  }
+
   const pools = {}, tokens = {};
   
   // Preload all pools data in parallel instead of sequentially
@@ -54,10 +113,8 @@ async function fetchPnL(wallet) {
     }
   });
   
-  // Fetch position ages in parallel
-  const positionAges = await Promise.all(
-    data.map(d => getPositionAge(d.position))
-  );
+  // Fetch position ages using the new batched method
+  const positionAges = await getAges(data);
   
   // Process positions with already loaded data
   const positions = data.map((d, index) => {
@@ -86,12 +143,29 @@ async function fetchPnL(wallet) {
 }
 
 export default async (req, res) => {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   const { walletAddress } = req.body;
-  if (!walletAddress) return res.status(400).json({ error: 'Wallet address required' });
+  
+  if (!walletAddress) {
+    return res.status(400).json({ error: 'Wallet address is required' });
+  }
+
+  // Validate wallet address format
+  if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(walletAddress.trim())) {
+    return res.status(400).json({ error: 'Invalid Solana wallet address format' });
+  }
+
   try {
-    res.status(200).json(await fetchPnL(walletAddress));
+    const result = await fetchPnL(walletAddress.trim());
+    res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch data' });
+    console.error('Error in fetch-pnl:', error);
+    res.status(500).json({ 
+      error: error.message || 'Failed to fetch data',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
