@@ -1,39 +1,34 @@
-const SOLANA_RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
-const BATCH_SIZE = 5; // Process 5 positions at a time
-const RATE_LIMIT_WINDOW = 10000; // 10 seconds
-const MAX_RETRIES = 3;
+const BATCH_SIZE = 3;
+const MAX_RETRIES = 5;
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes cache
 
-// Cache for transaction ages
+// Enhanced cache with timestamps
 const ageCache = new Map();
-
-// Queue for rate limiting
-const requestQueue = [];
-let lastRequestTime = 0;
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function processWithRateLimit(fn) {
-  const now = Date.now();
-  const timeElapsed = now - lastRequestTime;
-  
-  if (timeElapsed < RATE_LIMIT_WINDOW) {
-    await delay(RATE_LIMIT_WINDOW - timeElapsed);
-  }
-  
-  lastRequestTime = Date.now();
-  return fn();
-}
-
-async function fetchWithRetry(url, options, retries = 0) {
+async function fetchWithRetry(body, retries = 0) {
   try {
-    const response = await fetch(url, options);
+    const apiKey = process.env.HELIUS_API_KEY;
+    if (!apiKey) {
+      throw new Error('Helius API key not configured');
+    }
+
+    const rpcEndpoint = `${process.env.HELIUS_RPC_URL}/?api-key=${apiKey}`;
+    const response = await fetch(rpcEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body)
+    });
     
     if (response.status === 429 && retries < MAX_RETRIES) {
       const backoffDelay = Math.pow(2, retries) * 1000;
       await delay(backoffDelay);
-      return fetchWithRetry(url, options, retries + 1);
+      return fetchWithRetry(body, retries + 1);
     }
     
     return response;
@@ -41,14 +36,13 @@ async function fetchWithRetry(url, options, retries = 0) {
     if (retries < MAX_RETRIES) {
       const backoffDelay = Math.pow(2, retries) * 1000;
       await delay(backoffDelay);
-      return fetchWithRetry(url, options, retries + 1);
+      return fetchWithRetry(body, retries + 1);
     }
     throw error;
   }
 }
 
 export async function getTransactionAge(address) {
-  // Validate address parameter
   if (!address) {
     console.error('Invalid address provided:', address);
     return 'Unknown';
@@ -56,24 +50,23 @@ export async function getTransactionAge(address) {
 
   // Check cache first
   if (ageCache.has(address)) {
-    return ageCache.get(address);
+    const cached = ageCache.get(address);
+    if (Date.now() - cached.timestamp < CACHE_DURATION) {
+      return cached.age;
+    }
+    ageCache.delete(address);
   }
 
   try {
     const getAge = async () => {
-      // Get signatures for address
-      const signaturesResponse = await fetchWithRetry(SOLANA_RPC_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getSignaturesForAddress',
-          params: [
-            address.toString(), // Ensure address is converted to string
-            { limit: 1000 }
-          ]
-        })
+      const signaturesResponse = await fetchWithRetry({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'getSignaturesForAddress',
+        params: [
+          address.toString(),
+          { limit: 1000 }
+        ]
       });
 
       const signaturesData = await signaturesResponse.json();
@@ -89,22 +82,16 @@ export async function getTransactionAge(address) {
         throw new Error('No transactions found');
       }
 
-      // Get the last (oldest) signature
       const oldestSignature = result[result.length - 1].signature;
 
-      // Get transaction details
-      const txResponse = await fetchWithRetry(SOLANA_RPC_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getTransaction',
-          params: [
-            oldestSignature,
-            { maxSupportedTransactionVersion: 0 }
-          ]
-        })
+      const txResponse = await fetchWithRetry({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'getTransaction',
+        params: [
+          oldestSignature,
+          { maxSupportedTransactionVersion: 0 }
+        ]
       });
 
       const txData = await txResponse.json();
@@ -122,31 +109,23 @@ export async function getTransactionAge(address) {
       const minutes = Math.floor((age % 3600) / 60);
       const seconds = age % 60;
       
+      let ageString;
       if (days > 0) {
-        if (hours > 0) {
-          return `${days}d ${hours}h`.trim();  // Show days and hours
-        }
-        return `${days}d`;
+        ageString = hours > 0 ? `${days}d ${hours}h` : `${days}d`;
+      } else if (hours > 0) {
+        ageString = `${hours}h ${minutes}m`;
+      } else if (minutes > 0) {
+        ageString = seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+      } else {
+        ageString = `${seconds}s`;
       }
-      if (hours > 0) {
-        return `${hours}h ${minutes}m`.trim();  // Show hours and minutes
-      }
-      if (minutes > 0) {
-        if (seconds > 0) {
-          return `${minutes}m ${seconds}s`.trim();  // Show minutes and seconds
-        }
-        return `${minutes}m`;
-      }
-      if (seconds > 0) {
-        return `${seconds}s`;
-      }
-      
-      return '0s';  // Default case if all values are 0
+
+      // Cache the result with timestamp
+      ageCache.set(address, { age: ageString, timestamp: Date.now() });
+      return ageString;
     };
 
-    const age = await processWithRateLimit(getAge);
-    ageCache.set(address, age); // Cache the result
-    return age;
+    return await getAge();
   } catch (error) {
     console.error('Error fetching transaction age:', error);
     return 'Unknown';
@@ -172,11 +151,6 @@ export async function getTransactionAges(addresses) {
     batch.forEach((address, index) => {
       results.set(address, batchResults[index]);
     });
-    
-    // Add delay between batches to respect rate limits
-    if (batches.indexOf(batch) < batches.length - 1) {
-      await delay(RATE_LIMIT_WINDOW);
-    }
   }
   
   return results;

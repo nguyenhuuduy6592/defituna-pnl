@@ -2,7 +2,28 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
+First, set up your environment variables by copying `.env.local.example` to `.env.local`:
+
+```bash
+cp .env.local.example .env.local
+```
+
+Then, set up your Helius API key:
+1. Create an account at [https://www.helius.dev/](https://www.helius.dev/)
+2. Generate an API key
+3. Add your API key to `.env.local` for local development:
+   ```
+   HELIUS_API_KEY=your_api_key_here
+   ```
+
+For Vercel deployment:
+1. Go to your project settings in Vercel
+2. Navigate to "Environment Variables"
+3. Add the following variables:
+   - `HELIUS_API_KEY`: Your Helius API key
+   - `HELIUS_RPC_URL`: https://rpc-mainnet.helius.xyz
+
+Then, run the development server:
 
 ```bash
 npm run dev

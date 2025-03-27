@@ -79,7 +79,7 @@ Provide client-side tools for users to simulate adjustments to their positions a
 ## 6. Multi-Wallet Portfolio View
 
 **Priority: High**  
-**Status: Partially Implemented**
+**Status: Completed**
 
 ### Description
 Expand the existing wallet management to support viewing multiple wallets simultaneously for a holistic portfolio view.
@@ -87,7 +87,6 @@ Expand the existing wallet management to support viewing multiple wallets simult
 ### Implementation Notes
 - Enhance the current wallet selection to allow multiple active wallets
 - Implement data aggregation across selected wallets
-- Add wallet grouping and labeling stored in localStorage
 - Create a consolidated portfolio dashboard
 
 ## 9. Scenario Planning and Risk Assessment
