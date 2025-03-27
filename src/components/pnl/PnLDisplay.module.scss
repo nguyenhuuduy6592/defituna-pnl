@@ -48,19 +48,46 @@
   }
 }
 
+.pnlContainer {
+  margin-top: spacing(md);
+}
+
+.pnlHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: spacing(md);
+}
+
+.pnlGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: spacing(md);
+  margin-bottom: spacing(md);
+}
+
 .pnlItem {
   @include card;
+  padding: spacing(md);
+  background: bg-color(card);
+  border-radius: border-radius(md);
+  box-shadow: box-shadow(sm);
+  transition: box-shadow 0.3s ease;
+  
+  &:hover {
+    box-shadow: box-shadow(md);
+  }
 
   .label {
-    color: text-color(secondary);
     font-size: font-size(sm);
+    color: text-color(secondary);
     margin-bottom: spacing(xs);
   }
 
   .value {
     font-size: font-size(xl);
-    font-weight: bold;
-    color: text-color(primary);
+    font-weight: font-weight(bold);
+    font-family: monospace;
     
     &.positive { color: color(positive); }
     &.negative { color: color(negative); }
@@ -73,4 +100,64 @@
   text-align: right;
   font-size: font-size(xs);
   color: text-color(secondary);
+}
+
+.positive {
+  color: color(positive);
+}
+
+.negative {
+  color: color(negative);
+}
+
+.zero {
+  color: text-color(secondary);
+}
+
+.groupedPositions {
+  margin-bottom: spacing(lg);
+  
+  h3 {
+    font-size: font-size(md);
+    color: text-color(primary);
+    margin-bottom: spacing(sm);
+    padding-bottom: spacing(xs);
+    border-bottom: 1px solid bg-color(border);
+  }
+}
+
+.walletGroup, .pairGroup {
+  margin-bottom: spacing(md);
+  padding: spacing(md);
+  border-radius: border-radius(md);
+  background: bg-color(card);
+  box-shadow: box-shadow(sm);
+}
+
+.walletHeader, .pairHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: spacing(md);
+  padding-bottom: spacing(xs);
+  border-bottom: 1px solid bg-color(divider);
+}
+
+.walletAddress {
+  font-family: monospace;
+  font-weight: font-weight(medium);
+  font-size: font-size(sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.walletPnL, .pairPnL {
+  font-weight: font-weight(bold);
+  font-family: monospace;
+  font-size: font-size(md);
+}
+
+.pairName {
+  font-weight: font-weight(bold);
+  font-size: font-size(md);
 }

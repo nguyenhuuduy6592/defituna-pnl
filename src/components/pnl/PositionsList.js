@@ -1,7 +1,10 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import styles from './PositionsList.module.scss';
 
-export const PositionsList = memo(({ positions, formatValue }) => {
+export const PositionsList = memo(({ positions, formatValue, showWallet = false }) => {
+  const [sortField, setSortField] = useState('pnl');
+  const [sortDirection, setSortDirection] = useState('desc');
+  
   const formatNumber = (num) => {
     if (num === null || num === undefined) return '0.00';
     
@@ -37,29 +40,97 @@ export const PositionsList = memo(({ positions, formatValue }) => {
     if (value < 0) return styles.negative;
     return styles.zero;
   };
+  
+  const formatWalletAddress = (address) => {
+    if (!address) return 'Unknown';
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+  
+  const handleSort = (field) => {
+    if (field === sortField) {
+      // Toggle direction if clicking on the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Default to descending for new field
+      setSortField(field);
+      setSortDirection('desc');
+    }
+  };
+  
+  const getSortedPositions = () => {
+    if (!positions) return [];
+    
+    return [...positions].sort((a, b) => {
+      let aValue = a[sortField];
+      let bValue = b[sortField];
+      
+      // Special handling for string fields
+      if (sortField === 'pair' || sortField === 'state' || sortField === 'age' || sortField === 'walletAddress') {
+        aValue = String(aValue || '');
+        bValue = String(bValue || '');
+        return sortDirection === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      
+      // Numeric fields
+      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+    });
+  };
+  
+  const getSortIcon = (field) => {
+    if (field !== sortField) return '↕';
+    return sortDirection === 'asc' ? '↑' : '↓';
+  };
 
   if (!positions || positions.length === 0) {
     return <div className={styles.noPositions}>No positions found</div>;
   }
+  
+  const sortedPositions = getSortedPositions();
 
   return (
     <div className={styles.positionsContainer}>
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Pair</th>
-            <th>State</th>
-            <th>Age</th>
-            <th>Yield</th>
-            <th>Compounded</th>
-            <th>Debt Change</th>
-            <th>PnL</th>
+            <th onClick={() => handleSort('pair')} className={styles.sortable}>
+              Pair {getSortIcon('pair')}
+            </th>
+            {showWallet && (
+              <th onClick={() => handleSort('walletAddress')} className={styles.sortable}>
+                Wallet {getSortIcon('walletAddress')}
+              </th>
+            )}
+            <th onClick={() => handleSort('state')} className={styles.sortable}>
+              State {getSortIcon('state')}
+            </th>
+            <th onClick={() => handleSort('age')} className={styles.sortable}>
+              Age {getSortIcon('age')}
+            </th>
+            <th onClick={() => handleSort('yield')} className={styles.sortable}>
+              Yield {getSortIcon('yield')}
+            </th>
+            <th onClick={() => handleSort('compounded')} className={styles.sortable}>
+              Compounded {getSortIcon('compounded')}
+            </th>
+            <th onClick={() => handleSort('debt')} className={styles.sortable}>
+              Debt Change {getSortIcon('debt')}
+            </th>
+            <th onClick={() => handleSort('pnl')} className={styles.sortable}>
+              PnL {getSortIcon('pnl')}
+            </th>
           </tr>
         </thead>
         <tbody>
-          {positions.map((p, i) => (
-            <tr key={`${p.pair}-${i}`}>
+          {sortedPositions.map((p, i) => (
+            <tr key={`${p.pair}-${p.walletAddress || ''}-${i}`}>
               <td>{p.pair}</td>
+              {showWallet && (
+                <td className={styles.walletCell} title={p.walletAddress}>
+                  {formatWalletAddress(p.walletAddress)}
+                </td>
+              )}
               <td className={getStateClass(p.state)}>{p.state}</td>
               <td className={styles.timestamp}>{formatDuration(p.age)}</td>
               <td className={getValueClass(p.yield)}>
