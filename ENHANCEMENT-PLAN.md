@@ -144,22 +144,54 @@ Transform the web application into a Progressive Web App to enable offline funct
 - Ensure proper handling of push notifications if implemented
 - Validate PWA implementation using Lighthouse audits
 
-## 12. Create PnL card showcase
+## 12. Create PnL Card Showcase
 
 **Priority: High**  
 **Status: Not Started**
 
 ### Description
-Implement a visually appealing and informative PnL card system that showcases position performance in an easily digestible format.
+Implement a visually appealing and informative PnL card system that showcases position performance in an easily digestible format. The cards should be shareable, exportable, and contain comprehensive position details in a visually appealing layout.
 
 ### Implementation Notes
-- Design responsive card layout with key metrics
-- Include visual indicators for profit/loss status
-- Add interactive elements for detailed view
-- Implement smooth animations for updates
-- Create filtering and sorting options
-- Support both light and dark themes
-- Optimize for mobile viewing
-- Add share functionality for individual cards
-- Include performance sparklines or mini-charts
-- Implement card grouping by strategy or asset type
+
+#### Core Features
+- Add a "Share Position" button next to each position in the PositionsList component
+- Implement a modal/overlay system to display the PnL card when clicked
+- Position cards should be responsive and maintain aspect ratio for sharing
+
+#### Card Content
+- Position identifier and timestamp
+- Current PnL value with percentage change
+- Entry and current price
+- Position size and leverage
+- Visual indicators for profit (green) or loss (red) status
+- Token/pair information with icons
+- Platform/protocol identifier
+
+#### Technical Implementation
+- Create a new React component `PnLCard` with styled-components or CSS modules
+- Use html2canvas or similar library for image export functionality
+- Implement QR code generation using qrcode.react
+  - QR code should link to the current site
+  - Include proper error handling for QR generation
+- Add copy to clipboard functionality for sharing links
+- Implement image download in PNG format
+  - Maintain high resolution for social media sharing
+  - Include proper file naming convention with position details
+
+#### Export Options
+- Download as PNG button with high resolution export
+- Copy to clipboard button for direct sharing
+- Share button with native share API integration where supported
+
+#### Design Requirements
+- Implement a clean, modern card design
+- Use consistent typography and spacing
+- Follow existing app theme and color scheme
+- Ensure proper contrast for readability
+- Implement loading states and error handling
+
+#### Performance Considerations
+- Lazy load card generation components
+- Optimize image generation and export process
+- Implement proper loading states during export
