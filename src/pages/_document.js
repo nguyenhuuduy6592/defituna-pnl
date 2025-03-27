@@ -15,6 +15,7 @@ export default function Document() {
 
         <link rel='apple-touch-icon' href='/icon-192x192.png' />
         <link rel='manifest' href='/manifest.json' />
+        <link rel="icon" type="image/png" href="/favicon.svg" />
       </Head>
       <body>
         <Main />
