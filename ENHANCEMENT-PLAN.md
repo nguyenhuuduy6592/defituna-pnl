@@ -102,3 +102,24 @@ Help users understand potential risks and outcomes under different market condit
 - Implement client-side liquidation threshold calculations
 - Create a simple risk scoring system
 - Allow users to save scenarios in localStorage for future reference
+
+## 10. Solana Wallet Donation Feature
+
+**Priority: Medium**  
+**Status: Not Started**
+
+### Description
+Implement a donation system using Solana Blink to simplify the donation process. This allows users to donate with minimal friction using SOL, with USD conversion handled automatically by the Blink protocol.
+
+### Implementation Notes
+- Add a simple donation button at the bottom of the page with a default 5 USD amount with Solana Blink for easier setup
+- Only show the button when the data is already loaded.
+- Allow custom donation amount input
+- Use Solana Blink payment links with USD/SOL conversion
+- Display thank-you messages after successful donations
+- Have a list of wallets as env variable, use the variable to let user send to a random wallet in the list
+- Create a dedicated `/donations` page showing:
+  - Transaction history
+  - Amount and token name
+  - Donor wallet address (truncated). list must be return from server which is already truncated.
+  - Transaction timestamp
