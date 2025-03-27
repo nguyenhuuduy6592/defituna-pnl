@@ -6,7 +6,6 @@ import { usePositionAlerts } from '../hooks/usePositionAlerts';
 import WalletForm from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
-import { Alerts } from '../components/pnl/Alerts';
 
 export async function getServerSideProps() {
   return { props: { data: null } };
@@ -213,12 +212,6 @@ export default ({ data: initData }) => {
             loading={loading}
           />
           
-          {/* <Alerts
-            alerts={alerts}
-            settings={alertSettings}
-            updateSettings={updateAlertSettings}
-            clearAlerts={clearAlerts}
-          /> */}
         </>
       )}
       
