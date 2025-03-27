@@ -130,11 +130,36 @@ Implement a donation system using Solana Blink to simplify the donation process.
 **Status: Not Started**
 
 ### Description
-Enable Progressive Web App functionality.
+Transform the web application into a Progressive Web App to enable offline functionality, improved performance, and native app-like experience.
 
 ### Implementation Notes
-- Configure service worker
-- Update manifest.json
-- Implement offline support
-- Test on mobile devices
-- Cache essential data
+- Configure and implement service worker for offline support and caching
+- Update manifest.json with proper app metadata, icons, and theme colors
+- Implement app shell architecture for faster loading
+- Add install prompts and handling for "Add to Home Screen"
+- Configure offline fallbacks and synchronization strategies
+- Implement background sync for pending transactions
+- Test PWA features across different devices and browsers
+- Optimize caching strategies for API responses and static assets
+- Ensure proper handling of push notifications if implemented
+- Validate PWA implementation using Lighthouse audits
+
+## 12. Create PnL card showcase
+
+**Priority: High**  
+**Status: Not Started**
+
+### Description
+Implement a visually appealing and informative PnL card system that showcases position performance in an easily digestible format.
+
+### Implementation Notes
+- Design responsive card layout with key metrics
+- Include visual indicators for profit/loss status
+- Add interactive elements for detailed view
+- Implement smooth animations for updates
+- Create filtering and sorting options
+- Support both light and dark themes
+- Optimize for mobile viewing
+- Add share functionality for individual cards
+- Include performance sparklines or mini-charts
+- Implement card grouping by strategy or asset type
