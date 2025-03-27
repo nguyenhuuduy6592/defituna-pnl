@@ -6,13 +6,11 @@ export const PositionsList = memo(({ positions, formatValue }) => {
     if (num === null || num === undefined) return '0.00';
     
     if (Math.abs(num) < 0.01 && num !== 0) {
-      // Small USD values: show up to 6 decimal places
       return num.toLocaleString(undefined, {
         minimumFractionDigits: 6,
         maximumFractionDigits: 6
       });
     } else {
-      // Normal USD values: show 2 decimal places
       return num.toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
@@ -32,6 +30,12 @@ export const PositionsList = memo(({ positions, formatValue }) => {
       case 'liquidated': return styles.stateLiquidated;
       default: return '';
     }
+  };
+
+  const getValueClass = (value) => {
+    if (value > 0) return styles.positive;
+    if (value < 0) return styles.negative;
+    return styles.zero;
   };
 
   if (!positions || positions.length === 0) {
@@ -58,16 +62,16 @@ export const PositionsList = memo(({ positions, formatValue }) => {
               <td>{p.pair}</td>
               <td className={getStateClass(p.state)}>{p.state}</td>
               <td className={styles.timestamp}>{formatDuration(p.age)}</td>
-              <td className={p.yield > 0 ? styles.positive : p.yield < 0 ? styles.negative : styles.zero}>
+              <td className={getValueClass(p.yield)}>
                 ${formatNumber(p.yield)}
               </td>
-              <td className={p.compounded > 0 ? styles.positive : p.compounded < 0 ? styles.negative : styles.zero}>
+              <td className={getValueClass(p.compounded)}>
                 ${formatNumber(p.compounded)}
               </td>
-              <td className={p.debt > 0 ? styles.positive : p.debt < 0 ? styles.negative : styles.zero}>
+              <td className={getValueClass(p.debt)}>
                 ${formatNumber(p.debt)}
               </td>
-              <td className={p.pnl > 0 ? styles.positive : p.pnl < 0 ? styles.negative : styles.zero}>
+              <td className={getValueClass(p.pnl)}>
                 ${formatNumber(p.pnl)}
               </td>
             </tr>

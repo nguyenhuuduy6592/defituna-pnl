@@ -5,24 +5,20 @@
   margin: 0 auto;
   padding: spacing(md);
   font-family: Arial, sans-serif;
-}
 
-.heading {
-  color: #333;
-}
+  .heading {
+    color: color(textPrimary);
+  }
 
-.positive { color: color(positive); }
-.negative { color: color(negative); }
-.zero { color: color(zero); }
+  .solPrice {
+    margin-bottom: spacing(md);
+  }
 
-.solPrice {
-  margin-bottom: spacing(md);
-}
-
-.divider {
-  margin: spacing(md) 0;
-  border: 0;
-  border-top: 1px solid color(border);
+  .divider {
+    margin: spacing(md) 0;
+    border: 0;
+    border-top: 1px solid color(border);
+  }
 }
 
 .pnlContainer {
@@ -35,20 +31,20 @@
   @include responsive(md) {
     padding: spacing(lg);
   }
-}
 
-.pnlGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: spacing(md);
-  margin-top: spacing(sm);
-
-  @include responsive(sm) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @include responsive(lg) {
-    grid-template-columns: repeat(3, 1fr);
+  .pnlGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: spacing(md);
+    margin-top: spacing(sm);
+  
+    @include responsive(sm) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    @include responsive(lg) {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 }
 
@@ -65,7 +61,7 @@
     font-size: font-size(xl);
     font-weight: bold;
     color: text-color(primary);
-
+    
     &.positive { color: color(positive); }
     &.negative { color: color(negative); }
     &.zero { color: color(zero); }

@@ -21,32 +21,32 @@
     flex-direction: row;
     gap: spacing(md);
   }
-}
 
-.autoRefreshLabel {
-  @include flex-start;
-  gap: spacing(sm);
-  cursor: pointer;
-  color: text-color(primary);
-  font-size: font-size(base);
-  
-  input[type="checkbox"] {
-    width: spacing(md);
-    height: spacing(md);
-  }
-}
-
-.intervalSelector {
-  select {
-    @extend %input-base;
-    padding: spacing(xs) spacing(sm);
-    width: auto;
-    font-size: font-size(sm);
-    min-width: 120px;
+  .autoRefreshLabel {
+    @include flex-start;
+    gap: spacing(sm);
+    cursor: pointer;
+    color: text-color(primary);
+    font-size: font-size(base);
     
-    &:focus {
-      outline: none;
-      border-color: color(primary);
+    input[type="checkbox"] {
+      width: spacing(md);
+      height: spacing(md);
+    }
+  }
+
+  .intervalSelector {
+    select {
+      @extend %input-base;
+      padding: spacing(xs) spacing(sm);
+      width: auto;
+      font-size: font-size(sm);
+      min-width: 120px;
+      
+      &:focus {
+        outline: none;
+        border-color: color(primary);
+      }
     }
   }
 }

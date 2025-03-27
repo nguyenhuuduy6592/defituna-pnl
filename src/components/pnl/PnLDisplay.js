@@ -4,12 +4,16 @@ import styles from './PnLDisplay.module.scss';
 export const PnLDisplay = ({ data }) => {
   const formatValue = (val) => {
     if (Math.abs(val) < 0.01 && val !== 0) {
-      // Small USD values: show up to 6 decimal places
       return `${val >= 0 ? ' ' : '-'}${Math.abs(val).toFixed(6)}`.padStart(8);
     } else {
-      // Normal USD values: show 2 decimal places
       return `${val >= 0 ? ' ' : '-'}${Math.abs(val).toFixed(2)}`.padStart(8);
     }
+  };
+
+  const getValueClass = (value) => {
+    if (value > 0) return styles.positive;
+    if (value < 0) return styles.negative;
+    return styles.zero;
   };
 
   return (
@@ -17,7 +21,7 @@ export const PnLDisplay = ({ data }) => {
       <div className={styles.pnlGrid}>
         <div className={styles.pnlItem}>
           <div className={styles.label}>Total PnL</div>
-          <div className={`${styles.value} ${data.totalPnL > 0 ? styles.positive : data.totalPnL < 0 ? styles.negative : styles.zero}`}>
+          <div className={`${styles.value} ${getValueClass(data.totalPnL)}`}>
             ${formatValue(data.totalPnL)}
           </div>
         </div>

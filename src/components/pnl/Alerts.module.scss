@@ -6,52 +6,52 @@
   background-color: bg-color(light);
   border-radius: map-get($border-radius, sm);
   border: 1px solid color(border);
-}
 
-.alertsHeader {
-  @include flex-between;
-  margin-bottom: spacing(md);
-}
+  .alertsHeader {
+    @include flex-between;
+    margin-bottom: spacing(md);
 
-.headerLeft {
-  display: flex;
-  align-items: center;
-  gap: spacing(sm);
-  cursor: pointer;
-
-  h3 {
-    margin: 0;
-    color: text-color(primary);
-    font-size: font-size(lg);
-  }
-}
-
-.alertsControls {
-  display: flex;
-  gap: spacing(sm);
-  align-items: center;
-
-  label {
-    @include flex-center;
-    gap: spacing(xs);
-    color: text-color(secondary);
-    font-size: font-size(base);
-  }
-
-  button {
-    padding: spacing(xs) spacing(sm);
-    border-radius: map-get($border-radius, sm);
-    border: 1px solid color(border);
-    background: bg-color(white);
-    cursor: pointer;
-    font-size: font-size(sm);
-
-    &:hover {
-      background: bg-color(light);
+    .headerLeft {
+      display: flex;
+      align-items: center;
+      gap: spacing(sm);
+      cursor: pointer;
+  
+      h3 {
+        margin: 0;
+        color: text-color(primary);
+        font-size: font-size(lg);
+      }
     }
 
-    &.clearButton {
-      color: color(negative);
+    .alertsControls {
+      display: flex;
+      gap: spacing(sm);
+      align-items: center;
+  
+      label {
+        @include flex-center;
+        gap: spacing(xs);
+        color: text-color(secondary);
+        font-size: font-size(base);
+      }
+  
+      button {
+        padding: spacing(xs) spacing(sm);
+        border-radius: map-get($border-radius, sm);
+        border: 1px solid color(border);
+        background: bg-color(white);
+        cursor: pointer;
+        font-size: font-size(sm);
+  
+        &:hover {
+          background: bg-color(light);
+        }
+  
+        &.clearButton {
+          color: color(negative);
+        }
+      }
     }
   }
 }
@@ -72,22 +72,22 @@
 .alertsSettings {
   @include card;
   margin-bottom: spacing(md);
-}
 
-.settingItem {
-  @include flex-between;
-  margin-bottom: spacing(sm);
-  color: text-color(secondary);
-  font-size: font-size(base);
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  input[type="number"] {
-    @extend %input-base;
-    width: 80px;
-    font-size: font-size(sm);
+  .settingItem {
+    @include flex-between;
+    margin-bottom: spacing(sm);
+    color: text-color(secondary);
+    font-size: font-size(base);
+  
+    &:last-child {
+      margin-bottom: 0;
+    }
+  
+    input[type="number"] {
+      @extend %input-base;
+      width: 80px;
+      font-size: font-size(sm);
+    }
   }
 }
 
@@ -121,30 +121,30 @@
     max-height: 40px;
     overflow: hidden;
   }
-}
 
-.alertContent {
-  @include flex-between;
-  gap: spacing(sm);
-  display: flex;
-  align-items: center;
-}
+  .alertContent {
+    @include flex-between;
+    gap: spacing(sm);
+    display: flex;
+    align-items: center;
+  }
 
-.alertMessage {
-  color: text-color(primary);
-  font-size: font-size(base);
-}
+  .alertMessage {
+    color: text-color(primary);
+    font-size: font-size(base);
+  }
 
-.alertTime {
-  color: text-color(secondary);
-  font-size: font-size(xs);
-  white-space: nowrap;
-}
+  .alertTime {
+    color: text-color(secondary);
+    font-size: font-size(xs);
+    white-space: nowrap;
+  }
 
-.collapseIndicator {
-  font-size: 12px;
-  width: 12px;
-  text-align: center;
-  cursor: pointer;
-  user-select: none;
+  .collapseIndicator {
+    font-size: 12px;
+    width: 12px;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+  }
 }

@@ -29,12 +29,18 @@
     white-space: nowrap;
   }
 
-  tr:nth-child(even) {
-    background: bg-color(light);
-  }
+  tr {
+    &:nth-child(even) {
+      background: bg-color(light);
+    }
 
-  td {
-    color: text-color(primary);
+    td {
+      color: text-color(primary);
+  
+      &.positive { color: color(positive); }
+      &.negative { color: color(negative); }
+      &.zero { color: color(zero); }
+    }
   }
 }
 
@@ -52,30 +58,25 @@
   font-size: font-size(base);
 }
 
-// State colors
+// State styles
 %state-text {
   font-weight: 500;
 }
 
-.stateOpen { 
+.stateOpen {
   @extend %state-text;
-  color: #4CAF50; 
+  color: #4CAF50;
 }
 
-.stateClosed { 
+.stateClosed {
   @extend %state-text;
   color: text-color(disabled);
 }
 
-.stateLiquidated { 
+.stateLiquidated {
   @extend %state-text;
-  color: color(negative); 
+  color: color(negative);
 }
-
-// Value colors using the color function
-.positive { color: color(positive); }
-.negative { color: color(negative); }
-.zero { color: color(zero); }
 
 .timestamp {
   color: text-color(secondary);
