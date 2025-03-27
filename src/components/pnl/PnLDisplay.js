@@ -1,5 +1,6 @@
 import { PositionsList } from './PositionsList';
 import styles from './PnLDisplay.module.scss';
+import { showNotification } from '../../utils/notifications';
 
 export const PnLDisplay = ({ data, isAggregated = false }) => {
   const formatValue = (val) => {
@@ -14,6 +15,16 @@ export const PnLDisplay = ({ data, isAggregated = false }) => {
     if (value > 0) return styles.positive;
     if (value < 0) return styles.negative;
     return styles.zero;
+  };
+
+  const handleCopyAddress = () => {
+    const address = process.env.NEXT_PUBLIC_DONATION_WALLET;
+    navigator.clipboard.writeText(address);
+    showNotification('Wallet address copied to clipboard! 🐟');
+  };
+
+  const formatWalletAddress = (address) => {
+    return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
   return (
@@ -36,6 +47,23 @@ export const PnLDisplay = ({ data, isAggregated = false }) => {
         formatValue={formatValue} 
         showWallet={isAggregated}
       />
+
+      {/* Donation footer */}
+      {data.positions.length > 0 && process.env.NEXT_PUBLIC_DONATION_WALLET && (
+        <div className={styles.donationFooter}>
+          <div className={styles.title}>Support me</div>
+          <div 
+            className={styles.address} 
+            onClick={handleCopyAddress}
+            title="Click to copy"
+          >
+            {formatWalletAddress(process.env.NEXT_PUBLIC_DONATION_WALLET)}
+          </div>
+          <div className={styles.description}>
+            Your support helps keep the tool running and improving. Thank you! 🐟
+          </div>
+        </div>
+      )}
     </div>
   );
 };
