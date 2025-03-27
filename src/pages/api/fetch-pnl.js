@@ -1,4 +1,4 @@
-import { getPositionAge } from '../../utils/solscan';
+// Only import the web3 utility
 import { getTransactionAges } from '../../utils/solanaweb3';
 
 async function getAges(positions) {
@@ -15,28 +15,17 @@ async function getAges(positions) {
       return positions.map(() => 'Unknown');
     }
 
-    // Try Solana RPC first with batch processing
+    // Use Helius RPC with batch processing
     const ages = await getTransactionAges(validPositions.map(p => p.address));
     
-    // For any positions that returned 'Unknown', fall back to solscan
-    const results = await Promise.all(
-      positions.map(async (pos) => {
-        if (!pos || !pos.address) return 'Unknown';
-        const age = ages.get(pos.address);
-        if (age === 'Unknown') {
-          return getPositionAge(pos.address);
-        }
-        return age;
-      })
-    );
-    
-    return results;
+    // Map results back to all positions
+    return positions.map(pos => {
+      if (!pos || !pos.address) return 'Unknown';
+      return ages.get(pos.address) || 'Unknown';
+    });
   } catch (error) {
     console.error('Error getting ages:', error);
-    // Final fallback to solscan for all positions
-    return Promise.all(
-      positions.map(pos => pos && pos.address ? getPositionAge(pos.address) : 'Unknown')
-    );
+    return positions.map(() => 'Unknown');
   }
 }
 
