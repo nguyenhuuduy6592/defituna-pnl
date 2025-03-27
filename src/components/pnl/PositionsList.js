@@ -3,6 +3,8 @@ import styles from './PositionsList.module.scss';
 
 export const PositionsList = memo(({ positions, formatValue }) => {
   const formatNumber = (num) => {
+    if (num === null || num === undefined) return '0.00';
+    
     if (Math.abs(num) < 0.01 && num !== 0) {
       // Small USD values: show up to 6 decimal places
       return num.toLocaleString(undefined, {
@@ -20,8 +22,6 @@ export const PositionsList = memo(({ positions, formatValue }) => {
 
   const formatDuration = (ageString) => {
     if (!ageString || ageString === 'Unknown') return 'Unknown';
-    
-    // Age string is already formatted (e.g. "5d", "2h", "30m", "45s")
     return ageString;
   };
 

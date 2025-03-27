@@ -21,10 +21,6 @@ export const PnLDisplay = ({ data }) => {
             ${formatValue(data.totalPnL)}
           </div>
         </div>
-        <div className={styles.pnlItem}>
-          <div className={styles.label}>Current SOL Price</div>
-          <div className={styles.value}>${data.solPrice.toFixed(2)}</div>
-        </div>
       </div>
       <PositionsList positions={data.positions} formatValue={formatValue} />
     </div>
