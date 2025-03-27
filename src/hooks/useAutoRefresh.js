@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [refreshInterval, setRefreshInterval] = useState(initialInterval);
   const [refreshCountdown, setRefreshCountdown] = useState(initialInterval);
+  const refreshTimeoutId = useRef(null);
 
   // Load saved settings
   useEffect(() => {
@@ -30,29 +31,28 @@ export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
 
   // Handle countdown and refresh
   useEffect(() => {
-    let timer;
-
-    if (autoRefresh) {
-      timer = setInterval(() => {
-        setRefreshCountdown((prev) => {
-          if (prev <= 1) {
-            // Schedule refresh for next tick to avoid state update conflicts
-            setTimeout(() => {
-              onRefresh();
-              setRefreshCountdown(refreshInterval);
-            }, 0);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    if (!autoRefresh) {
+      if (refreshTimeoutId.current) {
+        clearTimeout(refreshTimeoutId.current);
+      }
+      return;
     }
 
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
+    const countdownTick = () => {
+      setRefreshCountdown((prev) => {
+        if (prev <= 1) {
+          // Only refresh if tab is visible
+          if (document.visibilityState === 'visible' && onRefresh) {
+            onRefresh();
+          }
+          return refreshInterval;
+        }
+        return prev - 1;
+      });
     };
+
+    const timer = setInterval(countdownTick, 1000);
+    return () => clearInterval(timer);
   }, [autoRefresh, refreshInterval, onRefresh]);
 
   return {

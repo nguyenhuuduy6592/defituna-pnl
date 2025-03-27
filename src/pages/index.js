@@ -28,7 +28,8 @@ export default ({ data: initData }) => {
     setShowDropdown,
     addWallet,
     removeWallet,
-    clearWallets
+    clearWallets,
+    initialized
   } = useWallet();
 
   // Function to fetch PnL data for a specific wallet
@@ -86,17 +87,17 @@ export default ({ data: initData }) => {
 
   // Function to fetch PnL for all active wallets
   const fetchPnLData = useCallback(async (isAutoRefresh = false) => {
-    // Check if there are active wallets
+    // Check if we have active wallets or a primary wallet
+    let walletsToFetch = activeWallets;
+    
+    // If no active wallets but have a primary wallet, use it
     if (activeWallets.length === 0 && wallet) {
-      // Support legacy behavior with single wallet
-      toggleWalletActive(wallet);
+      toggleWalletActive(wallet); // This will update activeWallets
+      walletsToFetch = [wallet];
     }
     
-    // If still no active wallets, don't fetch
-    if (activeWallets.length === 0 && !wallet) return;
-    
-    // Determine which wallets to fetch
-    const walletsToFetch = activeWallets.length > 0 ? activeWallets : [wallet];
+    // If still no wallets to fetch, return
+    if (walletsToFetch.length === 0) return;
     
     try {
       setLoading(true);
@@ -164,10 +165,13 @@ export default ({ data: initData }) => {
 
   // Auto fetch data if there are active wallets on page load
   useEffect(() => {
-    if ((activeWallets.length > 0 || wallet) && !data && !aggregatedData) {
-      fetchPnLData(false);
+    if (initialized && !data && !aggregatedData) {
+      const hasWallets = activeWallets.length > 0 || wallet;
+      if (hasWallets) {
+        fetchPnLData(false);
+      }
     }
-  }, [activeWallets, wallet, data, aggregatedData, fetchPnLData]);
+  }, [initialized]); // Only run when initialized changes
 
   const handleSubmit = async e => {
     e.preventDefault();
