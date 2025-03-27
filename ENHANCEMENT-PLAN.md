@@ -123,3 +123,18 @@ Implement a donation system using Solana Blink to simplify the donation process.
   - Amount and token name
   - Donor wallet address (truncated). list must be return from server which is already truncated.
   - Transaction timestamp
+
+## 11. PWA Support
+
+**Priority: High**  
+**Status: Not Started**
+
+### Description
+Enable Progressive Web App functionality.
+
+### Implementation Notes
+- Configure service worker
+- Update manifest.json
+- Implement offline support
+- Test on mobile devices
+- Cache essential data
