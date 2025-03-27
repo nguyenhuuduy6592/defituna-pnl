@@ -147,7 +147,7 @@ Transform the web application into a Progressive Web App to enable offline funct
 ## 12. Create PnL Card Showcase
 
 **Priority: High**  
-**Status: Not Started**
+**Status: Completed**
 
 ### Description
 Implement a visually appealing and informative PnL card system that showcases position performance in an easily digestible format. The cards should be shareable, exportable, and contain comprehensive position details in a visually appealing layout.
@@ -167,6 +167,17 @@ Implement a visually appealing and informative PnL card system that showcases po
 - Visual indicators for profit (green) or loss (red) status
 - Token/pair information with icons
 - Platform/protocol identifier
+- Position state (open/closed/liquidated)
+- Position age with detailed timestamp
+- Yield metrics:
+  - Current yield in USD
+  - Compounded yield in USD
+  - Debt change in USD
+- Pool information:
+  - Token A/B symbols
+  - Token A/B mint addresses (truncated)
+- SOL price at time of snapshot
+- Wallet address (truncated) for multi-wallet views
 
 #### Technical Implementation
 - Create a new React component `PnLCard` with styled-components or CSS modules

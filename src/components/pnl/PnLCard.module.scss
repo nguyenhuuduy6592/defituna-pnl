@@ -1,0 +1,267 @@
+@import '../../styles/variables.module.scss';
+
+.cardOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  @include flex-center;
+  z-index: 1000;
+  padding: spacing(md);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modalContainer {
+  background: rgba(30, 41, 59, 0.95);
+  padding: spacing(md);
+  width: 100%;
+  max-width: 380px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  color: white;
+  position: relative;
+  animation: slideUp 0.4s ease-out;
+}
+
+.cardContent {
+  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+  padding: spacing(lg) spacing(md);
+  margin-bottom: spacing(md);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: spacing(md);
+}
+
+.header {
+  @include flex-between;
+  margin-bottom: spacing(md);
+
+  h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.closeButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+
+  svg {
+    color: rgba(255, 255, 255, 0.8);
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.2);
+    
+    svg {
+      color: white;
+    }
+  }
+}
+
+.pairTitle {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: spacing(xs);
+}
+
+.mainInfo {
+  display: flex;
+  flex-direction: column;
+  gap: spacing(xs);
+}
+
+.pnl {
+  @include flex-center;
+  flex-direction: column;
+  padding: spacing(sm);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+
+  .label {
+    font-size: font-size(xs);
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+  }
+
+  .value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: spacing(xs);
+
+    .currencyIcon {
+      font-size: 1.5rem;
+      opacity: 0.8;
+    }
+  }
+
+  &.positive .value {
+    color: #10B981;
+  }
+
+  &.negative .value {
+    color: #EF4444;
+  }
+
+  &.zero .value {
+    color: #60A5FA;
+  }
+}
+
+.stats {
+  padding: spacing(xs);
+  gap: 4px;
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+}
+
+.statRow {
+  @include flex-between;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .label {
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: spacing(xs);
+    font-size: font-size(sm);
+
+    .icon {
+      font-size: 1em;
+      opacity: 0.7;
+    }
+  }
+
+  .value {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: font-size(sm);
+
+    &.positive {
+      color: #10B981;
+    }
+
+    &.negative {
+      color: #EF4444;
+    }
+
+    &.zero {
+      color: #60A5FA;
+    }
+  }
+}
+
+.qrSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  :global(.qrcode) {
+    background: white;
+    border-radius: 8px;
+    height: 64px;
+    width: 64px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .qrLabel {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: font-size(xs);
+  }
+}
+
+.actions {
+  display: flex;
+  gap: spacing(xs);
+  justify-content: flex-end;
+
+  button {
+    @extend %button-base;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-weight: 500;
+    padding: spacing(xs) spacing(md);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: spacing(xs);
+    font-size: font-size(sm);
+
+    .buttonIcon {
+      font-size: 1.1em;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

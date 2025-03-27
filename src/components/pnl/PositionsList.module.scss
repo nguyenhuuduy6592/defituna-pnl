@@ -5,7 +5,7 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
   max-width: 100%;
-  border-radius: border-radius(md);
+  border-radius: map-get($border-radius, md);
   box-shadow: 0 1px 3px color(shadow);
 }
 
@@ -122,4 +122,27 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   opacity: 0.8;
+}
+
+.shareButton {
+  padding: spacing(xs) spacing(sm);
+  border-radius: map-get($border-radius, sm);
+  border: none;
+  background: color(primary);
+  color: bg-color(white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: font-size(sm);
+  line-height: 1;
+  min-width: 60px;
+  text-align: center;
+  white-space: nowrap;
+
+  &:hover {
+    background: color(hover);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
 }

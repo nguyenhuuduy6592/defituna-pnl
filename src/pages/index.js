@@ -181,10 +181,11 @@ export default ({ data: initData }) => {
     setRefreshInterval(newInterval);
   };
 
+  const title = 'Defituna PnL Viewer';
   return (
     <div className="container">
-      <title>Wallet PnL Viewer</title>
-      <h1>Wallet PnL Viewer</h1>
+      <title>{title}</title>
+      <h1>{title}</h1>
       
       <WalletForm
         wallet={wallet}

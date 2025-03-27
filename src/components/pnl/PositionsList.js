@@ -1,9 +1,11 @@
 import { memo, useState } from 'react';
 import styles from './PositionsList.module.scss';
+import { PnLCard } from './PnLCard';
 
 export const PositionsList = memo(({ positions, formatValue, showWallet = false }) => {
   const [sortField, setSortField] = useState('pnl');
   const [sortDirection, setSortDirection] = useState('desc');
+  const [selectedPosition, setSelectedPosition] = useState(null);
   
   const formatNumber = (num) => {
     if (num === null || num === undefined) return '0.00';
@@ -120,6 +122,7 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
             <th onClick={() => handleSort('pnl')} className={styles.sortable}>
               PnL {getSortIcon('pnl')}
             </th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -145,10 +148,25 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
               <td className={getValueClass(p.pnl)}>
                 ${formatNumber(p.pnl)}
               </td>
+              <td>
+                <button 
+                  className={styles.shareButton}
+                  onClick={() => setSelectedPosition(p)}
+                >
+                  Share
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      {selectedPosition && (
+        <PnLCard
+          position={selectedPosition}
+          onClose={() => setSelectedPosition(null)}
+        />
+      )}
     </div>
   );
 });
