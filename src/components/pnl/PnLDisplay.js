@@ -4,8 +4,22 @@ import styles from './PnLDisplay.module.scss';
 
 export const PnLDisplay = ({ data, isSol, setIsSol }) => {
   const formatValue = (val) => {
-    const value = isSol ? val : val * data.solPrice;
-    return `${value >= 0 ? ' ' : '-'}${Math.abs(value).toFixed(isSol ? 6 : 2)}`.padStart(isSol ? 10 : 8);
+    // Convert USD to SOL or keep as USD
+    const value = isSol ? val / data.solPrice : val;
+    
+    if (isSol) {
+      // For SOL values, always show 6 decimal places
+      return `${value >= 0 ? ' ' : '-'}${Math.abs(value).toFixed(6)}`.padStart(10);
+    } else {
+      // For USD values
+      if (Math.abs(value) < 0.01 && value !== 0) {
+        // Small USD values: show up to 6 decimal places
+        return `${value >= 0 ? ' ' : '-'}${Math.abs(value).toFixed(6)}`.padStart(8);
+      } else {
+        // Normal USD values: show 2 decimal places
+        return `${value >= 0 ? ' ' : '-'}${Math.abs(value).toFixed(2)}`.padStart(8);
+      }
+    }
   };
 
   return (

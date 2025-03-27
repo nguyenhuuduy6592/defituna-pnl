@@ -1,9 +1,33 @@
 import { memo } from 'react';
 import styles from './PositionsList.module.scss';
 
-export const PositionsList = memo(({ positions, isSol }) => {
+export const PositionsList = memo(({ positions, isSol, formatValue }) => {
   const formatNumber = (num) => {
-    return num.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+    // Convert USD to SOL or keep as USD
+    const value = isSol ? num / positions[0]?.solPrice : num;
+    
+    if (isSol) {
+      // For SOL values, always show 6 decimal places
+      return value.toLocaleString(undefined, { 
+        minimumFractionDigits: 6,
+        maximumFractionDigits: 6
+      });
+    } else {
+      // For USD values
+      if (Math.abs(value) < 0.01 && value !== 0) {
+        // Small USD values: show up to 6 decimal places
+        return value.toLocaleString(undefined, {
+          minimumFractionDigits: 6,
+          maximumFractionDigits: 6
+        });
+      } else {
+        // Normal USD values: show 2 decimal places
+        return value.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+    }
   };
 
   const formatDuration = (ageString) => {

@@ -128,15 +128,19 @@ async function fetchPnL(wallet) {
       pair: `${tokenA}/${tokenB}`,
       state: d.state,
       age: positionAges[index],
-      yield: (d.yield_a.usd + d.yield_b.usd) / solPrice,
-      compounded: (d.compounded_yield_a.usd + d.compounded_yield_b.usd) / solPrice,
-      debt: (d.loan_funds_b.usd - d.current_loan_b.usd) / solPrice,
-      pnl: d.pnl.usd / solPrice
+      yield: d.yield_a.usd + d.yield_b.usd,
+      compounded: d.compounded_yield_a.usd + d.compounded_yield_b.usd,
+      debt: d.loan_funds_b.usd - d.current_loan_b.usd,
+      pnl: d.pnl.usd,  // Only use the position's PnL value
+      solPrice
     };
   });
   
+  // Calculate total PnL as the sum of individual position PnLs
+  const totalPnL = positions.reduce((sum, p) => sum + p.pnl, 0);
+  
   return { 
-    totalPnL: positions.reduce((sum, p) => sum + p.pnl, 0), 
+    totalPnL,
     positions, 
     solPrice 
   };

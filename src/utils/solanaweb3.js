@@ -77,7 +77,6 @@ export async function getTransactionAge(address) {
       });
 
       const signaturesData = await signaturesResponse.json();
-      console.log('Signatures response for address:', address, signaturesData);
       
       if (signaturesData.error) {
         console.error('RPC error:', signaturesData.error);
@@ -109,7 +108,6 @@ export async function getTransactionAge(address) {
       });
 
       const txData = await txResponse.json();
-      console.log('Transaction details for signature:', oldestSignature, txData);
       const { result: txResult } = txData;
       if (!txResult || !txResult.blockTime) {
         throw new Error('Transaction details not found');
