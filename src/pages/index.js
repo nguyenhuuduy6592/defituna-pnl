@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { BsInfoCircle } from 'react-icons/bs';
+import { Tooltip } from '../components/Tooltip';
 import { useWallet } from '../hooks/useWallet';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCountdown } from '../hooks/useCountdown';
@@ -6,6 +8,7 @@ import { usePositionAlerts } from '../hooks/usePositionAlerts';
 import WalletForm from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
+import styles from './index.module.scss';
 
 export async function getServerSideProps() {
   return { props: { data: null } };
@@ -189,7 +192,20 @@ export default ({ data: initData }) => {
   return (
     <div className="container">
       <title>{title}</title>
-      <h1>{title}</h1>
+      <div className={styles.titleContainer}>
+        <h1>{title}</h1>
+        <Tooltip content={`
+• View Defituna positions and PnL
+• Support for multiple wallet
+• Auto-refresh data
+• Show position age
+• PnL card to share with friends
+          `}>
+          <div className={styles.infoIcon}>
+            <BsInfoCircle />
+          </div>
+        </Tooltip>
+      </div>
       
       <WalletForm
         wallet={wallet}
@@ -220,7 +236,6 @@ export default ({ data: initData }) => {
         </>
       )}
       
-      {loading && <p className="loading">Loading...</p>}
       {error && <p className="error">{error}</p>}
       
       {/* Display aggregated data if available, otherwise fall back to single wallet data */}
