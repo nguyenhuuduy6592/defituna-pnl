@@ -43,8 +43,18 @@ async function fetchWithRetry(body, retries = 0) {
       console.error(`[fetchWithRetry] Error response: ${errorText}`);
       throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
     }
+
+    const responseData = await response.json();
     
-    return response;
+    // Check for RPC error -32019 (long-term storage query failure)
+    if (responseData.error && responseData.error.code === -32019 && retries < MAX_RETRIES) {
+      const backoffDelay = Math.pow(2, retries) * 1000;
+      console.log(`[fetchWithRetry] Long-term storage query failed, retrying in ${backoffDelay}ms`);
+      await delay(backoffDelay);
+      return fetchWithRetry(body, retries + 1);
+    }
+    
+    return responseData;
   } catch (error) {
     console.error(`[fetchWithRetry] Error:`, error);
     console.error(`[fetchWithRetry] Stack:`, error.stack);
@@ -89,14 +99,13 @@ export async function getTransactionAge(address) {
         ]
       });
 
-      const signaturesData = await signaturesResponse.json();
-      
-      if (signaturesData.error) {
-        console.error('[getTransactionAge] RPC error:', signaturesData.error);
-        throw new Error(signaturesData.error.message);
+      // signaturesResponse is already JSON, no need to parse
+      if (signaturesResponse.error) {
+        console.error('[getTransactionAge] RPC error:', signaturesResponse.error);
+        throw new Error(signaturesResponse.error.message);
       }
 
-      const { result } = signaturesData;
+      const { result } = signaturesResponse;
       
       if (!result || result.length === 0) {
         console.log(`[getTransactionAge] No transactions found for ${address}`);
@@ -116,10 +125,10 @@ export async function getTransactionAge(address) {
         ]
       });
 
-      const txData = await txResponse.json();
-      const { result: txResult } = txData;
+      // txResponse is already JSON, no need to parse
+      const { result: txResult } = txResponse;
       if (!txResult || !txResult.blockTime) {
-        console.error('[getTransactionAge] Transaction details not found:', txData);
+        console.error('[getTransactionAge] Transaction details not found:', txResponse);
         throw new Error('Transaction details not found');
       }
 
