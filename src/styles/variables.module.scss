@@ -130,21 +130,3 @@ $font-sizes: (
     border-color: color(primary);
   }
 }
-
-// Export for JavaScript usage
-:export {
-  primary: color(primary);
-  hover: color(hover);
-  disabled: color(disabled);
-  positive: color(positive);
-  negative: color(negative);
-  zero: color(zero);
-  border: color(border);
-  shadow: color(shadow);
-  bgLight: bg-color(light);
-  bgTh: bg-color(th);
-  textPrimary: text-color(primary);
-  textSecondary: text-color(secondary);
-  textDisabled: text-color(disabled);
-  bgWhite: bg-color(white);
-}
