@@ -24,12 +24,17 @@ body {
 
 // Layout containers
 .container {
-  max-width: 800px;
+  width: 100%;
+  max-width: 90vw; // Makes the container responsive to viewport width
   margin: 0 auto;
   padding: spacing(md);
   
   @include responsive(sm) {
     padding: spacing(lg);
+  }
+
+  @include responsive(xl) {
+    max-width: 1600px; // Maximum width on very large screens
   }
 }
 

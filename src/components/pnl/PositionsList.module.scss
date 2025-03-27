@@ -3,10 +3,16 @@
 .positionsContainer {
   margin-top: spacing(md);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+  max-width: 100%;
+  border-radius: border-radius(md);
+  box-shadow: 0 1px 3px color(shadow);
 }
 
 .table {
   width: 100%;
+  min-width: 800px; // Ensure minimum width for content
+  max-width: 100%;
   border-collapse: collapse;
   background: bg-color(white);
   box-shadow: 0 1px 3px color(shadow);

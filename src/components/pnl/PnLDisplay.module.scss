@@ -1,7 +1,8 @@
 @import '../../styles/variables.module.scss';
 
 .container {
-  max-width: 800px;
+  width: 100%;
+  max-width: 1200px; // Increased from 800px to better accommodate the table
   margin: 0 auto;
   padding: spacing(md);
   font-family: Arial, sans-serif;
@@ -27,6 +28,7 @@
   background-color: bg-color(light);
   border-radius: map-get($border-radius, sm);
   border: 1px solid color(border);
+  width: 100%;
 
   @include responsive(md) {
     padding: spacing(lg);
@@ -34,17 +36,9 @@
 
   .pnlGrid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: spacing(md);
     margin-top: spacing(sm);
-  
-    @include responsive(sm) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-  
-    @include responsive(lg) {
-      grid-template-columns: repeat(3, 1fr);
-    }
   }
 }
 
