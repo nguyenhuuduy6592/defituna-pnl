@@ -1,32 +1,20 @@
 import { memo } from 'react';
 import styles from './PositionsList.module.scss';
 
-export const PositionsList = memo(({ positions, isSol, formatValue }) => {
+export const PositionsList = memo(({ positions, formatValue }) => {
   const formatNumber = (num) => {
-    // Convert USD to SOL or keep as USD
-    const value = isSol ? num / positions[0]?.solPrice : num;
-    
-    if (isSol) {
-      // For SOL values, always show 6 decimal places
-      return value.toLocaleString(undefined, { 
+    if (Math.abs(num) < 0.01 && num !== 0) {
+      // Small USD values: show up to 6 decimal places
+      return num.toLocaleString(undefined, {
         minimumFractionDigits: 6,
         maximumFractionDigits: 6
       });
     } else {
-      // For USD values
-      if (Math.abs(value) < 0.01 && value !== 0) {
-        // Small USD values: show up to 6 decimal places
-        return value.toLocaleString(undefined, {
-          minimumFractionDigits: 6,
-          maximumFractionDigits: 6
-        });
-      } else {
-        // Normal USD values: show 2 decimal places
-        return value.toLocaleString(undefined, {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
-      }
+      // Normal USD values: show 2 decimal places
+      return num.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
     }
   };
 
@@ -66,21 +54,21 @@ export const PositionsList = memo(({ positions, isSol, formatValue }) => {
         </thead>
         <tbody>
           {positions.map((p, i) => (
-            <tr key={`${p.pair}-${i}-${isSol}`}>
+            <tr key={`${p.pair}-${i}`}>
               <td>{p.pair}</td>
               <td className={getStateClass(p.state)}>{p.state}</td>
               <td className={styles.timestamp}>{formatDuration(p.age)}</td>
               <td className={p.yield > 0 ? styles.positive : p.yield < 0 ? styles.negative : styles.zero}>
-                {formatNumber(p.yield)} {isSol ? 'SOL' : 'USD'}
+                ${formatNumber(p.yield)}
               </td>
               <td className={p.compounded > 0 ? styles.positive : p.compounded < 0 ? styles.negative : styles.zero}>
-                {formatNumber(p.compounded)} {isSol ? 'SOL' : 'USD'}
+                ${formatNumber(p.compounded)}
               </td>
               <td className={p.debt > 0 ? styles.positive : p.debt < 0 ? styles.negative : styles.zero}>
-                {formatNumber(p.debt)} {isSol ? 'SOL' : 'USD'}
+                ${formatNumber(p.debt)}
               </td>
               <td className={p.pnl > 0 ? styles.positive : p.pnl < 0 ? styles.negative : styles.zero}>
-                {formatNumber(p.pnl)} {isSol ? 'SOL' : 'USD'}
+                ${formatNumber(p.pnl)}
               </td>
             </tr>
           ))}

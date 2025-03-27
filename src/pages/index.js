@@ -16,7 +16,6 @@ export default ({ data: initData }) => {
   const [data, setData] = useState(initData);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [isSol, setIsSol] = useState(true);
   const { countdown: fetchCooldown, startCountdown: startFetchCooldown } = useCountdown(0);
 
   const {
@@ -73,14 +72,6 @@ export default ({ data: initData }) => {
     updateSettings: updateAlertSettings,
     clearAlerts
   } = usePositionAlerts(data?.positions, data?.solPrice);
-
-  useEffect(() => {
-    setIsSol(localStorage.getItem('currency') !== 'usd');
-  }, []);
-
-  useEffect(() => {
-    if (data) localStorage.setItem('currency', isSol ? 'sol' : 'usd');
-  }, [isSol, data]);
 
   // Auto fetch data if there's a wallet on page load
   useEffect(() => {
@@ -140,7 +131,7 @@ export default ({ data: initData }) => {
       
       {loading && <p className="loading">Loading...</p>}
       {error && <p className="error">{error}</p>}
-      {data && <PnLDisplay data={data} isSol={isSol} setIsSol={setIsSol} />}
+      {data && <PnLDisplay data={data} />}
     </div>
   );
 };
