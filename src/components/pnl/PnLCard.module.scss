@@ -1,4 +1,4 @@
-@import '../../styles/variables.module.scss';
+@use '../../styles/variables.module.scss';
 
 .cardOverlay {
   position: fixed;
@@ -7,15 +7,15 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.85);
-  @include flex-center;
+  @include variables.flex-center;
   z-index: 1000;
-  padding: spacing(md);
+  padding: variables.spacing(md);
   animation: fadeIn 0.3s ease-out;
 }
 
 .modalContainer {
   background: rgba(30, 41, 59, 0.95);
-  padding: spacing(md);
+  padding: variables.spacing(md);
   width: 100%;
   max-width: 380px;
   backdrop-filter: blur(20px);
@@ -30,19 +30,19 @@
 
 .cardContent {
   background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-  padding: spacing(lg) spacing(md);
-  margin-bottom: spacing(md);
+  padding: variables.spacing(lg) variables.spacing(md);
+  margin-bottom: variables.spacing(md);
   box-shadow: 
     0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
-  gap: spacing(md);
+  gap: variables.spacing(md);
 }
 
 .header {
-  @include flex-between;
-  margin-bottom: spacing(md);
+  @include variables.flex-between;
+  margin-bottom: variables.spacing(md);
 
   h2 {
     margin: 0;
@@ -91,25 +91,25 @@
 .content {
   display: flex;
   flex-direction: column;
-  gap: spacing(xs);
+  gap: variables.spacing(xs);
 }
 
 .mainInfo {
   display: flex;
   flex-direction: column;
-  gap: spacing(xs);
+  gap: variables.spacing(xs);
 }
 
 .pnl {
-  @include flex-center;
+  @include variables.flex-center;
   flex-direction: column;
-  padding: spacing(sm);
+  padding: variables.spacing(sm);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
 
   .label {
-    font-size: font-size(xs);
+    font-size: variables.font-size(xs);
     color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -122,7 +122,7 @@
     letter-spacing: -0.02em;
     display: flex;
     align-items: center;
-    gap: spacing(xs);
+    gap: variables.spacing(xs);
 
     .currencyIcon {
       font-size: 1.5rem;
@@ -144,7 +144,7 @@
 }
 
 .stats {
-  padding: spacing(xs);
+  padding: variables.spacing(xs);
   gap: 4px;
   display: flex;
   flex-direction: column;
@@ -153,7 +153,7 @@
 }
 
 .statRow {
-  @include flex-between;
+  @include variables.flex-between;
   padding: 4px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
@@ -165,8 +165,8 @@
     color: rgba(255, 255, 255, 0.5);
     display: flex;
     align-items: center;
-    gap: spacing(xs);
-    font-size: font-size(sm);
+    gap: variables.spacing(xs);
+    font-size: variables.font-size(sm);
 
     .icon {
       font-size: 1em;
@@ -177,7 +177,7 @@
   .value {
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
-    font-size: font-size(sm);
+    font-size: variables.font-size(sm);
 
     &.positive {
       color: #10B981;
@@ -208,13 +208,13 @@
 
   .qrLabel {
     color: rgba(255, 255, 255, 0.6);
-    font-size: font-size(xs);
+    font-size: variables.font-size(xs);
   }
 }
 
 .actions {
   display: flex;
-  gap: spacing(xs);
+  gap: variables.spacing(xs);
   justify-content: flex-end;
 
   button {
@@ -222,14 +222,14 @@
     background: rgba(255, 255, 255, 0.1);
     color: white;
     font-weight: 500;
-    padding: spacing(xs) spacing(md);
+    padding: variables.spacing(xs) variables.spacing(md);
     border-radius: 8px;
     backdrop-filter: blur(10px);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    gap: spacing(xs);
-    font-size: font-size(sm);
+    gap: variables.spacing(xs);
+    font-size: variables.font-size(sm);
 
     .buttonIcon {
       font-size: 1.1em;

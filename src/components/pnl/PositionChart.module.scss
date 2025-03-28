@@ -1,4 +1,5 @@
-@import '../../styles/variables.module.scss';
+@use "sass:map";
+@use '../../styles/variables.module.scss';
 
 .chartOverlay {
   position: fixed;
@@ -11,14 +12,14 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: spacing(md);
+  padding: variables.spacing(md);
   backdrop-filter: blur(2px);
 }
 
 .chartContainer {
-  background: bg-color(white);
-  border-radius: map-get($border-radius, md);
-  padding: spacing(xl);
+  background: variables.bg-color(white);
+  border-radius: map.get(variables.$border-radius, md);
+  padding: variables.spacing(xl);
   width: 90%;
   max-width: 1200px;
   max-height: 90vh;
@@ -32,51 +33,51 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: spacing(lg);
-  padding-bottom: spacing(sm);
-  border-bottom: 1px solid color(border);
+  margin-bottom: variables.spacing(lg);
+  padding-bottom: variables.spacing(sm);
+  border-bottom: 1px solid variables.color(border);
 
   h3 {
     margin: 0;
-    font-size: font-size(xl);
-    color: text-color(primary);
+    font-size: variables.font-size(xl);
+    color: variables.text-color(primary);
     font-weight: bold;
   }
 }
 
 .controls {
   display: flex;
-  gap: spacing(sm);
+  gap: variables.spacing(sm);
   align-items: center;
 }
 
 .periodSelect {
-  padding: spacing(xs) spacing(md);
-  border-radius: map-get($border-radius, sm);
-  border: 1px solid color(border);
-  background: bg-color(white);
-  color: text-color(primary);
+  padding: variables.spacing(xs) variables.spacing(md);
+  border-radius: map.get(variables.$border-radius, sm);
+  border: 1px solid variables.color(border);
+  background: variables.bg-color(white);
+  color: variables.text-color(primary);
   cursor: pointer;
-  font-size: font-size(sm);
+  font-size: variables.font-size(sm);
   min-width: 120px;
 
   &:hover {
-    border-color: color(primary);
+    border-color: variables.color(primary);
   }
 
   &:focus {
     outline: none;
-    border-color: color(primary);
-    box-shadow: 0 0 0 2px rgba(color(primary), 0.1);
+    border-color: variables.color(primary);
+    box-shadow: 0 0 0 2px rgba(variables.color(primary), 0.1);
   }
 }
 
 .closeButton {
   background: none;
   border: none;
-  color: text-color(secondary);
+  color: variables.text-color(secondary);
   cursor: pointer;
-  padding: spacing(xs);
+  padding: variables.spacing(xs);
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -84,38 +85,38 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  margin-left: spacing(sm);
+  margin-left: variables.spacing(sm);
 
   &:hover {
-    background: bg-color(light);
-    color: text-color(primary);
+    background: variables.bg-color(light);
+    color: variables.text-color(primary);
   }
 }
 
 .metricToggles {
   display: flex;
   flex-wrap: wrap;
-  gap: spacing(md);
-  margin-bottom: spacing(lg);
-  padding: spacing(md);
-  background: bg-color(light);
-  border-radius: map-get($border-radius, sm);
+  gap: variables.spacing(md);
+  margin-bottom: variables.spacing(lg);
+  padding: variables.spacing(md);
+  background: variables.bg-color(light);
+  border-radius: map.get(variables.$border-radius, sm);
 
   label {
     display: flex;
     align-items: center;
-    gap: spacing(xs);
+    gap: variables.spacing(xs);
     cursor: pointer;
-    color: text-color(primary);
-    font-size: font-size(sm);
+    color: variables.text-color(primary);
+    font-size: variables.font-size(sm);
     user-select: none;
-    padding: spacing(xs) spacing(sm);
-    border-radius: map-get($border-radius, xs);
+    padding: variables.spacing(xs) variables.spacing(sm);
+    border-radius: map.get(variables.$border-radius, xs);
     transition: all 0.2s ease;
 
     &:hover {
-      background: color(hover);
-      color: bg-color(white);
+      background: variables.color(hover);
+      color: variables.bg-color(white);
     }
 
     input[type="checkbox"] {
@@ -127,29 +128,29 @@
 }
 
 .chartContent {
-  background: bg-color(white);
-  padding: spacing(lg);
-  border-radius: map-get($border-radius, sm);
-  border: 1px solid color(border);
+  background: variables.bg-color(white);
+  padding: variables.spacing(lg);
+  border-radius: map.get(variables.$border-radius, sm);
+  border: 1px solid variables.color(border);
   overflow: hidden;
 }
 
 .tooltip {
-  background: bg-color(white);
-  border: 1px solid color(border);
-  border-radius: map-get($border-radius, sm);
-  padding: spacing(sm);
+  background: variables.bg-color(white);
+  border: 1px solid variables.color(border);
+  border-radius: map.get(variables.$border-radius, sm);
+  padding: variables.spacing(sm);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   p {
-    margin: spacing(xs) 0;
-    font-size: font-size(sm);
+    margin: variables.spacing(xs) 0;
+    font-size: variables.font-size(sm);
   }
 
   .tooltipLabel {
     font-weight: bold;
-    margin-bottom: spacing(sm);
-    color: text-color(primary);
+    margin-bottom: variables.spacing(sm);
+    color: variables.text-color(primary);
   }
 }
 

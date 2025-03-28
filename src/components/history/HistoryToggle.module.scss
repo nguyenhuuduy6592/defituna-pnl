@@ -1,16 +1,16 @@
-@import '../../styles/variables.module.scss';
+@use '../../styles/variables.module.scss';
 
 .toggle {
-  @include flex-start;
-  gap: spacing(sm);
+  @include variables.flex-start;
+  gap: variables.spacing(sm);
   cursor: pointer;
-  color: text-color(primary);
-  font-size: font-size(base);
+  color: variables.text-color(primary);
+  font-size: variables.font-size(base);
   user-select: none;
   
   input[type="checkbox"] {
-    width: spacing(md);
-    height: spacing(md);
+    width: variables.spacing(md);
+    height: variables.spacing(md);
     margin: 0;
   }
 }

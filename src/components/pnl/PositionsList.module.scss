@@ -1,12 +1,13 @@
-@import '../../styles/variables.module.scss';
+@use "sass:map";
+@use '../../styles/variables.module.scss';
 
 .positionsContainer {
-  margin-top: spacing(md);
+  margin-top: variables.spacing(md);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
   max-width: 100%;
-  border-radius: map-get($border-radius, md);
-  box-shadow: 0 1px 3px color(shadow);
+  border-radius: map.get(variables.$border-radius, md);
+  box-shadow: 0 1px 3px variables.color(shadow);
 }
 
 .positionsTable {
@@ -14,25 +15,25 @@
   min-width: 800px; // Ensure minimum width for content
   max-width: 100%;
   border-collapse: collapse;
-  background: bg-color(white);
-  box-shadow: 0 1px 3px color(shadow);
-  font-size: font-size(sm);
+  background: variables.bg-color(white);
+  box-shadow: 0 1px 3px variables.color(shadow);
+  font-size: variables.font-size(sm);
   
-  @include responsive(md) {
-    font-size: font-size(base);
+  @include variables.responsive(md) {
+    font-size: variables.font-size(base);
   }
   
   th, td {
-    border: 1px solid color(border);
-    padding: spacing(sm);
+    border: 1px solid variables.color(border);
+    padding: variables.spacing(sm);
     text-align: left;
     white-space: nowrap;
   }
   
   th {
-    background: bg-color(light);
+    background: variables.bg-color(light);
     font-weight: font-weight(bold);
-    color: text-color(secondary);
+    color: variables.text-color(secondary);
     
     &.sortable {
       cursor: pointer;
@@ -40,44 +41,44 @@
       user-select: none;
       
       &:hover {
-        background-color: bg-color(hover);
+        background-color: variables.bg-color(hover);
       }
     }
   }
 
   tr {
     &:nth-child(even) {
-      background: bg-color(light);
+      background: variables.bg-color(light);
     }
 
     td {
-      color: text-color(primary);
+      color: variables.text-color(primary);
   
-      &.positive { color: color(positive); }
-      &.negative { color: color(negative); }
-      &.zero { color: color(zero); }
+      &.positive { color: variables.color(positive); }
+      &.negative { color: variables.color(negative); }
+      &.zero { color: variables.color(zero); }
     }
   }
 
   tbody tr {
     &:hover {
-      background-color: bg-color(hover);
+      background-color: variables.bg-color(hover);
     }
   }
 }
 
 .position {
-  margin: spacing(md) 0;
+  margin: variables.spacing(md) 0;
 }
 
 .noData {
   text-align: center;
-  padding: spacing(md);
-  color: text-color(secondary);
-  background: bg-color(light);
-  border-radius: map-get($border-radius, sm);
-  margin: spacing(md) 0;
-  font-size: font-size(base);
+  padding: variables.spacing(md);
+  color: variables.text-color(secondary);
+  background: variables.bg-color(light);
+  border-radius: map.get(variables.$border-radius, sm);
+  margin: variables.spacing(md) 0;
+  font-size: variables.font-size(base);
   font-style: italic;
 }
 
@@ -88,28 +89,28 @@
 
 .stateOpen {
   @extend %state-text;
-  color: color(success);
+  color: variables.color(success);
 }
 
 .stateClosed {
   @extend %state-text;
-  color: text-color(disabled);
+  color: variables.text-color(disabled);
 }
 
 .stateLiquidated {
   @extend %state-text;
-  color: color(negative);
+  color: variables.color(negative);
 }
 
 .timestamp {
-  color: text-color(secondary);
+  color: variables.text-color(secondary);
   white-space: nowrap;
-  font-size: font-size(xs);
+  font-size: variables.font-size(xs);
 }
 
 .walletCell {
   font-family: monospace;
-  font-size: font-size(xs);
+  font-size: variables.font-size(xs);
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -118,15 +119,15 @@
 }
 
 .shareButton, .chartButton {
-  padding: spacing(xs) spacing(sm);
-  border-radius: map-get($border-radius, sm);
+  padding: variables.spacing(xs) variables.spacing(sm);
+  border-radius: map.get(variables.$border-radius, sm);
   cursor: pointer;
-  font-size: font-size(sm);
+  font-size: variables.font-size(sm);
   line-height: 1;
   text-align: center;
   white-space: nowrap;
   transition: all 0.2s ease;
-  margin-right: spacing(xs);
+  margin-right: variables.spacing(xs);
 
   &:last-child {
     margin-right: 0;
@@ -138,24 +139,24 @@
 }
 
 .shareButton {
-  background: color(primary);
-  color: bg-color(white);
+  background: variables.color(primary);
+  color: variables.bg-color(white);
   border: none;
   min-width: 60px;
 
   &:hover {
-    background: color(hover);
+    background: variables.color(hover);
   }
 }
 
 .chartButton {
-  background: bg-color(light);
-  color: text-color(primary);
-  border: 1px solid color(border);
+  background: variables.bg-color(light);
+  color: variables.text-color(primary);
+  border: 1px solid variables.color(border);
 
   &:hover {
-    background: color(primary);
-    color: bg-color(white);
-    border-color: color(primary);
+    background: variables.color(primary);
+    color: variables.bg-color(white);
+    border-color: variables.color(primary);
   }
 }

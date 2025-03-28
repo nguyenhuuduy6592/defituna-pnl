@@ -1,69 +1,70 @@
-@import '../../styles/variables.module.scss';
+@use "sass:map";
+@use '../../styles/variables.module.scss';
 
 .container {
   width: 100%;
   max-width: 1200px; // Increased from 800px to better accommodate the table
   margin: 0 auto;
-  padding: spacing(md);
+  padding: variables.spacing(md);
   font-family: Arial, sans-serif;
 
   .heading {
-    color: color(textPrimary);
+    color: variables.color(textPrimary);
   }
 
   .solPrice {
-    margin-bottom: spacing(md);
+    margin-bottom: variables.spacing(md);
   }
 
   .divider {
-    margin: spacing(md) 0;
+    margin: variables.spacing(md) 0;
     border: 0;
-    border-top: 1px solid color(border);
+    border-top: 1px solid variables.color(border);
   }
 }
 
 .pnlContainer {
-  margin: spacing(md) 0;
-  padding: spacing(md);
-  background-color: bg-color(light);
-  border-radius: map-get($border-radius, sm);
-  border: 1px solid color(border);
+  margin: variables.spacing(md) 0;
+  padding: variables.spacing(md);
+  background-color: variables.bg-color(light);
+  border-radius: map.get(variables.$border-radius, sm);
+  border: 1px solid variables.color(border);
   width: 100%;
 
-  @include responsive(md) {
-    padding: spacing(lg);
+  @include variables.responsive(md) {
+    padding: variables.spacing(lg);
   }
 
   .pnlGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: spacing(md);
-    margin-top: spacing(sm);
+    gap: variables.spacing(md);
+    margin-top: variables.spacing(sm);
   }
 }
 
 .pnlContainer {
-  margin-top: spacing(md);
+  margin-top: variables.spacing(md);
 }
 
 .pnlHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: spacing(md);
+  margin-bottom: variables.spacing(md);
 }
 
 .pnlGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: spacing(md);
-  margin-bottom: spacing(md);
+  gap: variables.spacing(md);
+  margin-bottom: variables.spacing(md);
 }
 
 .pnlItem {
-  @include card;
-  padding: spacing(md);
-  background: bg-color(card);
+  @include variables.card;
+  padding: variables.spacing(md);
+  background: variables.bg-color(card);
   border-radius: border-radius(md);
   box-shadow: box-shadow(sm);
   transition: box-shadow 0.3s ease;
@@ -73,58 +74,58 @@
   }
 
   .label {
-    font-size: font-size(sm);
-    color: text-color(secondary);
-    margin-bottom: spacing(xs);
+    font-size: variables.font-size(sm);
+    color: variables.text-color(secondary);
+    margin-bottom: variables.spacing(xs);
   }
 
   .value {
-    font-size: font-size(xl);
+    font-size: variables.font-size(xl);
     font-weight: font-weight(bold);
     font-family: monospace;
     
-    &.positive { color: color(positive); }
-    &.negative { color: color(negative); }
-    &.zero { color: color(zero); }
+    &.positive { color: variables.color(positive); }
+    &.negative { color: variables.color(negative); }
+    &.zero { color: variables.color(zero); }
   }
 }
 
 .refreshTime {
-  margin-top: spacing(sm);
+  margin-top: variables.spacing(sm);
   text-align: right;
-  font-size: font-size(xs);
-  color: text-color(secondary);
+  font-size: variables.font-size(xs);
+  color: variables.text-color(secondary);
 }
 
 .positive {
-  color: color(positive);
+  color: variables.color(positive);
 }
 
 .negative {
-  color: color(negative);
+  color: variables.color(negative);
 }
 
 .zero {
-  color: text-color(secondary);
+  color: variables.text-color(secondary);
 }
 
 .groupedPositions {
-  margin-bottom: spacing(lg);
+  margin-bottom: variables.spacing(lg);
   
   h3 {
-    font-size: font-size(md);
-    color: text-color(primary);
-    margin-bottom: spacing(sm);
-    padding-bottom: spacing(xs);
-    border-bottom: 1px solid bg-color(border);
+    font-size: variables.font-size(md);
+    color: variables.text-color(primary);
+    margin-bottom: variables.spacing(sm);
+    padding-bottom: variables.spacing(xs);
+    border-bottom: 1px solid variables.bg-color(border);
   }
 }
 
 .walletGroup, .pairGroup {
-  margin-bottom: spacing(md);
-  padding: spacing(md);
+  margin-bottom: variables.spacing(md);
+  padding: variables.spacing(md);
   border-radius: border-radius(md);
-  background: bg-color(card);
+  background: variables.bg-color(card);
   box-shadow: box-shadow(sm);
 }
 
@@ -132,15 +133,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: spacing(md);
-  padding-bottom: spacing(xs);
-  border-bottom: 1px solid bg-color(divider);
+  margin-bottom: variables.spacing(md);
+  padding-bottom: variables.spacing(xs);
+  border-bottom: 1px solid variables.bg-color(divider);
 }
 
 .walletAddress {
   font-family: monospace;
   font-weight: font-weight(medium);
-  font-size: font-size(sm);
+  font-size: variables.font-size(sm);
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -148,35 +149,35 @@
 .walletPnL, .pairPnL {
   font-weight: font-weight(bold);
   font-family: monospace;
-  font-size: font-size(md);
+  font-size: variables.font-size(md);
 }
 
 .pairName {
   font-weight: font-weight(bold);
-  font-size: font-size(md);
+  font-size: variables.font-size(md);
 }
 
 // Add donation footer styles
 .donationFooter {
-  margin-top: spacing(lg);
-  padding: spacing(md);
+  margin-top: variables.spacing(lg);
+  padding: variables.spacing(md);
   background: rgba(255, 255, 255, 0.05);
   border-radius: border-radius(md);
   border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
-  color: text-color(secondary);
+  color: variables.text-color(secondary);
   backdrop-filter: blur(10px);
 
   .title {
-    font-size: font-size(sm);
-    margin-bottom: spacing(xs);
-    color: text-color(primary);
+    font-size: variables.font-size(sm);
+    margin-bottom: variables.spacing(xs);
+    color: variables.text-color(primary);
   }
 
   .address {
     font-family: monospace;
-    font-size: font-size(sm);
-    padding: spacing(xs) spacing(sm);
+    font-size: variables.font-size(sm);
+    padding: variables.spacing(xs) variables.spacing(sm);
     background: rgba(255, 255, 255, 0.05);
     border-radius: border-radius(sm);
     display: inline-block;
@@ -189,8 +190,8 @@
   }
 
   .description {
-    font-size: font-size(xs);
-    margin-top: spacing(xs);
+    font-size: variables.font-size(xs);
+    margin-top: variables.spacing(xs);
     opacity: 0.7;
   }
 }

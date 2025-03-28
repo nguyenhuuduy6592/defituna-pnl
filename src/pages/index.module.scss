@@ -1,10 +1,10 @@
-@import '../styles/variables.module.scss';
+@use '../styles/variables.module.scss';
 
 .titleContainer {
   display: flex;
   align-items: center;
-  gap: spacing(sm);
-  margin-bottom: spacing(lg);
+  gap: variables.spacing(sm);
+  margin-bottom: variables.spacing(lg);
 
   h1 {
     margin: 0;
@@ -13,13 +13,13 @@
   .infoIcon {
     display: flex;
     align-items: center;
-    color: text-color(secondary);
-    font-size: font-size(lg);
+    color: variables.text-color(secondary);
+    font-size: variables.font-size(lg);
     cursor: help;
     transition: color 0.2s ease;
 
     &:hover {
-      color: color(primary);
+      color: variables.color(primary);
     }
   }
 }

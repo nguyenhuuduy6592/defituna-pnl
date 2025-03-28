@@ -1,4 +1,5 @@
-@import './variables.module.scss';
+@use "sass:map";
+@use 'variables.module.scss';
 
 // Reset and base styles
 html, 
@@ -7,10 +8,10 @@ body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  font-size: font-size(base);
-  color: text-color(primary);
+  font-size: variables.font-size(base);
+  color: variables.text-color(primary);
   line-height: 1.5;
-  background: bg-color(white);
+  background: variables.bg-color(white);
 }
 
 * {
@@ -27,40 +28,40 @@ body {
   width: 100%;
   max-width: 90vw; // Makes the container responsive to viewport width
   margin: 0 auto;
-  padding: spacing(md);
+  padding: variables.spacing(md);
   
-  @include responsive(sm) {
-    padding: spacing(lg);
+  @include variables.responsive(sm) {
+    padding: variables.spacing(lg);
   }
 
-  @include responsive(xl) {
+  @include variables.responsive(xl) {
     max-width: 1600px; // Maximum width on very large screens
   }
 }
 
 // Typography
 h1 { 
-  font-size: font-size(xl) * 1.5;
-  margin-bottom: spacing(lg);
+  font-size: variables.font-size(xl) * 1.5;
+  margin-bottom: variables.spacing(lg);
 }
 
 h2 { 
-  font-size: font-size(xl);
-  margin-bottom: spacing(md);
+  font-size: variables.font-size(xl);
+  margin-bottom: variables.spacing(md);
 }
 
 h3 { 
-  font-size: font-size(lg);
-  margin-bottom: spacing(md);
+  font-size: variables.font-size(lg);
+  margin-bottom: variables.spacing(md);
 }
 
 h4, h5, h6 { 
-  font-size: font-size(base);
-  margin-bottom: spacing(sm);
+  font-size: variables.font-size(base);
+  margin-bottom: variables.spacing(sm);
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: text-color(primary);
+  color: variables.text-color(primary);
   margin-top: 0;
   font-weight: 600;
   line-height: 1.2;
@@ -71,26 +72,26 @@ input,
 select,
 textarea {
   @extend %input-base;
-  font-size: font-size(base);
-  color: text-color(primary);
+  font-size: variables.font-size(base);
+  color: variables.text-color(primary);
 
   &::placeholder {
-    color: text-color(disabled);
+    color: variables.text-color(disabled);
   }
 }
 
 button {
   @extend %button-base;
-  font-size: font-size(base);
+  font-size: variables.font-size(base);
 }
 
 // Common status classes
 .loading { 
-  color: color(primary); 
-  margin-top: spacing(sm);
+  color: variables.color(primary); 
+  margin-top: variables.spacing(sm);
   display: flex;
   align-items: center;
-  gap: spacing(xs);
+  gap: variables.spacing(xs);
 
   &::after {
     content: "...";
@@ -98,33 +99,33 @@ button {
 }
 
 .error { 
-  color: color(negative); 
-  margin-top: spacing(sm);
-  padding: spacing(sm);
-  border-radius: map-get($border-radius, sm);
-  background-color: rgba(color(negative), 0.1);
+  color: variables.color(negative); 
+  margin-top: variables.spacing(sm);
+  padding: variables.spacing(sm);
+  border-radius: map.get(variables.$border-radius, sm);
+  background-color: rgba(variables.color(negative), 0.1);
 }
 
 // Common utility classes
-.text-primary { color: text-color(primary); }
-.text-secondary { color: text-color(secondary); }
-.text-disabled { color: text-color(disabled); }
+.text-primary { color: variables.text-color(primary); }
+.text-secondary { color: variables.text-color(secondary); }
+.text-disabled { color: variables.text-color(disabled); }
 
-.positive { color: color(positive); }
-.negative { color: color(negative); }
-.zero { color: color(zero); }
+.positive { color: variables.color(positive); }
+.negative { color: variables.color(negative); }
+.zero { color: variables.color(zero); }
 
-.bg-light { background-color: bg-color(light); }
-.bg-white { background-color: bg-color(white); }
+.bg-light { background-color: variables.bg-color(light); }
+.bg-white { background-color: variables.bg-color(white); }
 
 // Spacing utilities
-.mt-sm { margin-top: spacing(sm); }
-.mt-md { margin-top: spacing(md); }
-.mt-lg { margin-top: spacing(lg); }
+.mt-sm { margin-top: variables.spacing(sm); }
+.mt-md { margin-top: variables.spacing(md); }
+.mt-lg { margin-top: variables.spacing(lg); }
 
-.mb-sm { margin-bottom: spacing(sm); }
-.mb-md { margin-bottom: spacing(md); }
-.mb-lg { margin-bottom: spacing(lg); }
+.mb-sm { margin-bottom: variables.spacing(sm); }
+.mb-md { margin-bottom: variables.spacing(md); }
+.mb-lg { margin-bottom: variables.spacing(lg); }
 
 // Accessibility
 .visually-hidden {

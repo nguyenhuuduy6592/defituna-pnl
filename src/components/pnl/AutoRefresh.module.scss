@@ -1,16 +1,17 @@
-@import '../../styles/variables.module.scss';
+@use "sass:map";
+@use '../../styles/variables.module.scss';
 
 .refreshControls {
-  margin: spacing(md) 0;
-  padding: spacing(md);
-  background-color: bg-color(light);
-  border-radius: map-get($border-radius, sm);
-  border: 1px solid color(border);
+  margin: variables.spacing(md) 0;
+  padding: variables.spacing(md);
+  background-color: variables.bg-color(light);
+  border-radius: map.get(variables.$border-radius, sm);
+  border: 1px solid variables.color(border);
   display: flex;
   flex-direction: column;
-  gap: spacing(md);
+  gap: variables.spacing(md);
 
-  @include responsive(sm) {
+  @include variables.responsive(sm) {
     flex-direction: row;
     align-items: center;
   }
@@ -18,20 +19,20 @@
 
 .refreshToggles {
   display: flex;
-  gap: spacing(lg);
+  gap: variables.spacing(lg);
   align-items: center;
 }
 
 .refreshToggle {
-  @include flex-start;
-  gap: spacing(sm);
+  @include variables.flex-start;
+  gap: variables.spacing(sm);
   cursor: pointer;
-  color: text-color(primary);
-  font-size: font-size(base);
+  color: variables.text-color(primary);
+  font-size: variables.font-size(base);
   
   input[type="checkbox"] {
-    width: spacing(md);
-    height: spacing(md);
+    width: variables.spacing(md);
+    height: variables.spacing(md);
     margin: 0;
   }
 
@@ -45,25 +46,25 @@
 
   select {
     @extend %input-base;
-    padding: spacing(xs) spacing(sm);
+    padding: variables.spacing(xs) variables.spacing(sm);
     width: auto;
-    font-size: font-size(sm);
+    font-size: variables.font-size(sm);
     min-width: 120px;
     margin: 0;
     
     &:focus {
       outline: none;
-      border-color: color(primary);
+      border-color: variables.color(primary);
     }
   }
 }
 
 .refreshStatus {
-  font-size: font-size(sm);
-  color: text-color(secondary);
+  font-size: variables.font-size(sm);
+  color: variables.text-color(secondary);
   white-space: nowrap;
 
-  @include responsive(sm) {
-    margin-left: spacing(md);
+  @include variables.responsive(sm) {
+    margin-left: variables.spacing(md);
   }
 }

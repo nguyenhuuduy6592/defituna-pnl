@@ -1,4 +1,4 @@
-@import '../styles/variables.module.scss';
+@use '../styles/variables.module.scss';
 
 .tooltipContainer {
   position: relative;
@@ -23,9 +23,9 @@
 
   text-align: left;
   line-height: 1.6; // Increased line height for better spacing
-  padding: 0 spacing(sm); // Adjusted padding for better spacing
+  padding: 0 variables.spacing(sm); // Adjusted padding for better spacing
   white-space: pre-wrap;
-  font-size: font-size(sm); // Slightly larger font size for readability
+  font-size: variables.font-size(sm); // Slightly larger font size for readability
 
   &::before {
     content: '';
