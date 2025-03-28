@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BsInfoCircle } from 'react-icons/bs';
-import { Tooltip } from '../components/Tooltip';
+import { Tooltip } from '../components/common/Tooltip';
 import { useWallet } from '../hooks/useWallet';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCountdown } from '../hooks/useCountdown';
