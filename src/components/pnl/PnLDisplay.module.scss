@@ -3,10 +3,14 @@
 
 .container {
   width: 100%;
-  max-width: 1200px; // Increased from 800px to better accommodate the table
+  max-width: 1200px;
   margin: 0 auto;
   padding: variables.spacing(md);
   font-family: Arial, sans-serif;
+
+  @include variables.responsive(sm) {
+    padding: variables.spacing(lg);
+  }
 
   .heading {
     color: variables.color(textPrimary);
@@ -30,6 +34,7 @@
   border-radius: map.get(variables.$border-radius, sm);
   border: 1px solid variables.color(border);
   width: 100%;
+  box-sizing: border-box;
 
   @include variables.responsive(md) {
     padding: variables.spacing(lg);
@@ -37,9 +42,13 @@
 
   .pnlGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 1fr;
     gap: variables.spacing(md);
     margin-top: variables.spacing(sm);
+
+    @include variables.responsive(sm) {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
   }
 }
 
@@ -56,9 +65,13 @@
 
 .pnlGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: variables.spacing(md);
-  margin-bottom: variables.spacing(md);
+  margin-top: variables.spacing(sm);
+
+  @include variables.responsive(sm) {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
 }
 
 .pnlItem {
@@ -68,6 +81,8 @@
   border-radius: border-radius(md);
   box-shadow: box-shadow(sm);
   transition: box-shadow 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
   
   &:hover {
     box-shadow: box-shadow(md);
@@ -83,6 +98,7 @@
     font-size: variables.font-size(xl);
     font-weight: font-weight(bold);
     font-family: monospace;
+    word-break: break-word;
     
     &.positive { color: variables.color(positive); }
     &.negative { color: variables.color(negative); }
@@ -127,6 +143,8 @@
   border-radius: border-radius(md);
   background: variables.bg-color(card);
   box-shadow: box-shadow(sm);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .walletHeader, .pairHeader {
@@ -136,6 +154,13 @@
   margin-bottom: variables.spacing(md);
   padding-bottom: variables.spacing(xs);
   border-bottom: 1px solid variables.bg-color(divider);
+  flex-wrap: wrap;
+  gap: variables.spacing(sm);
+
+  @include variables.responsive(sm) {
+    flex-wrap: nowrap;
+    gap: 0;
+  }
 }
 
 .walletAddress {
@@ -144,54 +169,51 @@
   font-size: variables.font-size(sm);
   overflow: hidden;
   text-overflow: ellipsis;
+  word-break: break-all;
 }
 
 .walletPnL, .pairPnL {
   font-weight: font-weight(bold);
   font-family: monospace;
   font-size: variables.font-size(md);
+  white-space: nowrap;
 }
 
 .pairName {
   font-weight: font-weight(bold);
   font-size: variables.font-size(md);
+  word-break: break-word;
 }
 
 // Add donation footer styles
 .donationFooter {
   margin-top: variables.spacing(lg);
   padding: variables.spacing(md);
-  background: rgba(255, 255, 255, 0.05);
+  background: variables.bg-color(card);
   border-radius: border-radius(md);
-  border: 1px solid rgba(255, 255, 255, 0.1);
   text-align: center;
-  color: variables.text-color(secondary);
-  backdrop-filter: blur(10px);
+  width: 100%;
+  box-sizing: border-box;
 
   .title {
-    font-size: variables.font-size(sm);
-    margin-bottom: variables.spacing(xs);
-    color: variables.text-color(primary);
+    font-size: variables.font-size(lg);
+    font-weight: font-weight(bold);
+    margin-bottom: variables.spacing(sm);
   }
 
   .address {
     font-family: monospace;
     font-size: variables.font-size(sm);
-    padding: variables.spacing(xs) variables.spacing(sm);
-    background: rgba(255, 255, 255, 0.05);
+    padding: variables.spacing(sm);
+    background: variables.bg-color(light);
     border-radius: border-radius(sm);
-    display: inline-block;
     cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
+    margin: variables.spacing(sm) 0;
+    word-break: break-all;
   }
 
   .description {
-    font-size: variables.font-size(xs);
-    margin-top: variables.spacing(xs);
-    opacity: 0.7;
+    font-size: variables.font-size(sm);
+    color: variables.text-color(secondary);
   }
 }
