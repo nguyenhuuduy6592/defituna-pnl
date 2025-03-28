@@ -204,7 +204,7 @@ const defaultSettings = {
   - 1, 4 hour intervals
   - Daily, weekly, monthly views
   - Proper tick generation for each period
-
+`
 - ✅ Visual Features
   - Consistent grid lines
   - Proper axis formatting

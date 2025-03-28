@@ -5,6 +5,11 @@ const nextConfig = {
   sassOptions: {
     modules: true,
   },
+  experimental: {
+    turbo: {
+      enabled: true // Enable Turbopack
+    }
+  },
   headers: async () => [
     {
       source: '/sw.js',
