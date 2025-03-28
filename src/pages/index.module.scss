@@ -5,21 +5,38 @@
   align-items: center;
   gap: variables.spacing(sm);
   margin-bottom: variables.spacing(lg);
+  padding: 0 16px;
+
+  @include variables.responsive(sm) {
+    padding: 0;
+  }
 
   h1 {
     margin: 0;
+    font-size: variables.font-size(xl);
+    line-height: 1.2;
+
+    @include variables.responsive(sm) {
+      font-size: variables.font-size(xl) * 1.5;
+    }
   }
 
   .infoIcon {
     display: flex;
     align-items: center;
+    justify-content: center;
     color: variables.text-color(secondary);
     font-size: variables.font-size(lg);
     cursor: help;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: variables.bg-color(light);
 
     &:hover {
       color: variables.color(primary);
+      background: rgba(variables.color(primary), 0.1);
     }
   }
 }

@@ -1,5 +1,3 @@
-@use '../styles/variables.module.scss';
-
 .tooltipContainer {
   position: relative;
   display: inline-flex;
@@ -7,35 +5,72 @@
 
 .tooltip {
   position: absolute;
-  top: calc(100% + 8px); // Increased spacing from the icon
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0, 0, 0, 0.95); // Slightly darker background for better contrast
+  top: calc(100% + 12px);
+  right: -12px;
+  transform: none;
+  background: rgba(0, 0, 0, 0.95);
   color: white;
-  border-radius: border-radius(md); // Slightly larger border radius
+  border-radius: 8px;
   z-index: 1000;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); // Enhanced shadow for better visibility
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-  min-width: 280px; // Slightly wider for better readability
-  backdrop-filter: blur(6px); // Increased blur for a smoother effect
+  transition: all 0.2s ease;
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  backdrop-filter: blur(10px);
+  padding: 16px;
 
   text-align: left;
-  line-height: 1.6; // Increased line height for better spacing
-  padding: 0 variables.spacing(sm); // Adjusted padding for better spacing
+  line-height: 1.6;
+  font-size: 14px;
+  font-weight: normal;
   white-space: pre-wrap;
-  font-size: variables.font-size(sm); // Slightly larger font size for readability
 
   &::before {
     content: '';
     position: absolute;
-    top: -6px; // Adjusted position for the arrow
+    top: -6px;
+    right: 16px;
+    transform: rotate(45deg);
+    width: 12px;
+    height: 12px;
+    background: rgba(0, 0, 0, 0.95);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      position: relative;
+      padding-left: 16px;
+      margin-bottom: 8px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: rgba(255, 255, 255, 0.5);
+      }
+    }
+  }
+
+  @media (min-width: 768px) {
+    right: auto;
     left: 50%;
-    transform: translateX(-50%) rotate(45deg);
-    width: 10px;
-    height: 10px;
-    background: rgba(0, 0, 0, 0.95); // Match the tooltip background
+    transform: translateX(-50%);
+
+    &::before {
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+    }
   }
 }
 
