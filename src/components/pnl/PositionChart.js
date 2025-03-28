@@ -246,48 +246,32 @@ export const PositionChart = ({ positionHistory, onClose }) => {
                 No data available for the selected time period
               </div>
             ) : (
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart 
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
                   data={data}
-                  margin={{ top: 5, right: 30, bottom: 25, left: 30 }}
+                  margin={{
+                    top: 10,
+                    right: 10,
+                    bottom: 20,
+                    left: 50
+                  }}
                 >
-                  <CartesianGrid 
-                    strokeDasharray="3 3"
-                    horizontal={true}
-                    vertical={true}
-                    verticalPoints={getTimeAxisTicks(data)}
-                    horizontalPoints={getYAxisTicks(data)}
-                  />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
                   <XAxis 
-                    dataKey="timestamp" 
-                    type="number"
-                    scale="time"
-                    domain={['dataMin', 'dataMax']}
+                    dataKey="timestamp"
                     tickFormatter={formatXAxisLabel}
-                    ticks={getTimeAxisTicks(data)}
-                    tick={{
-                      fontSize: 11,
-                      textAnchor: 'middle',
-                      dy: 10
-                    }}
-                    height={40}
-                    padding={{ left: 0, right: 0 }}
+                    interval="preserveStartEnd"
+                    minTickGap={40}
+                    tick={{ fontSize: 11 }}
+                    height={30}
                   />
                   <YAxis 
                     tickFormatter={formatValue}
                     ticks={getYAxisTicks(data)}
-                    domain={[
-                      dataMin => Math.floor(dataMin * 1.1 * 100) / 100,
-                      dataMax => Math.ceil(dataMax * 1.1 * 100) / 100
-                    ]}
-                    padding={{ top: 10, bottom: 10 }}
-                    width={70}
-                    tick={{
-                      fontSize: 11,
-                      dx: -5
-                    }}
-                    axisLine={true}
-                    tickLine={true}
+                    tick={{ fontSize: 11 }}
+                    width={50}
+                    tickCount={8}
+                    domain={['auto', 'auto']}
                   />
                   <Tooltip 
                     content={<CustomTooltip />}
@@ -295,10 +279,11 @@ export const PositionChart = ({ positionHistory, onClose }) => {
                   />
                   <Legend 
                     verticalAlign="top" 
-                    height={36}
+                    height={24}
                     onClick={handleMetricToggle}
                     wrapperStyle={{
-                      paddingTop: '10px'
+                      paddingTop: '5px',
+                      fontSize: '11px'
                     }}
                   />
                   {metrics.pnl && (
@@ -308,7 +293,7 @@ export const PositionChart = ({ positionHistory, onClose }) => {
                       stroke="#8884d8"
                       name="PnL"
                       dot={false}
-                      activeDot={{ r: 4 }}
+                      activeDot={{ r: 3 }}
                       isAnimationActive={false}
                       connectNulls
                       strokeWidth={1.5}
@@ -321,7 +306,7 @@ export const PositionChart = ({ positionHistory, onClose }) => {
                       stroke="#82ca9d"
                       name="Yield"
                       dot={false}
-                      activeDot={{ r: 4 }}
+                      activeDot={{ r: 3 }}
                       isAnimationActive={false}
                       connectNulls
                       strokeWidth={1.5}

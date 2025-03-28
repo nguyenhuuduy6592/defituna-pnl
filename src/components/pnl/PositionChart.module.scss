@@ -12,36 +12,42 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: variables.spacing(md);
+  padding: variables.spacing(xs);
   backdrop-filter: blur(2px);
 }
 
 .chartContainer {
   background: variables.bg-color(white);
   border-radius: map.get(variables.$border-radius, md);
-  padding: variables.spacing(xl);
-  width: 90%;
+  padding: variables.spacing(sm);
+  width: 100%;
   max-width: 1200px;
-  max-height: 90vh;
+  max-height: calc(100vh - 32px);
   overflow-y: auto;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   position: relative;
   animation: slideUp 0.3s ease-out;
+
+  @include variables.responsive(sm) {
+    padding: variables.spacing(lg);
+  }
 }
 
 .chartHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: variables.spacing(lg);
+  margin-bottom: variables.spacing(md);
   padding-bottom: variables.spacing(sm);
   border-bottom: 1px solid variables.color(border);
+  gap: variables.spacing(sm);
 
   h3 {
     margin: 0;
-    font-size: variables.font-size(xl);
+    font-size: variables.font-size(lg);
     color: variables.text-color(primary);
     font-weight: bold;
+    line-height: 1.2;
   }
 }
 
@@ -52,14 +58,21 @@
 }
 
 .periodSelect {
-  padding: variables.spacing(xs) variables.spacing(md);
+  padding: variables.spacing(xs) variables.spacing(sm);
   border-radius: map.get(variables.$border-radius, sm);
   border: 1px solid variables.color(border);
   background: variables.bg-color(white);
   color: variables.text-color(primary);
   cursor: pointer;
   font-size: variables.font-size(sm);
-  min-width: 120px;
+  min-width: 100px;
+  height: 32px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+  padding-right: 32px;
 
   &:hover {
     border-color: variables.color(primary);
@@ -77,15 +90,15 @@
   border: none;
   color: variables.text-color(secondary);
   cursor: pointer;
-  padding: variables.spacing(xs);
-  border-radius: 50%;
+  padding: 0;
   width: 32px;
   height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 50%;
   transition: all 0.2s ease;
-  margin-left: variables.spacing(sm);
+  font-size: variables.font-size(lg);
 
   &:hover {
     background: variables.bg-color(light);
@@ -129,10 +142,26 @@
 
 .chartContent {
   background: variables.bg-color(white);
-  padding: variables.spacing(lg);
+  padding: variables.spacing(xs);
   border-radius: map.get(variables.$border-radius, sm);
   border: 1px solid variables.color(border);
   overflow: hidden;
+  min-height: 300px;
+  height: calc(100vh - 180px);
+  max-height: 600px;
+
+  @include variables.responsive(sm) {
+    padding: variables.spacing(md);
+  }
+}
+
+.noData {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: variables.text-color(secondary);
+  font-size: variables.font-size(base);
 }
 
 .tooltip {
@@ -145,11 +174,12 @@
   p {
     margin: variables.spacing(xs) 0;
     font-size: variables.font-size(sm);
+    white-space: nowrap;
   }
 
   .tooltipLabel {
     font-weight: bold;
-    margin-bottom: variables.spacing(sm);
+    margin-bottom: variables.spacing(xs);
     color: variables.text-color(primary);
   }
 }
