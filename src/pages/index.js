@@ -5,6 +5,7 @@ import { useWallet } from '../hooks/useWallet';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCountdown } from '../hooks/useCountdown';
 import { usePositionAlerts } from '../hooks/usePositionAlerts';
+import { useHistoricalData } from '../hooks/useHistoricalData';
 import WalletForm from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
@@ -34,6 +35,14 @@ export default ({ data: initData }) => {
     clearWallets,
     initialized
   } = useWallet();
+
+  const {
+    enabled: historyEnabled,
+    toggleHistoryEnabled,
+    savePositionSnapshot,
+    getPositionHistory,
+    storageStats
+  } = useHistoricalData();
 
   // Function to fetch PnL data for a specific wallet
   const fetchWalletPnL = useCallback(async (walletAddress) => {
@@ -133,6 +142,11 @@ export default ({ data: initData }) => {
       // Aggregate data from all wallets
       const combined = aggregatePnLData(successfulResults);
       setAggregatedData(combined);
+
+      // Save position snapshot if historical data is enabled
+      if (historyEnabled && combined) {
+        await savePositionSnapshot(combined.positions);
+      }
       
       if (!isAutoRefresh) {
         startFetchCooldown(30);
@@ -147,7 +161,7 @@ export default ({ data: initData }) => {
     } finally {
       setLoading(false);
     }
-  }, [activeWallets, wallet, fetchWalletPnL, aggregatePnLData, toggleWalletActive, addWallet, startFetchCooldown]);
+  }, [activeWallets, wallet, fetchWalletPnL, aggregatePnLData, toggleWalletActive, addWallet, startFetchCooldown, historyEnabled, savePositionSnapshot]);
 
   const {
     autoRefresh,
@@ -231,6 +245,8 @@ export default ({ data: initData }) => {
             onIntervalChange={handleIntervalChange}
             autoRefreshCountdown={refreshCountdown}
             loading={loading}
+            historyEnabled={historyEnabled}
+            onHistoryToggle={toggleHistoryEnabled}
           />
           
         </>

@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import styles from './AutoRefresh.module.scss';
+import { HistoryToggle } from '../history/HistoryToggle';
 
 export const AutoRefresh = ({
   autoRefresh,
@@ -6,30 +8,39 @@ export const AutoRefresh = ({
   refreshInterval,
   onIntervalChange,
   autoRefreshCountdown,
-  loading
+  loading,
+  historyEnabled,
+  onHistoryToggle
 }) => {
   return (
     <div className={styles.refreshControls}>
-      <div className={styles.refreshToggle}>
-        <label className={styles.autoRefreshLabel}>
+      <div className={styles.refreshToggles}>
+        <label className={styles.refreshToggle}>
           <input 
             type="checkbox" 
             checked={autoRefresh} 
             onChange={e => setAutoRefresh(e.target.checked)}
           />
-          Auto-refresh
+          <span>Auto-refresh</span>
         </label>
         
-        {autoRefresh && (
-          <div className={styles.intervalSelector}>
-            <select value={refreshInterval} onChange={onIntervalChange}>
-              <option value="30">30 seconds</option>
-              <option value="60">1 minute</option>
-              <option value="300">5 minutes</option>
-            </select>
-          </div>
-        )}
+        <HistoryToggle 
+          enabled={historyEnabled}
+          onToggle={onHistoryToggle}
+          setAutoRefresh={setAutoRefresh}
+        />
       </div>
+      
+      {autoRefresh && (
+        <div className={styles.intervalSelector}>
+          <select value={refreshInterval} onChange={onIntervalChange}>
+            <option value="30">30 seconds</option>
+            <option value="60">1 minute</option>
+            <option value="300">5 minutes</option>
+          </select>
+        </div>
+      )}
+      
       {autoRefresh && (
         <div className={styles.refreshStatus}>
           {loading ? 

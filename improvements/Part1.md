@@ -10,56 +10,47 @@ This document outlines strategic features to enhance the DeFiTuna PnL applicatio
 
 | Feature | Status | Dependencies | Priority |
 |---------|--------|--------------|----------|
-| 1. Offline Position Data Storage | Ready for implementation | None | High |
+| 1. Offline Position Data Storage | ✅ Implemented | None | High |
 | 2. Configurable Browser Notifications | Ready for implementation | Feature #1 | High |
 | 3. Position Status Change Alerts | Ready for implementation | Features #1, #2 | Medium |
 | 4. Position PnL Target Alerts | Ready for implementation | Features #1, #2 | Medium |
 | 5. Historical PnL Visualization | Requires additional dependencies | Feature #1, Chart library | Low |
 
-## Feature Implementation Plan
+## Implementation Details
 
-### 1. Offline Position Data Storage
+### 1. Offline Position Data Storage (✅ Completed)
 
 **Description:** Allow users to save position data locally for offline access and historical analysis.
 
-**Implementation:**
-- Add a toggle switch similar to auto-refresh in the UI
-- Store position snapshots in IndexedDB with timestamps
-- Implement data retention policy (maximum 30 days)
-- Add storage management utilities to prevent excessive storage usage
+**Implementation Status:**
+- ✅ IndexedDB setup with `idb` package
+- ✅ Position snapshot storage with timestamps
+- ✅ 30-day data retention policy
+- ✅ Storage management utilities
+- ✅ User confirmation modal
+- ✅ Auto-refresh integration
+- ✅ Data cleanup routines
 
-**Technical Details:**
-- Use IndexedDB for efficient storage of time-series data
-- Add storage quota monitoring and cleanup routines
-- Show confirmation modal to user, let them know data is stored locally with limitations and list features relies on this historical data
+**Current Features:**
+- Local storage of position data with timestamps
+- Automatic data cleanup for entries older than 30 days
+- Integration with auto-refresh for regular data collection
+- Clean UI with confirmation modal and storage toggle
+- Storage statistics tracking
+- Organized in dedicated `history` components folder
 
-**Implementation Steps:**
-1. Install `idb` package for IndexedDB management: `npm install idb`
-2. Create `useHistoricalData.js` hook in `src/hooks/` with these functions:
-   - `initializeDB()`: Set up database structure with position history store
-   - `savePositionSnapshot(positions, timestamp)`: Store position data
-   - `getPositionHistory(positionId, timeRange)`: Retrieve historical data
-   - `cleanupOldData(retentionDays = 30)`: Remove records older than 30 days
-   - `getStorageStats()`: Calculate current storage usage
-3. Add UI toggle to `index.js` next to the auto-refresh controls
-4. Create confirmation modal explaining local storage purpose
-5. Integrate data storage logic with existing fetch workflow
+**Location of Implementation:**
+- `src/hooks/useHistoricalData.js` - Core data management hook
+- `src/components/history/` - UI components
+  - HistoryToggle.js
+  - HistoryConfirmationModal.js
+  - Associated SCSS modules
 
-**Database Structure:**
-```javascript
-const dbStructure = {
-  name: "defituna-pnl",
-  version: 1,
-  stores: {
-    positions: { 
-      keyPath: ["id", "timestamp"],
-      indexes: ["timestamp", "pair", "walletAddress"] 
-    },
-    settings: { 
-      keyPath: "id" 
-    }
-  }
-};
+**Dependencies:**
+```json
+{
+  "idb": "^8.0.2"
+}
 ```
 
 ### 2. Configurable Browser Notifications System
@@ -237,4 +228,5 @@ const defaultSettings = {
     "recharts": "^2.9.0"
   }
 }
+```
 

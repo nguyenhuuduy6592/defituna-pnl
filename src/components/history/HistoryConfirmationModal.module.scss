@@ -1,0 +1,145 @@
+@import '../../styles/variables.module.scss';
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  @include flex-center;
+  z-index: 1000;
+  padding: spacing(md);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+  background: white;
+  border-radius: map-get($border-radius, md);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+  animation: slideUp 0.3s ease-out;
+}
+
+.header {
+  @include flex-between;
+  padding: spacing(md);
+  border-bottom: 1px solid color(border);
+
+  h2 {
+    margin: 0;
+    font-size: font-size(lg);
+    color: text-color(primary);
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  padding: spacing(xs);
+  cursor: pointer;
+  color: text-color(secondary);
+  border-radius: 50%;
+  @include flex-center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: bg-color(light);
+    color: text-color(primary);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.content {
+  padding: spacing(md);
+  color: text-color(primary);
+
+  p {
+    margin: spacing(sm) 0;
+    line-height: 1.5;
+  }
+
+  ul {
+    margin: spacing(sm) 0;
+    padding-left: spacing(lg);
+
+    li {
+      margin: spacing(xs) 0;
+      line-height: 1.4;
+    }
+  }
+}
+
+.notice {
+  margin-top: spacing(md);
+  padding: spacing(md);
+  background: bg-color(light);
+  border-radius: map-get($border-radius, sm);
+  border-left: 4px solid color(primary);
+
+  p {
+    margin-top: 0;
+  }
+
+  ul {
+    margin-bottom: 0;
+  }
+}
+
+.actions {
+  padding: spacing(md);
+  border-top: 1px solid color(border);
+  @include flex-between;
+  gap: spacing(sm);
+}
+
+.cancelButton,
+.confirmButton {
+  padding: spacing(sm) spacing(md);
+  border-radius: map-get($border-radius, sm);
+  font-size: font-size(base);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.cancelButton {
+  background: bg-color(light);
+  border: 1px solid color(border);
+  color: text-color(primary);
+
+  &:hover {
+    background: darken(bg-color(light), 5%);
+  }
+}
+
+.confirmButton {
+  background: color(primary);
+  border: none;
+  color: white;
+
+  &:hover {
+    background: color(hover);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -2,57 +2,68 @@
 
 .refreshControls {
   margin: spacing(md) 0;
-  padding: spacing(sm);
+  padding: spacing(md);
   background-color: bg-color(light);
   border-radius: map-get($border-radius, sm);
   border: 1px solid color(border);
+  display: flex;
+  flex-direction: column;
+  gap: spacing(md);
 
   @include responsive(sm) {
-    padding: spacing(md);
+    flex-direction: row;
+    align-items: center;
   }
+}
+
+.refreshToggles {
+  display: flex;
+  gap: spacing(lg);
+  align-items: center;
 }
 
 .refreshToggle {
   @include flex-start;
-  flex-direction: column;
   gap: spacing(sm);
+  cursor: pointer;
+  color: text-color(primary);
+  font-size: font-size(base);
   
-  @include responsive(sm) {
-    flex-direction: row;
-    gap: spacing(md);
+  input[type="checkbox"] {
+    width: spacing(md);
+    height: spacing(md);
+    margin: 0;
   }
 
-  .autoRefreshLabel {
-    @include flex-start;
-    gap: spacing(sm);
-    cursor: pointer;
-    color: text-color(primary);
-    font-size: font-size(base);
+  span {
+    user-select: none;
+  }
+}
+
+.intervalSelector {
+  margin-left: auto;
+
+  select {
+    @extend %input-base;
+    padding: spacing(xs) spacing(sm);
+    width: auto;
+    font-size: font-size(sm);
+    min-width: 120px;
+    margin: 0;
     
-    input[type="checkbox"] {
-      width: spacing(md);
-      height: spacing(md);
-    }
-  }
-
-  .intervalSelector {
-    select {
-      @extend %input-base;
-      padding: spacing(xs) spacing(sm);
-      width: auto;
-      font-size: font-size(sm);
-      min-width: 120px;
-      
-      &:focus {
-        outline: none;
-        border-color: color(primary);
-      }
+    &:focus {
+      outline: none;
+      border-color: color(primary);
     }
   }
 }
 
 .refreshStatus {
-  margin-top: spacing(sm);
   font-size: font-size(sm);
   color: text-color(secondary);
+  white-space: nowrap;
+
+  @include responsive(sm) {
+    margin-left: spacing(md);
+  }
 }
