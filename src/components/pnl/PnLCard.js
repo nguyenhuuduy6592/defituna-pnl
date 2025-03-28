@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { HiX } from 'react-icons/hi';
 import { HiDownload, HiShare } from 'react-icons/hi';
 import { BsCurrencyDollar, BsClock } from 'react-icons/bs';
+import { Portal } from '../common/Portal';
 import html2canvas from 'html2canvas';
 import styles from './PnLCard.module.scss';
 
@@ -72,84 +73,86 @@ export const PnLCard = ({ position, onClose }) => {
   };
 
   return (
-    <div 
-      className={styles.cardOverlay}
-      role="dialog"
-      aria-labelledby="modal-title"
-      aria-modal="true"
-      onClick={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className={styles.modalContainer} ref={cardRef}>
-        <div className={styles.header}>
-          <h2 id="modal-title">Position Details</h2>
-          <button 
-            className={styles.closeButton} 
-            onClick={onClose}
-            ref={closeButtonRef}
-            aria-label="Close"
-            title="Close"
-          >
-            <HiX className={styles.closeIcon} size={16} />
-          </button>
-        </div>
-
-        <div className={styles.cardContent} ref={exportContentRef}>
-          <h3 className={styles.pairTitle}>{position.pair}</h3>
-          
-          <div className={styles.mainInfo}>
-            <div 
-              className={`${styles.pnl} ${getValueClass(position.pnl)}`}
-              role="status"
-              aria-live="polite"
+    <Portal>
+      <div 
+        className={styles.cardOverlay}
+        role="dialog"
+        aria-labelledby="modal-title"
+        aria-modal="true"
+        onClick={(e) => e.target === e.currentTarget && onClose()}
+      >
+        <div className={styles.modalContainer} ref={cardRef}>
+          <div className={styles.header}>
+            <h2 id="modal-title">Position Details</h2>
+            <button 
+              className={styles.closeButton} 
+              onClick={onClose}
+              ref={closeButtonRef}
+              aria-label="Close"
+              title="Close"
             >
-              <span className={styles.label}>PnL</span>
-              <span className={styles.value}>
-                <BsCurrencyDollar className={styles.currencyIcon} />
-                {formatNumber(position.pnl)}
-              </span>
-            </div>
+              <HiX className={styles.closeIcon} size={16} />
+            </button>
+          </div>
+
+          <div className={styles.cardContent} ref={exportContentRef}>
+            <h3 className={styles.pairTitle}>{position.pair}</h3>
             
-            <dl className={styles.stats}>
-              <div className={styles.statRow}>
-                <dt className={styles.label}>
-                  <BsClock className={styles.icon} />
-                  Time in Position:
-                </dt>
-                <dd className={styles.value}>{position.age}</dd>
+            <div className={styles.mainInfo}>
+              <div 
+                className={`${styles.pnl} ${getValueClass(position.pnl)}`}
+                role="status"
+                aria-live="polite"
+              >
+                <span className={styles.label}>PnL</span>
+                <span className={styles.value}>
+                  <BsCurrencyDollar className={styles.currencyIcon} />
+                  {formatNumber(position.pnl)}
+                </span>
               </div>
-              <div className={styles.statRow}>
-                <dt className={styles.label}>
-                  <BsCurrencyDollar className={styles.icon} />
-                  Fee Yield:
-                </dt>
-                <dd className={`${styles.value} ${getValueClass(position.yield)}`}>
-                  ${formatNumber(position.yield)}
-                </dd>
-              </div>
-              <div className={styles.statRow}>
-                <dt className={styles.label}>
-                  <BsCurrencyDollar className={styles.icon} />
-                  Compounded:
-                </dt>
-                <dd className={`${styles.value} ${getValueClass(position.compounded)}`}>
-                  ${formatNumber(position.compounded)}
-                </dd>
-              </div>
-            </dl>
+              
+              <dl className={styles.stats}>
+                <div className={styles.statRow}>
+                  <dt className={styles.label}>
+                    <BsClock className={styles.icon} />
+                    Time in Position:
+                  </dt>
+                  <dd className={styles.value}>{position.age}</dd>
+                </div>
+                <div className={styles.statRow}>
+                  <dt className={styles.label}>
+                    <BsCurrencyDollar className={styles.icon} />
+                    Fee Yield:
+                  </dt>
+                  <dd className={`${styles.value} ${getValueClass(position.yield)}`}>
+                    ${formatNumber(position.yield)}
+                  </dd>
+                </div>
+                <div className={styles.statRow}>
+                  <dt className={styles.label}>
+                    <BsCurrencyDollar className={styles.icon} />
+                    Compounded:
+                  </dt>
+                  <dd className={`${styles.value} ${getValueClass(position.compounded)}`}>
+                    ${formatNumber(position.compounded)}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+
+          <div className={styles.actions}>
+            <button onClick={handleExport} aria-label={`Download ${position.pair} PnL card as PNG`}>
+              <HiDownload className={styles.buttonIcon} />
+              Download PNG
+            </button>
+            <button onClick={handleShare} aria-label={`Share ${position.pair} PnL card`}>
+              <HiShare className={styles.buttonIcon} />
+              Share
+            </button>
           </div>
         </div>
-
-        <div className={styles.actions}>
-          <button onClick={handleExport} aria-label={`Download ${position.pair} PnL card as PNG`}>
-            <HiDownload className={styles.buttonIcon} />
-            Download PNG
-          </button>
-          <button onClick={handleShare} aria-label={`Share ${position.pair} PnL card`}>
-            <HiShare className={styles.buttonIcon} />
-            Share
-          </button>
-        </div>
       </div>
-    </div>
+    </Portal>
   );
 };

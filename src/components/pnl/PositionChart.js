@@ -9,6 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { Portal } from '../common/Portal';
 import { prepareChartData, groupChartData } from '../../utils/chart';
 import styles from './PositionChart.module.scss';
 
@@ -208,128 +209,130 @@ export const PositionChart = ({ positionHistory, onClose }) => {
   };
 
   return (
-    <div className={styles.chartOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className={styles.chartContainer} onClick={e => e.stopPropagation()}>
-        <div className={styles.chartHeader}>
-          <h3>Position History</h3>
-          <div className={styles.controls}>
-            <select 
-              value={period} 
-              onChange={(e) => setPeriod(e.target.value)}
-              className={styles.periodSelect}
-            >
-              <option value={TIME_PERIODS.MINUTE_1}>1 Minute</option>
-              <option value={TIME_PERIODS.MINUTE_5}>5 Minutes</option>
-              <option value={TIME_PERIODS.MINUTE_15}>15 Minutes</option>
-              <option value={TIME_PERIODS.MINUTE_30}>30 Minutes</option>
-              <option value={TIME_PERIODS.HOUR_1}>1 Hour</option>
-              <option value={TIME_PERIODS.HOUR_4}>4 Hours</option>
-              <option value={TIME_PERIODS.DAY_1}>1 Day</option>
-              <option value={TIME_PERIODS.WEEK_1}>1 Week</option>
-              <option value={TIME_PERIODS.MONTH_1}>1 Month</option>
-            </select>
-            <button 
-              className={styles.closeButton} 
-              onClick={onClose}
-              aria-label="Close chart"
-            >
-              ✕
-            </button>
+    <Portal>
+      <div className={styles.chartOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
+        <div className={styles.chartContainer} onClick={e => e.stopPropagation()}>
+          <div className={styles.chartHeader}>
+            <h3>Position History</h3>
+            <div className={styles.controls}>
+              <select 
+                value={period} 
+                onChange={(e) => setPeriod(e.target.value)}
+                className={styles.periodSelect}
+              >
+                <option value={TIME_PERIODS.MINUTE_1}>1 Minute</option>
+                <option value={TIME_PERIODS.MINUTE_5}>5 Minutes</option>
+                <option value={TIME_PERIODS.MINUTE_15}>15 Minutes</option>
+                <option value={TIME_PERIODS.MINUTE_30}>30 Minutes</option>
+                <option value={TIME_PERIODS.HOUR_1}>1 Hour</option>
+                <option value={TIME_PERIODS.HOUR_4}>4 Hours</option>
+                <option value={TIME_PERIODS.DAY_1}>1 Day</option>
+                <option value={TIME_PERIODS.WEEK_1}>1 Week</option>
+                <option value={TIME_PERIODS.MONTH_1}>1 Month</option>
+              </select>
+              <button 
+                className={styles.closeButton} 
+                onClick={onClose}
+                aria-label="Close chart"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <div className={styles.chartContent}>
+            {data.length === 0 ? (
+              <div className={styles.noData}>
+                No data available for the selected time period
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={400}>
+                <LineChart 
+                  data={data}
+                  margin={{ top: 5, right: 30, bottom: 25, left: 30 }}
+                >
+                  <CartesianGrid 
+                    strokeDasharray="3 3"
+                    horizontal={true}
+                    vertical={true}
+                    verticalPoints={getTimeAxisTicks(data)}
+                    horizontalPoints={getYAxisTicks(data)}
+                  />
+                  <XAxis 
+                    dataKey="timestamp" 
+                    type="number"
+                    scale="time"
+                    domain={['dataMin', 'dataMax']}
+                    tickFormatter={formatXAxisLabel}
+                    ticks={getTimeAxisTicks(data)}
+                    tick={{
+                      fontSize: 11,
+                      textAnchor: 'middle',
+                      dy: 10
+                    }}
+                    height={40}
+                    padding={{ left: 0, right: 0 }}
+                  />
+                  <YAxis 
+                    tickFormatter={formatValue}
+                    ticks={getYAxisTicks(data)}
+                    domain={[
+                      dataMin => Math.floor(dataMin * 1.1 * 100) / 100,
+                      dataMax => Math.ceil(dataMax * 1.1 * 100) / 100
+                    ]}
+                    padding={{ top: 10, bottom: 10 }}
+                    width={70}
+                    tick={{
+                      fontSize: 11,
+                      dx: -5
+                    }}
+                    axisLine={true}
+                    tickLine={true}
+                  />
+                  <Tooltip 
+                    content={<CustomTooltip />}
+                    isAnimationActive={false}
+                  />
+                  <Legend 
+                    verticalAlign="top" 
+                    height={36}
+                    onClick={handleMetricToggle}
+                    wrapperStyle={{
+                      paddingTop: '10px'
+                    }}
+                  />
+                  {metrics.pnl && (
+                    <Line
+                      type="monotone"
+                      dataKey="pnl"
+                      stroke="#8884d8"
+                      name="PnL"
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                      isAnimationActive={false}
+                      connectNulls
+                      strokeWidth={1.5}
+                    />
+                  )}
+                  {metrics.yield && (
+                    <Line
+                      type="monotone"
+                      dataKey="yield"
+                      stroke="#82ca9d"
+                      name="Yield"
+                      dot={false}
+                      activeDot={{ r: 4 }}
+                      isAnimationActive={false}
+                      connectNulls
+                      strokeWidth={1.5}
+                    />
+                  )}
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
-
-        <div className={styles.chartContent}>
-          {data.length === 0 ? (
-            <div className={styles.noData}>
-              No data available for the selected time period
-            </div>
-          ) : (
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart 
-                data={data}
-                margin={{ top: 5, right: 30, bottom: 25, left: 30 }}
-              >
-                <CartesianGrid 
-                  strokeDasharray="3 3"
-                  horizontal={true}
-                  vertical={true}
-                  verticalPoints={getTimeAxisTicks(data)}
-                  horizontalPoints={getYAxisTicks(data)}
-                />
-                <XAxis 
-                  dataKey="timestamp" 
-                  type="number"
-                  scale="time"
-                  domain={['dataMin', 'dataMax']}
-                  tickFormatter={formatXAxisLabel}
-                  ticks={getTimeAxisTicks(data)}
-                  tick={{
-                    fontSize: 11,
-                    textAnchor: 'middle',
-                    dy: 10
-                  }}
-                  height={40}
-                  padding={{ left: 0, right: 0 }}
-                />
-                <YAxis 
-                  tickFormatter={formatValue}
-                  ticks={getYAxisTicks(data)}
-                  domain={[
-                    dataMin => Math.floor(dataMin * 1.1 * 100) / 100,
-                    dataMax => Math.ceil(dataMax * 1.1 * 100) / 100
-                  ]}
-                  padding={{ top: 10, bottom: 10 }}
-                  width={70}
-                  tick={{
-                    fontSize: 11,
-                    dx: -5
-                  }}
-                  axisLine={true}
-                  tickLine={true}
-                />
-                <Tooltip 
-                  content={<CustomTooltip />}
-                  isAnimationActive={false}
-                />
-                <Legend 
-                  verticalAlign="top" 
-                  height={36}
-                  onClick={handleMetricToggle}
-                  wrapperStyle={{
-                    paddingTop: '10px'
-                  }}
-                />
-                {metrics.pnl && (
-                  <Line
-                    type="monotone"
-                    dataKey="pnl"
-                    stroke="#8884d8"
-                    name="PnL"
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                    isAnimationActive={false}
-                    connectNulls
-                    strokeWidth={1.5}
-                  />
-                )}
-                {metrics.yield && (
-                  <Line
-                    type="monotone"
-                    dataKey="yield"
-                    stroke="#82ca9d"
-                    name="Yield"
-                    dot={false}
-                    activeDot={{ r: 4 }}
-                    isAnimationActive={false}
-                    connectNulls
-                    strokeWidth={1.5}
-                  />
-                )}
-              </LineChart>
-            </ResponsiveContainer>
-          )}
-        </div>
       </div>
-    </div>
+    </Portal>
   );
 };
