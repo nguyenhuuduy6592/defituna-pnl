@@ -14,7 +14,7 @@ This document outlines strategic features to enhance the DeFiTuna PnL applicatio
 | 2. Configurable Browser Notifications | Ready for implementation | Feature #1 | High |
 | 3. Position Status Change Alerts | Ready for implementation | Features #1, #2 | Medium |
 | 4. Position PnL Target Alerts | Ready for implementation | Features #1, #2 | Medium |
-| 5. Historical PnL Visualization | Requires additional dependencies | Feature #1, Chart library | Low |
+| 5. Historical PnL Visualization | ✅ Implemented | Feature #1, Chart library | Low |
 
 ## Implementation Details
 
@@ -180,44 +180,81 @@ const defaultSettings = {
 4. Add "Set Target" button to position actions column in the table
 5. Implement notification logic in `processPositionsData` function
 
-### 5. Historical PnL Visualization
+### 5. Historical PnL Visualization (✅ Completed)
 
-**Description:** Create charts showing position PnL over time compared to holding strategies.
+**Description:** Interactive chart showing position PnL and yield over time with configurable time periods.
 
-**Implementation:**
-- Utilize stored position history to generate time-series charts
-- Calculate equivalent "HODL" value for comparison
-- Show impermanent loss effects visually
-- Provide interactive charts with zoom capabilities
+**Implementation Status:**
+- ✅ Chart Component Implementation
+  - Responsive chart layout
+  - Time period selection (1min to 1month)
+  - PnL and Yield metrics display
+  - Interactive tooltips and legend
+  - Consistent grid lines
 
-**Technical Details:**
-- Integrate lightweight charting library compatible with Next.js
-- Implement data processing utilities for chart preparation
-- Show chart components by a new button on the Actions column of each position
-- Optimize rendering for mobile devices
+- ✅ Data Processing
+  - Robust timestamp handling
+  - Proper data grouping by time periods
+  - Value validation and error handling
+  - Support for different data formats
 
-**Implementation Steps:**
-1. Install charting library: `npm install recharts`
-2. Create `PositionChart.js` component in `src/components/` folder:
-   - Time-series chart of position PnL over time
-   - Comparison line for "HODL" strategy
-   - Visual indication of impermanent loss
-   - Interactive zoom and tooltips
-3. Create `PositionChartModal.js` for displaying charts in a modal
-4. Add "Chart" button to position actions column in the table
-5. Implement data processing utilities:
-   ```javascript
-   function prepareChartData(positionHistory) {
-     return positionHistory.map(snapshot => ({
-       timestamp: snapshot.timestamp,
-       pnl: snapshot.pnl,
-       yield: snapshot.yield,
-       hodlValue: calculateHodlValue(snapshot),
-       impermanentLoss: calculateImpermanentLoss(snapshot)
-     }));
-   }
-   ```
-6. Optimize chart rendering for mobile devices with responsive design
+- ✅ Time Period Support
+  - 1 minute intervals
+  - 5, 15, 30 minute intervals
+  - 1, 4 hour intervals
+  - Daily, weekly, monthly views
+  - Proper tick generation for each period
+
+- ✅ Visual Features
+  - Consistent grid lines
+  - Proper axis formatting
+  - Interactive tooltips
+  - Toggleable metrics
+  - Responsive layout
+
+**Location of Implementation:**
+- `src/components/pnl/PositionChart.js` - Main chart component
+- `src/utils/chart.js` - Data processing utilities
+
+**Dependencies:**
+```json
+{
+  "recharts": "^2.9.0"
+}
+```
+
+**Technical Features:**
+1. Data Processing:
+   - Timestamp validation and normalization
+   - Flexible value parsing (number, object with usd/value)
+   - Data grouping by time periods
+   - Proper handling of missing/invalid data
+
+2. Chart Display:
+   - Consistent grid lines with proper spacing
+   - Formatted time labels based on period
+   - Dollar value formatting with proper precision
+   - Interactive legend for toggling metrics
+   - Responsive tooltips with formatted values
+
+3. Time Period Handling:
+   - Support for all time periods from 1min to 1month
+   - Proper data grouping for each period
+   - Consistent tick generation
+   - Appropriate date/time formatting
+
+4. Performance Optimizations:
+   - Disabled animations for better performance
+   - Efficient data processing
+   - Proper error handling
+   - Memory efficient data structures
+
+5. User Interface:
+   - Clean, modern design
+   - Easy period selection
+   - Clear metric toggles
+   - Informative tooltips
+   - Proper spacing and layout
 
 ## Required Dependencies
 

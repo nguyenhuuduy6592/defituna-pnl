@@ -9,7 +9,7 @@
   box-shadow: 0 1px 3px color(shadow);
 }
 
-.table {
+.positionsTable {
   width: 100%;
   min-width: 800px; // Ensure minimum width for content
   max-width: 100%;
@@ -27,17 +27,12 @@
     padding: spacing(sm);
     text-align: left;
     white-space: nowrap;
-    border-bottom: 1px solid bg-color(border);
   }
   
   th {
-    background: bg-color(th);
-    font-weight: 600;
-    color: text-color(primary);
-    white-space: nowrap;
+    background: bg-color(light);
     font-weight: font-weight(bold);
     color: text-color(secondary);
-    background-color: bg-color(light);
     
     &.sortable {
       cursor: pointer;
@@ -75,7 +70,7 @@
   margin: spacing(md) 0;
 }
 
-.noPositions {
+.noData {
   text-align: center;
   padding: spacing(md);
   color: text-color(secondary);
@@ -88,24 +83,22 @@
 
 // State styles
 %state-text {
-  font-weight: 500;
+  font-weight: font-weight(bold);
 }
 
 .stateOpen {
   @extend %state-text;
-  color: #4CAF50;
+  color: color(success);
 }
 
 .stateClosed {
   @extend %state-text;
   color: text-color(disabled);
-  color: #9e9e9e;
 }
 
 .stateLiquidated {
   @extend %state-text;
   color: color(negative);
-  color: #f44336;
 }
 
 .timestamp {
@@ -124,25 +117,45 @@
   opacity: 0.8;
 }
 
-.shareButton {
+.shareButton, .chartButton {
   padding: spacing(xs) spacing(sm);
   border-radius: map-get($border-radius, sm);
-  border: none;
-  background: color(primary);
-  color: bg-color(white);
   cursor: pointer;
-  transition: all 0.2s ease;
   font-size: font-size(sm);
   line-height: 1;
-  min-width: 60px;
   text-align: center;
   white-space: nowrap;
+  transition: all 0.2s ease;
+  margin-right: spacing(xs);
 
-  &:hover {
-    background: color(hover);
+  &:last-child {
+    margin-right: 0;
   }
 
   &:active {
     transform: translateY(1px);
+  }
+}
+
+.shareButton {
+  background: color(primary);
+  color: bg-color(white);
+  border: none;
+  min-width: 60px;
+
+  &:hover {
+    background: color(hover);
+  }
+}
+
+.chartButton {
+  background: bg-color(light);
+  color: text-color(primary);
+  border: 1px solid color(border);
+
+  &:hover {
+    background: color(primary);
+    color: bg-color(white);
+    border-color: color(primary);
   }
 }

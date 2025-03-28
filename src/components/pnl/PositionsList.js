@@ -1,11 +1,15 @@
 import { memo, useState } from 'react';
 import styles from './PositionsList.module.scss';
 import { PnLCard } from './PnLCard';
+import { PositionChart } from './PositionChart';
+import { useHistoricalData } from '../../hooks/useHistoricalData';
 
 export const PositionsList = memo(({ positions, formatValue, showWallet = false }) => {
   const [sortField, setSortField] = useState('pnl');
   const [sortDirection, setSortDirection] = useState('desc');
   const [selectedPosition, setSelectedPosition] = useState(null);
+  const [chartPosition, setChartPosition] = useState(null);
+  const { getPositionHistory } = useHistoricalData();
   
   const formatNumber = (num) => {
     if (num === null || num === undefined) return '0.00';
@@ -85,15 +89,21 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
     return sortDirection === 'asc' ? '↑' : '↓';
   };
 
+  const handleShowChart = async (position) => {
+    const positionId = `${position.pair}-${position.walletAddress || 'default'}`;
+    const history = await getPositionHistory(positionId);
+    setChartPosition({ ...position, history });
+  };
+
   if (!positions || positions.length === 0) {
-    return <div className={styles.noPositions}>No positions found</div>;
+    return <div className={styles.noData}>No positions found</div>;
   }
   
   const sortedPositions = getSortedPositions();
 
   return (
     <div className={styles.positionsContainer}>
-      <table className={styles.table}>
+      <table className={styles.positionsTable}>
         <thead>
           <tr>
             <th onClick={() => handleSort('pair')} className={styles.sortable}>
@@ -152,8 +162,16 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
                 <button 
                   className={styles.shareButton}
                   onClick={() => setSelectedPosition(p)}
+                  aria-label="Share position"
                 >
                   Share
+                </button>
+                <button 
+                  className={styles.chartButton}
+                  onClick={() => handleShowChart(p)}
+                  aria-label="View position history chart"
+                >
+                  Chart
                 </button>
               </td>
             </tr>
@@ -165,6 +183,13 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
         <PnLCard
           position={selectedPosition}
           onClose={() => setSelectedPosition(null)}
+        />
+      )}
+
+      {chartPosition && (
+        <PositionChart
+          positionHistory={chartPosition.history}
+          onClose={() => setChartPosition(null)}
         />
       )}
     </div>
