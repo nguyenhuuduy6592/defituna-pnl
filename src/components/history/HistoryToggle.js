@@ -31,6 +31,8 @@ export const HistoryToggle = ({ enabled, onToggle, setAutoRefresh }) => {
           type="checkbox" 
           checked={enabled}
           onChange={handleToggle}
+          aria-label="Enable historical data storage"
+          title="Store position history for charting"
         />
         <span>Store History</span>
       </label>

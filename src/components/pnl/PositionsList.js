@@ -106,30 +106,30 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
       <table className={styles.positionsTable}>
         <thead>
           <tr>
-            <th onClick={() => handleSort('pair')} className={styles.sortable}>
+            <th onClick={() => handleSort('pair')} className={styles.sortable} role="button" aria-label={`Sort by pair ${sortField === 'pair' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
               Pair {getSortIcon('pair')}
             </th>
             {showWallet && (
-              <th onClick={() => handleSort('walletAddress')} className={styles.sortable}>
+              <th onClick={() => handleSort('walletAddress')} className={styles.sortable} role="button" aria-label={`Sort by wallet ${sortField === 'walletAddress' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
                 Wallet {getSortIcon('walletAddress')}
               </th>
             )}
-            <th onClick={() => handleSort('state')} className={styles.sortable}>
+            <th onClick={() => handleSort('state')} className={styles.sortable} role="button" aria-label={`Sort by state ${sortField === 'state' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
               State {getSortIcon('state')}
             </th>
-            <th onClick={() => handleSort('age')} className={styles.sortable}>
+            <th onClick={() => handleSort('age')} className={styles.sortable} role="button" aria-label={`Sort by age ${sortField === 'age' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
               Age {getSortIcon('age')}
             </th>
-            <th onClick={() => handleSort('yield')} className={styles.sortable}>
+            <th onClick={() => handleSort('yield')} className={styles.sortable} role="button" aria-label={`Sort by yield ${sortField === 'yield' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
               Yield {getSortIcon('yield')}
             </th>
-            <th onClick={() => handleSort('compounded')} className={styles.sortable}>
+            <th onClick={() => handleSort('compounded')} className={styles.sortable} role="button" aria-label={`Sort by compounded ${sortField === 'compounded' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
               Compounded {getSortIcon('compounded')}
             </th>
-            <th onClick={() => handleSort('debt')} className={styles.sortable}>
+            <th onClick={() => handleSort('debt')} className={styles.sortable} role="button" aria-label={`Sort by debt change ${sortField === 'debt' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
               Debt Change {getSortIcon('debt')}
             </th>
-            <th onClick={() => handleSort('pnl')} className={styles.sortable}>
+            <th onClick={() => handleSort('pnl')} className={styles.sortable} role="button" aria-label={`Sort by PnL ${sortField === 'pnl' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
               PnL {getSortIcon('pnl')}
             </th>
             <th>Actions</th>
@@ -163,6 +163,7 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
                   className={styles.shareButton}
                   onClick={() => setSelectedPosition(p)}
                   aria-label="Share position"
+                  title="Share position details"
                 >
                   Share
                 </button>
@@ -170,6 +171,7 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
                   className={styles.chartButton}
                   onClick={() => handleShowChart(p)}
                   aria-label="View position history chart"
+                  title="View position performance chart"
                 >
                   Chart
                 </button>

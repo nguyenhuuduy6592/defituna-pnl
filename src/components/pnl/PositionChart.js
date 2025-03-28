@@ -213,27 +213,30 @@ export const PositionChart = ({ positionHistory, onClose }) => {
       <div className={styles.chartOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
         <div className={styles.chartContainer} onClick={e => e.stopPropagation()}>
           <div className={styles.chartHeader}>
-            <h3>Position History</h3>
+            <h3 className={styles.title}>Position History</h3>
             <div className={styles.controls}>
               <select 
-                value={period} 
+                value={period}
                 onChange={(e) => setPeriod(e.target.value)}
                 className={styles.periodSelect}
+                aria-label="Select time period"
+                title="Select time period for chart data"
               >
-                <option value={TIME_PERIODS.MINUTE_1}>1 Minute</option>
-                <option value={TIME_PERIODS.MINUTE_5}>5 Minutes</option>
-                <option value={TIME_PERIODS.MINUTE_15}>15 Minutes</option>
-                <option value={TIME_PERIODS.MINUTE_30}>30 Minutes</option>
-                <option value={TIME_PERIODS.HOUR_1}>1 Hour</option>
-                <option value={TIME_PERIODS.HOUR_4}>4 Hours</option>
-                <option value={TIME_PERIODS.DAY_1}>1 Day</option>
-                <option value={TIME_PERIODS.WEEK_1}>1 Week</option>
-                <option value={TIME_PERIODS.MONTH_1}>1 Month</option>
+                <option value={TIME_PERIODS.MINUTE_1}>1 minute</option>
+                <option value={TIME_PERIODS.MINUTE_5}>5 minutes</option>
+                <option value={TIME_PERIODS.MINUTE_15}>15 minutes</option>
+                <option value={TIME_PERIODS.MINUTE_30}>30 minutes</option>
+                <option value={TIME_PERIODS.HOUR_1}>1 hour</option>
+                <option value={TIME_PERIODS.HOUR_4}>4 hours</option>
+                <option value={TIME_PERIODS.DAY_1}>1 day</option>
+                <option value={TIME_PERIODS.WEEK_1}>1 wek</option>
+                <option value={TIME_PERIODS.MONTH_1}>1 month</option>
               </select>
               <button 
-                className={styles.closeButton} 
+                className={styles.closeButton}
                 onClick={onClose}
                 aria-label="Close chart"
+                title="Close chart view"
               >
                 ✕
               </button>

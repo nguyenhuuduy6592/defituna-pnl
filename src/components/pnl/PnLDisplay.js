@@ -56,6 +56,8 @@ export const PnLDisplay = ({ data, isAggregated = false }) => {
             className={styles.address} 
             onClick={handleCopyAddress}
             title="Click to copy"
+            role="button"
+            aria-label="Copy donation wallet address"
           >
             {formatWalletAddress(process.env.NEXT_PUBLIC_DONATION_WALLET)}
           </div>

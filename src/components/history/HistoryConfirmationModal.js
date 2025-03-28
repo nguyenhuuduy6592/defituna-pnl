@@ -30,6 +30,7 @@ export const HistoryConfirmationModal = ({ onConfirm, onCancel }) => {
             onClick={onCancel}
             ref={closeButtonRef}
             aria-label="Close"
+            title="Close modal"
           >
             <HiX />
           </button>
@@ -58,10 +59,21 @@ export const HistoryConfirmationModal = ({ onConfirm, onCancel }) => {
         </div>
 
         <div className={styles.actions}>
-          <button onClick={onCancel} className={styles.cancelButton}>
+          <button 
+            onClick={onCancel} 
+            className={styles.cancelButton}
+            aria-label="Cancel enabling historical data"
+            title="Cancel enabling historical data storage"
+          >
             Cancel
           </button>
-          <button onClick={onConfirm} className={styles.confirmButton} autoFocus>
+          <button 
+            onClick={onConfirm} 
+            className={styles.confirmButton} 
+            autoFocus
+            aria-label="Enable historical data storage"
+            title="Enable historical data storage"
+          >
             Enable Historical Data
           </button>
         </div>

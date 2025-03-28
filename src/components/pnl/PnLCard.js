@@ -103,13 +103,13 @@ export const PnLCard = ({ position, onClose }) => {
       >
         <div className={styles.modalContainer} ref={cardRef}>
           <div className={styles.header}>
-            <h2 id="modal-title">Position Details</h2>
+            <h2 id="modal-title">PnL Card</h2>
             <button 
               className={styles.closeButton} 
               onClick={onClose}
               ref={closeButtonRef}
               aria-label="Close"
-              title="Close"
+              title="Close PnL card"
             >
               <HiX className={styles.closeIcon} size={16} />
             </button>
@@ -162,11 +162,19 @@ export const PnLCard = ({ position, onClose }) => {
           </div>
 
           <div className={styles.actions}>
-            <button onClick={handleExport} aria-label={`Download ${position.pair} PnL card as PNG`}>
+            <button 
+              onClick={handleExport} 
+              aria-label={`Download ${position.pair} PnL card as PNG`}
+              title="Download PnL card as PNG image"
+            >
               <HiDownload className={styles.buttonIcon} />
               Download PNG
             </button>
-            <button onClick={handleShare} aria-label={`Share ${position.pair} PnL card`}>
+            <button 
+              onClick={handleShare} 
+              aria-label={`Share ${position.pair} PnL card`}
+              title="Share PnL card"
+            >
               <HiShare className={styles.buttonIcon} />
               Share
             </button>

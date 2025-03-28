@@ -20,6 +20,8 @@ export const AutoRefresh = ({
             type="checkbox" 
             checked={autoRefresh} 
             onChange={e => setAutoRefresh(e.target.checked)}
+            aria-label="Enable auto-refresh"
+            title="Automatically refresh data periodically"
           />
           <span>Auto-refresh</span>
         </label>
@@ -33,7 +35,12 @@ export const AutoRefresh = ({
       
       {autoRefresh && (
         <div className={styles.intervalSelector}>
-          <select value={refreshInterval} onChange={onIntervalChange}>
+          <select 
+            value={refreshInterval} 
+            onChange={onIntervalChange}
+            aria-label="Select refresh interval"
+            title="Select how often to refresh the data"
+          >
             <option value="30">30 seconds</option>
             <option value="60">1 minute</option>
             <option value="300">5 minutes</option>

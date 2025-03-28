@@ -62,6 +62,7 @@ export default function WalletForm({
             className={styles.input}
             disabled={loading}
             aria-label="Wallet address input"
+            title="Enter a Solana wallet address"
           />
           {error && <div className={styles.error}>{error}</div>}
           
@@ -70,13 +71,14 @@ export default function WalletForm({
               <div className={styles.savedWallets}>
                 {savedWallets.map((w, i) => (
                   <div key={i} className={`${styles.dropdownItem} ${activeWallets.includes(w) ? styles.activeWallet : ''}`}>
-                    <span onClick={() => onWalletChange(w)}>{w}</span>
+                    <span onClick={() => onWalletChange(w)} title="Click to select this wallet">{w}</span>
                     <div className={styles.walletActions}>
                       <button 
                         type="button"
                         className={styles.checkboxButton}
                         onClick={() => toggleWalletActive(w)}
                         aria-label={activeWallets.includes(w) ? "Deactivate wallet" : "Activate wallet"}
+                        title={activeWallets.includes(w) ? "Deactivate this wallet" : "Activate this wallet"}
                       >
                         {activeWallets.includes(w) ? '✓' : '◯'}
                       </button>
@@ -85,6 +87,7 @@ export default function WalletForm({
                         className={styles.removeButton}
                         onClick={() => onRemoveWallet(w)}
                         aria-label="Remove wallet"
+                        title="Remove this wallet from saved list"
                       >
                         ✕
                       </button>
@@ -96,6 +99,7 @@ export default function WalletForm({
                   className={styles.clearButton} 
                   onClick={onClearWallets}
                   aria-label="Clear all wallets"
+                  title="Remove all saved wallets"
                 >
                   Clear List
                 </button>
@@ -109,6 +113,7 @@ export default function WalletForm({
           className={styles.button} 
           disabled={loading || countdown > 0}
           aria-label={loading ? "Loading..." : countdown > 0 ? `Wait ${countdown} seconds` : "Fetch Data"}
+          title={loading ? "Loading data..." : countdown > 0 ? `Wait ${countdown} seconds before next fetch` : "Fetch position data"}
         >
           {loading ? 'Loading...' : countdown > 0 ? `Wait ${countdown}s` : 'Fetch Data'}
         </button>
@@ -126,6 +131,7 @@ export default function WalletForm({
                   className={styles.removeChip}
                   onClick={() => toggleWalletActive(w)}
                   aria-label="Deactivate wallet"
+                  title="Deactivate this wallet"
                 >
                   ✕
                 </button>
