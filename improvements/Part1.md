@@ -15,6 +15,7 @@ This document outlines strategic features to enhance the DeFiTuna PnL applicatio
 | 3. Position Status Change Alerts | Ready for implementation | Features #1, #2 | Medium |
 | 4. Position PnL Target Alerts | Ready for implementation | Features #1, #2 | Medium |
 | 5. Historical PnL Visualization | ✅ Implemented | Feature #1, Chart library | Low |
+| 6. Background Position Data Fetching | Ready for implementation | Feature #1 | High |
 
 ## Implementation Details
 
@@ -267,3 +268,48 @@ const defaultSettings = {
 }
 ```
 
+### 6. Background Position Data Fetching
+
+**Description:** Implement a service worker to fetch position data in the background, enabling real-time updates even when the browser tab is inactive.
+
+**Implementation:**
+- Create a service worker for background data fetching
+- Implement periodic data refresh mechanism
+- Handle offline/online state transitions
+- Only enable if historical data is enabled
+
+**Technical Details:**
+- Service worker registration and lifecycle management
+- Background sync API for reliable data fetching
+- Same data storage as the Store History feature
+
+**Integration Points:**
+- Service worker registration in `src/index.js`
+- Background sync request in `useHistoricalData` hook
+- Status display in main UI
+- Notification system integration for sync status
+
+**Technical Features:**
+1. Background Sync:
+   - Periodic data fetching (use value from Auto Refresh feature)
+   - Reliable sync using Background Sync API
+   - Offline queue management
+   - Error handling and retry logic
+
+2. Data Management:
+   - Reuse the same data storage as the Store History feature
+
+3. Performance:
+   - Minimal battery impact
+   - Efficient network usage
+   - Smart retry strategies
+   - Resource cleanup
+
+**Dependencies:**
+```json
+{
+  "workbox-background-sync": "^7.0.0",
+  "workbox-routing": "^7.0.0",
+  "workbox-strategies": "^7.0.0"
+}
+```
