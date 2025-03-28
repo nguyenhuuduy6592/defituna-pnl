@@ -40,9 +40,9 @@ export const HistoryConfirmationModal = ({ onConfirm, onCancel }) => {
             This feature will store your position data locally in your browser to enable:
           </p>
           <ul>
-            <li>Position status change tracking</li>
-            <li>PnL target alerts</li>
-            <li>Historical performance analysis</li>
+            {/* <li>Position status change tracking</li>
+            <li>PnL target alerts</li> */}
+            <li>Historical performance chart</li>
           </ul>
           
           <div className={styles.notice}>

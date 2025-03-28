@@ -214,6 +214,7 @@ export default ({ data: initData }) => {
 • Auto-refresh data
 • Show position age
 • PnL card to share with friends
+• Historical data tracking for positions
           `}>
           <div className={styles.infoIcon}>
             <BsInfoCircle />
