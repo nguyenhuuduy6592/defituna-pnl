@@ -49,9 +49,9 @@ async function fetchPnL(wallet) {
   
   // Process positions data with ages
   const positions = await processPositionsData(positionsData, positionAges);
-  
+
   // Calculate total PnL
-  const totalPnL = positions.reduce((sum, p) => sum + p.pnl, 0);
+  const totalPnL = positions.reduce((sum, p) => sum + (p.pnl?.usd || 0), 0);
   
   return { 
     totalPnL,

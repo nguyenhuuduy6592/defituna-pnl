@@ -91,7 +91,7 @@ export const PnLCard = ({ position, onClose }) => {
       console.error('Error sharing card:', error);
     }
   };
-
+  
   return (
     <Portal>
       <div 
@@ -120,14 +120,14 @@ export const PnLCard = ({ position, onClose }) => {
             
             <div className={styles.mainInfo}>
               <div 
-                className={`${styles.pnl} ${getValueClass(position.pnl)}`}
+                className={`${styles.pnl} ${getValueClass(position.pnl.usd)}`}
                 role="status"
                 aria-live="polite"
               >
                 <span className={styles.label}>PnL</span>
                 <span className={styles.value}>
                   <BsCurrencyDollar className={styles.currencyIcon} />
-                  {formatNumber(position.pnl)}
+                  {formatNumber(position.pnl.usd)}
                 </span>
               </div>
               
@@ -144,8 +144,8 @@ export const PnLCard = ({ position, onClose }) => {
                     <BsCurrencyDollar className={styles.icon} />
                     Fee Yield:
                   </dt>
-                  <dd className={`${styles.value} ${getValueClass(position.yield)}`}>
-                    ${formatNumber(position.yield)}
+                  <dd className={`${styles.value} ${getValueClass(position.yield.usd)}`}>
+                    ${formatNumber(position.yield.usd)}
                   </dd>
                 </div>
                 <div className={styles.statRow}>
@@ -153,8 +153,8 @@ export const PnLCard = ({ position, onClose }) => {
                     <BsCurrencyDollar className={styles.icon} />
                     Compounded:
                   </dt>
-                  <dd className={`${styles.value} ${getValueClass(position.compounded)}`}>
-                    ${formatNumber(position.compounded)}
+                  <dd className={`${styles.value} ${getValueClass(position.compounded.usd)}`}>
+                    ${formatNumber(position.compounded.usd)}
                   </dd>
                 </div>
               </dl>

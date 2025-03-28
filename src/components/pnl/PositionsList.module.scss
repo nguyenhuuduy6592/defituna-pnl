@@ -12,7 +12,7 @@
 
 .positionsTable {
   width: 100%;
-  min-width: 800px; // Ensure minimum width for content
+  min-width: 1200px; // Increased minimum width for more columns
   max-width: 100%;
   border-collapse: collapse;
   background: variables.bg-color(white);
@@ -32,12 +32,14 @@
   
   th {
     background: variables.bg-color(light);
-    font-weight: font-weight(bold);
+    font-weight: 700;
     color: variables.text-color(secondary);
+    position: sticky;
+    top: 0;
+    z-index: 1;
     
     &.sortable {
       cursor: pointer;
-      position: relative;
       user-select: none;
       
       &:hover {
@@ -56,7 +58,11 @@
   
       &.positive { color: variables.color(positive); }
       &.negative { color: variables.color(negative); }
-      &.zero { color: variables.color(zero); }
+      &.zero { color: variables.text-color(secondary); }
+
+      .positionLabel {
+        font-weight: 700;
+      }
     }
   }
 
@@ -83,39 +89,52 @@
 }
 
 // State styles
-%state-text {
-  font-weight: font-weight(bold);
+%state-cell {
+  font-weight: 700;
+  text-align: center;
+  min-width: 80px;
 }
 
-.stateOpen {
-  @extend %state-text;
-  color: variables.color(success);
+.stateInRange {
+  @extend %state-cell;
+  color: variables.bg-color(white);
+  background: variables.color(success);
+}
+
+.stateWarning {
+  @extend %state-cell;
+  color: variables.bg-color(white);
+  background: variables.color(warning);
 }
 
 .stateClosed {
-  @extend %state-text;
-  color: variables.text-color(disabled);
+  @extend %state-cell;
+  color: variables.bg-color(white);
+  background: variables.color(negative);
 }
 
 .stateLiquidated {
-  @extend %state-text;
-  color: variables.color(negative);
+  @extend %state-cell;
+  color: variables.bg-color(white);
+  background: variables.color(negative);
 }
 
-.timestamp {
-  color: variables.text-color(secondary);
-  white-space: nowrap;
-  font-size: variables.font-size(xs);
+.stateOpen {
+  @extend %state-cell;
+  color: variables.color(success);
+  background: rgba(variables.color(success), 0.1);
 }
 
-.walletCell {
-  font-family: monospace;
-  font-size: variables.font-size(xs);
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  opacity: 0.8;
+.stateBelow {
+  @extend %state-cell;
+  color: variables.color(info);
+  background: rgba(variables.color(info), 0.1);
+}
+
+.stateAbove {
+  @extend %state-cell;
+  color: variables.color(primary);
+  background: rgba(variables.color(primary), 0.1);
 }
 
 .shareButton, .chartButton {

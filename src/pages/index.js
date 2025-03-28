@@ -87,7 +87,7 @@ export default ({ data: initData }) => {
     );
     
     // Calculate total PnL across all wallets
-    const totalPnL = validData.reduce((sum, d) => sum + d.totalPnL, 0);
+    const totalPnL = validData.reduce((sum, d) => sum + (d.totalPnL || 0), 0);
     
     return {
       totalPnL,

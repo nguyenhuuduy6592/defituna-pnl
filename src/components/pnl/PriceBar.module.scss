@@ -1,0 +1,111 @@
+.priceBarContainer {
+  position: relative;
+  width: 100%;
+  min-width: 150px;
+  padding: 12px 0;
+  cursor: pointer;
+}
+
+.barContainer {
+  position: relative;
+  width: 100%;
+  height: 3px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+}
+
+.pricePoint {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+    z-index: 2;
+  }
+
+  &.circle {
+    border-radius: 50%;
+  }
+
+  &.square {
+    border-radius: 2px;
+  }
+
+  &.diamond {
+    transform: translate(-50%, -50%) rotate(45deg);
+    &:hover {
+      transform: translate(-50%, -50%) rotate(45deg) scale(1.2);
+    }
+  }
+
+  &.triangle-up {
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    height: 14px;
+  }
+
+  &.triangle-down {
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+    height: 14px;
+  }
+}
+
+.tooltipContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 180px;
+  padding: 4px;
+}
+
+.tooltipRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.9em;
+  padding: 2px 0;
+}
+
+.tooltipLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-weight: 500;
+}
+
+.tooltipValue {
+  color: white;
+}
+
+.priceShape {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+
+  &.circle {
+    border-radius: 50%;
+  }
+
+  &.square {
+    border-radius: 2px;
+  }
+
+  &.diamond {
+    transform: rotate(45deg);
+  }
+
+  &.triangle-up {
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    height: 12px;
+  }
+
+  &.triangle-down {
+    clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+    height: 12px;
+  }
+} 

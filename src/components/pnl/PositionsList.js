@@ -2,6 +2,8 @@ import { memo, useState } from 'react';
 import styles from './PositionsList.module.scss';
 import { PnLCard } from './PnLCard';
 import { PositionChart } from './PositionChart';
+import { ClusterBar } from './ClusterBar';
+import { PriceBar } from './PriceBar';
 import { useHistoricalData } from '../../hooks/useHistoricalData';
 
 export const PositionsList = memo(({ positions, formatValue, showWallet = false }) => {
@@ -34,9 +36,10 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
 
   const getStateClass = (state) => {
     switch (state) {
-      case 'open': return styles.stateOpen;
-      case 'closed': return styles.stateClosed;
-      case 'liquidated': return styles.stateLiquidated;
+      case 'In range': return styles.stateInRange;
+      case 'Out of range': return styles.stateWarning;
+      case 'Closed': return styles.stateClosed;
+      case 'Liquidated': return styles.stateLiquidated;
       default: return '';
     }
   };
@@ -51,13 +54,17 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
     if (!address) return 'Unknown';
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
+
+  const formatPrice = (price) => {
+    if (price === Infinity) return '∞';
+    if (price === 0) return '0';
+    return formatNumber(price);
+  };
   
   const handleSort = (field) => {
     if (field === sortField) {
-      // Toggle direction if clicking on the same field
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
-      // Default to descending for new field
       setSortField(field);
       setSortDirection('desc');
     }
@@ -70,8 +77,14 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
       let aValue = a[sortField];
       let bValue = b[sortField];
       
+      // Special handling for nested objects
+      if (sortField === 'priceRange') {
+        aValue = a.priceRange.lower;
+        bValue = b.priceRange.lower;
+      }
+      
       // Special handling for string fields
-      if (sortField === 'pair' || sortField === 'state' || sortField === 'age' || sortField === 'walletAddress') {
+      if (['pair', 'state', 'age', 'walletAddress', 'status'].includes(sortField)) {
         aValue = String(aValue || '');
         bValue = String(bValue || '');
         return sortDirection === 'asc' 
@@ -106,31 +119,31 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
       <table className={styles.positionsTable}>
         <thead>
           <tr>
-            <th onClick={() => handleSort('pair')} className={styles.sortable} role="button" aria-label={`Sort by pair ${sortField === 'pair' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
+            <th onClick={() => handleSort('pair')} className={styles.sortable}>
               Pair {getSortIcon('pair')}
             </th>
             {showWallet && (
-              <th onClick={() => handleSort('walletAddress')} className={styles.sortable} role="button" aria-label={`Sort by wallet ${sortField === 'walletAddress' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
+              <th onClick={() => handleSort('walletAddress')} className={styles.sortable}>
                 Wallet {getSortIcon('walletAddress')}
               </th>
             )}
-            <th onClick={() => handleSort('state')} className={styles.sortable} role="button" aria-label={`Sort by state ${sortField === 'state' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
-              State {getSortIcon('state')}
+            <th onClick={() => handleSort('status')} className={styles.sortable}>
+              Status {getSortIcon('status')}
             </th>
-            <th onClick={() => handleSort('age')} className={styles.sortable} role="button" aria-label={`Sort by age ${sortField === 'age' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
+            <th onClick={() => handleSort('age')} className={styles.sortable}>
               Age {getSortIcon('age')}
             </th>
-            <th onClick={() => handleSort('yield')} className={styles.sortable} role="button" aria-label={`Sort by yield ${sortField === 'yield' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
-              Yield {getSortIcon('yield')}
-            </th>
-            <th onClick={() => handleSort('compounded')} className={styles.sortable} role="button" aria-label={`Sort by compounded ${sortField === 'compounded' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
-              Compounded {getSortIcon('compounded')}
-            </th>
-            <th onClick={() => handleSort('debt')} className={styles.sortable} role="button" aria-label={`Sort by debt change ${sortField === 'debt' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
-              Debt Change {getSortIcon('debt')}
-            </th>
-            <th onClick={() => handleSort('pnl')} className={styles.sortable} role="button" aria-label={`Sort by PnL ${sortField === 'pnl' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : ''}`}>
+            <th onClick={() => handleSort('pnl')} className={styles.sortable}>
               PnL {getSortIcon('pnl')}
+            </th>
+            <th  onClick={() => handleSort('size')} className={styles.sortable}>
+              Position Details {getSortIcon('size')}
+            </th>
+            <th>
+              Price Range
+            </th>
+            <th onClick={() => handleSort('yield')} className={styles.sortable}>
+              Yield {getSortIcon('yield')}
             </th>
             <th>Actions</th>
           </tr>
@@ -138,26 +151,34 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
         <tbody>
           {sortedPositions.map((p, i) => (
             <tr key={`${p.pair}-${p.walletAddress || ''}-${i}`}>
-              <td>{p.pair}</td>
+              <td><span className={styles.positionLabel}>{p.pair}</span> ({p.leverage} Leverage)</td>
               {showWallet && (
-                <td className={styles.walletCell} title={p.walletAddress}>
+                <td title={p.walletAddress}>
                   {formatWalletAddress(p.walletAddress)}
                 </td>
               )}
-              <td className={getStateClass(p.state)}>{p.state}</td>
-              <td className={styles.timestamp}>{formatDuration(p.age)}</td>
-              <td className={getValueClass(p.yield)}>
-                ${formatNumber(p.yield)}
+              <td className={getStateClass(p.status)}>{p.status}</td>
+              <td>{formatDuration(p.age)}</td>
+              <td className={getValueClass(p.pnl.usd)}>{formatNumber(p.pnl.usd)} ({p.pnl.percentage}%)</td>
+              <td>
+                <ClusterBar
+                  size={p.size}
+                  collateral={p.collateral}
+                  debt={p.debt}
+                  interest={p.interest}
+                  formatValue={formatNumber}
+                />
               </td>
-              <td className={getValueClass(p.compounded)}>
-                ${formatNumber(p.compounded)}
+              <td>
+                <PriceBar
+                  currentPrice={p.currentPrice}
+                  entryPrice={p.entryPrice}
+                  liquidationPrice={p.liquidationPrice}
+                  rangePrices={p.rangePrices}
+                  formatValue={formatNumber}
+                />
               </td>
-              <td className={getValueClass(p.debt)}>
-                ${formatNumber(p.debt)}
-              </td>
-              <td className={getValueClass(p.pnl)}>
-                ${formatNumber(p.pnl)}
-              </td>
+              <td className={getValueClass(p.yield)}>{formatNumber(p.yield.usd)}</td>
               <td>
                 <button 
                   className={styles.shareButton}
