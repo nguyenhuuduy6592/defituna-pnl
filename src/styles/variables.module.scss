@@ -1,3 +1,5 @@
+@use "sass:map";
+
 // Colors
 $colors: (
   primary: #0070f3,
@@ -75,43 +77,43 @@ $font-sizes: (
 
 @mixin card {
   background: white;
-  border-radius: map-get($border-radius, sm);
-  box-shadow: 0 2px 4px map-get($colors, shadow);
-  padding: map-get($spacing, md);
+  border-radius: map.get($border-radius, sm);
+  box-shadow: 0 2px 4px map.get($colors, shadow);
+  padding: map.get($spacing, md);
 }
 
 @mixin responsive($breakpoint) {
-  @media (min-width: map-get($breakpoints, $breakpoint)) {
+  @media (min-width: map.get($breakpoints, $breakpoint)) {
     @content;
   }
 }
 
 // Functions
 @function color($key) {
-  @return map-get($colors, $key);
+  @return map.get($colors, $key);
 }
 
 @function text-color($key) {
-  @return map-get(map-get($colors, text), $key);
+  @return map.get(map.get($colors, text), $key);
 }
 
 @function bg-color($key) {
-  @return map-get(map-get($colors, bg), $key);
+  @return map.get(map.get($colors, bg), $key);
 }
 
 @function spacing($key) {
-  @return map-get($spacing, $key);
+  @return map.get($spacing, $key);
 }
 
 @function font-size($key) {
-  @return map-get($font-sizes, $key);
+  @return map.get($font-sizes, $key);
 }
 
 // Placeholders
 %button-base {
   padding: spacing(sm) spacing(md);
   border: none;
-  border-radius: map-get($border-radius, sm);
+  border-radius: map.get($border-radius, sm);
   cursor: pointer;
   transition: background-color 0.2s ease;
   
@@ -123,7 +125,7 @@ $font-sizes: (
 %input-base {
   padding: spacing(sm);
   border: 1px solid color(border);
-  border-radius: map-get($border-radius, sm);
+  border-radius: map.get($border-radius, sm);
   width: 100%;
   
   &:focus {
