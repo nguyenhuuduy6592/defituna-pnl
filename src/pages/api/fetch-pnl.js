@@ -1,5 +1,5 @@
 import { getTransactionAges } from '../../utils/helius';
-import { fetchSolPrice, fetchPositions, processPositionsData } from '../../utils/defituna';
+import { fetchPositions, processPositionsData } from '../../utils/defituna';
 
 // Debug logging for environment variables
 const logEnvironmentInfo = () => {
@@ -68,11 +68,8 @@ async function fetchPnL(wallet) {
     throw new Error('Wallet address is required');
   }
 
-  // Fetch data in parallel
-  const [solPrice, positionsData] = await Promise.all([
-    fetchSolPrice(),
-    fetchPositions(wallet)
-  ]);
+  // Fetch positions data
+  const positionsData = await fetchPositions(wallet);
 
   // Get ages for positions
   const positionAges = await getAges(positionsData);
@@ -86,7 +83,6 @@ async function fetchPnL(wallet) {
   return { 
     totalPnL,
     positions, 
-    solPrice 
   };
 }
 

@@ -1,14 +1,3 @@
-export async function fetchSolPrice() {
-  const solPriceData = await fetch(`${process.env.DEFITUNA_API_URL}/oracle-prices/So11111111111111111111111111111111111111112`)
-    .then(r => r.json())
-    .catch(error => {
-      console.error('Error fetching SOL price:', error);
-      throw new Error('Failed to fetch SOL price');
-    });
-
-  return parseFloat(solPriceData.data.price) / Math.pow(10, solPriceData.data.decimals);
-}
-
 export async function fetchPositions(wallet) {
   const response = await fetch(`${process.env.DEFITUNA_API_URL}/users/${wallet}/tuna-positions`);
   if (!response.ok) {
