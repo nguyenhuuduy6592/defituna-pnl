@@ -5,20 +5,24 @@
   flex-direction: column;
   gap: 15px;
   margin-bottom: 20px;
+  padding: 0 16px;
 
   @include variables.responsive(sm) {
     flex-direction: row;
     align-items: flex-start;
+    padding: 0;
   }
 }
 
 .inputContainer {
   position: relative;
   width: 100%;
+  max-width: 100%;
 
   @include variables.responsive(sm) {
     flex: 1;
     margin-right: 15px;
+    max-width: 600px;
   }
 }
 
@@ -30,6 +34,7 @@
   border-radius: 4px;
   box-sizing: border-box;
   height: 48px;
+  max-width: 100%;
 }
 
 .button {
@@ -44,8 +49,10 @@
   height: 48px;
   min-width: 120px;
   white-space: nowrap;
+  width: 100%;
   
   @include variables.responsive(sm) {
+    width: auto;
     align-self: flex-start;
   }
   

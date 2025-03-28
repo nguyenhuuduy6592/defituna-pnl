@@ -19,8 +19,13 @@
 
 .refreshToggles {
   display: flex;
-  gap: variables.spacing(lg);
+  flex-wrap: wrap;
+  gap: variables.spacing(md);
   align-items: center;
+
+  @include variables.responsive(sm) {
+    gap: variables.spacing(lg);
+  }
 }
 
 .refreshToggle {
@@ -29,6 +34,7 @@
   cursor: pointer;
   color: variables.text-color(primary);
   font-size: variables.font-size(base);
+  padding: variables.spacing(xs) 0;
   
   input[type="checkbox"] {
     width: variables.spacing(md);
@@ -42,15 +48,25 @@
 }
 
 .intervalSelector {
-  margin-left: auto;
+  margin-left: 0;
+  width: 100%;
+
+  @include variables.responsive(sm) {
+    margin-left: auto;
+    width: auto;
+  }
 
   select {
     @extend %input-base;
     padding: variables.spacing(xs) variables.spacing(sm);
-    width: auto;
+    width: 100%;
     font-size: variables.font-size(sm);
     min-width: 120px;
     margin: 0;
+    
+    @include variables.responsive(sm) {
+      width: auto;
+    }
     
     &:focus {
       outline: none;
@@ -63,8 +79,10 @@
   font-size: variables.font-size(sm);
   color: variables.text-color(secondary);
   white-space: nowrap;
+  text-align: center;
 
   @include variables.responsive(sm) {
+    text-align: left;
     margin-left: variables.spacing(md);
   }
 }
