@@ -1,61 +1,63 @@
+# DeFiTuna PnL Viewer
+
+A web application for tracking and analyzing your DeFiTuna positions on Solana. This tool provides real-time PnL (Profit and Loss) tracking and position management features.
+
+## Features
+
+- 📊 Real-time PnL tracking for DeFiTuna positions
+- 👛 Support for multiple wallet addresses
+- 🔄 Auto-refresh functionality to keep data current
+- ⏱️ Position age tracking
+- 📱 Shareable PnL cards
+- 📂 Local position history storage (30-day retention)
+- 💰 Total PnL aggregation across multiple wallets
+- 🔍 Detailed position information including yield and debt
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
 ## Getting Started
 
-First, set up your environment variables by copying `.env.local.example` to `.env.local`:
+First, set up your environment variables:
 
-```bash
-cp .env.local.example .env.local
-```
-
-Then, set up your Helius API key:
-1. Create an account at [https://www.helius.dev/](https://www.helius.dev/)
-2. Generate an API key
-3. Add your API key to `.env.local` for local development:
-   ```
-   HELIUS_API_KEY=your_api_key_here
+1. Copy `.env.local.example` to `.env.local`:
+   ```bash
+   cp .env.local.example .env.local
    ```
 
-For Vercel deployment:
-1. Go to your project settings in Vercel
-2. Navigate to "Environment Variables"
-3. Add the following variables:
-   - `HELIUS_API_KEY`: Your Helius API key
-   - `HELIUS_RPC_URL`: https://rpc-mainnet.helius.xyz
+2. Create an account at [Helius](https://www.helius.dev/) and generate an API key
 
-Then, run the development server:
+3. Configure your environment variables in `.env.local`:
+   ```
+   # API Configuration
+   DEFITUNA_API_URL=https://api.defituna.com/api/v1
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+   # Helius API Configuration
+   HELIUS_API_KEY=your_helius_api_key_here
+   HELIUS_RPC_URL=https://mainnet.helius-rpc.com
+
+   # Donation Configuration (optional)
+   NEXT_PUBLIC_DONATION_WALLET=5bxoPwxEoYMAwfuLWRQRSmS2M926GjYXEUjrR9xC2dZ3
+   ```
+
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Deployment
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+To deploy on Vercel:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+1. Go to your project settings in Vercel
+2. Add these environment variables:
+   - `HELIUS_API_KEY`: Your Helius API key
+   - `HELIUS_RPC_URL`: https://rpc-mainnet.helius.xyz
+   - `DEFITUNA_API_URL`: https://api.defituna.com/api/v1
+   - `NEXT_PUBLIC_DONATION_WALLET`: Your wallet to receive donation
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Reference
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+- [Defituna PnL production](https://defituna-pnl.vercel.app/)
+- [Defituna](https://defituna.com/trade)
