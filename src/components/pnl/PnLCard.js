@@ -42,7 +42,27 @@ export const PnLCard = ({ position, onClose }) => {
 
   const handleExport = async () => {
     try {
-      const canvas = await html2canvas(exportContentRef.current);
+      // Configure html2canvas options for better mobile rendering
+      const canvas = await html2canvas(exportContentRef.current, {
+        scale: 2, // Increase resolution
+        useCORS: true, // Enable cross-origin images
+        backgroundColor: '#1E293B', // Match the card background
+        width: exportContentRef.current.offsetWidth,
+        height: exportContentRef.current.offsetHeight,
+        logging: false,
+        onclone: (clonedDoc) => {
+          // Ensure the cloned element has the correct dimensions and styles
+          const clonedContent = clonedDoc.querySelector('[data-export-content]');
+          if (clonedContent) {
+            clonedContent.style.width = `${exportContentRef.current.offsetWidth}px`;
+            clonedContent.style.height = `${exportContentRef.current.offsetHeight}px`;
+            clonedContent.style.position = 'relative';
+            clonedContent.style.transform = 'none';
+          }
+        }
+      });
+
+      // Create download link
       const link = document.createElement('a');
       link.download = `${position.pair}-pnl-${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png');
@@ -95,7 +115,7 @@ export const PnLCard = ({ position, onClose }) => {
             </button>
           </div>
 
-          <div className={styles.cardContent} ref={exportContentRef}>
+          <div className={styles.cardContent} ref={exportContentRef} data-export-content>
             <h3 className={styles.pairTitle}>{position.pair}</h3>
             
             <div className={styles.mainInfo}>

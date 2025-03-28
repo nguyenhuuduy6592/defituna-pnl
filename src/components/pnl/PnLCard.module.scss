@@ -9,8 +9,9 @@
   background: rgba(0, 0, 0, 0.85);
   @include variables.flex-center;
   z-index: 1000;
-  padding: variables.spacing(md);
+  padding: variables.spacing(lg);
   animation: fadeIn 0.3s ease-out;
+  overflow-y: auto;
 }
 
 .modalContainer {
@@ -26,18 +27,21 @@
   color: white;
   position: relative;
   animation: slideUp 0.4s ease-out;
+  margin: variables.spacing(md) 0;
 }
 
 .cardContent {
   background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
   padding: variables.spacing(lg) variables.spacing(md);
-  margin-bottom: variables.spacing(md);
+  margin-bottom: variables.spacing(sm);
   box-shadow: 
     0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   gap: variables.spacing(md);
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .header {
@@ -82,7 +86,7 @@
 
 .pairTitle {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
   text-align: center;
@@ -97,14 +101,14 @@
 .mainInfo {
   display: flex;
   flex-direction: column;
-  gap: variables.spacing(xs);
+  gap: variables.spacing(md);
 }
 
 .pnl {
   @include variables.flex-center;
   flex-direction: column;
-  padding: variables.spacing(sm);
-  border-radius: 16px;
+  padding: variables.spacing(md);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
 
@@ -113,11 +117,11 @@
     color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 2px;
+    margin-bottom: 4px;
   }
 
   .value {
-    font-size: 1.75rem;
+    font-size: 2rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     display: flex;
@@ -125,7 +129,7 @@
     gap: variables.spacing(xs);
 
     .currencyIcon {
-      font-size: 1.5rem;
+      font-size: 1.75rem;
       opacity: 0.8;
     }
   }
@@ -144,17 +148,18 @@
 }
 
 .stats {
-  padding: variables.spacing(xs);
-  gap: 4px;
+  padding: variables.spacing(md);
+  gap: variables.spacing(xs);
   display: flex;
   flex-direction: column;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 16px;
+  border-radius: 10px;
+  margin: 0;
 }
 
 .statRow {
   @include variables.flex-between;
-  padding: 4px 0;
+  padding: variables.spacing(xs) 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 
   &:last-child {
@@ -223,7 +228,7 @@
     color: white;
     font-weight: 500;
     padding: variables.spacing(xs) variables.spacing(md);
-    border-radius: 8px;
+    border-radius: 10px;
     backdrop-filter: blur(10px);
     transition: all 0.2s ease;
     display: flex;
