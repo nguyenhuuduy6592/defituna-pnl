@@ -42,7 +42,7 @@ export const useHistoricalData = () => {
       const store = tx.objectStore(STORE_NAME);
 
       await Promise.all(positions.map(position => {
-        const id = `${position.pair}-${position.walletAddress || 'default'}`;
+        const id = `${position.pair}-${position.positionAddress}`;
         return store.add({
           ...position,
           id,

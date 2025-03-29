@@ -109,9 +109,10 @@ export async function processPositionsData(positionsData, ages) {
       return {
         ...processedPosition,
         pair: `${tokenA.symbol}/${tokenB.symbol}`,
-        walletAddress: position.address,
+        walletAddress: position.authority,
+        positionAddress: position.address,
+        state: position.state,
         age: ages[index],
-        state: position.state
       };
     }).filter(Boolean); // Remove any null entries from failed processing
   } catch (error) {

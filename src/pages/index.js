@@ -76,7 +76,6 @@ export default () => {
     const allPositions = validData.flatMap(d => 
       d.positions.map(pos => ({
         ...pos,
-        walletAddress: d.walletAddress
       }))
     );
     
@@ -108,7 +107,7 @@ export default () => {
       const results = await Promise.all(
         walletsToFetch.map(async (address) => {
           const walletData = await fetchWalletPnL(address);
-          return walletData ? { ...walletData, walletAddress: address } : null;
+          return walletData ? { ...walletData } : null;
         })
       );
       

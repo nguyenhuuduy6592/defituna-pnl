@@ -105,7 +105,7 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
   };
 
   const handleShowChart = async (position) => {
-    const positionId = `${position.pair}-${position.walletAddress || 'default'}`;
+    const positionId = `${position.pair}-${position.positionAddress}`;
     const history = await getPositionHistory(positionId);
     setChartPosition({ ...position, history });
   };
@@ -150,7 +150,7 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
         </thead>
         <tbody>
           {adjustedPositions.map((p, i) => (
-            <tr key={`${p.pair}-${p.walletAddress || ''}-${i}`}>
+            <tr key={`${p.pair}-${p.positionAddress}-${i}`}>
               <td>
                 <span 
                   className={`${styles.positionLabel} ${isInverted(p.pair) ? styles.invertedPair : ''}`}
