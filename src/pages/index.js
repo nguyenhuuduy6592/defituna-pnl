@@ -7,6 +7,7 @@ import { useWallet } from '../hooks/useWallet';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCountdown } from '../hooks/useCountdown';
 import { useHistoricalData } from '../hooks/useHistoricalData';
+import { useDebounceApi } from '../hooks/useDebounceApi';
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
@@ -45,7 +46,29 @@ export default () => {
     }
   }, []);
 
-  // Function to fetch PnL data for a specific wallet
+  // Debounced function to fetch PnL data for a specific wallet
+  const debouncedFetchWalletPnL = useDebounceApi(async (walletAddress) => {
+    if (!walletAddress) return null;
+    
+    try {
+      const res = await fetch('/api/fetch-pnl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ walletAddress })
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to fetch');
+      }
+      
+      return await res.json();
+    } catch (err) {
+      return null;
+    }
+  }, 500); // 500ms debounce
+
+  // Non-debounced version for direct calls that need immediate response
   const fetchWalletPnL = useCallback(async (walletAddress) => {
     if (!walletAddress) return null;
     
@@ -104,9 +127,12 @@ export default () => {
     try {
       setLoading(true);
       
+      // Use the appropriate fetch function based on context
+      const fetchFunc = isAutoRefresh ? debouncedFetchWalletPnL : fetchWalletPnL;
+      
       const results = await Promise.all(
         walletsToFetch.map(async (address) => {
-          const walletData = await fetchWalletPnL(address);
+          const walletData = await fetchFunc(address);
           return walletData ? { ...walletData } : null;
         })
       );
@@ -136,7 +162,7 @@ export default () => {
     } finally {
       setLoading(false);
     }
-  }, [activeWallets, wallet, fetchWalletPnL, aggregatePnLData, toggleWalletActive, addWallet, startFetchCooldown, historyEnabled, savePositionSnapshot]);
+  }, [activeWallets, wallet, fetchWalletPnL, debouncedFetchWalletPnL, aggregatePnLData, toggleWalletActive, addWallet, startFetchCooldown, historyEnabled, savePositionSnapshot]);
 
   const {
     autoRefresh,
