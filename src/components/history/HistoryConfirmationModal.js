@@ -52,6 +52,7 @@ export const HistoryConfirmationModal = ({ onConfirm, onCancel, isEnabling }) =>
                 <p><strong>Important notes:</strong></p>
                 <ul>
                   <li>Auto-refresh will be enabled to collect data regularly</li>
+                  <li>The browser tab must be open to collect data</li>
                   <li>Data is stored only in your browser</li>
                   <li>Limited to last 30 days of history</li>
                   <li>Requires approximately 5MB of storage space</li>
