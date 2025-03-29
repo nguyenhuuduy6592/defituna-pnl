@@ -184,6 +184,29 @@
   }
 }
 
+.title {
+  margin: 0;
+  font-size: variables.font-size(lg);
+  color: variables.text-color(primary);
+  font-weight: bold;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: variables.spacing(xs);
+}
+
+.infoIcon {
+  display: inline-flex;
+  color: variables.text-color(secondary);
+  font-size: variables.font-size(sm);
+  cursor: pointer;
+  transition: color 0.2s ease;
+  
+  &:hover {
+    color: variables.color(primary);
+  }
+}
+
 @keyframes slideUp {
   from {
     opacity: 0;

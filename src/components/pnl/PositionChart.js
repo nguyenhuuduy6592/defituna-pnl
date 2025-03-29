@@ -5,11 +5,13 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   Legend,
   ResponsiveContainer,
 } from 'recharts';
 import { Portal } from '../common/Portal';
+import { Tooltip } from '../common/Tooltip';
+import { BsInfoCircle } from 'react-icons/bs';
 import { prepareChartData, groupChartData } from '../../utils/chart';
 import { formatNumber } from '../../utils/formatters';
 import { TIME_PERIODS } from '../../utils/constants';
@@ -164,7 +166,20 @@ export const PositionChart = ({ positionHistory, onClose }) => {
       <div className={styles.chartOverlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
         <div className={styles.chartContainer} onClick={e => e.stopPropagation()}>
           <div className={styles.chartHeader}>
-            <h3 className={styles.title}>Position History</h3>
+            <h3 className={styles.title}>
+              Position History
+              <Tooltip content={`
+• Shows how your position value changes over time
+• Historical data is stored locally in your browser
+• Data is collected and saved each time data is refreshed
+• Limited to 30 days of history
+• Enable "Store History" to collect data
+              `}>
+                <span className={styles.infoIcon}>
+                  <BsInfoCircle />
+                </span>
+              </Tooltip>
+            </h3>
             <div className={styles.controls}>
               <select 
                 value={period}
@@ -221,7 +236,7 @@ export const PositionChart = ({ positionHistory, onClose }) => {
                     tickCount={8}
                     domain={['auto', 'auto']}
                   />
-                  <Tooltip 
+                  <RechartsTooltip 
                     content={<CustomTooltip />}
                     isAnimationActive={false}
                   />
