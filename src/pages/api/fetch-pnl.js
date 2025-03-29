@@ -2,17 +2,11 @@ import { getTransactionAges } from '../../utils/helius';
 import { fetchPositions, processPositionsData } from '../../utils/defituna';
 
 async function getAges(positions) {
-  if (!positions || !Array.isArray(positions) || positions.length === 0) {
-    console.error('Invalid positions array:', positions);
-    return [];
-  }
-
   try {
     // Validate positions have the required address property
     const validPositions = positions.filter(p => p && p.address);
     if (validPositions.length === 0) {
-      console.error('No valid positions found with address property');
-      return positions.map(() => 'Unknown');
+      return [];
     }
 
     console.log('Fetching ages for positions:', validPositions.length);
@@ -44,6 +38,15 @@ async function fetchPnL(wallet) {
   // Fetch positions data
   const positionsData = await fetchPositions(wallet);
 
+  // Handle empty positions case early
+  if (!positionsData || !Array.isArray(positionsData) || positionsData.length === 0) {
+    return {
+      totalPnL: 0,
+      positions: [],
+      message: 'No positions found for this wallet'
+    };
+  }
+
   // Get ages for positions
   const positionAges = await getAges(positionsData);
   
@@ -55,7 +58,7 @@ async function fetchPnL(wallet) {
   
   return { 
     totalPnL,
-    positions, 
+    positions,
   };
 }
 
