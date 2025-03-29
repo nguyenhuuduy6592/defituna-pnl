@@ -2,6 +2,7 @@ import { useRef, useState, useMemo } from 'react';
 import styles from './WalletForm.module.scss';
 import { copyToClipboard, showNotification } from '../../utils/notifications';
 import { isValidWalletAddress } from '../../utils/validation';
+import { formatWalletAddress } from '../../utils/formatters';
 
 export function WalletForm({
   wallet,
@@ -75,7 +76,9 @@ export function WalletForm({
               <div className={styles.savedWallets}>
                 {uniqueSavedWallets.map((w, i) => (
                   <div key={i} className={`${styles.dropdownItem} ${activeWallets.includes(w) ? styles.activeWallet : ''}`}>
-                    <span onClick={() => onWalletChange(w)} title="Click to select this wallet">{w}</span>
+                    <span onClick={() => onWalletChange(w)} title="Click to select this wallet">
+                      {formatWalletAddress(w)}
+                    </span>
                     <div className={styles.walletActions}>
                       <button 
                         type="button"
@@ -140,7 +143,7 @@ export function WalletForm({
                     }
                   }}
                 >
-                  {w.slice(0, 6)}...{w.slice(-4)}
+                  {formatWalletAddress(w)}
                 </span>
                 <button 
                   type="button"
