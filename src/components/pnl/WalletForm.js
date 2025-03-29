@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import styles from './WalletForm.module.scss';
 
 export function WalletForm({
@@ -10,19 +10,19 @@ export function WalletForm({
   loading,
   countdown,
   savedWallets,
-  showDropdown: externalShowDropdown,
-  setShowDropdown: externalSetShowDropdown,
+  showDropdown,
+  setShowDropdown,
   onRemoveWallet,
   onClearWallets
 }) {
   const inputRef = useRef(null);
   const [error, setError] = useState('');
-  // Initialize local state if not provided as props
-  const [internalShowDropdown, setInternalShowDropdown] = useState(false);
   
-  // Use either external props or internal state
-  const showDropdown = externalShowDropdown !== undefined ? externalShowDropdown : internalShowDropdown;
-  const setShowDropdown = externalSetShowDropdown || setInternalShowDropdown;
+  // Filter out duplicate wallets
+  const uniqueSavedWallets = useMemo(() => {
+    // Use a Set to remove duplicates
+    return [...new Set(savedWallets)];
+  }, [savedWallets]);
 
   const handleSubmit = (e) => {
     if (e) {
@@ -72,10 +72,10 @@ export function WalletForm({
           />
           {error && <div className={styles.error}>{error}</div>}
           
-          {showDropdown && savedWallets.length > 0 && (
+          {showDropdown && uniqueSavedWallets.length > 0 && (
             <div className={styles.dropdown}>
               <div className={styles.savedWallets}>
-                {savedWallets.map((w, i) => (
+                {uniqueSavedWallets.map((w, i) => (
                   <div key={i} className={`${styles.dropdownItem} ${activeWallets.includes(w) ? styles.activeWallet : ''}`}>
                     <span onClick={() => onWalletChange(w)} title="Click to select this wallet">{w}</span>
                     <div className={styles.walletActions}>

@@ -14,6 +14,7 @@ export default () => {
   const [loading, setLoading] = useState(false);
   const { countdown: fetchCooldown, startCountdown: startFetchCooldown } = useCountdown(0);
   const [aggregatedData, setAggregatedData] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const {
     wallet,
@@ -186,6 +187,8 @@ export default () => {
         savedWallets={savedWallets}
         onRemoveWallet={removeWallet}
         onClearWallets={clearWallets}
+        showDropdown={showDropdown}
+        setShowDropdown={setShowDropdown}
       />
       
       {aggregatedData && (
