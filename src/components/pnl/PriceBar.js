@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import styles from './PriceBar.module.scss';
-import { TooltipPortal } from '../TooltipPortal';
+import { TooltipPortal } from '../common/TooltipPortal';
 
 export const PriceBar = ({ 
   currentPrice,

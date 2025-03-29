@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import styles from './ClusterBar.module.scss';
-import { TooltipPortal } from '../TooltipPortal';
+import { TooltipPortal } from '../common/TooltipPortal';
 
 export const ClusterBar = ({ size, collateral, debt, interest, formatValue }) => {
   const [showTooltip, setShowTooltip] = useState(false);
