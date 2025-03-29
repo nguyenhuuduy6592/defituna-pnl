@@ -164,11 +164,12 @@ export default () => {
         <h1>{title}</h1>
         <Tooltip content={`
 • View Defituna positions and PnL
-• Support for multiple wallet
-• Auto-refresh data
-• Show position age
-• PnL card to share with friends
+• No transactions needed - just enter wallet address
+• Support for multiple wallets
+• Auto-refresh data with configurable intervals
 • Historical data tracking for positions
+• Position age tracking
+• PnL card to share with friends
           `}>
           <div className={styles.infoIcon}>
             <BsInfoCircle />
