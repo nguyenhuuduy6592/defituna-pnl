@@ -72,7 +72,7 @@ async function fetchWithRetry(body, retries = 0) {
 export async function getTransactionAge(address) {
   if (!address) {
     console.error('[getTransactionAge] Invalid address provided:', address);
-    return 'Unknown';
+    return 0;
   }
 
   // Check cache first
@@ -135,35 +135,16 @@ export async function getTransactionAge(address) {
       const now = Math.floor(Date.now() / 1000);
       const age = now - txResult.blockTime;
       
-      // Convert to human readable format
-      const days = Math.floor(age / 86400);
-      const hours = Math.floor((age % 86400) / 3600);
-      const minutes = Math.floor((age % 3600) / 60);
-      const seconds = age % 60;
-      
-      let ageString;
-      if (days > 0) {
-        ageString = hours > 0 ? `${days}d ${hours}h` : `${days}d`;
-      } else if (hours > 0) {
-        ageString = `${hours}h ${minutes}m`;
-      } else if (minutes > 0) {
-        ageString = seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
-      } else {
-        ageString = `${seconds}s`;
-      }
-
-      console.log(`[getTransactionAge] Calculated age for ${address}: ${ageString}`);
-
       // Cache the result with timestamp
-      ageCache.set(address, { age: ageString, timestamp: Date.now() });
-      return ageString;
+      ageCache.set(address, { age, timestamp: Date.now() });
+      return age;
     };
 
     return await getAge();
   } catch (error) {
     console.error('[getTransactionAge] Error:', error);
     console.error('[getTransactionAge] Stack:', error.stack);
-    return 'Unknown';
+    return 0;
   }
 }
 

@@ -7,7 +7,7 @@ import { PriceBar } from './PriceBar';
 import { useHistoricalData } from '../../hooks/useHistoricalData';
 
 export const PositionsList = memo(({ positions, formatValue, showWallet = false }) => {
-  const [sortField, setSortField] = useState('pnl');
+  const [sortField, setSortField] = useState('age');
   const [sortDirection, setSortDirection] = useState('desc');
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [chartPosition, setChartPosition] = useState(null);
@@ -29,9 +29,27 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
     }
   };
 
-  const formatDuration = (ageString) => {
-    if (!ageString || ageString === 'Unknown') return 'Unknown';
-    return ageString;
+  const formatDuration = (ageSeconds) => {
+    if (ageSeconds === null || ageSeconds === undefined || ageSeconds === 0) return 'Unknown';
+    
+    const days = Math.floor(ageSeconds / 86400);
+    const hours = Math.floor((ageSeconds % 86400) / 3600);
+    const minutes = Math.floor((ageSeconds % 3600) / 60);
+    const seconds = ageSeconds % 60;
+    
+    if (days > 0) {
+      if (hours > 0) {
+        return minutes > 0 ? `${days}d ${hours}h ${minutes}m` : `${days}d ${hours}h`;
+      } else {
+        return minutes > 0 ? `${days}d ${minutes}m` : `${days}d`;
+      }
+    } else if (hours > 0) {
+      return minutes > 0 ? `${hours}h ${minutes}m` : `${hours}h`;
+    } else if (minutes > 0) {
+      return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+    } else {
+      return `${seconds}s`;
+    }
   };
 
   const getStateClass = (state) => {
@@ -84,12 +102,17 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
       }
       
       // Special handling for string fields
-      if (['pair', 'state', 'age', 'walletAddress', 'status'].includes(sortField)) {
+      if (['pair', 'state', 'walletAddress', 'status'].includes(sortField)) {
         aValue = String(aValue || '');
         bValue = String(bValue || '');
         return sortDirection === 'asc' 
           ? aValue.localeCompare(bValue)
           : bValue.localeCompare(aValue);
+      }
+      
+      // Special handling for age field
+      if (sortField === 'age') {
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
       }
       
       // Numeric fields
