@@ -73,12 +73,6 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const formatPrice = (price) => {
-    if (price === Infinity) return '∞';
-    if (price === 0) return '0';
-    return formatNumber(price);
-  };
-  
   const handleSort = (field) => {
     if (field === sortField) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -99,6 +93,15 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
       if (sortField === 'priceRange') {
         aValue = a.priceRange.lower;
         bValue = b.priceRange.lower;
+      } else if (sortField === 'pnl') {
+        aValue = a.pnl.usd;
+        bValue = b.pnl.usd;
+      } else if (sortField === 'yield') {
+        aValue = a.yield.usd;
+        bValue = b.yield.usd;
+      } else if (sortField === 'size') {
+        aValue = a.size.usd;
+        bValue = b.size.usd;
       }
       
       // Special handling for string fields
