@@ -82,7 +82,8 @@ export default () => {
   const fetchPnLData = useCallback(async (isAutoRefresh = false) => {
     let walletsToFetch = activeWallets;
     
-    if (activeWallets.length === 0 && wallet) {
+    // Only add the current wallet input if we're submitting the form (not auto-refreshing)
+    if (!isAutoRefresh && wallet && walletsToFetch.length === 0) {
       toggleWalletActive(wallet);
       walletsToFetch = [wallet];
     }
@@ -138,13 +139,10 @@ export default () => {
 
   // Auto fetch data if there are active wallets on page load
   useEffect(() => {
-    if (!aggregatedData) {
-      const hasWallets = activeWallets.length > 0 || wallet;
-      if (hasWallets) {
-        fetchPnLData(false);
-      }
+    if (!aggregatedData && activeWallets.length > 0) {
+      fetchPnLData(false);
     }
-  }, [activeWallets, wallet, aggregatedData, fetchPnLData]);
+  }, [activeWallets, aggregatedData, fetchPnLData]);
 
   const handleSubmit = async e => {
     e.preventDefault();
