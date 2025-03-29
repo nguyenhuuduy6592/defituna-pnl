@@ -18,7 +18,6 @@ async function fetchWithRetry(body, retries = 0) {
     }
 
     const rpcEndpoint = `${process.env.HELIUS_RPC_URL}/?api-key=${apiKey}`;
-    console.log(`[fetchWithRetry] Attempt ${retries + 1}/${MAX_RETRIES}`);
     
     const response = await fetch(rpcEndpoint, {
       method: 'POST',
@@ -28,12 +27,8 @@ async function fetchWithRetry(body, retries = 0) {
       body: JSON.stringify(body)
     });
     
-    // Log response status
-    console.log(`[fetchWithRetry] Response status: ${response.status}`);
-    
     if (response.status === 429 && retries < MAX_RETRIES) {
       const backoffDelay = Math.pow(2, retries) * 1000;
-      console.log(`[fetchWithRetry] Rate limited, retrying in ${backoffDelay}ms`);
       await delay(backoffDelay);
       return fetchWithRetry(body, retries + 1);
     }
@@ -49,7 +44,6 @@ async function fetchWithRetry(body, retries = 0) {
     // Check for RPC error -32019 (long-term storage query failure)
     if (responseData.error && responseData.error.code === -32019 && retries < MAX_RETRIES) {
       const backoffDelay = Math.pow(2, retries) * 1000;
-      console.log(`[fetchWithRetry] Long-term storage query failed, retrying in ${backoffDelay}ms`);
       await delay(backoffDelay);
       return fetchWithRetry(body, retries + 1);
     }
@@ -61,7 +55,6 @@ async function fetchWithRetry(body, retries = 0) {
     
     if (retries < MAX_RETRIES) {
       const backoffDelay = Math.pow(2, retries) * 1000;
-      console.log(`[fetchWithRetry] Retrying in ${backoffDelay}ms`);
       await delay(backoffDelay);
       return fetchWithRetry(body, retries + 1);
     }
@@ -81,7 +74,7 @@ export async function getTransactionAge(address) {
     if (Date.now() - cached.timestamp < CACHE_DURATION) {
       return cached.age;
     }
-    
+
     ageCache.delete(address);
   }
 
