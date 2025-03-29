@@ -99,9 +99,6 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
       } else if (sortField === 'yield') {
         aValue = a.yield.usd;
         bValue = b.yield.usd;
-      } else if (sortField === 'size') {
-        aValue = a.size.usd;
-        bValue = b.size.usd;
       }
       
       // Special handling for string fields
