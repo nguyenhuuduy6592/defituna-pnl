@@ -4,24 +4,26 @@ import { HistoryConfirmationModal } from './HistoryConfirmationModal';
 
 export const HistoryToggle = ({ enabled, onToggle, setAutoRefresh }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
   
   const handleToggle = (e) => {
     const newEnabled = e.target.checked;
-    if (newEnabled) {
-      setShowConfirmation(true);
-    } else {
-      onToggle(false);
-    }
+    setPendingAction(newEnabled);
+    setShowConfirmation(true);
   };
 
   const handleConfirm = () => {
     setShowConfirmation(false);
-    setAutoRefresh(true); // Enable auto-refresh when enabling history
-    onToggle(true);
+    if (pendingAction) {
+      setAutoRefresh(true); // Enable auto-refresh when enabling history
+    }
+    onToggle(pendingAction);
+    setPendingAction(null);
   };
 
   const handleCancel = () => {
     setShowConfirmation(false);
+    setPendingAction(null);
   };
 
   return (
@@ -41,6 +43,7 @@ export const HistoryToggle = ({ enabled, onToggle, setAutoRefresh }) => {
         <HistoryConfirmationModal
           onConfirm={handleConfirm}
           onCancel={handleCancel}
+          isEnabling={pendingAction}
         />
       )}
     </>
