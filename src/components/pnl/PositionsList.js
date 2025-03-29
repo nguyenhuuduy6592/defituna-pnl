@@ -122,10 +122,10 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
                   {formatWalletAddress(p.walletAddress)}
                 </td>
               )}
-              <td className={getStateClass(p.status)}>{p.status}</td>
+              <td className={styles[getStateClass(p.status)]}>{p.status}</td>
               <td>{formatDuration(p.age)}</td>
-              <td className={getValueClass(p.pnl.usd)}>${formatNumber(p.pnl.usd)} <span className={styles.positionPnlPercentage}>({p.pnl.percentage}%)</span></td>
-              <td className={getValueClass(p.yield.usd)}>{formatNumber(p.yield.usd)}</td>
+              <td className={styles[getValueClass(p.pnl.usd)]}>${formatNumber(p.pnl.usd)} <span className={styles.positionPnlPercentage}>({p.pnl.percentage}%)</span></td>
+              <td className={styles[getValueClass(p.yield.usd)]}>{formatNumber(p.yield.usd)}</td>
               <td>
                 <ClusterBar
                   size={p.size}

@@ -19,7 +19,7 @@ export const PnLDisplay = ({ data }) => {
             <div className={styles.label}>
               Total PnL ({data.walletCount} Wallets)
             </div>
-            <div className={`${styles.value} ${getValueClass(data.totalPnL)}`}>
+            <div className={`${styles.value} ${styles[getValueClass(data.totalPnL)]}`}>
               ${formatValue(data.totalPnL)}
             </div>
           </div>
