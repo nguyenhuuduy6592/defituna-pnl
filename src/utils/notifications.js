@@ -30,3 +30,34 @@ export const showNotification = (message, type = 'success') => {
     }, 300);
   }, 3000);
 };
+
+export const copyToClipboard = async (text) => {
+  try {
+    // Try using the Clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      // Fallback for iOS and other browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      
+      // Make the textarea invisible
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      
+      // Select and copy the text
+      textArea.focus();
+      textArea.select();
+      document.execCommand('copy');
+      
+      // Clean up
+      textArea.remove();
+    }
+    
+    showNotification('Copied to clipboard!');
+  } catch (err) {
+    console.error('Failed to copy text: ', err);
+  }
+};

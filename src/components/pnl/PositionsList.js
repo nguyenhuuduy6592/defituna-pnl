@@ -8,6 +8,7 @@ import { useHistoricalData } from '../../hooks/useHistoricalData';
 import { formatNumber, formatDuration, formatWalletAddress } from '../../utils/formatters';
 import { getValueClass, getStateClass } from '../../utils/positionUtils';
 import { invertPairString, getAdjustedPosition } from '../../utils/pairUtils';
+import { copyToClipboard } from '../../utils/notifications';
 
 export const PositionsList = memo(({ positions, showWallet = false, historyEnabled }) => {
   const [sortField, setSortField] = useState('age');
@@ -164,7 +165,18 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
                 <span className={styles.positionLeverage}>({formatNumber(p.leverage)}x Leverage)</span>
               </td>
               {showWallet && (
-                <td title={p.walletAddress}>
+                <td 
+                  title="Copy to clipboard"
+                  onClick={() => copyToClipboard(p.walletAddress)}
+                  className={styles.walletCell}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      copyToClipboard(p.walletAddress);
+                    }
+                  }}
+                >
                   {formatWalletAddress(p.walletAddress)}
                 </td>
               )}

@@ -214,3 +214,24 @@
     transform: translateX(0);
   }
 }
+
+.walletCell {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  padding: variables.spacing(xs) variables.spacing(sm);
+  border-radius: map.get(variables.$border-radius, sm);
+
+  &:hover {
+    background: variables.bg-color(light);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px variables.color(primary);
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+}

@@ -1,5 +1,6 @@
 import { useRef, useState, useMemo } from 'react';
 import styles from './WalletForm.module.scss';
+import { copyToClipboard } from '../../utils/notifications';
 
 export function WalletForm({
   wallet,
@@ -131,7 +132,19 @@ export function WalletForm({
           <div className={styles.walletChips}>
             {activeWallets.map((w, i) => (
               <div key={i} className={styles.walletChip}>
-                <span title={w}>{w.slice(0, 6)}...{w.slice(-4)}</span>
+                <span 
+                  title="Copy to clipboard"
+                  onClick={() => copyToClipboard(w)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      copyToClipboard(w);
+                    }
+                  }}
+                >
+                  {w.slice(0, 6)}...{w.slice(-4)}
+                </span>
                 <button 
                   type="button"
                   className={styles.removeChip}
