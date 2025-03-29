@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useMemo } from 'react';
 import styles from './PositionsList.module.scss';
 import { PnLCard } from './PnLCard';
 import { PositionChart } from './PositionChart';
@@ -6,6 +6,7 @@ import { ClusterBar } from './ClusterBar';
 import { PriceBar } from './PriceBar';
 import { useHistoricalData } from '../../hooks/useHistoricalData';
 import { formatNumber, formatDuration, formatWalletAddress } from '../../utils/formatters';
+import { getValueClass, getStateClass } from '../../utils/positionUtils';
 
 export const PositionsList = memo(({ positions, showWallet = false }) => {
   const [sortField, setSortField] = useState('age');
@@ -13,22 +14,6 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [chartPosition, setChartPosition] = useState(null);
   const { getPositionHistory } = useHistoricalData();
-
-  const getStateClass = (state) => {
-    switch (state) {
-      case 'In range': return styles.stateInRange;
-      case 'Out of range': return styles.stateWarning;
-      case 'Closed': return styles.stateClosed;
-      case 'Liquidated': return styles.stateLiquidated;
-      default: return '';
-    }
-  };
-
-  const getValueClass = (value) => {
-    if (value > 0) return styles.positive;
-    if (value < 0) return styles.negative;
-    return styles.zero;
-  };
 
   const handleSort = (field) => {
     if (positions.length <= 1) return;
@@ -40,7 +25,7 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
     }
   };
   
-  const getSortedPositions = () => {
+  const sortedPositions = useMemo(() => {
     if (!positions) return [];
     
     return [...positions].sort((a, b) => {
@@ -76,7 +61,7 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
       // Numeric fields
       return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
     });
-  };
+  }, [positions, sortField, sortDirection]);
   
   const getSortIcon = (field) => {
     if (positions.length <= 1) return null;
@@ -93,8 +78,6 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
   if (!positions || positions.length === 0) {
     return <div className={styles.noData}>No positions found</div>;
   }
-  
-  const sortedPositions = getSortedPositions();
 
   return (
     <div className={styles.positionsContainer}>

@@ -2,14 +2,9 @@ import { PositionsList } from './PositionsList';
 import styles from './PnLDisplay.module.scss';
 import { showNotification } from '../../utils/notifications';
 import { formatValue, formatWalletAddress } from '../../utils/formatters';
+import { getValueClass } from '../../utils/positionUtils';
 
 export const PnLDisplay = ({ data }) => {
-  const getValueClass = (value) => {
-    if (value > 0) return styles.positive;
-    if (value < 0) return styles.negative;
-    return styles.zero;
-  };
-
   const handleCopyAddress = () => {
     const address = process.env.NEXT_PUBLIC_DONATION_WALLET;
     navigator.clipboard.writeText(address);
