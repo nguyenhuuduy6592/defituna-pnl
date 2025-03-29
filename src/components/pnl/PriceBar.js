@@ -7,6 +7,7 @@ export const PriceBar = ({
   entryPrice,
   liquidationPrice,
   rangePrices,
+  limitOrderPrices,
   formatValue
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -49,8 +50,20 @@ export const PriceBar = ({
       label: 'Range Upper', 
       color: '#34C759',
       shape: 'square'
+    },
+    {
+      value: limitOrderPrices.lower,
+      label: 'Stop Loss',
+      color: '#FF9500',
+      shape: 'triangle-down'
+    },
+    {
+      value: limitOrderPrices.upper,
+      label: 'Take Profit',
+      color: '#FF9500',
+      shape: 'triangle-up'
     }
-  ].filter(point => point.value !== Infinity && point.value !== 0)
+  ].filter(point => point.value !== Infinity && point.value !== null && point.value !== 0)
    .sort((a, b) => a.value - b.value);
 
   // Find min and max for scaling

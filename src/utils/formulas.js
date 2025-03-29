@@ -22,6 +22,10 @@ function computeLiquidationPrices({ lowerPrice, upperPrice, debtA, debtB, liquid
 }
 
 function tickToPrice(tick, decimalsA, decimalsB) {
+    if (tick == 2147483647) {
+        return Infinity;
+    }
+
     const price = Math.pow(1.0001, tick);
     return price * (10 ** (decimalsA - decimalsB));
 }
@@ -57,6 +61,8 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
     const currentPrice = tickToPrice(pool.tick_current_index, tokenADecimals, tokenBDecimals);
     const lowerRangePrice = tickToPrice(position.tick_lower_index, tokenADecimals, tokenBDecimals);
     const upperRangePrice = tickToPrice(position.tick_upper_index, tokenADecimals, tokenBDecimals);
+    const lowerLimitOrderPrice = tickToPrice(position.tick_stop_loss_index, tokenADecimals, tokenBDecimals);
+    const upperLimitOrderPrice = tickToPrice(position.tick_take_profit_index, tokenADecimals, tokenBDecimals);
 
     // Calculate leverage and status
     const leverage = calculateLeverage({ price: currentPrice, debtA, debtB, totalA, totalB });
@@ -96,8 +102,6 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
 
     // Calculate entry and limit order prices
     const entryPrice = tickToPrice(position.tick_entry_index, tokenADecimals, tokenBDecimals);
-    const lowerLimitOrderPrice = position.tick_stop_loss_index !== -20716 ? tickToPrice(position.tick_stop_loss_index, tokenADecimals, tokenBDecimals) : null;
-    const upperLimitOrderPrice = position.tick_take_profit_index !== 2147483647 ? tickToPrice(position.tick_take_profit_index, tokenADecimals, tokenBDecimals) : null;
 
     // Calculate yield values
     const yieldValue = {
@@ -131,8 +135,10 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
         },
         entryPrice: Number(entryPrice.toFixed(6)),
         currentPrice: Number(currentPrice.toFixed(6)),
-        lowerLimitOrderPrice: lowerLimitOrderPrice ? Number(lowerLimitOrderPrice.toFixed(6)) : null,
-        upperLimitOrderPrice: upperLimitOrderPrice ? Number(upperLimitOrderPrice.toFixed(6)) : null,
+        limitOrderPrices: {
+            lower: isNaN(lowerLimitOrderPrice) ? Infinity : Number(lowerLimitOrderPrice.toFixed(6)),
+            upper: isNaN(upperLimitOrderPrice) ? Infinity : Number(upperLimitOrderPrice.toFixed(6)),
+        },
         yield: yieldValue,
         compounded,
         rangePrices: {

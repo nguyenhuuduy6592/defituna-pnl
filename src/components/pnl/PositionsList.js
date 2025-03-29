@@ -175,6 +175,7 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
                   entryPrice={p.entryPrice}
                   liquidationPrice={p.liquidationPrice}
                   rangePrices={p.rangePrices}
+                  limitOrderPrices={p.limitOrderPrices}
                   formatValue={formatNumber}
                 />
               </td>
