@@ -275,7 +275,6 @@ const defaultSettings = {
 **Implementation:**
 - Create a service worker for background data fetching
 - Implement periodic data refresh mechanism
-- Handle offline/online state transitions
 - Only enable if historical data is enabled
 
 **Technical Details:**
@@ -286,14 +285,11 @@ const defaultSettings = {
 **Integration Points:**
 - Service worker registration in `src/index.js`
 - Background sync request in `useHistoricalData` hook
-- Status display in main UI
-- Notification system integration for sync status
 
 **Technical Features:**
 1. Background Sync:
    - Periodic data fetching (use value from Auto Refresh feature)
-   - Reliable sync using Background Sync API
-   - Offline queue management
+   - Reliable sync using Background Sync API (reuse the fetch-pnl logic, refactor to not have duplicate code)
    - Error handling and retry logic
 
 2. Data Management:
