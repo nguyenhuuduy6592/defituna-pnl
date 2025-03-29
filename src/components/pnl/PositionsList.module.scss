@@ -62,6 +62,24 @@
 
       .positionLabel {
         font-weight: 700;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        
+        &:hover {
+          color: variables.color(primary);
+        }
+        
+        &.invertedPair {
+          color: variables.color(primary);
+          
+          .invertedIndicator {
+            display: inline-block;
+            margin-left: variables.spacing(xs);
+            font-size: variables.font-size(xs);
+            opacity: 0.7;
+            transform: rotate(90deg);
+          }
+        }
       }
 
       .positionLeverage, .positionPnlPercentage {

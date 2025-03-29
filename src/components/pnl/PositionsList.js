@@ -1,4 +1,4 @@
-import { memo, useState, useMemo } from 'react';
+import { memo, useState, useMemo, useEffect } from 'react';
 import styles from './PositionsList.module.scss';
 import { PnLCard } from './PnLCard';
 import { PositionChart } from './PositionChart';
@@ -7,6 +7,7 @@ import { PriceBar } from './PriceBar';
 import { useHistoricalData } from '../../hooks/useHistoricalData';
 import { formatNumber, formatDuration, formatWalletAddress } from '../../utils/formatters';
 import { getValueClass, getStateClass } from '../../utils/positionUtils';
+import { invertPairString, getAdjustedPosition } from '../../utils/pairUtils';
 
 export const PositionsList = memo(({ positions, showWallet = false }) => {
   const [sortField, setSortField] = useState('age');
@@ -14,6 +15,34 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [chartPosition, setChartPosition] = useState(null);
   const { getPositionHistory } = useHistoricalData();
+  const [invertedPairs, setInvertedPairs] = useState(new Set());
+
+  // Load inverted pairs from localStorage on mount
+  useEffect(() => {
+    const savedInvertedPairs = localStorage.getItem('invertedPairs');
+    if (savedInvertedPairs) {
+      setInvertedPairs(new Set(JSON.parse(savedInvertedPairs)));
+    }
+  }, []);
+
+  // Save inverted pairs to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('invertedPairs', JSON.stringify(Array.from(invertedPairs)));
+  }, [invertedPairs]);
+
+  const handlePairInversion = (pair) => {
+    setInvertedPairs(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(pair)) {
+        newSet.delete(pair);
+      } else {
+        newSet.add(pair);
+      }
+      return newSet;
+    });
+  };
+
+  const isInverted = (pair) => invertedPairs.has(pair);
 
   const handleSort = (field) => {
     if (positions.length <= 1) return;
@@ -62,6 +91,11 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
       return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
     });
   }, [positions, sortField, sortDirection]);
+
+  // Apply position adjustments for inverted pairs
+  const adjustedPositions = useMemo(() => {
+    return sortedPositions.map(position => getAdjustedPosition(position, isInverted(position.pair)));
+  }, [sortedPositions, invertedPairs]);
   
   const getSortIcon = (field) => {
     if (positions.length <= 1) return null;
@@ -114,9 +148,21 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
           </tr>
         </thead>
         <tbody>
-          {sortedPositions.map((p, i) => (
+          {adjustedPositions.map((p, i) => (
             <tr key={`${p.pair}-${p.walletAddress || ''}-${i}`}>
-              <td><span className={styles.positionLabel}>{p.pair}</span> <span className={styles.positionLeverage}>({formatNumber(p.leverage)}x Leverage)</span></td>
+              <td>
+                <span 
+                  className={`${styles.positionLabel} ${isInverted(p.pair) ? styles.invertedPair : ''}`}
+                  onClick={() => handlePairInversion(p.pair)}
+                  title={`Click to ${isInverted(p.pair) ? 'restore' : 'invert'} token order`}
+                >
+                  {isInverted(p.pair) ? invertPairString(p.pair) : p.pair}
+                  {isInverted(p.pair) && (
+                    <span className={styles.invertedIndicator}>↔</span>
+                  )}
+                </span>
+                <span className={styles.positionLeverage}>({formatNumber(p.leverage)}x Leverage)</span>
+              </td>
               {showWallet && (
                 <td title={p.walletAddress}>
                   {formatWalletAddress(p.walletAddress)}
@@ -143,6 +189,7 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
                   rangePrices={p.rangePrices}
                   limitOrderPrices={p.limitOrderPrices}
                   formatValue={formatNumber}
+                  isInverted={isInverted(p.pair)}
                 />
               </td>
               <td>
