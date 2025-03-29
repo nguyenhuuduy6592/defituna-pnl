@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BsInfoCircle } from 'react-icons/bs';
+import { FiAlertTriangle } from 'react-icons/fi';
 import { Tooltip } from '../components/common/Tooltip';
+import { DisclaimerModal } from '../components/common/DisclaimerModal';
 import { useWallet } from '../hooks/useWallet';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCountdown } from '../hooks/useCountdown';
@@ -15,6 +17,7 @@ export default () => {
   const { countdown: fetchCooldown, startCountdown: startFetchCooldown } = useCountdown(0);
   const [aggregatedData, setAggregatedData] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [disclaimerOpen, setDisclaimerOpen] = useState(false);
 
   const {
     wallet,
@@ -32,6 +35,15 @@ export default () => {
     toggleHistoryEnabled,
     savePositionSnapshot
   } = useHistoricalData();
+
+  // Check if this is the first visit
+  useEffect(() => {
+    const disclaimerShown = localStorage.getItem('disclaimerShown');
+    if (!disclaimerShown) {
+      setDisclaimerOpen(true);
+      localStorage.setItem('disclaimerShown', 'true');
+    }
+  }, []);
 
   // Function to fetch PnL data for a specific wallet
   const fetchWalletPnL = useCallback(async (walletAddress) => {
@@ -155,6 +167,11 @@ export default () => {
     setRefreshInterval(newInterval);
   };
 
+  const handleCloseDisclaimer = () => {
+    setDisclaimerOpen(false);
+    localStorage.setItem('disclaimerShown', 'true');
+  };
+
   const title = 'Defituna PnL Viewer';
   return (
     <div className="container">
@@ -169,11 +186,22 @@ export default () => {
 • Historical data tracking for positions
 • Position age tracking
 • PnL card to share with friends
-          `}>
+        `}>
           <div className={styles.infoIcon}>
             <BsInfoCircle />
           </div>
         </Tooltip>
+        <div className={styles.titleActions}>
+          <button 
+            className={styles.disclaimerButton} 
+            onClick={() => setDisclaimerOpen(true)}
+            aria-label="Project disclaimer"
+            title="View project disclaimer"
+          >
+            <FiAlertTriangle />
+            <span>Disclaimer</span>
+          </button>
+        </div>
       </div>
       
       <WalletForm
@@ -209,6 +237,11 @@ export default () => {
           />
         </>
       )}
+
+      <DisclaimerModal
+        isOpen={disclaimerOpen}
+        onClose={handleCloseDisclaimer}
+      />
     </div>
   );
 };

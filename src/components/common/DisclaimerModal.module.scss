@@ -1,0 +1,142 @@
+@use "sass:color";
+@use "sass:map";
+@use '../../styles/variables.module.scss';
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  @include variables.flex-center;
+  z-index: 1000;
+  padding: variables.spacing(md);
+  animation: fadeIn 0.2s ease-out;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  background: white;
+  border-radius: map.get(variables.$border-radius, md);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 580px;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease-out;
+}
+
+.header {
+  @include variables.flex-between;
+  padding: variables.spacing(md);
+  border-bottom: 1px solid variables.color(border);
+
+  h2 {
+    margin: 0;
+    font-size: variables.font-size(lg);
+    color: variables.text-color(primary);
+    font-weight: 600;
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  padding: variables.spacing(xs);
+  cursor: pointer;
+  color: variables.text-color(secondary);
+  border-radius: 50%;
+  @include variables.flex-center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: variables.bg-color(light);
+    color: variables.text-color(primary);
+  }
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.content {
+  padding: variables.spacing(md);
+  color: variables.text-color(primary);
+
+  p {
+    margin: variables.spacing(sm) 0;
+    line-height: 1.5;
+  }
+
+  ul {
+    margin: variables.spacing(sm) 0;
+    padding-left: variables.spacing(lg);
+
+    li {
+      margin: variables.spacing(xs) 0;
+      line-height: 1.4;
+    }
+  }
+
+  a {
+    color: variables.color(primary);
+    text-decoration: none;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.section {
+  margin-top: variables.spacing(md);
+  
+  h3 {
+    font-size: variables.font-size(md);
+    margin-bottom: variables.spacing(xs);
+    color: variables.text-color(primary);
+    font-weight: 600;
+  }
+}
+
+.actions {
+  padding: variables.spacing(md);
+  border-top: 1px solid variables.color(border);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.confirmButton {
+  padding: variables.spacing(sm) variables.spacing(md);
+  border-radius: map.get(variables.$border-radius, sm);
+  font-size: variables.font-size(base);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  background: variables.color(primary);
+  border: none;
+  color: white;
+  min-width: 140px;
+
+  &:hover {
+    background: variables.color(hover);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

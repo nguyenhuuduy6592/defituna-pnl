@@ -20,23 +20,60 @@
       font-size: variables.font-size(xl) * 1.5;
     }
   }
+}
 
-  .infoIcon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: variables.text-color(secondary);
-    font-size: variables.font-size(lg);
-    cursor: help;
-    transition: all 0.2s ease;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+.titleActions {
+  display: flex;
+  align-items: center;
+  gap: variables.spacing(sm);
+}
+
+.disclaimerButton {
+  display: flex;
+  align-items: center;
+  gap: variables.spacing(xs);
+  padding: variables.spacing(xs) variables.spacing(sm);
+  background: variables.bg-color(white);
+  border: 1px solid variables.color(border);
+  border-radius: 16px;
+  font-size: variables.font-size(sm);
+  color: variables.text-color(primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  svg {
+    color: variables.color(warning);
+  }
+  
+  &:hover {
     background: variables.bg-color(light);
-
-    &:hover {
-      color: variables.color(primary);
-      background: rgba(variables.color(primary), 0.1);
+    border-color: variables.color(primary);
+  }
+  
+  span {
+    display: none;
+    
+    @include variables.responsive(sm) {
+      display: inline;
     }
+  }
+}
+
+.infoIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: variables.text-color(secondary);
+  font-size: variables.font-size(lg);
+  cursor: help;
+  transition: all 0.2s ease;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: variables.bg-color(light);
+
+  &:hover {
+    color: variables.color(primary);
+    background: rgba(variables.color(primary), 0.1);
   }
 }
