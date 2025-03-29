@@ -10,13 +10,19 @@ export function WalletForm({
   loading,
   countdown,
   savedWallets,
-  showDropdown,
-  setShowDropdown,
+  showDropdown: externalShowDropdown,
+  setShowDropdown: externalSetShowDropdown,
   onRemoveWallet,
   onClearWallets
 }) {
   const inputRef = useRef(null);
   const [error, setError] = useState('');
+  // Initialize local state if not provided as props
+  const [internalShowDropdown, setInternalShowDropdown] = useState(false);
+  
+  // Use either external props or internal state
+  const showDropdown = externalShowDropdown !== undefined ? externalShowDropdown : internalShowDropdown;
+  const setShowDropdown = externalSetShowDropdown || setInternalShowDropdown;
 
   const handleSubmit = (e) => {
     if (e) {
