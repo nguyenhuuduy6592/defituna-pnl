@@ -1,5 +1,6 @@
 import { getTransactionAges } from '../../utils/helius';
 import { fetchPositions, processPositionsData } from '../../utils/defituna';
+import { isValidWalletAddress } from '../../utils/validation';
 
 async function getAges(positions) {
   try {
@@ -57,23 +58,21 @@ async function fetchPnL(wallet) {
   };
 }
 
-export default async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { walletAddress } = req.body;
-  
-  if (!walletAddress) {
-    return res.status(400).json({ error: 'Wallet address is required' });
-  }
-
-  // Validate wallet address format
-  if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(walletAddress.trim())) {
-    return res.status(400).json({ error: 'Invalid Solana wallet address format' });
-  }
-
   try {
+    const { walletAddress } = req.body;
+
+    if (!isValidWalletAddress(walletAddress)) {
+      return res.status(400).json({ 
+        error: 'Invalid wallet address format',
+        details: 'Please provide a valid Solana wallet address'
+      });
+    }
+
     const result = await fetchPnL(walletAddress.trim());
     res.status(200).json(result);
   } catch (error) {
@@ -83,4 +82,4 @@ export default async (req, res) => {
       details: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
-};
+}

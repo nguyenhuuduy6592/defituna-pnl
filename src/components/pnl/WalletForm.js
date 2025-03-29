@@ -1,6 +1,7 @@
 import { useRef, useState, useMemo } from 'react';
 import styles from './WalletForm.module.scss';
-import { copyToClipboard } from '../../utils/notifications';
+import { copyToClipboard, showNotification } from '../../utils/notifications';
+import { isValidWalletAddress } from '../../utils/validation';
 
 export function WalletForm({
   wallet,
@@ -34,22 +35,19 @@ export function WalletForm({
     setError('');
 
     // Check if we have active wallets
-    if (activeWallets.length === 0) {
-      if (!wallet.trim()) {
-        setError('Please enter or select at least one wallet address');
-        return;
-      }
-      
-      // Basic validation for Solana address (base58, 32-44 chars)
-      const trimmedWallet = wallet.trim();
-      if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(trimmedWallet)) {
-        setError('Invalid Solana wallet address format');
-        return;
-      }
-      
-      // Add the current wallet as active if none are active
-      toggleWalletActive(trimmedWallet);
+    if (!wallet.trim()) {
+      showNotification('Please enter or select at least one wallet address', 'error');
+      return;
     }
+
+    // Validate wallet address using centralized validation
+    if (!isValidWalletAddress(wallet)) {
+      showNotification('Invalid Solana wallet address format', 'error');
+      return;
+    }
+    
+    // Add the current wallet as active if none are active
+    toggleWalletActive(wallet.trim());
 
     onSubmit(e);
   };
@@ -71,7 +69,6 @@ export function WalletForm({
             aria-label="Wallet address input"
             title="Enter a Solana wallet address"
           />
-          {error && <div className={styles.error}>{error}</div>}
           
           {showDropdown && uniqueSavedWallets.length > 0 && (
             <div className={styles.dropdown}>

@@ -7,16 +7,18 @@ Target response time: ~500ms
 ## Optimization Steps
 
 ### 1. Early Validation 🟢 Completed
-- [x] Validate wallet address format on client side
+- [x] Validate wallet address format on client side using showNotification
 - [x] Validate wallet address format on server side
 - [x] Implement early returns with descriptive error messages
 - [x] Keep validation simple and focused
+- [x] Remove inline error display in favor of notifications
 
 Benefits:
 - Reduces unnecessary API calls
-- Provides faster feedback for invalid inputs
+- Provides faster feedback for invalid inputs via toast notifications
 - Improves error handling and user experience
 - Simple and maintainable validation
+- Consistent error display with rest of the application
 
 ### 2. Response Compression
 Status: 🔴 Not Started
@@ -58,8 +60,9 @@ Benefits:
 ### Early Validation
 - Simple wallet address validation
 - Consistent validation on both client and server
-- Clear error messages
+- Clear error messages via toast notifications
 - Proper error status codes
+- No inline error display for cleaner UI
 
 ### Response Compression
 - Configure compression level based on server resources
