@@ -28,13 +28,15 @@ export const HistoryToggle = ({ enabled, onToggle, setAutoRefresh }) => {
 
   return (
     <>
-      <label className={styles.toggle}>
+      <label 
+        className={styles.toggle}
+        title="Store position history for charting and tracking performance over time"
+      >
         <input 
           type="checkbox" 
           checked={enabled}
           onChange={handleToggle}
           aria-label="Enable historical data storage"
-          title="Store position history for charting"
         />
         <span>Store History</span>
       </label>

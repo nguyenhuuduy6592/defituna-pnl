@@ -15,13 +15,15 @@ export const AutoRefresh = ({
   return (
     <div className={styles.refreshControls}>
       <div className={styles.refreshToggles}>
-        <label className={styles.refreshToggle}>
+        <label 
+          className={styles.refreshToggle}
+          title="Automatically update position data at regular intervals. Useful for tracking real-time changes."
+        >
           <input 
             type="checkbox" 
             checked={autoRefresh} 
             onChange={e => setAutoRefresh(e.target.checked)}
             aria-label="Enable auto-refresh"
-            title="Automatically refresh data periodically"
           />
           <span>Auto-refresh</span>
         </label>
