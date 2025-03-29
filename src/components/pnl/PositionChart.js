@@ -52,38 +52,6 @@ export const PositionChart = ({ positionHistory, onClose }) => {
     }
   }, [positionHistory, period]);
 
-  const getTimeAxisTicks = (data) => {
-    if (!data || data.length < 2) return [];
-    
-    const start = data[0].timestamp;
-    const end = data[data.length - 1].timestamp;
-    const duration = end - start;
-    
-    // Calculate number of ticks based on period
-    let tickCount;
-    switch(period) {
-      case TIME_PERIODS.MINUTE_1.value:
-        tickCount = 12;
-        break;
-      case TIME_PERIODS.MINUTE_5.value:
-        tickCount = 10;
-        break;
-      case TIME_PERIODS.MINUTE_15.value:
-      case TIME_PERIODS.MINUTE_30.value:
-        tickCount = 8;
-        break;
-      default:
-        tickCount = 6;
-    }
-
-    // Generate evenly spaced ticks
-    const ticks = [];
-    for (let i = 0; i <= tickCount; i++) {
-      ticks.push(start + (duration * i) / tickCount);
-    }
-    return ticks;
-  };
-
   const formatXAxisLabel = (timestamp) => {
     if (!timestamp || isNaN(timestamp)) return '';
     const date = new Date(timestamp);
