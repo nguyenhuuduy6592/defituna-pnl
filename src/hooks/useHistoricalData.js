@@ -95,9 +95,6 @@ export const useHistoricalData = () => {
       }
 
       await tx.done;
-      if (cursor) {
-        console.log(`Old data older than ${retentionDays} days has been cleaned up`);
-      }
     } catch (error) {
       console.error('Failed to cleanup old data:', error);
     }
