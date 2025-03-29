@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [refreshInterval, setRefreshInterval] = useState(initialInterval);
   const [refreshCountdown, setRefreshCountdown] = useState(initialInterval);
-  const refreshTimeoutId = useRef(null);
+  const [isVisible, setIsVisible] = useState(true);
 
   // Load saved settings
   useEffect(() => {
@@ -22,6 +22,16 @@ export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
     localStorage.setItem('refreshInterval', refreshInterval);
   }, [autoRefresh, refreshInterval]);
 
+  // Handle visibility changes
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      setIsVisible(document.visibilityState === 'visible');
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
   // Reset countdown when interval changes or auto-refresh is enabled
   useEffect(() => {
     if (autoRefresh) {
@@ -32,9 +42,6 @@ export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
   // Handle countdown and refresh
   useEffect(() => {
     if (!autoRefresh) {
-      if (refreshTimeoutId.current) {
-        clearTimeout(refreshTimeoutId.current);
-      }
       return;
     }
 
@@ -42,7 +49,7 @@ export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
       setRefreshCountdown((prev) => {
         if (prev <= 1) {
           // Only refresh if tab is visible
-          if (document.visibilityState === 'visible' && onRefresh) {
+          if (isVisible && onRefresh) {
             onRefresh();
           }
           return refreshInterval;
@@ -53,7 +60,7 @@ export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
 
     const timer = setInterval(countdownTick, 1000);
     return () => clearInterval(timer);
-  }, [autoRefresh, refreshInterval, onRefresh]);
+  }, [autoRefresh, refreshInterval, onRefresh, isVisible]);
 
   return {
     autoRefresh,

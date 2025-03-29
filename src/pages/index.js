@@ -4,19 +4,13 @@ import { Tooltip } from '../components/common/Tooltip';
 import { useWallet } from '../hooks/useWallet';
 import { useAutoRefresh } from '../hooks/useAutoRefresh';
 import { useCountdown } from '../hooks/useCountdown';
-import { usePositionAlerts } from '../hooks/usePositionAlerts';
 import { useHistoricalData } from '../hooks/useHistoricalData';
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
 import styles from './index.module.scss';
 
-export async function getServerSideProps() {
-  return { props: { data: null } };
-}
-
-export default ({ data: initData }) => {
-  const [data, setData] = useState(initData);
+export default () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { countdown: fetchCooldown, startCountdown: startFetchCooldown } = useCountdown(0);
@@ -28,12 +22,9 @@ export default ({ data: initData }) => {
     activeWallets,
     toggleWalletActive,
     savedWallets,
-    showDropdown,
-    setShowDropdown,
     addWallet,
     removeWallet,
-    clearWallets,
-    initialized
+    clearWallets
   } = useWallet();
 
   const {
@@ -69,24 +60,17 @@ export default ({ data: initData }) => {
 
   // Aggregate PnL data from multiple wallets
   const aggregatePnLData = useCallback((walletsData) => {
-    // Remove null entries (failed fetches)
     const validData = walletsData.filter(d => d !== null);
-    
     if (validData.length === 0) return null;
     
-    // Use the first wallet's solPrice (they should all be the same)
     const solPrice = validData[0].solPrice;
-    
-    // Combine all positions from different wallets
     const allPositions = validData.flatMap(d => 
-      // Add wallet address to each position for reference
       d.positions.map(pos => ({
         ...pos,
         walletAddress: d.walletAddress
       }))
     );
     
-    // Calculate total PnL across all wallets
     const totalPnL = validData.reduce((sum, d) => sum + (d.totalPnL || 0), 0);
     
     return {
@@ -99,23 +83,19 @@ export default ({ data: initData }) => {
 
   // Function to fetch PnL for all active wallets
   const fetchPnLData = useCallback(async (isAutoRefresh = false) => {
-    // Check if we have active wallets or a primary wallet
     let walletsToFetch = activeWallets;
     
-    // If no active wallets but have a primary wallet, use it
     if (activeWallets.length === 0 && wallet) {
-      toggleWalletActive(wallet); // This will update activeWallets
+      toggleWalletActive(wallet);
       walletsToFetch = [wallet];
     }
     
-    // If still no wallets to fetch, return
     if (walletsToFetch.length === 0) return;
     
     try {
       setLoading(true);
       setError(null);
       
-      // Fetch data for each wallet in parallel
       const results = await Promise.all(
         walletsToFetch.map(async (address) => {
           const walletData = await fetchWalletPnL(address);
@@ -123,7 +103,6 @@ export default ({ data: initData }) => {
         })
       );
       
-      // Process results
       const successfulResults = results.filter(r => r !== null);
       const failedCount = results.length - successfulResults.length;
       
@@ -135,22 +114,15 @@ export default ({ data: initData }) => {
         console.warn(`Failed to fetch data for ${failedCount} wallet(s)`);
       }
       
-      // For backward compatibility, set data to the primary wallet's data
-      const primaryWalletData = results.find(r => r?.walletAddress === wallet) || successfulResults[0];
-      setData(primaryWalletData);
-      
-      // Aggregate data from all wallets
       const combined = aggregatePnLData(successfulResults);
       setAggregatedData(combined);
 
-      // Save position snapshot if historical data is enabled
       if (historyEnabled && combined) {
         await savePositionSnapshot(combined.positions);
       }
       
       if (!isAutoRefresh) {
         startFetchCooldown(30);
-        // Add wallet to saved wallets if it's not there already
         if (wallet) {
           addWallet(wallet);
         }
@@ -173,26 +145,18 @@ export default ({ data: initData }) => {
     useCallback(() => fetchPnLData(true), [fetchPnLData])
   );
 
-  const {
-    alerts,
-    settings: alertSettings,
-    updateSettings: updateAlertSettings,
-    clearAlerts
-  } = usePositionAlerts(aggregatedData?.positions || data?.positions, aggregatedData?.solPrice || data?.solPrice);
-
   // Auto fetch data if there are active wallets on page load
   useEffect(() => {
-    if (initialized && !data && !aggregatedData) {
+    if (!aggregatedData) {
       const hasWallets = activeWallets.length > 0 || wallet;
       if (hasWallets) {
         fetchPnLData(false);
       }
     }
-  }, [initialized]); // Only run when initialized changes
+  }, [activeWallets, wallet, aggregatedData, fetchPnLData]);
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setData(null);
     setAggregatedData(null);
     await fetchPnLData(false);
   };
@@ -231,13 +195,11 @@ export default ({ data: initData }) => {
         loading={loading}
         countdown={fetchCooldown}
         savedWallets={savedWallets}
-        showDropdown={showDropdown}
-        setShowDropdown={setShowDropdown}
         onRemoveWallet={removeWallet}
         onClearWallets={clearWallets}
       />
       
-      {(data || aggregatedData) && (
+      {aggregatedData && (
         <>
           <AutoRefresh
             autoRefresh={autoRefresh}
@@ -249,15 +211,14 @@ export default ({ data: initData }) => {
             historyEnabled={historyEnabled}
             onHistoryToggle={toggleHistoryEnabled}
           />
-          
+          <PnLDisplay
+            data={aggregatedData}
+            loading={loading}
+            error={error}
+            storageStats={storageStats}
+          />
         </>
       )}
-      
-      {error && <p className="error">{error}</p>}
-      
-      {/* Display aggregated data if available, otherwise fall back to single wallet data */}
-      {aggregatedData && <PnLDisplay data={aggregatedData} isAggregated={true} />}
-      {!aggregatedData && data && <PnLDisplay data={data} isAggregated={false} />}
     </div>
   );
 };
