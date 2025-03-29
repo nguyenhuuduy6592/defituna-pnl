@@ -174,7 +174,7 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
         <tbody>
           {sortedPositions.map((p, i) => (
             <tr key={`${p.pair}-${p.walletAddress || ''}-${i}`}>
-              <td><span className={styles.positionLabel}>{p.pair}</span> ({p.leverage} Leverage)</td>
+              <td><span className={styles.positionLabel}>{p.pair}</span> ({p.leverage}x Leverage)</td>
               {showWallet && (
                 <td title={p.walletAddress}>
                   {formatWalletAddress(p.walletAddress)}
