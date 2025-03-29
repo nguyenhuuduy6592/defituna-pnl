@@ -74,6 +74,8 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
   };
 
   const handleSort = (field) => {
+    if (positions.length <= 1) return;
+    
     if (field === sortField) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
@@ -120,6 +122,7 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
   };
   
   const getSortIcon = (field) => {
+    if (positions.length <= 1) return null;
     if (field !== sortField) return '↕';
     return sortDirection === 'asc' ? '↑' : '↓';
   };
@@ -141,27 +144,27 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
       <table className={styles.positionsTable}>
         <thead>
           <tr>
-            <th onClick={() => handleSort('pair')} className={styles.sortable}>
+            <th className={positions.length > 1 ? styles.sortable : ''} onClick={() => handleSort('pair')}>
               Pair {getSortIcon('pair')}
             </th>
             {showWallet && (
-              <th onClick={() => handleSort('walletAddress')} className={styles.sortable}>
+              <th className={positions.length > 1 ? styles.sortable : ''} onClick={() => handleSort('walletAddress')}>
                 Wallet {getSortIcon('walletAddress')}
               </th>
             )}
-            <th onClick={() => handleSort('status')} className={styles.sortable}>
+            <th className={positions.length > 1 ? styles.sortable : ''} onClick={() => handleSort('status')}>
               Status {getSortIcon('status')}
             </th>
-            <th onClick={() => handleSort('age')} className={styles.sortable}>
+            <th className={positions.length > 1 ? styles.sortable : ''} onClick={() => handleSort('age')}>
               Age {getSortIcon('age')}
             </th>
-            <th onClick={() => handleSort('pnl')} className={styles.sortable}>
+            <th className={positions.length > 1 ? styles.sortable : ''} onClick={() => handleSort('pnl')}>
               PnL {getSortIcon('pnl')}
             </th>
-            <th onClick={() => handleSort('yield')} className={styles.sortable}>
+            <th className={positions.length > 1 ? styles.sortable : ''} onClick={() => handleSort('yield')}>
               Yield {getSortIcon('yield')}
             </th>
-            <th onClick={() => handleSort('size')} className={styles.sortable}>
+            <th className={positions.length > 1 ? styles.sortable : ''} onClick={() => handleSort('size')}>
               Position Details {getSortIcon('size')}
             </th>
             <th>
