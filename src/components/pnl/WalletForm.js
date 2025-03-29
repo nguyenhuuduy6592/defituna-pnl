@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import styles from './WalletForm.module.scss';
 
-export default function WalletForm({
+export function WalletForm({
   wallet,
   onWalletChange,
   activeWallets,
