@@ -78,7 +78,6 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
-      setSortDirection('desc');
     }
   };
   
