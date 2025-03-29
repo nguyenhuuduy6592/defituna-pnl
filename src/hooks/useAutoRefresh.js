@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [refreshInterval, setRefreshInterval] = useState(initialInterval);
   const [refreshCountdown, setRefreshCountdown] = useState(initialInterval);
-  const [isVisible, setIsVisible] = useState(true);
+  const isVisibleRef = useRef(true);
 
   // Load saved settings
   useEffect(() => {
@@ -23,14 +23,14 @@ export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
   }, [autoRefresh, refreshInterval]);
 
   // Handle visibility changes
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      setIsVisible(document.visibilityState === 'visible');
-    };
+  const handleVisibilityChange = useCallback(() => {
+    isVisibleRef.current = document.visibilityState === 'visible';
+  }, []);
 
+  useEffect(() => {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
+  }, [handleVisibilityChange]);
 
   // Reset countdown when interval changes or auto-refresh is enabled
   useEffect(() => {
@@ -49,7 +49,7 @@ export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
       setRefreshCountdown((prev) => {
         if (prev <= 1) {
           // Only refresh if tab is visible
-          if (isVisible && onRefresh) {
+          if (isVisibleRef.current && onRefresh) {
             onRefresh();
           }
           return refreshInterval;
@@ -60,7 +60,7 @@ export const useAutoRefresh = (onRefresh, initialInterval = 30) => {
 
     const timer = setInterval(countdownTick, 1000);
     return () => clearInterval(timer);
-  }, [autoRefresh, refreshInterval, onRefresh, isVisible]);
+  }, [autoRefresh, refreshInterval, onRefresh]);
 
   return {
     autoRefresh,

@@ -141,7 +141,7 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
               )}
               <td className={getStateClass(p.status)}>{p.status}</td>
               <td>{formatDuration(p.age)}</td>
-              <td className={getValueClass(p.pnl.usd)}>{formatNumber(p.pnl.usd)} <span className={styles.positionPnlPercentage}>({p.pnl.percentage}%)</span></td>
+              <td className={getValueClass(p.pnl.usd)}>${formatNumber(p.pnl.usd)} <span className={styles.positionPnlPercentage}>({p.pnl.percentage}%)</span></td>
               <td className={getValueClass(p.yield.usd)}>{formatNumber(p.yield.usd)}</td>
               <td>
                 <ClusterBar

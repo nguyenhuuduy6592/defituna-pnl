@@ -1,3 +1,8 @@
+/**
+ * Formats a number with appropriate decimal places based on its magnitude
+ * @param {number} num - The number to format
+ * @returns {string} The formatted number as a string
+ */
 export const formatNumber = (num) => {
   if (num === null || num === undefined) return '0.00';
   

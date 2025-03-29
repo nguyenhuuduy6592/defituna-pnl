@@ -22,7 +22,7 @@ function computeLiquidationPrices({ lowerPrice, upperPrice, debtA, debtB, liquid
 }
 
 function tickToPrice(tick, decimalsA, decimalsB) {
-    if (tick == 2147483647) {
+    if (tick === 2147483647) {
         return Infinity;
     }
 
@@ -123,27 +123,27 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
     };
 
     return {
-        leverage: Number(leverage.toFixed(2)),
+        leverage: leverage,
         status,
-        size: Number(size.toFixed(2)),
+        size: size,
         collateral,
         debt,
         interest,
         liquidationPrice: {
-            lower: Number(liquidationPrices.lowerLiquidationPrice.toFixed(6)),
-            upper: Number(liquidationPrices.upperLiquidationPrice.toFixed(6))
+            lower: liquidationPrices.lowerLiquidationPrice,
+            upper: liquidationPrices.upperLiquidationPrice
         },
-        entryPrice: Number(entryPrice.toFixed(6)),
-        currentPrice: Number(currentPrice.toFixed(6)),
+        entryPrice,
+        currentPrice,
         limitOrderPrices: {
-            lower: isNaN(lowerLimitOrderPrice) ? Infinity : Number(lowerLimitOrderPrice.toFixed(6)),
-            upper: isNaN(upperLimitOrderPrice) ? Infinity : Number(upperLimitOrderPrice.toFixed(6)),
+            lower: isNaN(lowerLimitOrderPrice) ? Infinity : lowerLimitOrderPrice,
+            upper: isNaN(upperLimitOrderPrice) ? Infinity : upperLimitOrderPrice,
         },
         yield: yieldValue,
         compounded,
         rangePrices: {
-            lower: Number(lowerRangePrice.toFixed(6)),
-            upper: Number(upperRangePrice.toFixed(6))
+            lower: lowerRangePrice,
+            upper: upperRangePrice
         },
         pnl
     };

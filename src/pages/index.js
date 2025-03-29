@@ -11,7 +11,6 @@ import { PnLDisplay } from '../components/pnl/PnLDisplay';
 import styles from './index.module.scss';
 
 export default () => {
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const { countdown: fetchCooldown, startCountdown: startFetchCooldown } = useCountdown(0);
   const [aggregatedData, setAggregatedData] = useState(null);
@@ -30,9 +29,7 @@ export default () => {
   const {
     enabled: historyEnabled,
     toggleHistoryEnabled,
-    savePositionSnapshot,
-    getPositionHistory,
-    storageStats
+    savePositionSnapshot
   } = useHistoricalData();
 
   // Function to fetch PnL data for a specific wallet
@@ -53,7 +50,6 @@ export default () => {
       
       return await res.json();
     } catch (err) {
-      console.error(`Error fetching data for wallet ${walletAddress}:`, err.message);
       return null;
     }
   }, []);
@@ -94,7 +90,6 @@ export default () => {
     
     try {
       setLoading(true);
-      setError(null);
       
       const results = await Promise.all(
         walletsToFetch.map(async (address) => {
@@ -104,14 +99,9 @@ export default () => {
       );
       
       const successfulResults = results.filter(r => r !== null);
-      const failedCount = results.length - successfulResults.length;
       
       if (successfulResults.length === 0) {
         throw new Error('Failed to fetch data for all wallets');
-      }
-      
-      if (failedCount > 0) {
-        console.warn(`Failed to fetch data for ${failedCount} wallet(s)`);
       }
       
       const combined = aggregatePnLData(successfulResults);
@@ -128,7 +118,6 @@ export default () => {
         }
       }
     } catch (err) {
-      setError(isAutoRefresh ? `Auto-refresh error: ${err.message}` : err.message);
       setAggregatedData(null);
     } finally {
       setLoading(false);

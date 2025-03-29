@@ -1,6 +1,5 @@
 import { processTunaPosition } from './formulas.js';
 
-
 export async function fetchPositions(wallet) {
   const response = await fetch(`${process.env.DEFITUNA_API_URL}/users/${wallet}/tuna-positions`);
   if (!response.ok) {
@@ -39,7 +38,6 @@ export async function fetchTokenData(mintAddress) {
     }
     const { data } = await response.json();
     return {
-      success: true,
       symbol: data.symbol,
       mint: data.mint,
       decimals: data.decimals
@@ -47,7 +45,6 @@ export async function fetchTokenData(mintAddress) {
   } catch (error) {
     console.error(`Error fetching token data for ${mintAddress}:`, error);
     return {
-      success: false,
       symbol: `${mintAddress.slice(0, 4)}...${mintAddress.slice(-4)}`,
       mint: mintAddress,
       decimals: 9 // Default to 9 decimals if unknown

@@ -1,6 +1,5 @@
 import { openDB } from 'idb';
 import { useState, useEffect, useCallback } from 'react';
-import { showNotification } from '../utils/notifications';
 
 const DB_NAME = 'defituna-pnl';
 const DB_VERSION = 1;
@@ -9,7 +8,6 @@ const STORE_NAME = 'positions';
 export const useHistoricalData = () => {
   const [enabled, setEnabled] = useState(false);
   const [dbInstance, setDbInstance] = useState(null);
-  const [storageStats, setStorageStats] = useState(null);
 
   // Initialize database
   const initializeDB = useCallback(async () => {
@@ -31,7 +29,6 @@ export const useHistoricalData = () => {
       return db;
     } catch (error) {
       console.error('Failed to initialize IndexedDB:', error);
-      showNotification('Failed to initialize local storage', 'error');
       return null;
     }
   }, []);
@@ -54,7 +51,6 @@ export const useHistoricalData = () => {
       }));
 
       await tx.done;
-      await updateStorageStats();
     } catch (error) {
       console.error('Failed to save position snapshot:', error);
     }
@@ -80,33 +76,6 @@ export const useHistoricalData = () => {
     }
   }, [dbInstance]);
 
-  // Get storage statistics
-  const updateStorageStats = useCallback(async () => {
-    if (!dbInstance) return;
-
-    try {
-      const tx = dbInstance.transaction(STORE_NAME, 'readonly');
-      const store = tx.objectStore(STORE_NAME);
-      const index = store.index('timestamp');
-
-      const count = await store.count();
-      const oldestCursor = await index.openCursor(null, 'next');
-      const newestCursor = await index.openCursor(null, 'prev');
-
-      const stats = {
-        count,
-        oldestTimestamp: oldestCursor?.value?.timestamp,
-        newestTimestamp: newestCursor?.value?.timestamp
-      };
-
-      setStorageStats(stats);
-      return stats;
-    } catch (error) {
-      console.error('Failed to get storage stats:', error);
-      return null;
-    }
-  }, [dbInstance]);
-
   // Clean up old data
   const cleanupOldData = useCallback(async (retentionDays = 30) => {
     if (!dbInstance) return;
@@ -126,14 +95,13 @@ export const useHistoricalData = () => {
       }
 
       await tx.done;
-      await updateStorageStats();
       if (cursor) {
-        showNotification(`Old data older than ${retentionDays} days has been cleaned up`);
+        console.log(`Old data older than ${retentionDays} days has been cleaned up`);
       }
     } catch (error) {
       console.error('Failed to cleanup old data:', error);
     }
-  }, [dbInstance, updateStorageStats]);
+  }, [dbInstance]);
 
   // Toggle history feature
   const toggleHistoryEnabled = useCallback(async (newEnabled) => {
@@ -166,7 +134,6 @@ export const useHistoricalData = () => {
     enabled,
     toggleHistoryEnabled,
     savePositionSnapshot,
-    getPositionHistory,
-    storageStats
+    getPositionHistory
   };
 };
