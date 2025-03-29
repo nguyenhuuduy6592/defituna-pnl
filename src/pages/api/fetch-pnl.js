@@ -9,18 +9,13 @@ async function getAges(positions) {
       return [];
     }
 
-    console.log('Fetching ages for positions:', validPositions.length);
-
     // Use Helius RPC with batch processing
     const ages = await getTransactionAges(validPositions.map(p => p.address));
-    
-    console.log('Successfully fetched ages for positions:', ages.size);
     
     // Map results back to all positions
     return positions.map(pos => {
       if (!pos || !pos.address) return 'Unknown';
       const age = ages.get(pos.address) || 'Unknown';
-      console.log(`Position ${pos.address.slice(0, 6)}... age:`, age);
       return age;
     });
   } catch (error) {

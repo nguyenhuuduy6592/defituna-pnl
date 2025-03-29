@@ -79,15 +79,13 @@ export async function getTransactionAge(address) {
   if (ageCache.has(address)) {
     const cached = ageCache.get(address);
     if (Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log(`[getTransactionAge] Cache hit for ${address}`);
       return cached.age;
     }
-    console.log(`[getTransactionAge] Cache expired for ${address}`);
+    
     ageCache.delete(address);
   }
 
   try {
-    console.log(`[getTransactionAge] Fetching age for address: ${address}`);
     const getAge = async () => {
       const signaturesResponse = await fetchWithRetry({
         jsonrpc: '2.0',
@@ -108,11 +106,9 @@ export async function getTransactionAge(address) {
       const { result } = signaturesResponse;
       
       if (!result || result.length === 0) {
-        console.log(`[getTransactionAge] No transactions found for ${address}`);
         throw new Error('No transactions found');
       }
 
-      console.log(`[getTransactionAge] Found ${result.length} transactions for ${address}`);
       const oldestSignature = result[result.length - 1].signature;
 
       const txResponse = await fetchWithRetry({
@@ -150,7 +146,6 @@ export async function getTransactionAge(address) {
 
 // Function to process multiple positions in batches
 export async function getTransactionAges(addresses) {
-  console.log(`[getTransactionAges] Processing ${addresses.length} addresses in batches of ${BATCH_SIZE}`);
   const results = new Map();
   const batches = [];
   
@@ -159,11 +154,8 @@ export async function getTransactionAges(addresses) {
     batches.push(addresses.slice(i, i + BATCH_SIZE));
   }
   
-  console.log(`[getTransactionAges] Split into ${batches.length} batches`);
-  
   // Process each batch sequentially
   for (const batch of batches) {
-    console.log(`[getTransactionAges] Processing batch of ${batch.length} addresses`);
     const batchResults = await Promise.all(
       batch.map(address => getTransactionAge(address))
     );
@@ -173,6 +165,5 @@ export async function getTransactionAges(addresses) {
     });
   }
   
-  console.log(`[getTransactionAges] Completed processing all batches. Results size: ${results.size}`);
   return results;
 }
