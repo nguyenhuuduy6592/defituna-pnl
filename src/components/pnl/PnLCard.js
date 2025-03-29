@@ -4,7 +4,7 @@ import { HiDownload, HiShare } from 'react-icons/hi';
 import { BsCurrencyDollar, BsClock } from 'react-icons/bs';
 import { Portal } from '../common/Portal';
 import styles from './PnLCard.module.scss';
-import { formatNumber } from '../../utils/formatters';
+import { formatNumber, formatDuration } from '../../utils/formatters';
 import { getValueClass } from '../../utils/styles';
 import { exportCardAsImage, shareCard } from '../../utils/export';
 
@@ -80,7 +80,7 @@ export const PnLCard = ({ position, onClose }) => {
                     <BsClock className={styles.icon} />
                     Time in Position:
                   </dt>
-                  <dd className={styles.value}>{position.age}</dd>
+                  <dd className={styles.value}>{formatDuration(position.age)}</dd>
                 </div>
                 <div className={styles.statRow}>
                   <dt className={styles.label}>
