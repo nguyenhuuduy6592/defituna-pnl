@@ -4,10 +4,7 @@ import { showNotification } from '../utils/notifications';
 
 const DB_NAME = 'defituna-pnl';
 const DB_VERSION = 1;
-const STORES = {
-  positions: 'positions',
-  settings: 'settings'
-};
+const STORE_NAME = 'positions';
 
 export const useHistoricalData = () => {
   const [enabled, setEnabled] = useState(false);
@@ -19,20 +16,13 @@ export const useHistoricalData = () => {
     try {
       const db = await openDB(DB_NAME, DB_VERSION, {
         upgrade(db) {
-          // Create positions store with compound key
-          if (!db.objectStoreNames.contains(STORES.positions)) {
-            const positionsStore = db.createObjectStore(STORES.positions, {
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            const store = db.createObjectStore(STORE_NAME, {
               keyPath: ['id', 'timestamp']
             });
-            // Create indexes for querying
-            positionsStore.createIndex('timestamp', 'timestamp');
-            positionsStore.createIndex('pair', 'pair');
-            positionsStore.createIndex('walletAddress', 'walletAddress');
-          }
-
-          // Create settings store
-          if (!db.objectStoreNames.contains(STORES.settings)) {
-            db.createObjectStore(STORES.settings, { keyPath: 'id' });
+            store.createIndex('timestamp', 'timestamp');
+            store.createIndex('pair', 'pair');
+            store.createIndex('walletAddress', 'walletAddress');
           }
         }
       });
@@ -51,10 +41,9 @@ export const useHistoricalData = () => {
     if (!enabled || !dbInstance) return;
 
     try {
-      const tx = dbInstance.transaction(STORES.positions, 'readwrite');
-      const store = tx.objectStore(STORES.positions);
+      const tx = dbInstance.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
 
-      // Save each position with a unique ID
       await Promise.all(positions.map(position => {
         const id = `${position.pair}-${position.walletAddress || 'default'}`;
         return store.add({
@@ -76,8 +65,8 @@ export const useHistoricalData = () => {
     if (!dbInstance) return [];
 
     try {
-      const tx = dbInstance.transaction(STORES.positions, 'readonly');
-      const store = tx.objectStore(STORES.positions);
+      const tx = dbInstance.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
       const index = store.index('timestamp');
 
       const startTime = timeRange ? Date.now() - timeRange : 0;
@@ -91,41 +80,13 @@ export const useHistoricalData = () => {
     }
   }, [dbInstance]);
 
-  // Clean up old data
-  const cleanupOldData = useCallback(async (retentionDays = 30) => {
-    if (!dbInstance) return;
-
-    try {
-      const tx = dbInstance.transaction(STORES.positions, 'readwrite');
-      const store = tx.objectStore(STORES.positions);
-      const index = store.index('timestamp');
-
-      const cutoffTime = Date.now() - (retentionDays * 24 * 60 * 60 * 1000);
-      const range = IDBKeyRange.upperBound(cutoffTime);
-
-      let cursor = await index.openCursor(range);
-      while (cursor) {
-        await cursor.delete();
-        cursor = await cursor.continue();
-      }
-
-      await tx.done;
-      await updateStorageStats();
-      if (cursor) {
-        showNotification(`Old data older than the retention period of ${retentionDays} days has been cleaned up successfully`);
-      }
-    } catch (error) {
-      console.error('Failed to cleanup old data:', error);
-    }
-  }, [dbInstance]);
-
   // Get storage statistics
   const updateStorageStats = useCallback(async () => {
     if (!dbInstance) return;
 
     try {
-      const tx = dbInstance.transaction(STORES.positions, 'readonly');
-      const store = tx.objectStore(STORES.positions);
+      const tx = dbInstance.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
       const index = store.index('timestamp');
 
       const count = await store.count();
@@ -145,6 +106,34 @@ export const useHistoricalData = () => {
       return null;
     }
   }, [dbInstance]);
+
+  // Clean up old data
+  const cleanupOldData = useCallback(async (retentionDays = 30) => {
+    if (!dbInstance) return;
+
+    try {
+      const tx = dbInstance.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const index = store.index('timestamp');
+
+      const cutoffTime = Date.now() - (retentionDays * 24 * 60 * 60 * 1000);
+      const range = IDBKeyRange.upperBound(cutoffTime);
+
+      let cursor = await index.openCursor(range);
+      while (cursor) {
+        await cursor.delete();
+        cursor = await cursor.continue();
+      }
+
+      await tx.done;
+      await updateStorageStats();
+      if (cursor) {
+        showNotification(`Old data older than ${retentionDays} days has been cleaned up`);
+      }
+    } catch (error) {
+      console.error('Failed to cleanup old data:', error);
+    }
+  }, [dbInstance, updateStorageStats]);
 
   // Toggle history feature
   const toggleHistoryEnabled = useCallback(async (newEnabled) => {
@@ -178,8 +167,6 @@ export const useHistoricalData = () => {
     toggleHistoryEnabled,
     savePositionSnapshot,
     getPositionHistory,
-    cleanupOldData,
-    storageStats,
-    updateStorageStats
+    storageStats
   };
 };

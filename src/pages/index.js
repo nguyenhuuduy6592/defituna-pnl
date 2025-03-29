@@ -211,12 +211,7 @@ export default () => {
             historyEnabled={historyEnabled}
             onHistoryToggle={toggleHistoryEnabled}
           />
-          <PnLDisplay
-            data={aggregatedData}
-            loading={loading}
-            error={error}
-            storageStats={storageStats}
-          />
+          <PnLDisplay data={aggregatedData} />
         </>
       )}
     </div>

@@ -18,7 +18,6 @@ export const useCountdown = (initialValue = 0) => {
 
   return {
     countdown,
-    startCountdown,
-    setCountdown
+    startCountdown
   };
 };
