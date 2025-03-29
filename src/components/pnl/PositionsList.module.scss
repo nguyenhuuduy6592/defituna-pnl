@@ -194,10 +194,23 @@
   background: variables.bg-color(light);
   color: variables.text-color(primary);
   border: 1px solid variables.color(border);
+  min-width: 60px;
+  animation: slideIn 0.2s ease-out;
 
   &:hover {
     background: variables.color(primary);
     color: variables.bg-color(white);
     border-color: variables.color(primary);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

@@ -9,7 +9,7 @@ import { formatNumber, formatDuration, formatWalletAddress } from '../../utils/f
 import { getValueClass, getStateClass } from '../../utils/positionUtils';
 import { invertPairString, getAdjustedPosition } from '../../utils/pairUtils';
 
-export const PositionsList = memo(({ positions, showWallet = false }) => {
+export const PositionsList = memo(({ positions, showWallet = false, historyEnabled }) => {
   const [sortField, setSortField] = useState('age');
   const [sortDirection, setSortDirection] = useState('desc');
   const [selectedPosition, setSelectedPosition] = useState(null);
@@ -201,14 +201,16 @@ export const PositionsList = memo(({ positions, showWallet = false }) => {
                 >
                   Share
                 </button>
-                <button 
-                  className={styles.chartButton}
-                  onClick={() => handleShowChart(p)}
-                  aria-label="View position history chart"
-                  title="View position performance chart"
-                >
-                  Chart
-                </button>
+                {historyEnabled && (
+                  <button 
+                    className={styles.chartButton}
+                    onClick={() => handleShowChart(p)}
+                    aria-label="View position history chart"
+                    title="View position performance chart"
+                  >
+                    Chart
+                  </button>
+                )}
               </td>
             </tr>
           ))}

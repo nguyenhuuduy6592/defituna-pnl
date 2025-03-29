@@ -4,7 +4,7 @@ import { showNotification } from '../../utils/notifications';
 import { formatValue, formatWalletAddress } from '../../utils/formatters';
 import { getValueClass } from '../../utils/positionUtils';
 
-export const PnLDisplay = ({ data }) => {
+export const PnLDisplay = ({ data, historyEnabled }) => {
   const handleCopyAddress = () => {
     const address = process.env.NEXT_PUBLIC_DONATION_WALLET;
     navigator.clipboard.writeText(address);
@@ -29,6 +29,7 @@ export const PnLDisplay = ({ data }) => {
       <PositionsList 
         positions={data.positions} 
         showWallet={true}
+        historyEnabled={historyEnabled}
       />
 
       {/* Donation footer */}

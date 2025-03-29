@@ -204,7 +204,10 @@ export default () => {
             historyEnabled={historyEnabled}
             onHistoryToggle={toggleHistoryEnabled}
           />
-          <PnLDisplay data={aggregatedData} />
+          <PnLDisplay 
+            data={aggregatedData} 
+            historyEnabled={historyEnabled}
+          />
         </>
       )}
     </div>
