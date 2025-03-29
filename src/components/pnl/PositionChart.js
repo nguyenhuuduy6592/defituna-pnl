@@ -11,23 +11,13 @@ import {
 } from 'recharts';
 import { Portal } from '../common/Portal';
 import { prepareChartData, groupChartData } from '../../utils/chart';
+import { formatNumber } from '../../utils/formatters';
+import { TIME_PERIODS } from '../../utils/constants';
 import styles from './PositionChart.module.scss';
-
-const TIME_PERIODS = {
-  MINUTE_1: '1min',
-  MINUTE_5: '5min',
-  MINUTE_15: '15min',
-  MINUTE_30: '30min',
-  HOUR_1: '1hour',
-  HOUR_4: '4hour',
-  DAY_1: '1day',
-  WEEK_1: '1week',
-  MONTH_1: '1month'
-};
 
 export const PositionChart = ({ positionHistory, onClose }) => {
   const [data, setData] = useState([]);
-  const [period, setPeriod] = useState(TIME_PERIODS.MINUTE_5);
+  const [period, setPeriod] = useState(TIME_PERIODS.MINUTE_5.value);
   const [metrics, setMetrics] = useState({
     pnl: true,
     yield: true
@@ -36,16 +26,8 @@ export const PositionChart = ({ positionHistory, onClose }) => {
   useEffect(() => {
     if (positionHistory?.length > 0) {
       try {
-        console.log('Raw position history sample:', positionHistory[0]);
-        console.log('Processing position history:', positionHistory.length, 'entries');
-        
         const chartData = prepareChartData(positionHistory);
-        console.log('Prepared chart data:', chartData.length, 'entries');
-        console.log('Sample prepared data:', chartData[0]);
-        
         const groupedData = groupChartData(chartData, period);
-        console.log('Grouped chart data:', groupedData.length, 'entries');
-        console.log('Sample grouped data:', groupedData[0]);
         
         // Enhanced validation
         const validData = groupedData.filter(item => {
@@ -60,32 +42,12 @@ export const PositionChart = ({ positionHistory, onClose }) => {
           return hasValidTimestamp && hasNonZeroValues;
         });
         
-        console.log('Valid data points:', validData.length);
-        if (validData.length > 0) {
-          console.log('Sample valid data:', validData[0]);
-          console.log('Value ranges:', {
-            pnl: {
-              min: Math.min(...validData.map(d => d.pnl)),
-              max: Math.max(...validData.map(d => d.pnl))
-            },
-            yield: {
-              min: Math.min(...validData.map(d => d.yield)),
-              max: Math.max(...validData.map(d => d.yield))
-            }
-          });
-          console.log('Data range:', {
-            start: new Date(validData[0].timestamp).toISOString(),
-            end: new Date(validData[validData.length - 1].timestamp).toISOString()
-          });
-        }
-        
         setData(validData);
       } catch (error) {
         console.error('Error processing chart data:', error);
         setData([]);
       }
     } else {
-      console.log('No position history data available');
       setData([]);
     }
   }, [positionHistory, period]);
@@ -100,14 +62,14 @@ export const PositionChart = ({ positionHistory, onClose }) => {
     // Calculate number of ticks based on period
     let tickCount;
     switch(period) {
-      case TIME_PERIODS.MINUTE_1:
+      case TIME_PERIODS.MINUTE_1.value:
         tickCount = 12;
         break;
-      case TIME_PERIODS.MINUTE_5:
+      case TIME_PERIODS.MINUTE_5.value:
         tickCount = 10;
         break;
-      case TIME_PERIODS.MINUTE_15:
-      case TIME_PERIODS.MINUTE_30:
+      case TIME_PERIODS.MINUTE_15.value:
+      case TIME_PERIODS.MINUTE_30.value:
         tickCount = 8;
         break;
       default:
@@ -138,17 +100,17 @@ export const PositionChart = ({ positionHistory, onClose }) => {
 
       if (isDifferentDates) {
         switch(period) {
-          case TIME_PERIODS.MINUTE_1:
-          case TIME_PERIODS.MINUTE_5:
-          case TIME_PERIODS.MINUTE_15:
-          case TIME_PERIODS.MINUTE_30:
-          case TIME_PERIODS.HOUR_1:
-          case TIME_PERIODS.HOUR_4:
+          case TIME_PERIODS.MINUTE_1.value:
+          case TIME_PERIODS.MINUTE_5.value:
+          case TIME_PERIODS.MINUTE_15.value:
+          case TIME_PERIODS.MINUTE_30.value:
+          case TIME_PERIODS.HOUR_1.value:
+          case TIME_PERIODS.HOUR_4.value:
             return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
                    date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          case TIME_PERIODS.DAY_1:
-          case TIME_PERIODS.WEEK_1:
-          case TIME_PERIODS.MONTH_1:
+          case TIME_PERIODS.DAY_1.value:
+          case TIME_PERIODS.WEEK_1.value:
+          case TIME_PERIODS.MONTH_1.value:
             return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
           default:
             return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
@@ -157,19 +119,19 @@ export const PositionChart = ({ positionHistory, onClose }) => {
       } else {
         // For same-day data, use original formatting
         switch(period) {
-          case TIME_PERIODS.MINUTE_1:
-          case TIME_PERIODS.MINUTE_5:
-          case TIME_PERIODS.MINUTE_15:
-          case TIME_PERIODS.MINUTE_30:
+          case TIME_PERIODS.MINUTE_1.value:
+          case TIME_PERIODS.MINUTE_5.value:
+          case TIME_PERIODS.MINUTE_15.value:
+          case TIME_PERIODS.MINUTE_30.value:
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          case TIME_PERIODS.HOUR_1:
-          case TIME_PERIODS.HOUR_4:
+          case TIME_PERIODS.HOUR_1.value:
+          case TIME_PERIODS.HOUR_4.value:
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          case TIME_PERIODS.DAY_1:
+          case TIME_PERIODS.DAY_1.value:
             return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit' });
-          case TIME_PERIODS.WEEK_1:
+          case TIME_PERIODS.WEEK_1.value:
             return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-          case TIME_PERIODS.MONTH_1:
+          case TIME_PERIODS.MONTH_1.value:
             return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
           default:
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -188,14 +150,6 @@ export const PositionChart = ({ positionHistory, onClose }) => {
     }));
   };
 
-  const formatValue = (value) => {
-    if (typeof value !== 'number' || isNaN(value)) return '$0.00';
-    if (Math.abs(value) < 0.01 && value !== 0) {
-      return `$${value.toFixed(6)}`;
-    }
-    return `$${value.toFixed(2)}`;
-  };
-
   const CustomTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
 
@@ -204,7 +158,7 @@ export const PositionChart = ({ positionHistory, onClose }) => {
         <p className={styles.tooltipLabel}>{formatXAxisLabel(label)}</p>
         {payload.map((entry, index) => (
           <p key={index} style={{ color: entry.color }}>
-            {entry.name}: {formatValue(entry.value)}
+            {entry.name}: {formatNumber(entry.value)}
           </p>
         ))}
       </div>
@@ -251,15 +205,9 @@ export const PositionChart = ({ positionHistory, onClose }) => {
                 aria-label="Select time period"
                 title="Select time period for chart data"
               >
-                <option value={TIME_PERIODS.MINUTE_1}>1 minute</option>
-                <option value={TIME_PERIODS.MINUTE_5}>5 minutes</option>
-                <option value={TIME_PERIODS.MINUTE_15}>15 minutes</option>
-                <option value={TIME_PERIODS.MINUTE_30}>30 minutes</option>
-                <option value={TIME_PERIODS.HOUR_1}>1 hour</option>
-                <option value={TIME_PERIODS.HOUR_4}>4 hours</option>
-                <option value={TIME_PERIODS.DAY_1}>1 day</option>
-                <option value={TIME_PERIODS.WEEK_1}>1 wek</option>
-                <option value={TIME_PERIODS.MONTH_1}>1 month</option>
+                {Object.entries(TIME_PERIODS).map(([key, { value, label }]) => (
+                  <option key={key} value={value}>{label}</option>
+                ))}
               </select>
               <button 
                 className={styles.closeButton}
@@ -289,7 +237,7 @@ export const PositionChart = ({ positionHistory, onClose }) => {
                   }}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
-                  <XAxis 
+                  <XAxis
                     dataKey="timestamp"
                     tickFormatter={formatXAxisLabel}
                     interval="preserveStartEnd"
@@ -297,8 +245,8 @@ export const PositionChart = ({ positionHistory, onClose }) => {
                     tick={{ fontSize: 11 }}
                     height={30}
                   />
-                  <YAxis 
-                    tickFormatter={formatValue}
+                  <YAxis
+                    tickFormatter={formatNumber}
                     ticks={getYAxisTicks(data)}
                     tick={{ fontSize: 11 }}
                     width={50}

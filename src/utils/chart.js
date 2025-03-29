@@ -77,68 +77,56 @@ export function groupChartData(data, period = '5min') {
   
   data.forEach(entry => {
     if (!entry || typeof entry.timestamp !== 'number' || isNaN(entry.timestamp)) {
-      console.warn('Invalid entry in chart data:', entry);
       return;
     }
 
     const date = new Date(entry.timestamp);
     if (isNaN(date.getTime())) {
-      console.warn('Invalid timestamp in entry:', entry);
       return;
     }
 
     let key;
     try {
+      // Reset seconds and milliseconds
+      date.setSeconds(0, 0);
+      
+      // Adjust minutes/hours based on period
       switch(period) {
         case '1min':
-          date.setSeconds(0, 0);
-          key = date.getTime();
           break;
         case '5min':
-          date.setSeconds(0, 0);
           date.setMinutes(Math.floor(date.getMinutes() / 5) * 5);
-          key = date.getTime();
           break;
         case '15min':
-          date.setSeconds(0, 0);
           date.setMinutes(Math.floor(date.getMinutes() / 15) * 15);
-          key = date.getTime();
           break;
         case '30min':
-          date.setSeconds(0, 0);
           date.setMinutes(Math.floor(date.getMinutes() / 30) * 30);
-          key = date.getTime();
           break;
         case '1hour':
-          date.setMinutes(0, 0, 0);
-          key = date.getTime();
+          date.setMinutes(0);
           break;
         case '4hour':
-          date.setMinutes(0, 0, 0);
+          date.setMinutes(0);
           date.setHours(Math.floor(date.getHours() / 4) * 4);
-          key = date.getTime();
           break;
         case '1day':
           date.setHours(0, 0, 0, 0);
-          key = date.getTime();
           break;
         case '1week':
           date.setHours(0, 0, 0, 0);
           date.setDate(date.getDate() - date.getDay() + 1);
-          key = date.getTime();
           break;
         case '1month':
           date.setHours(0, 0, 0, 0);
           date.setDate(1);
-          key = date.getTime();
           break;
         default:
-          date.setSeconds(0, 0);
           date.setMinutes(Math.floor(date.getMinutes() / 5) * 5);
-          key = date.getTime();
       }
+      key = date.getTime();
     } catch (error) {
-      console.error('Error processing date:', error, entry);
+      console.error('Error processing date:', error);
       return;
     }
     

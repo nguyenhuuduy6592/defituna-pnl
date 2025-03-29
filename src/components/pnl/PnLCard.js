@@ -3,8 +3,10 @@ import { HiX } from 'react-icons/hi';
 import { HiDownload, HiShare } from 'react-icons/hi';
 import { BsCurrencyDollar, BsClock } from 'react-icons/bs';
 import { Portal } from '../common/Portal';
-import html2canvas from 'html2canvas';
 import styles from './PnLCard.module.scss';
+import { formatNumber } from '../../utils/formatters';
+import { getValueClass } from '../../utils/styles';
+import { exportCardAsImage, shareCard } from '../../utils/export';
 
 export const PnLCard = ({ position, onClose }) => {
   const cardRef = useRef(null);
@@ -20,76 +22,17 @@ export const PnLCard = ({ position, onClose }) => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
-  const getValueClass = (value) => {
-    if (value > 0) return styles.positive;
-    if (value < 0) return styles.negative;
-    return styles.zero;
+  const handleExport = () => {
+    exportCardAsImage(exportContentRef, `${position.pair}-pnl-${Date.now()}.png`);
   };
 
-  const formatNumber = (num) => {
-    if (num === null || num === undefined) return '0.00';
-    if (Math.abs(num) < 0.01 && num !== 0) {
-      return num.toLocaleString(undefined, {
-        minimumFractionDigits: 6,
-        maximumFractionDigits: 6
-      });
-    }
-    return num.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  };
-
-  const handleExport = async () => {
-    try {
-      // Configure html2canvas options for better mobile rendering
-      const canvas = await html2canvas(exportContentRef.current, {
-        scale: 2, // Increase resolution
-        useCORS: true, // Enable cross-origin images
-        backgroundColor: '#1E293B', // Match the card background
-        width: exportContentRef.current.offsetWidth,
-        height: exportContentRef.current.offsetHeight,
-        logging: false,
-        onclone: (clonedDoc) => {
-          // Ensure the cloned element has the correct dimensions and styles
-          const clonedContent = clonedDoc.querySelector('[data-export-content]');
-          if (clonedContent) {
-            clonedContent.style.width = `${exportContentRef.current.offsetWidth}px`;
-            clonedContent.style.height = `${exportContentRef.current.offsetHeight}px`;
-            clonedContent.style.position = 'relative';
-            clonedContent.style.transform = 'none';
-          }
-        }
-      });
-
-      // Create download link
-      const link = document.createElement('a');
-      link.download = `${position.pair}-pnl-${Date.now()}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    } catch (error) {
-      console.error('Error exporting card:', error);
-    }
-  };
-
-  const handleShare = async () => {
-    try {
-      const canvas = await html2canvas(cardRef.current, {
-        scale: 2,
-        backgroundColor: '#1a1a1a'
-      });
-      const blob = await new Promise(resolve => canvas.toBlob(resolve));
-      const file = new File([blob], `${position.pair}-pnl.png`, { type: 'image/png' });
-      if (navigator.share) {
-        await navigator.share({
-          files: [file],
-          title: `${position.pair} PnL Card`,
-          text: `Check out my ${position.pair} position on DeFiTuna!`
-        });
-      }
-    } catch (error) {
-      console.error('Error sharing card:', error);
-    }
+  const handleShare = () => {
+    shareCard(
+      cardRef,
+      `${position.pair}-pnl.png`,
+      `${position.pair} PnL Card`,
+      `Check out my ${position.pair} position on DeFiTuna!`
+    );
   };
   
   return (
@@ -120,7 +63,7 @@ export const PnLCard = ({ position, onClose }) => {
             
             <div className={styles.mainInfo}>
               <div 
-                className={`${styles.pnl} ${getValueClass(position.pnl.usd)}`}
+                className={`${styles.pnl} ${styles[getValueClass(position.pnl.usd)]}`}
                 role="status"
                 aria-live="polite"
               >
@@ -144,7 +87,7 @@ export const PnLCard = ({ position, onClose }) => {
                     <BsCurrencyDollar className={styles.icon} />
                     Fee Yield:
                   </dt>
-                  <dd className={`${styles.value} ${getValueClass(position.yield.usd)}`}>
+                  <dd className={`${styles.value} ${styles[getValueClass(position.yield.usd)]}`}>
                     ${formatNumber(position.yield.usd)}
                   </dd>
                 </div>
@@ -153,7 +96,7 @@ export const PnLCard = ({ position, onClose }) => {
                     <BsCurrencyDollar className={styles.icon} />
                     Compounded:
                   </dt>
-                  <dd className={`${styles.value} ${getValueClass(position.compounded.usd)}`}>
+                  <dd className={`${styles.value} ${styles[getValueClass(position.compounded.usd)]}`}>
                     ${formatNumber(position.compounded.usd)}
                   </dd>
                 </div>
