@@ -128,23 +128,52 @@ export const PositionChart = ({ positionHistory, onClose }) => {
     if (isNaN(date.getTime())) return '';
 
     try {
-      switch(period) {
-        case TIME_PERIODS.MINUTE_1:
-        case TIME_PERIODS.MINUTE_5:
-        case TIME_PERIODS.MINUTE_15:
-        case TIME_PERIODS.MINUTE_30:
-          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        case TIME_PERIODS.HOUR_1:
-        case TIME_PERIODS.HOUR_4:
-          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        case TIME_PERIODS.DAY_1:
-          return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit' });
-        case TIME_PERIODS.WEEK_1:
-          return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-        case TIME_PERIODS.MONTH_1:
-          return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
-        default:
-          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      // Check if we have data spanning different calendar dates
+      const startDate = new Date(data[0]?.timestamp);
+      const endDate = new Date(data[data.length - 1]?.timestamp);
+      const isDifferentDates = startDate && endDate && 
+        (startDate.getDate() !== endDate.getDate() ||
+         startDate.getMonth() !== endDate.getMonth() ||
+         startDate.getFullYear() !== endDate.getFullYear());
+
+      if (isDifferentDates) {
+        switch(period) {
+          case TIME_PERIODS.MINUTE_1:
+          case TIME_PERIODS.MINUTE_5:
+          case TIME_PERIODS.MINUTE_15:
+          case TIME_PERIODS.MINUTE_30:
+          case TIME_PERIODS.HOUR_1:
+          case TIME_PERIODS.HOUR_4:
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+                   date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          case TIME_PERIODS.DAY_1:
+          case TIME_PERIODS.WEEK_1:
+          case TIME_PERIODS.MONTH_1:
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+          default:
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+                   date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+      } else {
+        // For same-day data, use original formatting
+        switch(period) {
+          case TIME_PERIODS.MINUTE_1:
+          case TIME_PERIODS.MINUTE_5:
+          case TIME_PERIODS.MINUTE_15:
+          case TIME_PERIODS.MINUTE_30:
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          case TIME_PERIODS.HOUR_1:
+          case TIME_PERIODS.HOUR_4:
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          case TIME_PERIODS.DAY_1:
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit' });
+          case TIME_PERIODS.WEEK_1:
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+          case TIME_PERIODS.MONTH_1:
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+          default:
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
       }
     } catch (error) {
       console.error('Error formatting date:', error);
