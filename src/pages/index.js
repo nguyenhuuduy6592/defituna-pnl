@@ -116,6 +116,7 @@ export default () => {
         startFetchCooldown(30);
         if (wallet) {
           addWallet(wallet);
+          setWallet('');
         }
       }
     } catch (err) {
