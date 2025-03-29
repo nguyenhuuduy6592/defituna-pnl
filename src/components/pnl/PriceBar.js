@@ -19,13 +19,13 @@ export const PriceBar = ({
       value: liquidationPrice.lower, 
       label: 'Liq. Lower', 
       color: '#FF2D55',
-      shape: 'triangle-down'
+      shape: 'triangle-up'
     },
     { 
       value: liquidationPrice.upper, 
       label: 'Liq. Upper', 
       color: '#FF2D55',
-      shape: 'triangle-up'
+      shape: 'triangle-down'
     },
     { 
       value: entryPrice, 
@@ -55,16 +55,16 @@ export const PriceBar = ({
       value: limitOrderPrices.lower,
       label: 'Stop Loss',
       color: '#FF9500',
-      shape: 'triangle-down'
+      shape: 'triangle-up'
     },
     {
       value: limitOrderPrices.upper,
       label: 'Take Profit',
       color: '#FF9500',
-      shape: 'triangle-up'
+      shape: 'triangle-down'
     }
   ].filter(point => point.value !== Infinity && point.value !== null && point.value !== 0)
-   .sort((a, b) => a.value - b.value);
+   .sort((a, b) => b.value - a.value);
 
   // Find min and max for scaling
   const minPrice = Math.min(...pricePoints.map(p => p.value));
