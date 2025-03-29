@@ -63,6 +63,10 @@
       .positionLabel {
         font-weight: 700;
       }
+
+      .positionLeverage, .positionPnlPercentage {
+        font-size: variables.font-size(xs);
+      }
     }
   }
 

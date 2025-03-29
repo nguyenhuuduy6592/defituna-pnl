@@ -159,14 +159,14 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
             <th onClick={() => handleSort('pnl')} className={styles.sortable}>
               PnL {getSortIcon('pnl')}
             </th>
-            <th  onClick={() => handleSort('size')} className={styles.sortable}>
+            <th onClick={() => handleSort('yield')} className={styles.sortable}>
+              Yield {getSortIcon('yield')}
+            </th>
+            <th onClick={() => handleSort('size')} className={styles.sortable}>
               Position Details {getSortIcon('size')}
             </th>
             <th>
               Price Range
-            </th>
-            <th onClick={() => handleSort('yield')} className={styles.sortable}>
-              Yield {getSortIcon('yield')}
             </th>
             <th>Actions</th>
           </tr>
@@ -174,7 +174,7 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
         <tbody>
           {sortedPositions.map((p, i) => (
             <tr key={`${p.pair}-${p.walletAddress || ''}-${i}`}>
-              <td><span className={styles.positionLabel}>{p.pair}</span> ({p.leverage}x Leverage)</td>
+              <td><span className={styles.positionLabel}>{p.pair}</span> <span className={styles.positionLeverage}>({p.leverage}x Leverage)</span></td>
               {showWallet && (
                 <td title={p.walletAddress}>
                   {formatWalletAddress(p.walletAddress)}
@@ -182,7 +182,8 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
               )}
               <td className={getStateClass(p.status)}>{p.status}</td>
               <td>{formatDuration(p.age)}</td>
-              <td className={getValueClass(p.pnl.usd)}>{formatNumber(p.pnl.usd)} ({p.pnl.percentage}%)</td>
+              <td className={getValueClass(p.pnl.usd)}>{formatNumber(p.pnl.usd)} <span className={styles.positionPnlPercentage}>({p.pnl.percentage}%)</span></td>
+              <td className={getValueClass(p.yield.usd)}>{formatNumber(p.yield.usd)}</td>
               <td>
                 <ClusterBar
                   size={p.size}
@@ -202,7 +203,6 @@ export const PositionsList = memo(({ positions, formatValue, showWallet = false 
                   formatValue={formatNumber}
                 />
               </td>
-              <td className={getValueClass(p.yield)}>{formatNumber(p.yield.usd)}</td>
               <td>
                 <button 
                   className={styles.shareButton}
