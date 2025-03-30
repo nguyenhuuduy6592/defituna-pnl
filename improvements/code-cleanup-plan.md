@@ -143,11 +143,11 @@ This plan outlines a systematic approach to improve code readability and maintai
 | useSortState.js | 🟢 Completed | New hook for sort state management |
 | useInvertedPairs.js | 🟢 Completed | New hook for inverted pairs management |
 | usePositionAges.js | 🟢 Completed | New hook for calculating position ages with error handling |
-| useWallet.js | 🔴 Not Started | Wallet management hook |
-| useDebounceApi.js | 🔴 Not Started | API call debouncing |
-| useHistoricalData.js | 🔴 Not Started | Historical data management |
-| useAutoRefresh.js | 🔴 Not Started | Auto-refresh logic |
-| useCountdown.js | 🔴 Not Started | Countdown timer hook |
+| useWallet.js | 🟢 Completed | Added useCallback for all functions, improved error handling for localStorage, added comprehensive JSDoc comments |
+| useDebounceApi.js | 🟢 Completed | Verified existing implementation which already had good JSDoc comments and optimizations |
+| useHistoricalData.js | 🟢 Completed | Added error state, improved validation, enhanced JSDoc comments, added constants, and improved error handling |
+| useAutoRefresh.js | 🟢 Completed | Added validation for inputs, improved error handling, added comprehensive JSDoc comments, and optimized callback dependencies |
+| useCountdown.js | 🟢 Completed | Added stop and reset functionality, better validation, comprehensive JSDoc, and useCallback optimization |
 
 ### Utils
 | Utility File | Status | Notes |
@@ -204,14 +204,16 @@ This plan outlines a systematic approach to improve code readability and maintai
 - [ ] Code review completed
 - [ ] Documentation updated
 
-## Progress Notes (March 30)
+## Progress Notes (March 31)
 - Completed 14 of 20 components (70%)
 - All common components refactored (100%)
 - All history components refactored (100%) 
 - 9 of 13 PNL components refactored (69%)
+- **All 8 custom hooks refactored (100%)**
 - Applied consistent patterns across components
 - Enhanced accessibility throughout the application
-- Added thorough JSDoc documentation to all refactored components
+- Added thorough JSDoc documentation to all refactored components and hooks
 - Improved performance with React.memo, useCallback, and useMemo
 - Extracted reusable subcomponents to simplify complex components
 - Maintained backward compatibility for existing component imports
+- Added proper error handling and validation in hooks

@@ -1,100 +1,165 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
+/**
+ * Custom hook for managing wallet addresses
+ * Handles wallet input state, active wallets, saved wallets, and local storage persistence
+ * 
+ * @returns {Object} Wallet management methods and state
+ * @returns {string} returns.wallet - Current wallet input value
+ * @returns {Function} returns.setWallet - Function to update wallet input value
+ * @returns {string[]} returns.activeWallets - Array of currently active wallet addresses
+ * @returns {Function} returns.setActiveWallets - Function to set active wallets array
+ * @returns {Function} returns.toggleWalletActive - Function to toggle a wallet's active status
+ * @returns {string[]} returns.savedWallets - Array of saved wallet addresses
+ * @returns {Function} returns.addWallet - Function to add a wallet to saved wallets
+ * @returns {Function} returns.removeWallet - Function to remove a wallet from saved wallets
+ * @returns {Function} returns.clearWallets - Function to clear all wallets
+ */
 export const useWallet = () => {
+  // State for current wallet input, active wallets, and saved wallets
   const [wallet, setWallet] = useState('');
   const [activeWallets, setActiveWallets] = useState([]);
   const [savedWallets, setSavedWallets] = useState([]);
 
-  // Load saved wallets and active wallets on init
+  /**
+   * Load saved wallets and active wallets from localStorage on initialization
+   */
   useEffect(() => {
-    const savedWalletsData = JSON.parse(localStorage.getItem('wallets')) || [];
-    setSavedWallets(savedWalletsData);
-    
-    const lastActiveWallets = localStorage.getItem('activeWallets');
-    const parsedActiveWallets = lastActiveWallets ? JSON.parse(lastActiveWallets) : [];
-    
-    if (parsedActiveWallets.length > 0) {
-      setActiveWallets(parsedActiveWallets);
-      // Set the most recent active wallet as primary
-      setWallet(parsedActiveWallets[parsedActiveWallets.length - 1]);
-    } else {
-      // For backward compatibility
-      const lastWallet = localStorage.getItem('lastWallet');
-      if (lastWallet) {
-        setActiveWallets([lastWallet]);
-        setWallet(lastWallet);
+    try {
+      // Load saved wallets
+      const savedWalletsData = JSON.parse(localStorage.getItem('wallets')) || [];
+      setSavedWallets(savedWalletsData);
+      
+      // Load active wallets with fallback for backward compatibility
+      const lastActiveWallets = localStorage.getItem('activeWallets');
+      const parsedActiveWallets = lastActiveWallets ? JSON.parse(lastActiveWallets) : [];
+      
+      if (parsedActiveWallets.length > 0) {
+        setActiveWallets(parsedActiveWallets);
+        // Set the most recent active wallet as primary
+        setWallet(parsedActiveWallets[parsedActiveWallets.length - 1]);
+      } else {
+        // For backward compatibility
+        const lastWallet = localStorage.getItem('lastWallet');
+        if (lastWallet) {
+          setActiveWallets([lastWallet]);
+          setWallet(lastWallet);
+        }
       }
+    } catch (error) {
+      console.error('Error loading wallet data from localStorage:', error);
+      // Reset to defaults on error
+      setSavedWallets([]);
+      setActiveWallets([]);
+      setWallet('');
     }
   }, []); // Only run once on mount
 
-  // Save settings to localStorage whenever they change
+  /**
+   * Save settings to localStorage whenever they change
+   */
   useEffect(() => {
-    localStorage.setItem('wallets', JSON.stringify(savedWallets));
-    localStorage.setItem('activeWallets', JSON.stringify(activeWallets));
-    if (wallet) {
-      localStorage.setItem('lastWallet', wallet);
-    } else {
-      localStorage.removeItem('lastWallet');
+    try {
+      localStorage.setItem('wallets', JSON.stringify(savedWallets));
+      localStorage.setItem('activeWallets', JSON.stringify(activeWallets));
+      
+      if (wallet) {
+        localStorage.setItem('lastWallet', wallet);
+      } else {
+        localStorage.removeItem('lastWallet');
+      }
+    } catch (error) {
+      console.error('Error saving wallet data to localStorage:', error);
     }
   }, [savedWallets, activeWallets, wallet]);
 
-  // Custom setWallet function
-  const handleSetWallet = (newWallet) => {
+  /**
+   * Updates the current wallet input value
+   * @param {string} newWallet - New wallet address
+   */
+  const handleSetWallet = useCallback((newWallet) => {
     setWallet(newWallet);
-  };
+  }, []);
 
-  // Toggle wallet active status
-  const toggleWalletActive = (walletAddress) => {
-    let updatedActiveWallets;
-    
-    if (activeWallets.includes(walletAddress)) {
-      // Remove if already active
-      updatedActiveWallets = activeWallets.filter(w => w !== walletAddress);
-    } else {
-      // Add if not active
-      updatedActiveWallets = [...activeWallets, walletAddress];
-    }
-    
-    setActiveWallets(updatedActiveWallets);
-    
-    // Keep the most recently activated wallet as the primary wallet
-    if (updatedActiveWallets.length > 0) {
-      setWallet(updatedActiveWallets[updatedActiveWallets.length - 1]);
-    } else {
-      setWallet('');
-    }
-  };
+  /**
+   * Toggles a wallet's active status
+   * If the wallet is active, it will be deactivated
+   * If the wallet is not active, it will be activated
+   * Also updates the primary wallet
+   * 
+   * @param {string} walletAddress - Wallet address to toggle
+   */
+  const toggleWalletActive = useCallback((walletAddress) => {
+    setActiveWallets(prevActiveWallets => {
+      let updatedActiveWallets;
+      
+      if (prevActiveWallets.includes(walletAddress)) {
+        // Remove if already active
+        updatedActiveWallets = prevActiveWallets.filter(w => w !== walletAddress);
+      } else {
+        // Add if not active
+        updatedActiveWallets = [...prevActiveWallets, walletAddress];
+      }
+      
+      // Keep the most recently activated wallet as the primary wallet
+      if (updatedActiveWallets.length > 0) {
+        setWallet(updatedActiveWallets[updatedActiveWallets.length - 1]);
+      } else {
+        setWallet('');
+      }
+      
+      return updatedActiveWallets;
+    });
+  }, []);
 
-  const addWallet = (newWallet) => {
+  /**
+   * Adds a new wallet address to the saved wallets list if it doesn't already exist
+   * @param {string} newWallet - Wallet address to add
+   */
+  const addWallet = useCallback((newWallet) => {
     if (newWallet && !savedWallets.includes(newWallet)) {
       setSavedWallets(prev => [...prev, newWallet]);
     }
-  };
+  }, [savedWallets]);
 
-  const removeWallet = (walletToRemove) => {
+  /**
+   * Removes a wallet from saved wallets and active wallets if present
+   * Also updates the primary wallet if removed wallet was the primary
+   * 
+   * @param {string} walletToRemove - Wallet address to remove
+   */
+  const removeWallet = useCallback((walletToRemove) => {
     setSavedWallets(prev => prev.filter(w => w !== walletToRemove));
     
     // If removing an active wallet, remove it from active wallets too
-    if (activeWallets.includes(walletToRemove)) {
-      const updatedActiveWallets = activeWallets.filter(w => w !== walletToRemove);
-      setActiveWallets(updatedActiveWallets);
-      
-      // Update primary wallet if needed
-      if (walletToRemove === wallet) {
-        if (updatedActiveWallets.length > 0) {
-          setWallet(updatedActiveWallets[0]);
-        } else {
-          setWallet('');
+    setActiveWallets(prevActiveWallets => {
+      if (prevActiveWallets.includes(walletToRemove)) {
+        const updatedActiveWallets = prevActiveWallets.filter(w => w !== walletToRemove);
+        
+        // Update primary wallet if needed
+        if (walletToRemove === wallet) {
+          if (updatedActiveWallets.length > 0) {
+            setWallet(updatedActiveWallets[0]);
+          } else {
+            setWallet('');
+          }
         }
+        
+        return updatedActiveWallets;
       }
-    }
-  };
+      
+      return prevActiveWallets;
+    });
+  }, [wallet]);
 
-  const clearWallets = () => {
+  /**
+   * Clears all saved and active wallets and resets current wallet input
+   */
+  const clearWallets = useCallback(() => {
     setSavedWallets([]);
     setActiveWallets([]);
     setWallet('');
-  };
+  }, []);
 
   return {
     wallet,
