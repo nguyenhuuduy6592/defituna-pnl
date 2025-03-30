@@ -57,7 +57,7 @@ This document outlines a comprehensive plan to implement transaction history tra
 
 ### Phase 4: User Interface
 
-8. **Transaction List Implementation**
+8. **Transaction List Implementation (Priority 1)**
    - **Design transaction list similar to the existing active positions display for consistency**
    - **Maintain familiar column structure and layout patterns users already understand**
    - **Default to chronological order with newest transactions first**
@@ -70,27 +70,29 @@ This document outlines a comprehensive plan to implement transaction history tra
    - **Implement virtual scrolling for performance**
    - **Add subtle visual grouping by date or position**
    - **Use familiar patterns like pull-to-refresh on mobile**
+   - **Deliver as first UI component for early user testing and feedback**
 
-9. **Transaction Detail View**
-   - **Design a modal or slide-in panel for transaction details (similar to position details)**
-   - **Show complete history of all interactions with the position**
-   - **Display transaction sequence in chronological order**
-   - **Organize details into logical sections with clear headings:**
-     - Transaction summary (type, time, status)
-     - Position information (pair, size, leverage)
-     - Financial details (amount, fees, total)
-     - Technical details (collapsible section for advanced users)
-   - **Include a visual summary at the top (transaction type, status, amount)**
-   - **Provide contextual information (position state before/after)**
-   - **Include blockchain verification link for advanced users**
-   - **Use tooltips for technical terms**
+9. **Filtering and Sorting (Priority 2)**
+   - Implement filters for transaction type, date range, position, etc.
+   - Create sorting options for various transaction attributes
+   - Develop search functionality for transaction history
+   - Integrate directly with list view for immediate value
 
-10. **Filtering and Sorting**
-    - Implement filters for transaction type, date range, position, etc.
-    - Create sorting options for various transaction attributes
-    - Develop search functionality for transaction history
+10. **Transaction Detail View (Priority 3)**
+    - **Design a modal or slide-in panel for transaction details (similar to position details)**
+    - **Show complete history of all interactions with the position**
+    - **Display transaction sequence in chronological order**
+    - **Organize details into logical sections with clear headings:**
+      - Transaction summary (type, time, status)
+      - Position information (pair, size, leverage)
+      - Financial details (amount, fees, total)
+      - Technical details (collapsible section for advanced users)
+    - **Include a visual summary at the top (transaction type, status, amount)**
+    - **Provide contextual information (position state before/after)**
+    - **Include blockchain verification link for advanced users**
+    - **Use tooltips for technical terms**
 
-11. **Data Visualization**
+11. **Data Visualization (Priority 4)**
     - Design timeline visualization for position lifecycle
     - Implement charts to show position changes over time
     - Create visual indicators for significant events (liquidation risks, etc.)
@@ -192,26 +194,43 @@ This document outlines a comprehensive plan to implement transaction history tra
 4. Add persistence and cache management
 5. Test storage and retrieval performance
 
-### Step 5: UI Implementation
-1. Design transaction history UI components
-2. **Implement transaction list with clarity and simplicity**
+### Step 5: UI Implementation (Incremental Delivery Approach)
+
+1. **List View Development (Phase 1 - MVP)**
+   - Design and implement the transaction list view first
    - **Base design on existing positions table for familiarity and consistency**
    - **Default sort order: newest transactions first (descending chronological order)**
    - Use virtual list component for performance (react-window or similar)
    - Implement clear date-based section headers
-   - Design compact but readable list items with visual hierarchy
-   - Include subtle hover effects and active states
-   - Add empty state and loading state designs
-   - Ensure keyboard navigation works properly
+   - Ensure working UI for viewing basic transaction history
+   - Deploy for early user testing and feedback
+   - This provides immediate value to users while detail views are being developed
 
-3. **Create transaction detail view with progressive disclosure**
+2. **Filtering and Sorting Implementation (Phase 1 - MVP)**
+   - Implement essential filters (transaction type, date range)
+   - Add basic sorting capabilities
+   - Integrate directly with list view
+   - This completes the minimum viable product for transaction history
+
+3. **Detail View Development (Phase 2)**
    - Implement a slide-in panel or modal for transaction details
    - **Show comprehensive history of all interactions with the position**
    - **Maintain consistent styling with position details modal**
    - Group details into collapsible sections (transaction overview, position details, fee details)
    - Show visual comparison of before/after state where applicable
-   - Add option to view raw transaction data for advanced users (behind "View technical details" button)
-   - Include verification link to block explorer
+   - Add option to view raw transaction data for advanced users
+
+4. **Advanced Features (Phase 3)**
+   - Implement advanced search functionality
+   - Add data visualizations and charts
+   - Create export and sharing functionality
+   - Enhance with additional user-requested features based on feedback
+
+5. **Final Polish**
+   - Design refinements based on user feedback
+   - Performance optimizations
+   - Accessibility improvements
+   - Cross-browser and device testing
 
 ### Step 6: Testing & Optimization
 1. Test with various wallet profiles
@@ -247,10 +266,11 @@ This document outlines a comprehensive plan to implement transaction history tra
 - Phase 1 (Infrastructure): 1-2 weeks
 - Phase 2 (Data Retrieval): 2-3 weeks
 - Phase 3 (Storage): 1-2 weeks
-- Phase 4 (UI): 2-3 weeks
-- Phase 5 (Testing & Optimization): 1-2 weeks
+- Phase 4 (UI - List View MVP): 1-2 weeks
+- Phase 5 (UI - Detail View & Advanced Features): 2-3 weeks
+- Phase 6 (Testing & Optimization): 1-2 weeks
 
-Total estimated time: 7-12 weeks depending on complexity and resources.
+Total estimated time: 8-14 weeks depending on complexity and resources, with initial MVP available to users after 5-9 weeks.
 
 ## Future Enhancements
 
