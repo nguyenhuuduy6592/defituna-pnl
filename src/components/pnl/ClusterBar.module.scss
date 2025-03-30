@@ -1,7 +1,9 @@
+@use '../../styles/variables.module.scss' as variables;
+
 .clusterBarContainer {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: variables.spacing(sm);
   min-width: 150px;
   position: relative;
 }
@@ -12,7 +14,7 @@
   display: flex;
   border-radius: 4px;
   overflow: hidden;
-  background-color: #f0f0f0;
+  background-color: variables.bg-color(medium);
 }
 
 .barSegment {
@@ -21,67 +23,48 @@
   cursor: pointer;
 
   &:nth-child(1) {
-    background-color: #4CAF50; // Green for collateral
+    background-color: variables.color(success);
   }
 
   &:nth-child(2) {
-    background-color: #f44336; // Red for debt
+    background-color: variables.color(negative);
   }
 
   &:nth-child(3) {
-    background-color: #ff9800; // Orange for interest
+    background-color: variables.color(warning);
   }
 }
 
 .totalValue {
   min-width: 80px;
   text-align: right;
-  font-size: 0.9em;
-  color: #666;
-}
-
-.tooltip {
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 12px;
-  border-radius: 4px;
-  font-size: 0.85em;
-  white-space: nowrap;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  min-width: 200px;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 6px;
-    border-style: solid;
-    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
-  }
+  font-size: variables.font-size(sm);
+  color: variables.text-color(secondary);
 }
 
 .tooltipContent {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: variables.spacing(sm);
 }
 
 .tooltipRow {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: variables.spacing(md);
   align-items: center;
 }
 
 .tooltipLabel {
-  color: #ccc;
-  font-size: 0.9em;
+  color: variables.text-color(light-secondary);
+  font-size: variables.font-size(xs);
+  white-space: nowrap;
 }
 
 .tooltipValue {
-  color: white;
-  font-weight: 500;
-  font-size: 0.9em;
+  color: variables.text-color(inverse);
+  font-weight: 700;
+  font-size: variables.font-size(xs);
+  white-space: nowrap;
+  font-family: monospace;
 } 
