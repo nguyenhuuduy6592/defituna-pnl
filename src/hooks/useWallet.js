@@ -36,14 +36,11 @@ export const useWallet = () => {
       
       if (parsedActiveWallets.length > 0) {
         setActiveWallets(parsedActiveWallets);
-        // Set the most recent active wallet as primary
-        setWallet(parsedActiveWallets[parsedActiveWallets.length - 1]);
       } else {
-        // For backward compatibility
+        // For backward compatibility, but still don't set the input field
         const lastWallet = localStorage.getItem('lastWallet');
         if (lastWallet) {
           setActiveWallets([lastWallet]);
-          setWallet(lastWallet);
         }
       }
     } catch (error) {
