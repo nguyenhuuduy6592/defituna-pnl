@@ -3,11 +3,21 @@
   display: inline-flex;
 }
 
+.tooltipTrigger {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  // Add a larger touch target for mobile
+  @media (max-width: 767px) {
+    padding: 8px;
+    margin: -8px;
+  }
+}
+
 .tooltip {
   position: absolute;
-  top: calc(100% + 12px);
-  right: -12px;
-  transform: none;
   background: rgba(0, 0, 0, 0.95);
   color: white;
   border-radius: 8px;
@@ -30,9 +40,6 @@
   &::before {
     content: '';
     position: absolute;
-    top: -6px;
-    right: 16px;
-    transform: rotate(45deg);
     width: 12px;
     height: 12px;
     background: rgba(0, 0, 0, 0.95);
@@ -61,20 +68,160 @@
     }
   }
 
-  @media (min-width: 768px) {
-    right: auto;
+  // Position-specific styles
+  // Bottom position (default)
+  &.bottom {
+    top: calc(100% + 12px);
     left: 50%;
     transform: translateX(-50%);
 
     &::before {
-      right: auto;
+      top: -6px;
       left: 50%;
       transform: translateX(-50%) rotate(45deg);
     }
+    
+    // Mobile override
+    @media (max-width: 767px) {
+      top: calc(100% + 12px);
+      left: auto;
+      right: -12px;
+      transform: none;
+      
+      &::before {
+        left: auto;
+        right: 16px;
+        transform: rotate(45deg);
+      }
+    }
+  }
+  
+  // Bottom-center position (maintains center on mobile)
+  &.bottom-center {
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+
+    &::before {
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+    }
+    
+    // No mobile override - stays centered
+  }
+  
+  // Top position
+  &.top {
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    
+    &::before {
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+    }
+    
+    // Mobile override
+    @media (max-width: 767px) {
+      bottom: calc(100% + 12px);
+      left: auto;
+      right: -12px;
+      transform: none;
+      
+      &::before {
+        left: auto;
+        right: 16px;
+        transform: rotate(45deg);
+      }
+    }
+  }
+  
+  // Top-center position (maintains center on mobile)
+  &.top-center {
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%);
+    
+    &::before {
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+    }
+    
+    // No mobile override - stays centered
+  }
+  
+  // Left position
+  &.left {
+    right: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    
+    &::before {
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+    }
+    
+    // Mobile may need different positioning
+    @media (max-width: 767px) {
+      right: calc(100% + 12px);
+      top: 0;
+      transform: none;
+      
+      &::before {
+        right: -6px;
+        top: 16px;
+        transform: rotate(45deg);
+      }
+    }
+  }
+  
+  // Right position
+  &.right {
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    
+    &::before {
+      left: -6px;
+      top: 50%;
+      transform: translateY(-50%) rotate(45deg);
+    }
+    
+    // Mobile may need different positioning
+    @media (max-width: 767px) {
+      left: calc(100% + 12px);
+      top: 0;
+      transform: none;
+      
+      &::before {
+        left: -6px;
+        top: 16px;
+        transform: rotate(45deg);
+      }
+    }
+  }
+
+  // Mobile specific styles
+  @media (max-width: 767px) {
+    padding: 12px;
+    font-size: 13px;
+  }
+  
+  // Show when visible class is applied (for click behavior)
+  &.visible {
+    opacity: 1;
+    visibility: visible;
   }
 }
 
-.tooltipContainer:hover .tooltip {
-  opacity: 1;
-  visibility: visible;
+// Support for hover on desktop
+@media (min-width: 768px) {
+  .tooltipContainer:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+  }
 }

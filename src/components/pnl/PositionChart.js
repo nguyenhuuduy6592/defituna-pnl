@@ -30,7 +30,7 @@ const ChartHeader = memo(({ activePeriod, setActivePeriod, onClose }) => (
       <Tooltip content={`• Shows PnL ($) and Yield ($) changes over time.
 • Historical data is stored locally in your browser.
 • Limited to 30 days of history.
-• Enable "Store History" to collect data.`}>
+• Enable "Store History" to collect data.`} position="bottom-center">
         <span className={styles.infoIcon}>
           <BsInfoCircle />
         </span>
