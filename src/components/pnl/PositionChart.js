@@ -104,7 +104,19 @@ const ChartContent = memo(({ chartData, activeMetrics, yAxisDomain, activePeriod
           domain={yAxisDomain}
           allowDataOverflow={false}
         />
-        <ReferenceLine y={0} stroke="#4dabf7" strokeWidth={1} />
+        <ReferenceLine 
+          y={0} 
+          stroke="#4dabf7" 
+          strokeWidth={1.5}
+          strokeDasharray="3 3"
+          label={{
+            value: "Break-even ($0)",
+            position: "insideBottomRight",
+            fill: "#4dabf7",
+            fontSize: 11,
+            fontWeight: "500"
+          }}
+        />
         <RechartsTooltip 
           content={<CustomChartTooltip />}
           isAnimationActive={false}
