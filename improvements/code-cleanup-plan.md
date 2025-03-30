@@ -54,12 +54,12 @@ This plan outlines a systematic approach to improve code readability and maintai
 - [x] Properly scope CSS Module selectors
 - [x] Implement SASS variables and mixins consistently
 
-### 2. Style Simplification 🟢
-- [x] Consolidate similar styles into reusable classes
-- [x] Extract common values into CSS variables
-- [x] Reduce specificity where possible for easier overrides
-- [x] Create dedicated style modules for components
-- [x] Remove duplicate styles between components
+### 2. Style Simplification 🔴
+- [ ] Consolidate similar styles into reusable classes
+- [ ] Extract common values into CSS variables
+- [ ] Reduce specificity where possible for easier overrides
+- [ ] Create dedicated style modules for components
+- [ ] Remove duplicate styles between components
 
 ### 3. Responsive Design Cleanup 🟡
 - [x] Organize media queries consistently
@@ -120,8 +120,8 @@ This plan outlines a systematic approach to improve code readability and maintai
 | WalletForm.js | 🟢 Completed | Wallet input and validation, added JSDoc, memoized callbacks, extracted sub-components (Dropdown, ActiveDisplay) |
 | AutoRefresh.js | 🟢 Completed | Added JSDoc, improved accessibility and readability |
 | PnLCard.js | 🟢 Completed | Refactored structure, improved accessibility and error handling |
-| PriceBar.js | 🔴 Not Started | Price information display |
-| ClusterBar.js | 🔴 Not Started | Clustering visualization |
+| PriceBar.js | 🟢 Completed | Price information display, refactored structure, calculations, accessibility |
+| ClusterBar.js | 🟢 Completed | Clustering visualization, added JSDoc, memoized calculations, refactored styles |
 
 ### Styles
 | Style File | Status | Notes |
@@ -134,9 +134,9 @@ This plan outlines a systematic approach to improve code readability and maintai
 | PositionChart.module.scss | 🟢 Completed | Cleaned up styles, used SASS functions consistently |
 | WalletForm.module.scss | 🔴 Not Started | Form styles |
 | AutoRefresh.module.scss | 🔴 Not Started | Refresh component styles |
-| PnLCard.module.scss | 🔴 Not Started | Card component styles |
-| PriceBar.module.scss | 🔴 Not Started | Price display styles |
-| ClusterBar.module.scss | 🔴 Not Started | Cluster visualization styles |
+| PnLCard.module.scss | 🟢 Completed | Card component styles, refactored structure, used SASS variables, corrected color functions |
+| PriceBar.module.scss | 🟢 Completed | Price display styles, refactored structure, used SASS variables, corrected color functions |
+| ClusterBar.module.scss | 🟢 Completed | Cluster visualization styles, refactored using SASS variables/functions |
 
 ### Hooks
 | Hook File | Status | Notes |
