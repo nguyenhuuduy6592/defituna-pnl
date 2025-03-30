@@ -158,12 +158,46 @@ export async function processPositionsData(positionsData) {
         tokenB
       );
       
+      // Return only the fields actually used by the frontend
       return {
-        ...processedPosition,
-        pair: `${tokenA.symbol}/${tokenB.symbol}`,
-        walletAddress: position.authority,
+        // Core position data
         positionAddress: position.address,
         state: position.state,
+        pair: `${tokenA.symbol}/${tokenB.symbol}`,
+        
+        // Price data (used for status calculation and price bar)
+        currentPrice: processedPosition.currentPrice,
+        entryPrice: processedPosition.entryPrice,
+        rangePrices: processedPosition.rangePrices,
+        
+        // Only include properties actually used in the UI
+        liquidationPrice: processedPosition.liquidationPrice,
+        limitOrderPrices: processedPosition.limitOrderPrices,
+        leverage: processedPosition.leverage,
+        size: processedPosition.size,
+        
+        // Simplified financial metrics
+        pnl: {
+          usd: processedPosition.pnl.usd,
+          bps: processedPosition.pnl.bps
+        },
+        yield: {
+          usd: processedPosition.yield.usd
+        },
+        compounded: {
+          usd: processedPosition.compounded.usd
+        },
+        
+        // Simplified amounts for cluster bar - only used for display
+        collateral: {
+          usd: processedPosition.collateral.usd
+        },
+        debt: {
+          usd: processedPosition.debt.usd
+        },
+        interest: {
+          usd: processedPosition.interest.usd
+        }
       };
     }).filter(Boolean); 
     

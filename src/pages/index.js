@@ -11,6 +11,7 @@ import { useDebounceApi } from '../hooks/useDebounceApi';
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
+import { addWalletAddressToPositions } from '../utils/positionUtils';
 import styles from './index.module.scss';
 
 export default () => {
@@ -63,7 +64,15 @@ export default () => {
         console.error(`Error fetching for ${walletAddress}:`, errorData);
         throw new Error(errorData.error || `Failed to fetch data for ${walletAddress}`);
       }
-      return await res.json();
+      
+      const data = await res.json();
+      
+      // Add the wallet address to each position since it was removed from server response
+      if (data && data.positions) {
+        data.positions = addWalletAddressToPositions(data.positions, walletAddress);
+      }
+      
+      return data;
     } catch (err) {
       console.error(`Caught error fetching for ${walletAddress}:`, err);
       return { error: err.message || 'Unknown error fetching wallet data' }; 

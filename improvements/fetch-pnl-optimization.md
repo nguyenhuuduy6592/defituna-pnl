@@ -141,10 +141,14 @@ Benefits:
 ## Future Optimizations
 
 ### High Priority
-1. **Response Payload Optimization** 🔴
-   - Further reduce payload size by removing unused fields
-   - Implement numeric encoding for decimal values
-   - Consider binary formats for data transfer (MessagePack/Protobuf)
+1. **Response Payload Optimization** 🟡 In Progress
+   - [x] Remove `walletAddress` field from server response and add it client-side
+   - [x] Further reduce payload size by removing unused fields:
+      - Removed token-specific amounts (tokenA, tokenB) from collateral, debt, yield, and interest
+      - Only kept USD values needed for display
+      - Removed other unused fields from position objects
+   - [ ] Implement numeric encoding for decimal values
+   - [ ] Consider binary formats for data transfer (MessagePack/Protobuf)
    - Expected benefit: 10-30% reduction in response time and bandwidth usage
 
 2. **Request Batching** 🔴

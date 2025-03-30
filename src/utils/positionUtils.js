@@ -69,4 +69,22 @@ export const calculateStatus = (position) => {
                     position.currentPrice <= position.rangePrices.upper;
 
   return isInRange ? 'In range' : 'Out of range';
-}; 
+};
+
+/**
+ * Adds wallet address to each position in the array
+ * This is used to restore the wallet address that was removed from the server response
+ * to reduce payload size
+ * 
+ * @param {Array} positions - Array of position objects
+ * @param {string} walletAddress - The wallet address to add to each position
+ * @return {Array} - Positions with wallet address added
+ */
+export function addWalletAddressToPositions(positions, walletAddress) {
+  if (!positions || !Array.isArray(positions)) return [];
+  
+  return positions.map(position => ({
+    ...position,
+    walletAddress
+  }));
+} 
