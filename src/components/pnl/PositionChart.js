@@ -76,7 +76,7 @@ NoChartData.displayName = 'NoChartData';
 /**
  * Chart content component that renders the chart or no data message
  */
-const ChartContent = memo(({ chartData, activeMetrics, yAxisDomain, activePeriod }) => {
+const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
   if (chartData.length === 0) {
     return <NoChartData />;
   }
@@ -97,11 +97,23 @@ const ChartContent = memo(({ chartData, activeMetrics, yAxisDomain, activePeriod
           height={35}
         />
         <YAxis
-          tickFormatter={formatNumber}
+          tickFormatter={(value) => value === 0 ? '0' : formatNumber(value)}
           tick={{ fontSize: 11 }}
           width={60}
-          tickCount={Y_AXIS_TICK_COUNT}
-          domain={yAxisDomain}
+          domain={[
+            dataMin => {
+              // Ensure we include 0 and add padding below the min value
+              const minWithZero = Math.min(0, dataMin);
+              const padding = Math.abs(dataMin) * Y_AXIS_DOMAIN_PADDING_FACTOR;
+              return minWithZero - padding;
+            }, 
+            dataMax => {
+              // Ensure we include 0 and add padding above the max value
+              const maxWithZero = Math.max(0, dataMax);
+              const padding = Math.abs(dataMax) * Y_AXIS_DOMAIN_PADDING_FACTOR;
+              return maxWithZero + padding;
+            }
+          ]}
           allowDataOverflow={false}
         />
         <ReferenceLine 
@@ -109,6 +121,7 @@ const ChartContent = memo(({ chartData, activeMetrics, yAxisDomain, activePeriod
           stroke="#4dabf7" 
           strokeWidth={1.5}
           strokeDasharray="3 3"
+          ifOverflow="extendDomain"
           label={{
             value: "Break-even ($0)",
             position: "insideBottomRight",
@@ -206,34 +219,6 @@ const PositionChart = memo(function PositionChart({ positionHistory, onClose }) 
     }
   }, [onClose]);
 
-  const getYAxisDomain = useCallback((data) => {
-    if (!data || data.length === 0) return [0, 0];
-
-    const values = [];
-    data.forEach(item => {
-      if (activeMetrics.pnl && item.pnl != null) values.push(item.pnl);
-      if (activeMetrics.yield && item.yield != null) values.push(item.yield);
-    });
-
-    if (values.length === 0) return [0, 0];
-
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    
-    // Add padding to min/max unless they are the same
-    const range = max - min;
-    if (range === 0) {
-      // Handle case where min === max (e.g., single point or all values same)
-      const padding = Math.abs(max * Y_AXIS_DOMAIN_PADDING_FACTOR) || 1; // Default padding if max is 0
-      return [min - padding, max + padding];
-    }
-    
-    const padding = range * Y_AXIS_DOMAIN_PADDING_FACTOR;
-    return [min - padding, max + padding];
-  }, [activeMetrics]);
-  
-  const yAxisDomain = getYAxisDomain(chartData);
-
   if (!positionHistory) return null;
 
   return (
@@ -250,7 +235,6 @@ const PositionChart = memo(function PositionChart({ positionHistory, onClose }) 
             <ChartContent 
               chartData={chartData}
               activeMetrics={activeMetrics}
-              yAxisDomain={yAxisDomain}
               activePeriod={activePeriod}
             />
           </div>
