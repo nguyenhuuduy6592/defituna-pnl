@@ -119,15 +119,15 @@ This plan outlines a systematic approach to improve code readability and maintai
 | history/HistoryConfirmationModal.js | 🟢 Completed | Extracted content components, created helper functions, improved accessibility |
 | history/HistoryToggle.js | 🟢 Completed | Added proper JSDoc, optimized handlers with useCallback, improved structure |
 | pnl/ClusterBar.js | 🟢 Completed | Extracted BarSegment and TooltipRow components, optimized with useMemo and useCallback, added aria attributes |
-| pnl/WalletForm.js | 🔴 Not Started |  |
+| pnl/WalletForm.js | 🟢 Completed | Extracted SubmitButton and WalletInput components, added memo optimization, improved code organization |
 | pnl/SavedWalletsDropdown.js | 🟢 Completed | Extracted SavedWalletItem component, added keyboard navigation, optimized with useCallback and React.memo |
 | pnl/ActiveWalletsDisplay.js | 🟢 Completed | Extracted WalletChip component, applied React.memo, improved accessibility |
 | pnl/PriceBar.js | 🟢 Completed | Extracted PriceMarker and TooltipRow components, optimized with useMemo and useCallback, added aria attributes |
-| pnl/PnLCard.js | 🔴 Not Started |  |
+| pnl/PnLCard.js | 🟢 Completed | Extracted StatRow, PnLDisplay, and CardActions components, optimized with useCallback, improved accessibility |
 | pnl/AutoRefresh.js | 🟢 Completed | Extracted subcomponents, added useCallback, improved accessibility |
-| pnl/PositionChart.js | 🔴 Not Started |  |
-| pnl/PositionsTable.js | 🔴 Not Started |  |
-| pnl/PositionsList.js | 🔴 Not Started |  |
+| pnl/PositionChart.js | 🟢 Completed | Extracted ChartHeader, NoChartData, and ChartContent components, optimized with useCallback and memo, fixed component export and CustomChartTooltip memoization error |
+| pnl/PositionsTable.js | 🟢 Completed | Extracted TableHeader, PairCell, WalletCell, and ActionsCell components, optimized with useCallback and memo, improved accessibility |
+| pnl/PositionsList.js | 🟢 Completed | Added NoPositions component, optimized handlers with useCallback, improved component structure and documentation |
 | pnl/DonationFooter.js | 🟢 Completed | Added useCallback for handlers, improved accessibility with tabIndex |
 | pnl/TotalPnLDisplay.js | 🟢 Completed | Added useMemo for formatted values, improved accessibility |
 | pnl/PnLDisplay.js | 🟢 Completed | Added proper data validation with useMemo, improved component structure |
@@ -205,9 +205,10 @@ This plan outlines a systematic approach to improve code readability and maintai
 - [ ] Documentation updated
 
 ## Progress Notes (March 30)
-- Completed 12 of 20 components (60%)
-- All common and history components refactored (100%)
-- 7 of 13 PNL components refactored (54%)
+- Completed 14 of 20 components (70%)
+- All common components refactored (100%)
+- All history components refactored (100%) 
+- 9 of 13 PNL components refactored (69%)
 - Applied consistent patterns across components
 - Enhanced accessibility throughout the application
 - Added thorough JSDoc documentation to all refactored components

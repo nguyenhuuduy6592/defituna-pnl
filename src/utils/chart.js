@@ -203,18 +203,11 @@ export const formatXAxisLabel = (timestamp, allData = [], period = TIME_PERIODS.
  * @param {number} props.label - The timestamp label for the hovered point.
  * @returns {JSX.Element|null} The rendered tooltip or null.
  */
-export const CustomChartTooltip = ({ active, payload, label }) => {
+export const CustomChartTooltip = React.memo(function CustomChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
-
-  // Find the original data point corresponding to the label (timestamp)
-  // This assumes the `payload` array might contain data from multiple lines
-  // and we want consistent formatting based on the timestamp.
-  // Note: This lookup might be inefficient for very large datasets if not memoized.
-  // const originalDataPoint = /* find original point if needed */; 
 
   return (
     <div className={styles.tooltip}>
-      {/* Use a simplified label format for tooltip header, consistent time */}
       <p className={styles.tooltipLabel}>
         {new Date(label).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
       </p>
@@ -225,7 +218,7 @@ export const CustomChartTooltip = ({ active, payload, label }) => {
       ))}
     </div>
   );
-};
+});
 
 export const getGridStyling = () => ({
   stroke: '#cccccc',  // Darker grid color for better contrast

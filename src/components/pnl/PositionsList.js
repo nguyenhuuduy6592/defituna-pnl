@@ -1,4 +1,4 @@
-import { memo, useState, useMemo } from 'react';
+import { memo, useState, useMemo, useCallback } from 'react';
 import styles from './PositionsList.module.scss';
 import { PnLCard } from './PnLCard';
 import { PositionChart } from './PositionChart';
@@ -15,31 +15,77 @@ import {
   sortPositions 
 } from '../../utils';
 
-export const PositionsList = memo(({ positions, showWallet = false, historyEnabled }) => {
-  // Custom hooks
+/**
+ * Empty state component when no positions are available
+ */
+const NoPositions = memo(() => (
+  <div className={styles.noData} role="status" aria-live="polite">
+    No positions found
+  </div>
+));
+
+NoPositions.displayName = 'NoPositions';
+
+/**
+ * Component that renders a list of positions with sorting, filtering, and detailed views
+ * 
+ * @param {Object} props Component props
+ * @param {Array} props.positions List of position objects to display
+ * @param {boolean} props.showWallet Whether to show wallet addresses
+ * @param {boolean} props.historyEnabled Whether position history feature is enabled
+ */
+export const PositionsList = memo(({ 
+  positions, 
+  showWallet = false, 
+  historyEnabled = false 
+}) => {
+  // Custom hooks for state management
   const { sortState, handleSort } = useSortState('age', 'desc');
   const { invertedPairs, handlePairInversion, isInverted } = useInvertedPairs();
   const { getPositionHistory } = useHistoricalData();
   
-  // Local state
+  // Local state for modal dialogs
   const [selectedState, setSelectedState] = useState({
-    position: null,
-    chartPosition: null
+    position: null,     // Selected position for PnL card
+    chartPosition: null // Selected position for chart view
   });
 
-  // Handlers
-  const handleShowChart = async (position) => {
+  // Handler for showing the position chart
+  const handleShowChart = useCallback(async (position) => {
     const positionId = `${position.pair}-${position.positionAddress}`;
     const history = await getPositionHistory(positionId);
-    setSelectedState(prev => ({ ...prev, chartPosition: { ...position, history } }));
-  };
+    setSelectedState(prev => ({ 
+      ...prev, 
+      chartPosition: { ...position, history } 
+    }));
+  }, [getPositionHistory]);
 
-  // Memoized data processing
+  // Handler for showing the PnL card
+  const handleShowCard = useCallback((position) => {
+    setSelectedState(prev => ({ ...prev, position }));
+  }, []);
+
+  // Handlers for closing modals
+  const handleCloseCard = useCallback(() => {
+    setSelectedState(prev => ({ ...prev, position: null }));
+  }, []);
+
+  const handleCloseChart = useCallback(() => {
+    setSelectedState(prev => ({ ...prev, chartPosition: null }));
+  }, []);
+
+  // Process and prepare positions data with memoization
   const processedPositions = useMemo(() => {
-    if (!positions) return [];
+    if (!positions || positions.length === 0) return [];
 
-    const sorted = sortPositions(positions, sortState.field, sortState.direction);
+    // Sort positions based on current sort state
+    const sorted = sortPositions(
+      positions, 
+      sortState.field, 
+      sortState.direction
+    );
     
+    // Process each position with display-specific data
     return sorted.map(position => {
       const inverted = invertedPairs.has(position.pair);
       const adjusted = getAdjustedPosition(position, inverted);
@@ -52,12 +98,16 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
     });
   }, [positions, sortState.field, sortState.direction, invertedPairs]);
 
+  // Return empty state if no positions
   if (!positions || positions.length === 0) {
-    return <div className={styles.noData}>No positions found</div>;
+    return <NoPositions />;
   }
 
   return (
-    <div className={styles.positionsContainer}>
+    <div 
+      className={styles.positionsContainer}
+      aria-label="Positions list and details"
+    >
       <PositionsTable
         positions={processedPositions}
         showWallet={showWallet}
@@ -66,21 +116,21 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
         onSort={handleSort}
         isInverted={isInverted}
         onPairInversion={handlePairInversion}
-        onShare={(position) => setSelectedState(prev => ({ ...prev, position }))}
+        onShare={handleShowCard}
         onShowChart={handleShowChart}
       />
 
       {selectedState.position && (
         <PnLCard
           position={selectedState.position}
-          onClose={() => setSelectedState(prev => ({ ...prev, position: null }))}
+          onClose={handleCloseCard}
         />
       )}
 
       {selectedState.chartPosition && (
         <PositionChart
           positionHistory={selectedState.chartPosition.history}
-          onClose={() => setSelectedState(prev => ({ ...prev, chartPosition: null }))}
+          onClose={handleCloseChart}
         />
       )}
     </div>
