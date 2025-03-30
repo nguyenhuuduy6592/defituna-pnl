@@ -116,7 +116,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 | PnLDisplay.js | 🟢 Completed | Simplified component, extracted sub-components, added error handling |
 | TotalPnLDisplay.js | 🟢 Completed | New component for displaying PnL summary with dedicated styles |
 | DonationFooter.js | 🟢 Completed | New component for donation section with dedicated styles |
-| PositionChart.js | 🔴 Not Started | Chart visualization component |
+| PositionChart.js | 🟢 Completed | Refactored structure, improved calculations, moved formatting/tooltip to utils |
 | WalletForm.js | 🔴 Not Started | Wallet input and validation |
 | AutoRefresh.js | 🔴 Not Started | Auto-refresh functionality |
 | PnLCard.js | 🔴 Not Started | PnL display card component |
@@ -131,7 +131,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 | PnLDisplay.module.scss | 🟢 Completed | Simplified and organized styles with proper SASS variables |
 | TotalPnLDisplay.module.scss | 🟢 Completed | New styles for PnL display header with proper structure |
 | DonationFooter.module.scss | 🟢 Completed | New styles for donation section with improved hover effects |
-| PositionChart.module.scss | 🔴 Not Started | Chart styles |
+| PositionChart.module.scss | 🟢 Completed | Cleaned up styles, used SASS functions consistently |
 | WalletForm.module.scss | 🔴 Not Started | Form styles |
 | AutoRefresh.module.scss | 🔴 Not Started | Refresh component styles |
 | PnLCard.module.scss | 🔴 Not Started | Card component styles |
@@ -164,7 +164,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 | pairUtils.js | 🔴 Not Started | Token pair utilities |
 | formatters.js | 🟢 Completed | Refactored number, value, duration, and address formatters |
 | constants.js | 🔴 Not Started | Global constants |
-| chart.js | 🔴 Not Started | Chart utilities |
+| chart.js | 🟢 Completed | Added chart-specific formatters and tooltip component logic |
 | export.js | 🔴 Not Started | Data export functions |
 | styles.js | 🔴 Not Started | Style utilities |
 
