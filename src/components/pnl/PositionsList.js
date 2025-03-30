@@ -3,15 +3,17 @@ import styles from './PositionsList.module.scss';
 import { PnLCard } from './PnLCard';
 import { PositionChart } from './PositionChart';
 import { PositionsTable } from './PositionsTable';
-import { useHistoricalData } from '../../hooks/useHistoricalData';
+import { 
+  useHistoricalData, 
+  useSortState, 
+  useInvertedPairs 
+} from '../../hooks';
 import { 
   calculatePnlPercentage, 
   calculateStatus, 
   getAdjustedPosition, 
   sortPositions 
 } from '../../utils';
-import { useSortState } from '../../hooks/useSortState';
-import { useInvertedPairs } from '../../hooks/useInvertedPairs';
 
 export const PositionsList = memo(({ positions, showWallet = false, historyEnabled }) => {
   // Custom hooks
