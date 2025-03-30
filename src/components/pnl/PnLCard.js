@@ -179,12 +179,12 @@ export const PnLCard = ({ position, onClose }) => {
               <dl className={styles.stats}>
                 <StatRow 
                   icon={BsClock}
-                  label="Time in Position"
+                  label="Position Age"
                   value={formatDuration(position.age)}
                 />
                 <StatRow 
                   icon={BsCurrencyDollar}
-                  label="Fee Yield"
+                  label="Yield"
                   value={`$${formatNumber(position.yield.usd)}`}
                   valueClass={yieldValueClass}
                 />
