@@ -52,7 +52,7 @@ export async function fetchTokenData(mintAddress) {
   }
 }
 
-export async function processPositionsData(positionsData, ages) {
+export async function processPositionsData(positionsData) {
   try {
     // 1. Fetch market data (shared among all positions)
     const marketData = await fetchMarketData();
@@ -112,7 +112,6 @@ export async function processPositionsData(positionsData, ages) {
         walletAddress: position.authority,
         positionAddress: position.address,
         state: position.state,
-        age: ages[index],
       };
     }).filter(Boolean); // Remove any null entries from failed processing
   } catch (error) {

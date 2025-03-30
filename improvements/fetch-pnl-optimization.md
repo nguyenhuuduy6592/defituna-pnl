@@ -35,16 +35,16 @@ Benefits:
 - Better performance on slower connections
 
 ### 3. Split Position Age API
-Status: 🔴 Not Started
-- [ ] Create new `/api/fetch-position-age` endpoint
-- [ ] Remove age data from main `/api/fetch-pnl` endpoint
-- [ ] Implement client-side age calculation during auto-refresh
-- [ ] Add age data caching strategy
+Status: 🟢 Completed
+- [x] Create new `/api/fetch-position-age` endpoint (returns creation timestamps)
+- [x] Remove age data from main `/api/fetch-pnl` endpoint
+- [x] Implement client-side age calculation during auto-refresh (using fetched timestamps)
+- [ ] Add age data caching strategy (Handled by Helius util cache for now)
 - [ ] Handle edge cases:
-  - [ ] New positions during auto-refresh
-  - [ ] Page reload during auto-refresh
-  - [ ] Browser tab sleep/wake
-  - [ ] Multiple wallets with different load times
+  - [x] New positions during auto-refresh (Handled: New age fetched on next manual refresh/load)
+  - [x] Page reload during auto-refresh (Handled: Fetches both PnL and ages on reload)
+  - [x] Browser tab sleep/wake (Handled: `setInterval` resumes, age calculation updates)
+  - [x] Multiple wallets with different load times (Handled: Ages fetched after all PnL data aggregates)
 
 Benefits:
 - Faster initial position data loading

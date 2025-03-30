@@ -4,6 +4,7 @@ import { showNotification } from '../../utils/notifications';
 import { formatValue, formatWalletAddress } from '../../utils/formatters';
 import { getValueClass } from '../../utils/positionUtils';
 import { LoadingOverlay } from '../common/LoadingOverlay';
+import { useMemo, useState, useEffect } from 'react';
 
 // Default structure when data is not yet available
 const defaultData = {
@@ -12,7 +13,7 @@ const defaultData = {
   walletCount: 0,
 };
 
-export const PnLDisplay = ({ data, historyEnabled, loading }) => {
+export const PnLDisplay = ({ data, positionTimestamps, historyEnabled, loading }) => {
   const handleCopyAddress = () => {
     const address = process.env.NEXT_PUBLIC_DONATION_WALLET;
     navigator.clipboard.writeText(address);
@@ -21,6 +22,32 @@ export const PnLDisplay = ({ data, historyEnabled, loading }) => {
 
   // Use provided data or default data
   const displayData = data || defaultData;
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+
+  // Update current time every second for live age calculation
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Merge ages into positions, calculating duration on the fly
+  const positionsWithAge = useMemo(() => {
+    if (!displayData.positions) return [];
+    const nowSeconds = Math.floor(currentTime / 1000);
+    return displayData.positions.map(pos => {
+      const creationTimestamp = positionTimestamps[pos.positionAddress];
+      let ageSeconds = null; 
+      if (typeof creationTimestamp === 'number' && creationTimestamp > 0) {
+        ageSeconds = nowSeconds - creationTimestamp;
+      }
+      return {
+        ...pos,
+        age: ageSeconds // Pass calculated duration (or null)
+      };
+    });
+  }, [displayData.positions, positionTimestamps, currentTime]);
 
   return (
     <LoadingOverlay loading={loading}>
@@ -39,7 +66,7 @@ export const PnLDisplay = ({ data, historyEnabled, loading }) => {
         </div>
         
         <PositionsList 
-          positions={displayData.positions} 
+          positions={positionsWithAge}
           showWallet={true}
           historyEnabled={historyEnabled}
         />

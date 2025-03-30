@@ -3,7 +3,7 @@ const MAX_RETRIES = 5;
 const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes cache
 
 // Enhanced cache with timestamps
-const ageCache = new Map();
+const timestampCache = new Map();
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -69,17 +69,16 @@ export async function getTransactionAge(address) {
   }
 
   // Check cache first
-  if (ageCache.has(address)) {
-    const cached = ageCache.get(address);
-    if (Date.now() - cached.timestamp < CACHE_DURATION) {
-      return cached.age;
+  if (timestampCache.has(address)) {
+    const cached = timestampCache.get(address);
+    if (Date.now() - cached.fetchTime < CACHE_DURATION) {
+      return cached.creationTimestamp;
     }
-
-    ageCache.delete(address);
+    timestampCache.delete(address);
   }
 
   try {
-    const getAge = async () => {
+    const getTimestamp = async () => {
       const signaturesResponse = await fetchWithRetry({
         jsonrpc: '2.0',
         id: 1,
@@ -114,25 +113,27 @@ export async function getTransactionAge(address) {
         ]
       });
 
-      // txResponse is already JSON, no need to parse
       const { result: txResult } = txResponse;
-      if (!txResult || !txResult.blockTime) {
-        console.error('[getTransactionAge] Transaction details not found:', txResponse);
-        throw new Error('Transaction details not found');
+      if (!txResult || typeof txResult.blockTime !== 'number') {
+        console.error('[getTransactionAge] Transaction blockTime not found or invalid:', txResponse);
+        throw new Error('Transaction blockTime not found or invalid');
       }
 
-      const now = Math.floor(Date.now() / 1000);
-      const age = now - txResult.blockTime;
+      const creationTimestamp = txResult.blockTime;
       
-      // Cache the result with timestamp
-      ageCache.set(address, { age, timestamp: Date.now() });
-      return age;
+      // Cache the timestamp result with fetch timestamp
+      timestampCache.set(address, { 
+        creationTimestamp: creationTimestamp, 
+        fetchTime: Date.now() 
+      });
+      
+      return creationTimestamp;
     };
 
-    return await getAge();
+    return await getTimestamp();
   } catch (error) {
-    console.error('[getTransactionAge] Error:', error);
-    console.error('[getTransactionAge] Stack:', error.stack);
+    console.error(`[getTransactionAge] Error fetching age for ${address}:`, error);
+    timestampCache.set(address, { creationTimestamp: 0, fetchTime: Date.now() });
     return 0;
   }
 }
