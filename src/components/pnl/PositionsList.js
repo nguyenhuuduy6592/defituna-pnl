@@ -141,6 +141,7 @@ export const PositionsList = memo(({
 
       {selectedState.chartPosition && (
         <PositionChart
+          position={selectedState.chartPosition}
           positionHistory={selectedState.chartPosition.history}
           onClose={handleCloseChart}
         />

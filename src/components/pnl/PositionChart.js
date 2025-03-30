@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo } from 'react';
+import { useState, useEffect, useCallback, memo, useRef } from 'react';
 import {
   LineChart,
   Line,
@@ -13,7 +13,9 @@ import {
 import { Portal } from '../common/Portal';
 import { Tooltip } from '../common/Tooltip';
 import { BsInfoCircle } from 'react-icons/bs';
+import { HiDownload, HiShare } from 'react-icons/hi';
 import { prepareChartData, groupChartData, formatXAxisLabel, CustomChartTooltip, formatNumber, TIME_PERIODS } from '../../utils';
+import { exportCardAsImage, shareCard } from '../../utils/export';
 import styles from './PositionChart.module.scss';
 
 // --- Constants ---
@@ -23,42 +25,70 @@ const Y_AXIS_DOMAIN_PADDING_FACTOR = 0.1;
 /**
  * Chart header component with title, info tooltip and controls
  */
-const ChartHeader = memo(({ activePeriod, setActivePeriod, onClose }) => (
-  <div className={styles.chartHeader}>
-    <h3 className={styles.title}>
-      Position History
-      <Tooltip content={`• Shows PnL ($) and Yield ($) changes over time.
+const ChartHeader = memo(({ position, activePeriod, setActivePeriod, onClose, onExport, onShare, forExport = false }) => {
+  // Use position.pairDisplay if available, otherwise fall back to position.pair
+  const displayPair = position?.pairDisplay || position?.pair || "Position";
+  
+  return (
+    <div className={styles.chartHeader}>
+      <h3 className={styles.title}>
+        {displayPair} History
+        {!forExport && (
+          <Tooltip content={`• Shows PnL ($) and Yield ($) changes over time.
 • Historical data is stored locally in your browser.
 • Limited to 30 days of history.
 • Enable "Store History" to collect data.`} position="bottom-center">
-        <span className={styles.infoIcon}>
-          <BsInfoCircle />
-        </span>
-      </Tooltip>
-    </h3>
-    <div className={styles.controls}>
-      <select 
-        value={activePeriod}
-        onChange={(e) => setActivePeriod(e.target.value)}
-        className={styles.periodSelect}
-        aria-label="Select time period"
-        title="Select time period for chart data aggregation"
-      >
-        {Object.entries(TIME_PERIODS).map(([key, { value, label }]) => (
-          <option key={key} value={value}>{label}</option>
-        ))}
-      </select>
-      <button 
-        className={styles.closeButton}
-        onClick={onClose}
-        aria-label="Close chart"
-        title="Close chart view"
-      >
-        ✕
-      </button>
+            <span className={styles.infoIcon}>
+              <BsInfoCircle />
+            </span>
+          </Tooltip>
+        )}
+      </h3>
+      {!forExport && (
+        <div className={styles.controls}>
+          <select 
+            value={activePeriod}
+            onChange={(e) => setActivePeriod(e.target.value)}
+            className={styles.periodSelect}
+            aria-label="Select time period"
+            title="Select time period for chart data aggregation"
+          >
+            {Object.entries(TIME_PERIODS).map(([key, { value, label }]) => (
+              <option key={key} value={value}>{label}</option>
+            ))}
+          </select>
+          
+          <button 
+            className={styles.exportButton}
+            onClick={onExport}
+            aria-label={`Download ${displayPair} chart as PNG`}
+            title="Download chart as PNG image"
+          >
+            <HiDownload className={styles.buttonIcon} />
+          </button>
+          
+          <button 
+            className={styles.shareButton}
+            onClick={onShare}
+            aria-label={`Share ${displayPair} chart`}
+            title="Share chart"
+          >
+            <HiShare className={styles.buttonIcon} />
+          </button>
+          
+          <button 
+            className={styles.closeButton}
+            onClick={onClose}
+            aria-label="Close chart"
+            title="Close chart view"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
-  </div>
-));
+  );
+});
 
 ChartHeader.displayName = 'ChartHeader';
 
@@ -172,17 +202,22 @@ ChartContent.displayName = 'ChartContent';
  * A modal component displaying a historical performance chart for a position.
  * 
  * @param {object} props - Component props.
+ * @param {object} props.position - The position data with pair name.
  * @param {Array<object>} props.positionHistory - Array of historical data points for the position.
  * @param {Function} props.onClose - Callback function to close the chart modal.
  * @returns {JSX.Element|null} The rendered component.
  */
-const PositionChart = memo(function PositionChart({ positionHistory, onClose }) {
+const PositionChart = memo(function PositionChart({ position, positionHistory, onClose }) {
   const [chartData, setChartData] = useState([]);
   const [activePeriod, setActivePeriod] = useState(TIME_PERIODS.MINUTE_5.value);
   const [activeMetrics, setActiveMetrics] = useState({
     pnl: true,
     yield: true
   });
+  
+  const chartContainerRef = useRef(null);
+  const chartContentRef = useRef(null);
+  const exportWrapperRef = useRef(null);
 
   useEffect(() => {
     if (!positionHistory || positionHistory.length === 0) {
@@ -218,25 +253,64 @@ const PositionChart = memo(function PositionChart({ positionHistory, onClose }) 
       onClose();
     }
   }, [onClose]);
+  
+  // Handle export button click
+  const handleExport = useCallback(() => {
+    // Use position.pairDisplay if available, otherwise fall back to position.pair
+    const displayPair = position?.pairDisplay || position?.pair || "position";
+    exportCardAsImage(exportWrapperRef, `${displayPair}-chart-${Date.now()}.png`);
+  }, [position]);
+
+  // Handle share button click
+  const handleShare = useCallback(() => {
+    // Use position.pairDisplay if available, otherwise fall back to position.pair
+    const displayPair = position?.pairDisplay || position?.pair || "position";
+    shareCard(
+      chartContainerRef,
+      `${displayPair}-chart.png`,
+      `${displayPair} Performance Chart`,
+      `Check out my ${displayPair} position performance on DeFiTuna!`
+    );
+  }, [position]);
 
   if (!positionHistory) return null;
 
   return (
     <Portal>
       <div className={styles.chartOverlay} onClick={handleOverlayClick}>
-        <div className={styles.chartContainer} onClick={e => e.stopPropagation()}>
+        <div className={styles.chartContainer} onClick={e => e.stopPropagation()} ref={chartContainerRef}>
           <ChartHeader 
+            position={position}
             activePeriod={activePeriod}
             setActivePeriod={setActivePeriod}
             onClose={onClose}
+            onExport={handleExport}
+            onShare={handleShare}
           />
 
-          <div className={styles.chartContent}>
+          <div className={styles.chartContent} ref={chartContentRef}>
             <ChartContent 
               chartData={chartData}
               activeMetrics={activeMetrics}
               activePeriod={activePeriod}
             />
+          </div>
+          
+          {/* Hidden wrapper for export that includes pair title */}
+          <div className={styles.exportWrapper} ref={exportWrapperRef} data-export-content>
+            <ChartHeader 
+              position={position}
+              activePeriod={activePeriod}
+              setActivePeriod={setActivePeriod}
+              forExport={true}
+            />
+            <div className={styles.chartExportContent}>
+              <ChartContent 
+                chartData={chartData}
+                activeMetrics={activeMetrics}
+                activePeriod={activePeriod}
+              />
+            </div>
           </div>
         </div>
       </div>
