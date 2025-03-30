@@ -11,7 +11,7 @@ import { useDebounceApi } from '../hooks/useDebounceApi';
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
-import { addWalletAddressToPositions } from '../utils/positionUtils';
+import { addWalletAddressToPositions, decodePositions, decodeValue } from '../utils/positionUtils';
 import styles from './index.module.scss';
 
 export default () => {
@@ -67,7 +67,18 @@ export default () => {
       
       const data = await res.json();
       
-      // Add the wallet address to each position since it was removed from server response
+      // Decode the total PnL value (using same USD_MULTIPLIER = 100)
+      if (data.t_pnl !== undefined) {
+        data.totalPnL = decodeValue(data.t_pnl, 100);
+        delete data.t_pnl; // Remove the encoded field
+      }
+      
+      // First decode the numeric encoded values in positions
+      if (data && data.positions) {
+        data.positions = decodePositions(data.positions);
+      }
+      
+      // Then add the wallet address to each position (was removed from server response)
       if (data && data.positions) {
         data.positions = addWalletAddressToPositions(data.positions, walletAddress);
       }

@@ -87,4 +87,90 @@ export function addWalletAddressToPositions(positions, walletAddress) {
     ...position,
     walletAddress
   }));
+}
+
+// --- Value Decoding Constants ---
+const USD_MULTIPLIER = 100;       // Convert cents back to dollars (2 decimal places)
+const PRICE_MULTIPLIER = 1000000; // 6 decimal places for prices
+const LEVERAGE_MULTIPLIER = 100;  // 2 decimal places for leverage
+
+/**
+ * Decodes an encoded numeric value back to its original decimal form
+ * @param {number|null} value - The encoded integer value 
+ * @param {number} multiplier - The multiplier used for encoding
+ * @return {number|null} The decoded decimal value
+ */
+export function decodeValue(value, multiplier) {
+  if (value === null || value === undefined) return null;
+  return value / multiplier;
+}
+
+/**
+ * Decodes a position object with encoded values into client-ready object
+ * @param {Object} position - The position with encoded values
+ * @return {Object} Position with decoded values
+ */
+export function decodePosition(position) {
+  if (!position) return null;
+  
+  return {
+    positionAddress: position.p_addr,
+    state: position.state,
+    pair: position.pair,
+    
+    // Decode price data
+    currentPrice: decodeValue(position.c_price, PRICE_MULTIPLIER),
+    entryPrice: decodeValue(position.e_price, PRICE_MULTIPLIER),
+    rangePrices: {
+      lower: decodeValue(position.r_prices?.l, PRICE_MULTIPLIER),
+      upper: decodeValue(position.r_prices?.u, PRICE_MULTIPLIER)
+    },
+    
+    // Decode liquidation and limit prices
+    liquidationPrice: {
+      lower: decodeValue(position.liq_price?.l, PRICE_MULTIPLIER),
+      upper: decodeValue(position.liq_price?.u, PRICE_MULTIPLIER)
+    },
+    limitOrderPrices: {
+      lower: decodeValue(position.lim_prices?.l, PRICE_MULTIPLIER),
+      upper: decodeValue(position.lim_prices?.u, PRICE_MULTIPLIER)
+    },
+    
+    // Decode position data
+    leverage: decodeValue(position.lev, LEVERAGE_MULTIPLIER),
+    size: decodeValue(position.sz, USD_MULTIPLIER),
+    
+    // Decode financial metrics
+    pnl: {
+      usd: decodeValue(position.pnl?.u, USD_MULTIPLIER),
+      bps: position.pnl?.b // bps was not encoded
+    },
+    yield: {
+      usd: decodeValue(position.yld?.u, USD_MULTIPLIER)
+    },
+    compounded: {
+      usd: decodeValue(position.cmp?.u, USD_MULTIPLIER)
+    },
+    
+    // Decode display amounts
+    collateral: {
+      usd: decodeValue(position.col?.u, USD_MULTIPLIER)
+    },
+    debt: {
+      usd: decodeValue(position.dbt?.u, USD_MULTIPLIER)
+    },
+    interest: {
+      usd: decodeValue(position.int?.u, USD_MULTIPLIER)
+    }
+  };
+}
+
+/**
+ * Decodes an array of positions with encoded values into client-ready objects
+ * @param {Array} positions - Array of positions with encoded values
+ * @return {Array} Array of positions with decoded values
+ */
+export function decodePositions(positions) {
+  if (!positions || !Array.isArray(positions)) return [];
+  return positions.map(position => decodePosition(position));
 } 
