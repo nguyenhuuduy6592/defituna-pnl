@@ -43,7 +43,7 @@ const PnLDisplay = ({ value, valueClass, displayPnlPercentage }) => {
       <span className={styles.label}>PnL</span>
       <span className={styles.value}>
         <BsCurrencyDollar className={styles.currencyIcon} />
-        ${formatNumber(value)}
+        {formatNumber(value)}
         {percentageDisplay}
       </span>
     </div>
