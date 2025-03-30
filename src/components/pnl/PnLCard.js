@@ -6,6 +6,7 @@ import { Portal } from '../common/Portal';
 import styles from './PnLCard.module.scss';
 import { formatNumber, formatDuration } from '../../utils/formatters';
 import { getValueClass } from '../../utils/styles';
+import { getStateClass } from '../../utils/positionUtils';
 import { exportCardAsImage, shareCard } from '../../utils/export';
 
 /**
@@ -46,6 +47,19 @@ const PnLDisplay = ({ value, valueClass, displayPnlPercentage }) => {
         {formatNumber(value)}
         {percentageDisplay}
       </span>
+    </div>
+  );
+};
+
+/**
+ * Renders the position status display
+ */
+const StatusDisplay = ({ status }) => {
+  const stateClass = getStateClass(status);
+  
+  return (
+    <div className={`${styles.statusBadge} ${styles[stateClass]}`}>
+      {status}
     </div>
   );
 };
@@ -152,6 +166,8 @@ export const PnLCard = ({ position, onClose }) => {
 
           <div className={styles.cardContent} ref={exportContentRef} data-export-content>
             <h3 className={styles.pairTitle}>{displayPair}</h3>
+            
+            <StatusDisplay status={position.displayStatus} />
             
             <div className={styles.mainInfo}>
               <PnLDisplay 

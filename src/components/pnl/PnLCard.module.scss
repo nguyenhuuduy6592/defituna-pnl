@@ -258,6 +258,47 @@
   }
 }
 
+.statusBadge {
+  font-weight: 700;
+  text-align: center;
+  padding: variables.spacing(xs) variables.spacing(sm);
+  border-radius: 8px;
+  width: max-content;
+  margin: 0 auto;
+  font-size: variables.font-size(sm);
+}
+
+// Status classes - match PositionsTable styles
+.stateInRange {
+  color: variables.bg-color(white);
+  background: variables.color(success);
+}
+
+.stateWarning {
+  color: variables.bg-color(white);
+  background: variables.color(warning);
+}
+
+.stateClosed {
+  color: variables.bg-color(white);
+  background: variables.color(negative);
+}
+
+.stateLiquidated {
+  color: variables.bg-color(white);
+  background: variables.color(negative);
+}
+
+.stateOpenUnknown {
+  color: variables.bg-color(white);
+  background: variables.color(info);
+}
+
+.stateOpen {
+  color: variables.color(success);
+  background: rgba(variables.color(success), 0.1);
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

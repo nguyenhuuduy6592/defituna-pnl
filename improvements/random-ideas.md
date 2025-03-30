@@ -8,3 +8,4 @@
 8. Fix export pnl card.
 9. ✓ Add Total yield card - DONE
 10. Add chart for total values
+11. Add position status into the PnL card
