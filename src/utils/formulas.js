@@ -64,10 +64,8 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
     const lowerLimitOrderPrice = tickToPrice(position.tick_stop_loss_index, tokenADecimals, tokenBDecimals);
     const upperLimitOrderPrice = tickToPrice(position.tick_take_profit_index, tokenADecimals, tokenBDecimals);
 
-    // Calculate leverage and status
+    // Calculate leverage
     const leverage = calculateLeverage({ price: currentPrice, debtA, debtB, totalA, totalB });
-    const isInRange = checkInRange(pool.tick_current_index, position.tick_lower_index, position.tick_upper_index);
-    const status = position.state === "open" ? (isInRange ? "In range" : "Out of range") : "Closed";
 
     // Calculate size and collateral
     const size = position.total_a.usd + position.total_b.usd;
@@ -119,12 +117,11 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
     // Calculate PnL
     const pnl = {
         usd: position.pnl_usd.amount,
-        percentage: position.pnl_usd.bps / 100
+        bps: position.pnl_usd.bps
     };
 
     return {
         leverage: leverage,
-        status,
         size: size,
         collateral,
         debt,
@@ -145,6 +142,6 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
             lower: lowerRangePrice,
             upper: upperRangePrice
         },
-        pnl
+        pnl,
     };
 }

@@ -6,7 +6,7 @@ import { ClusterBar } from './ClusterBar';
 import { PriceBar } from './PriceBar';
 import { useHistoricalData } from '../../hooks/useHistoricalData';
 import { formatNumber, formatDuration, formatWalletAddress } from '../../utils/formatters';
-import { getValueClass, getStateClass } from '../../utils/positionUtils';
+import { getValueClass, getStateClass, calculatePnlPercentage, calculateStatus } from '../../utils/positionUtils';
 import { invertPairString, getAdjustedPosition } from '../../utils/pairUtils';
 import { copyToClipboard } from '../../utils/notifications';
 
@@ -55,26 +55,31 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
     }
   };
   
-  const sortedPositions = useMemo(() => {
+  // Apply position adjustments and client-side formatting
+  const processedPositions = useMemo(() => {
     if (!positions) return [];
-    
-    return [...positions].sort((a, b) => {
+
+    // First, sort the positions
+    const sorted = [...positions].sort((a, b) => {
       let aValue = a[sortField];
       let bValue = b[sortField];
       
       // Special handling for nested objects
-      if (sortField === 'priceRange') {
-        aValue = a.priceRange.lower;
-        bValue = b.priceRange.lower;
-      } else if (sortField === 'pnl') {
+      if (sortField === 'pnl') {
         aValue = a.pnl.usd;
         bValue = b.pnl.usd;
       } else if (sortField === 'yield') {
         aValue = a.yield.usd;
         bValue = b.yield.usd;
+      } else if (sortField === 'status') {
+        // Calculate status for sorting comparison
+        const aStatus = calculateStatus(a);
+        const bStatus = calculateStatus(b);
+        aValue = aStatus;
+        bValue = bStatus;
       }
       
-      // Special handling for string fields
+      // String comparison (including calculated status)
       if (['pair', 'state', 'walletAddress', 'status'].includes(sortField)) {
         aValue = String(aValue || '');
         bValue = String(bValue || '');
@@ -83,21 +88,37 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
           : bValue.localeCompare(aValue);
       }
       
-      // Special handling for age field
+      // Age comparison
       if (sortField === 'age') {
+        // Handle null/undefined ages during sort
+        aValue = a.age ?? (sortDirection === 'asc' ? Infinity : -Infinity);
+        bValue = b.age ?? (sortDirection === 'asc' ? Infinity : -Infinity);
         return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
       }
       
-      // Numeric fields
+      // Default numeric fields
+      aValue = Number(aValue || 0);
+      bValue = Number(bValue || 0);
       return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
     });
-  }, [positions, sortField, sortDirection]);
 
-  // Apply position adjustments for inverted pairs
-  const adjustedPositions = useMemo(() => {
-    return sortedPositions.map(position => getAdjustedPosition(position, isInverted(position.pair)));
-  }, [sortedPositions, invertedPairs]);
-  
+    // Then, apply adjustments and final formatting for display
+    return sorted.map(position => {
+      const inverted = isInverted(position.pair);
+      const adjusted = getAdjustedPosition(position, inverted);
+      
+      // Calculate display values
+      const displayStatus = calculateStatus(position);
+      const displayPnlPercentage = calculatePnlPercentage(position.pnl?.bps);
+
+      return {
+        ...adjusted, // Contains adjusted prices etc.
+        displayStatus, // Add calculated status for display
+        displayPnlPercentage, // Add calculated percentage for display
+      };
+    });
+  }, [positions, sortField, sortDirection, invertedPairs]);
+
   const getSortIcon = (field) => {
     if (positions.length <= 1) return null;
     if (field !== sortField) return '↕';
@@ -149,7 +170,7 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
           </tr>
         </thead>
         <tbody>
-          {adjustedPositions.map((p, i) => (
+          {processedPositions.map((p, i) => (
             <tr key={`${p.pair}-${p.positionAddress}-${i}`}>
               <td>
                 <span 
@@ -180,9 +201,12 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
                   {formatWalletAddress(p.walletAddress)}
                 </td>
               )}
-              <td className={styles[getStateClass(p.status)]}>{p.status}</td>
+              <td className={styles[getStateClass(p.displayStatus)]}>{p.displayStatus}</td>
               <td>{formatDuration(p.age)}</td>
-              <td className={styles[getValueClass(p.pnl.usd)]}>${formatNumber(p.pnl.usd)} <span className={styles.positionPnlPercentage}>({p.pnl.percentage}%)</span></td>
+              <td className={styles[getValueClass(p.pnl.usd)]}>
+                ${formatNumber(p.pnl.usd)} 
+                <span className={styles.positionPnlPercentage}>({p.displayPnlPercentage}%)</span>
+              </td>
               <td className={styles[getValueClass(p.yield.usd)]}>${formatNumber(p.yield.usd)}</td>
               <td>
                 <ClusterBar
