@@ -95,7 +95,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 
 ### Priority Components
 1. `PositionsList.js` ✅ - Split into smaller components, added custom hooks
-2. `PnLDisplay.js` 🔴 - Likely contains financial display logic
+2. `PnLDisplay.js` ✅ - Split into smaller components, improved error handling
 3. Core utility files (`positionUtils.js`, `formatters.js`) 🟡 - Partially refactored
 4. Higher-order components and context providers 🔴
 5. Shared UI components 🟡 - Table components completed
@@ -113,7 +113,9 @@ This plan outlines a systematic approach to improve code readability and maintai
 |----------------|--------|-------|
 | PositionsList.js | 🟢 Completed | Extracted table component, reorganized structure, added custom hooks, removed unused imports |
 | PositionsTable.js | 🟢 Completed | New component with dedicated styles and proper CSS modules |
-| PnLDisplay.js | 🔴 Not Started | Contains financial display logic |
+| PnLDisplay.js | 🟢 Completed | Simplified component, extracted sub-components, added error handling |
+| TotalPnLDisplay.js | 🟢 Completed | New component for displaying PnL summary with dedicated styles |
+| DonationFooter.js | 🟢 Completed | New component for donation section with dedicated styles |
 | PositionChart.js | 🔴 Not Started | Chart visualization component |
 | WalletForm.js | 🔴 Not Started | Wallet input and validation |
 | AutoRefresh.js | 🔴 Not Started | Auto-refresh functionality |
@@ -126,7 +128,9 @@ This plan outlines a systematic approach to improve code readability and maintai
 |----------------|--------|-------|
 | PositionsTable.module.scss | 🟢 Completed | Dedicated styles with proper scoping and SASS variables |
 | PositionsList.module.scss | 🟢 Completed | Cleaned up and removed duplicate styles |
-| PnLDisplay.module.scss | 🔴 Not Started | PnL display styles |
+| PnLDisplay.module.scss | 🟢 Completed | Simplified and organized styles with proper SASS variables |
+| TotalPnLDisplay.module.scss | 🟢 Completed | New styles for PnL display header with proper structure |
+| DonationFooter.module.scss | 🟢 Completed | New styles for donation section with improved hover effects |
 | PositionChart.module.scss | 🔴 Not Started | Chart styles |
 | WalletForm.module.scss | 🔴 Not Started | Form styles |
 | AutoRefresh.module.scss | 🔴 Not Started | Refresh component styles |
@@ -139,6 +143,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 |----------------|--------|-------|
 | useSortState.js | 🟢 Completed | New hook for sort state management |
 | useInvertedPairs.js | 🟢 Completed | New hook for inverted pairs management |
+| usePositionAges.js | 🟢 Completed | New hook for calculating position ages with error handling |
 | useWallet.js | 🔴 Not Started | Wallet management hook |
 | useDebounceApi.js | 🔴 Not Started | API call debouncing |
 | useHistoricalData.js | 🔴 Not Started | Historical data management |

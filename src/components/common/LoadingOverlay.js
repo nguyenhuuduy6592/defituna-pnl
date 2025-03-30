@@ -7,11 +7,11 @@ import styles from './LoadingOverlay.module.scss';
  */
 export const LoadingOverlay = ({ loading, children, message = 'Refreshing...' }) => {
   return (
-    <div className={styles.container}>
+    <div className={styles.loadingContainer}>
       {children} {/* Render children normally */}
       {/* Render overlay conditionally based on loading state */}
       <div 
-        className={`${styles.overlay} ${!loading ? styles.overlayHidden : ''}`}
+        className={`${styles.loadingOverlay} ${!loading ? styles.loadingOverlayHidden : ''}`}
         aria-hidden={!loading} // Accessibility
         aria-live="polite" // Announce changes for screen readers
       >
