@@ -7,26 +7,24 @@ import { formatValue, getValueClass } from '../../utils';
  * 
  * @param {Object} props Component props
  * @param {number} props.totalPnL Total PnL value
- * @param {number} props.walletCount Number of wallets
  * @returns {JSX.Element} Rendered component
  */
-export const TotalPnLDisplay = ({ totalPnL = 0, walletCount = 0 }) => {
+export const TotalPnLDisplay = ({ label, totalValue }) => {
   // Ensure we have numeric values
-  const safeTotalPnL = typeof totalPnL === 'number' ? totalPnL : 0;
-  const safeWalletCount = typeof walletCount === 'number' ? walletCount : 0;
+  const safeTotalValue = typeof totalValue === 'number' ? totalValue : 0;
   
   // Memoize the formatted value and class to prevent unnecessary recalculations
   const { formattedValue, valueClass } = useMemo(() => ({
-    formattedValue: formatValue(safeTotalPnL),
-    valueClass: getValueClass(safeTotalPnL)
-  }), [safeTotalPnL]);
+    formattedValue: formatValue(safeTotalValue),
+    valueClass: getValueClass(safeTotalValue)
+  }), [safeTotalValue]);
   
   return (
     <div className={styles.pnlHeader}>
       <div className={styles.pnlGrid}>
         <div className={styles.pnlItem}>
           <div className={styles.label}>
-            Total PnL ({safeWalletCount} Wallets)
+            {label}
           </div>
           <div 
             className={`${styles.value} ${styles[valueClass]}`}

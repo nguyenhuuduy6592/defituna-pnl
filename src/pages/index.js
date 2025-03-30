@@ -28,6 +28,7 @@ export default () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
+  const [allPositionsHistory, setAllPositionsHistory] = useState([]);
 
   const {
     wallet,
@@ -44,7 +45,8 @@ export default () => {
   const {
     enabled: historyEnabled,
     toggleHistoryEnabled,
-    savePositionSnapshot
+    savePositionSnapshot,
+    getPositionHistory
   } = useHistoricalData();
 
   // Check if this is the first visit
@@ -246,6 +248,32 @@ export default () => {
     }
   }, [JSON.stringify(activeWallets), fetchPnLData, aggregatedData, loading, errorMessage]);
 
+  // Load all historical data
+  useEffect(() => {
+    if (historyEnabled && aggregatedData?.positions?.length > 0) {
+      const loadAllHistory = async () => {
+        try {
+          const allHistory = [];
+          
+          for (const position of aggregatedData.positions) {
+            if (position.positionAddress) {
+              const history = await getPositionHistory(position.positionAddress);
+              if (history && history.length > 0) {
+                allHistory.push(...history);
+              }
+            }
+          }
+          
+          setAllPositionsHistory(allHistory);
+        } catch (error) {
+          console.error('Error loading historical data:', error);
+        }
+      };
+      
+      loadAllHistory();
+    }
+  }, [historyEnabled, aggregatedData, getPositionHistory]);
+
   const handleSubmit = async e => {
     e.preventDefault();
     const walletsToSubmit = wallet ? [wallet] : activeWallets; 
@@ -334,6 +362,7 @@ export default () => {
           positionTimestamps={positionTimestamps}
           historyEnabled={historyEnabled}
           loading={loading}
+          positionsHistory={allPositionsHistory}
         />
       )}
 

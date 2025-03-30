@@ -27,7 +27,8 @@ export const PnLDisplay = ({
   data, 
   positionTimestamps, 
   historyEnabled = false, 
-  loading = false 
+  loading = false,
+  positionsHistory = []
 }) => {
   // Use provided data or default data
   const displayData = useMemo(() => {
@@ -46,17 +47,47 @@ export const PnLDisplay = ({
     positionTimestamps
   );
 
+  // Calculate total yield from all positions
+  const { totalYield, totalCompounded } = useMemo(() => {
+    if (!Array.isArray(displayData.positions) || displayData.positions.length === 0) {
+      return { totalYield: 0, totalCompounded: 0 };
+    }
+    
+    return displayData.positions.reduce((acc, position) => {
+      // Add position yield if available
+      if (position?.yield?.usd) {
+        acc.totalYield += position.yield.usd;
+      }
+      
+      // Add compounded amount if available
+      if (position?.compounded?.usd) {
+        acc.totalCompounded += position.compounded.usd;
+      }
+      
+      return acc;
+    }, { totalYield: 0, totalCompounded: 0 });
+  }, [displayData.positions]);
+
   // Only show donation footer if we have positions
   const showDonationFooter = displayData.positions.length > 0;
 
   return (
     <LoadingOverlay loading={loading}>
       <div className={styles.pnlContainer}>
-        <TotalPnLDisplay 
-          totalPnL={displayData.totalPnL} 
-          walletCount={displayData.walletCount} 
-        />
+        <div className={styles.cardRow}>
+          <TotalPnLDisplay
+            label="Total PnL"
+            totalValue={displayData.totalPnL} />
+          
+          <TotalPnLDisplay
+            label="Total Yield"
+            totalValue={totalYield} />
         
+          <TotalPnLDisplay
+            label="Total Compounded"
+            totalValue={totalCompounded} />
+        </div>
+
         <PositionsList 
           positions={positionsWithAge}
           showWallet={true}

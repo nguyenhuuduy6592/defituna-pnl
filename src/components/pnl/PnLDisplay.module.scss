@@ -13,4 +13,18 @@
   @include variables.responsive(md) {
     padding: variables.spacing(lg);
   }
+  .cardRow {
+    display: grid;
+    grid-template-columns: 1fr;
+    
+    @include variables.responsive(md) {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  }
+  
+  .valueCards {
+    display: flex;
+    flex-direction: column;
+    gap: variables.spacing(md);
+  }
 }
