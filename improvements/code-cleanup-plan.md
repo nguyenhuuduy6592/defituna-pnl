@@ -201,5 +201,6 @@ This plan outlines a systematic approach to improve code readability and maintai
 - [x] Priority components initial refactor
 - [x] Style organization completed
 - [x] No regressions in functionality
+- [ ] Enfore imported from index files instead of direct items under hooks and utils
 - [ ] Code review completed
-- [ ] Documentation updated 
+- [ ] Documentation updated
