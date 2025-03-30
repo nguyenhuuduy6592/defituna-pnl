@@ -205,7 +205,7 @@ export const PositionsList = memo(({ positions, showWallet = false, historyEnabl
               <td>{formatDuration(p.age)}</td>
               <td className={styles[getValueClass(p.pnl.usd)]}>
                 ${formatNumber(p.pnl.usd)} 
-                <span className={styles.positionPnlPercentage}>({p.displayPnlPercentage}%)</span>
+                <span className={styles.positionPnlPercentage}> ({p.displayPnlPercentage}%)</span>
               </td>
               <td className={styles[getValueClass(p.yield.usd)]}>${formatNumber(p.yield.usd)}</td>
               <td>
