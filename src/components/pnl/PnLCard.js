@@ -26,19 +26,29 @@ const StatRow = ({ icon: Icon, label, value, valueClass }) => (
 /**
  * Renders the main PnL value display
  */
-const PnLDisplay = ({ value, valueClass }) => (
-  <div 
-    className={`${styles.pnl} ${styles[valueClass]}`}
-    role="status"
-    aria-live="polite"
-  >
-    <span className={styles.label}>PnL</span>
-    <span className={styles.value}>
-      <BsCurrencyDollar className={styles.currencyIcon} />
-      {formatNumber(value)}
+const PnLDisplay = ({ value, valueClass, displayPnlPercentage }) => {
+  // Only hide percentage if it's invalid
+  const percentageDisplay = displayPnlPercentage != null ? (
+    <span className={styles.percentage}>
+      ({displayPnlPercentage}%)
     </span>
-  </div>
-);
+  ) : null;
+
+  return (
+    <div 
+      className={`${styles.pnl} ${styles[valueClass]}`}
+      role="status"
+      aria-live="polite"
+    >
+      <span className={styles.label}>PnL</span>
+      <span className={styles.value}>
+        <BsCurrencyDollar className={styles.currencyIcon} />
+        ${formatNumber(value)}
+        {percentageDisplay}
+      </span>
+    </div>
+  );
+};
 
 /**
  * Renders action buttons for the card
@@ -77,6 +87,9 @@ export const PnLCard = ({ position, onClose }) => {
   const closeButtonRef = useRef(null);
   const exportContentRef = useRef(null);
 
+  // Use position.pairDisplay if available, otherwise fall back to position.pair
+  const displayPair = position.pairDisplay || position.pair;
+
   // Handle escape key press
   useEffect(() => {
     closeButtonRef.current?.focus();
@@ -96,18 +109,18 @@ export const PnLCard = ({ position, onClose }) => {
 
   // Handle export button click
   const handleExport = useCallback(() => {
-    exportCardAsImage(exportContentRef, `${position.pair}-pnl-${Date.now()}.png`);
-  }, [position.pair, exportContentRef]);
+    exportCardAsImage(exportContentRef, `${displayPair}-pnl-${Date.now()}.png`);
+  }, [displayPair, exportContentRef]);
 
   // Handle share button click
   const handleShare = useCallback(() => {
     shareCard(
       cardRef,
-      `${position.pair}-pnl.png`,
-      `${position.pair} PnL Card`,
-      `Check out my ${position.pair} position on DeFiTuna!`
+      `${displayPair}-pnl.png`,
+      `${displayPair} PnL Card`,
+      `Check out my ${displayPair} position on DeFiTuna!`
     );
-  }, [position.pair, cardRef]);
+  }, [displayPair, cardRef]);
   
   // Get value classes for styling
   const pnlValueClass = getValueClass(position.pnl.usd);
@@ -138,12 +151,13 @@ export const PnLCard = ({ position, onClose }) => {
           </div>
 
           <div className={styles.cardContent} ref={exportContentRef} data-export-content>
-            <h3 className={styles.pairTitle}>{position.pair}</h3>
+            <h3 className={styles.pairTitle}>{displayPair}</h3>
             
             <div className={styles.mainInfo}>
               <PnLDisplay 
                 value={position.pnl.usd} 
                 valueClass={pnlValueClass} 
+                displayPnlPercentage={position.displayPnlPercentage}
               />
               
               <dl className={styles.stats}>
@@ -171,7 +185,7 @@ export const PnLCard = ({ position, onClose }) => {
           <CardActions 
             onExport={handleExport}
             onShare={handleShare}
-            pairName={position.pair}
+            pairName={displayPair}
           />
         </div>
       </div>

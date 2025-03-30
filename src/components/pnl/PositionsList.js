@@ -12,7 +12,8 @@ import {
   calculatePnlPercentage, 
   calculateStatus, 
   getAdjustedPosition, 
-  sortPositions 
+  sortPositions,
+  invertPairString
 } from '../../utils';
 
 /**
@@ -62,8 +63,19 @@ export const PositionsList = memo(({
 
   // Handler for showing the PnL card
   const handleShowCard = useCallback((position) => {
-    setSelectedState(prev => ({ ...prev, position }));
-  }, []);
+    // Make sure we show the pair in the same order as in the table
+    // If the pair is inverted in the table, use the inverted display
+    const isPairInverted = isInverted(position.pair);
+    const adjustedPosition = {
+      ...position,
+      // If we don't preserve the display format, the PnL card will show a different order
+      pairDisplay: isPairInverted ? invertPairString(position.pair) : position.pair,
+      // Make sure the displayPnlPercentage is passed correctly
+      displayPnlPercentage: position.displayPnlPercentage
+    };
+    
+    setSelectedState(prev => ({ ...prev, position: adjustedPosition }));
+  }, [isInverted]);
 
   // Handlers for closing modals
   const handleCloseCard = useCallback(() => {
