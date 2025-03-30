@@ -1,6 +1,22 @@
 import { processTunaPosition } from './formulas.js';
 
+// --- Simple In-Memory Cache with Different TTLs --- 
+const POOL_CACHE_TTL = 30 * 1000;       // 30 seconds for pool data (contains dynamic ticks)
+const MARKET_CACHE_TTL = 60 * 60 * 1000; // 1 hour for market data (changes infrequently)
+const TOKEN_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours for token data (extremely static)
+
+// Map cache structure: <key, {data: any, timestamp: number}>
+const marketCache = { data: null, timestamp: 0 };
+const poolCache = new Map();
+const tokenCache = new Map();
+
+function isCacheValid(timestamp, ttl) {
+  return Date.now() - timestamp < ttl;
+}
+// --- End Cache --- 
+
 export async function fetchPositions(wallet) {
+  // This data always needs to be fresh since it's the main position data
   const response = await fetch(`${process.env.DEFITUNA_API_URL}/users/${wallet}/tuna-positions`);
   if (!response.ok) {
     throw new Error(`Failed to fetch positions: ${response.status} ${response.statusText}`);
@@ -15,35 +31,64 @@ export async function fetchPositions(wallet) {
 }
 
 export async function fetchPoolData(poolAddress) {
+  // Pool data has a short TTL since it contains the dynamic tick_current_index
+  if (poolCache.has(poolAddress) && isCacheValid(poolCache.get(poolAddress).timestamp, POOL_CACHE_TTL)) {
+    // console.log(`Cache hit for pool: ${poolAddress}`);
+    return poolCache.get(poolAddress).data;
+  }
+  // console.log(`Cache miss for pool: ${poolAddress}`);
+
   const response = await fetch(`${process.env.DEFITUNA_API_URL}/pools/${poolAddress}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch pool data: ${response.status} ${response.statusText}`);
   }
-  return await response.json();
+  const data = await response.json();
+  poolCache.set(poolAddress, { data: data, timestamp: Date.now() });
+  return data;
 }
 
 export async function fetchMarketData() {
+  // Market data has a long TTL since it changes infrequently
+  if (marketCache.data && isCacheValid(marketCache.timestamp, MARKET_CACHE_TTL)) {
+    // console.log('Cache hit for market data');
+    return marketCache.data;
+  }
+  // console.log('Cache miss for market data');
+
   const response = await fetch(`${process.env.DEFITUNA_API_URL}/markets`);
   if (!response.ok) {
     throw new Error(`Failed to fetch market data: ${response.status} ${response.statusText}`);
   }
-  return await response.json();
+  const data = await response.json();
+  marketCache.data = data;
+  marketCache.timestamp = Date.now();
+  return data;
 }
 
 export async function fetchTokenData(mintAddress) {
+  // Token data is practically permanent
+  if (tokenCache.has(mintAddress) && isCacheValid(tokenCache.get(mintAddress).timestamp, TOKEN_CACHE_TTL)) {
+    // console.log(`Cache hit for token: ${mintAddress}`);
+    return tokenCache.get(mintAddress).data;
+  }
+  // console.log(`Cache miss for token: ${mintAddress}`);
+
   try {
     const response = await fetch(`${process.env.DEFITUNA_API_URL}/mints/${mintAddress}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch token data: ${response.status} ${response.statusText}`);
     }
     const { data } = await response.json();
-    return {
+    const tokenData = {
       symbol: data.symbol,
       mint: data.mint,
       decimals: data.decimals
     };
+    tokenCache.set(mintAddress, { data: tokenData, timestamp: Date.now() });
+    return tokenData;
   } catch (error) {
     console.error(`Error fetching token data for ${mintAddress}:`, error);
+    // Don't cache errors, but return default structure
     return {
       symbol: `${mintAddress.slice(0, 4)}...${mintAddress.slice(-4)}`,
       mint: mintAddress,
@@ -53,39 +98,62 @@ export async function fetchTokenData(mintAddress) {
 }
 
 export async function processPositionsData(positionsData) {
+  console.time(`processPositionsData_total (${positionsData.length} positions)`);
   try {
-    // 1. Fetch market data (shared among all positions)
-    const marketData = await fetchMarketData();
+    // 1. Fetch market data (can often be fetched concurrently with others)
+    console.time('processPositionsData_fetchMarketData');
+    const marketDataPromise = fetchMarketData(); // Start fetching, don't await yet
     
     // 2. Get unique pools from positions
     const uniquePools = [...new Set(positionsData.map(d => d.pool))];
     
-    // 3. Fetch pool data for each unique pool
-    const poolsData = {};
-    for (const poolAddress of uniquePools) {
-      const poolResponse = await fetchPoolData(poolAddress);
-      poolsData[poolAddress] = poolResponse;
-    }
+    // 3. Fetch pool data in parallel
+    console.time(`processPositionsData_fetchPools (${uniquePools.length} pools)`);
+    const poolPromises = uniquePools.map(poolAddress => fetchPoolData(poolAddress));
+    const poolResponses = await Promise.all(poolPromises);
+    const poolsData = uniquePools.reduce((acc, poolAddress, index) => {
+      acc[poolAddress] = poolResponses[index];
+      return acc;
+    }, {});
+    console.timeEnd(`processPositionsData_fetchPools (${uniquePools.length} pools)`);
     
+    // Ensure market data is resolved before proceeding (if needed for token fetching)
+    const marketData = await marketDataPromise;
+    console.timeEnd('processPositionsData_fetchMarketData');
+
     // 4. Get unique token mints from all pools
     const uniqueMints = new Set();
     Object.values(poolsData).forEach(poolResponse => {
-      const pool = poolResponse.data;
-      uniqueMints.add(pool.token_a_mint);
-      uniqueMints.add(pool.token_b_mint);
+      if (poolResponse && poolResponse.data) { // Check if pool data is valid
+          const pool = poolResponse.data;
+          if (pool.token_a_mint) uniqueMints.add(pool.token_a_mint);
+          if (pool.token_b_mint) uniqueMints.add(pool.token_b_mint);
+      } else {
+          console.warn("Invalid pool response encountered while extracting mints:", poolResponse);
+      }
     });
+    const uniqueMintsArray = Array.from(uniqueMints);
     
-    // 5. Fetch token data for each unique mint
-    const tokensData = {};
-    for (const mintAddress of uniqueMints) {
-      const tokenData = await fetchTokenData(mintAddress);
-      tokensData[mintAddress] = tokenData;
-    }
+    // 5. Fetch token data in parallel
+    console.time(`processPositionsData_fetchTokens (${uniqueMintsArray.length} mints)`);
+    const tokenPromises = uniqueMintsArray.map(mintAddress => fetchTokenData(mintAddress));
+    const tokenResults = await Promise.all(tokenPromises);
+    const tokensData = uniqueMintsArray.reduce((acc, mintAddress, index) => {
+      acc[mintAddress] = tokenResults[index];
+      return acc;
+    }, {});
+    console.timeEnd(`processPositionsData_fetchTokens (${uniqueMintsArray.length} mints)`);
     
     // 6. Process each position with all the gathered data
-    return positionsData.map((position, index) => {
+    console.time(`processPositionsData_mapPositions (${positionsData.length} positions)`);
+    const processed = positionsData.map((position) => { // Removed unused index
       const poolAddress = position.pool;
       const poolData = poolsData[poolAddress];
+      // Add checks for poolData and poolData.data existence
+      if (!poolData || !poolData.data) {
+        console.error('Missing or invalid pool data for position:', position);
+        return null; 
+      }
       const pool = poolData.data;
       
       const tokenA = tokensData[pool.token_a_mint];
@@ -96,16 +164,14 @@ export async function processPositionsData(positionsData) {
         return null;
       }
       
-      // Process position using the main formula
       const processedPosition = processTunaPosition(
         { data: position },
         poolData,
-        marketData,
+        marketData, // Use resolved marketData
         tokenA,
         tokenB
       );
       
-      // Add additional fields
       return {
         ...processedPosition,
         pair: `${tokenA.symbol}/${tokenB.symbol}`,
@@ -113,9 +179,15 @@ export async function processPositionsData(positionsData) {
         positionAddress: position.address,
         state: position.state,
       };
-    }).filter(Boolean); // Remove any null entries from failed processing
+    }).filter(Boolean); 
+    console.timeEnd(`processPositionsData_mapPositions (${positionsData.length} positions)`);
+    
+    return processed;
+
   } catch (error) {
     console.error('Error processing positions data:', error);
     throw error;
+  } finally {
+      console.timeEnd(`processPositionsData_total (${positionsData.length} positions)`);
   }
 }

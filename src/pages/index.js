@@ -113,7 +113,7 @@ export default () => {
 
       if (fetchErrors.length > 0) {
         // Set error message but don't clear existing data immediately
-        setErrorMessage(`Failed to fetch data for ${fetchErrors.length} wallet(s). Check console for details.`);
+        setErrorMessage(`Failed to fetch data for ${fetchErrors.length} wallet(s). Please wait for next refresh.`);
         // Attempt to aggregate still, maybe some wallets succeeded
         combined = aggregatePnLData(results);
         if (!combined) {
