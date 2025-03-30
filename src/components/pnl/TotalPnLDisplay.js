@@ -1,6 +1,5 @@
 import styles from './TotalPnLDisplay.module.scss';
-import { formatValue } from '../../utils/formatters';
-import { getValueClass } from '../../utils/positionUtils';
+import { formatValue, getValueClass } from '../../utils';
 
 /**
  * Component for displaying total PnL information

@@ -11,7 +11,11 @@ import { useDebounceApi } from '../hooks/useDebounceApi';
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
-import { addWalletAddressToPositions, decodePositions, decodeValue } from '../utils/positionUtils';
+import { 
+  addWalletAddressToPositions, 
+  decodePositions, 
+  decodeValue 
+} from '../utils';
 import styles from './index.module.scss';
 
 export default () => {

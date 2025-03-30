@@ -1,6 +1,5 @@
 import styles from './DonationFooter.module.scss';
-import { formatWalletAddress } from '../../utils/formatters';
-import { copyToClipboard } from '../../utils/notifications';
+import { formatWalletAddress, copyToClipboard } from '../../utils';
 
 /**
  * Component for displaying donation information

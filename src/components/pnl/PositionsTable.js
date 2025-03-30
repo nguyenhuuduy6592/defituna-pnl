@@ -1,10 +1,15 @@
 import { memo } from 'react';
 import { ClusterBar } from './ClusterBar';
 import { PriceBar } from './PriceBar';
-import { formatNumber, formatDuration, formatWalletAddress } from '../../utils/formatters';
-import { getValueClass, getStateClass } from '../../utils/positionUtils';
-import { invertPairString } from '../../utils/pairUtils';
-import { copyToClipboard } from '../../utils/notifications';
+import {
+  formatNumber,
+  formatDuration,
+  formatWalletAddress,
+  getValueClass,
+  getStateClass,
+  invertPairString,
+  copyToClipboard
+} from '../../utils';
 import styles from './PositionsTable.module.scss';
 
 export const PositionsTable = memo(({

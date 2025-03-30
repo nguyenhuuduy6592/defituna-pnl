@@ -4,11 +4,14 @@ import { PnLCard } from './PnLCard';
 import { PositionChart } from './PositionChart';
 import { PositionsTable } from './PositionsTable';
 import { useHistoricalData } from '../../hooks/useHistoricalData';
-import { calculatePnlPercentage, calculateStatus } from '../../utils/positionUtils';
-import { getAdjustedPosition } from '../../utils/pairUtils';
+import { 
+  calculatePnlPercentage, 
+  calculateStatus, 
+  getAdjustedPosition, 
+  sortPositions 
+} from '../../utils';
 import { useSortState } from '../../hooks/useSortState';
 import { useInvertedPairs } from '../../hooks/useInvertedPairs';
-import { sortPositions } from '../../utils/sortUtils';
 
 export const PositionsList = memo(({ positions, showWallet = false, historyEnabled }) => {
   // Custom hooks
