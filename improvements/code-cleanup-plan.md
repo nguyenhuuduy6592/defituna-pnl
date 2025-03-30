@@ -96,7 +96,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 ### Priority Components
 1. `PositionsList.js` ✅ - Split into smaller components, added custom hooks
 2. `PnLDisplay.js` ✅ - Split into smaller components, improved error handling
-3. Core utility files (`positionUtils.js`, `formatters.js`) 🟡 - Partially refactored
+3. Core utility files (`positionUtils.js`, `formatters.js`) ✅ - Refactored for clarity, consistency, and error handling
 4. Higher-order components and context providers 🔴
 5. Shared UI components 🟡 - Table components completed
 
@@ -154,7 +154,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 | Utility File | Status | Notes |
 |----------------|--------|-------|
 | sortUtils.js | 🟢 Completed | New utility file for sorting functions |
-| positionUtils.js | 🟡 In Progress | Core utility functions being refactored |
+| positionUtils.js | 🟢 Completed | Refactored decoding, status calculation, and styling utils |
 | defituna.js | 🟡 In Progress | Main API integration utilities |
 | formulas.js | 🔴 Not Started | Financial calculations |
 | helius.js | 🔴 Not Started | Helius API integration |
@@ -162,7 +162,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 | validation.js | 🔴 Not Started | Form validation |
 | notifications.js | 🔴 Not Started | User notifications |
 | pairUtils.js | 🔴 Not Started | Token pair utilities |
-| formatters.js | 🟡 In Progress | Formatting utilities being improved |
+| formatters.js | 🟢 Completed | Refactored number, value, duration, and address formatters |
 | constants.js | 🔴 Not Started | Global constants |
 | chart.js | 🔴 Not Started | Chart utilities |
 | export.js | 🔴 Not Started | Data export functions |
