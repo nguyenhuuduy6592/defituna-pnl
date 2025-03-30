@@ -136,4 +136,48 @@ Benefits:
 - The caching solution implemented for market, pool, and token data is based on a tiered approach with TTLs.
 - The cache is designed to keep pool data (including current tick) reasonably fresh and maintain longer cache for rarely-changing data (markets, tokens).
 - The parallel fetching with Promise.all improves performance by allowing multiple cache fetches to run concurrently.
-- Resilient error handling for cache misses ensures that the system can handle cache misses gracefully and continue functioning without errors. 
+- Resilient error handling for cache misses ensures that the system can handle cache misses gracefully and continue functioning without errors.
+
+## Future Optimizations
+
+### High Priority
+1. **Response Payload Optimization** 🔴
+   - Further reduce payload size by removing unused fields
+   - Implement numeric encoding for decimal values
+   - Consider binary formats for data transfer (MessagePack/Protobuf)
+   - Expected benefit: 10-30% reduction in response time and bandwidth usage
+
+2. **Request Batching** 🔴
+   - Implement batching for multiple wallet requests similar to `getTransactionAges` in helius.js
+   - Consolidate redundant external API calls when users view multiple wallets
+   - Optimize concurrent limits to prevent API rate limiting
+   - Expected benefit: Improved scalability and reduced load on external API
+
+### Medium Priority
+1. **Wallet-level Position Caching** 🟡
+   - Implement short-term cache (30-60 seconds) for `fetchPositions` results
+   - Current main bottleneck at ~850ms per request
+   - Add similar TTL pattern as used for pool/market/token caching
+   - Expected benefit: Reduction in API response time to <200ms for repeat requests
+
+2. **Service Worker Cache** 🟡
+   - Implement browser service worker to cache responses
+   - Enable offline capabilities for previously viewed wallet data
+   - Reduce server load for frequent users
+   - Expected benefit: Improved user experience and reduced server costs
+
+### Future Considerations
+1. **Progressive Data Loading**
+   - Initially return basic position data quickly
+   - Load detailed metrics in a second phase
+   - Implement skeleton UI while waiting for complete data
+
+2. **WebSocket for Real-time Updates**
+   - Replace polling with WebSocket connections for position updates
+   - Reduces need for full API calls during auto-refresh
+   - Only fetch delta changes rather than full position data
+
+3. **Background Prefetching**
+   - Prefetch data for recently viewed wallets
+   - Refresh cache in background intervals
+   - Implement predictive prefetching for frequently used wallets 
