@@ -154,7 +154,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 |----------------|--------|-------|
 | sortUtils.js | 🟢 Completed | New utility file for sorting functions |
 | positionUtils.js | 🟢 Completed | Refactored decoding, status calculation, and styling utils |
-| defituna.js | 🟡 In Progress | Main API integration utilities |
+| defituna.js | 🟢 Completed | Added JSDoc documentation, improved error handling, and added fallback values |
 | formulas.js | 🟢 Completed | Added error handling, validation and documentation for financial calculations |
 | helius.js | 🟢 Completed | Enhanced with better error handling, input validation and documentation |
 | debounce.js | 🟢 Completed | Added input validation, error handling, and improved documentation |
