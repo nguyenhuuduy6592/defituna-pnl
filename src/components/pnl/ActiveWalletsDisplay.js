@@ -1,6 +1,43 @@
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import styles from './WalletForm.module.scss';
 import { formatWalletAddress, copyToClipboard } from '../../utils';
+
+/**
+ * Individual wallet chip component with copy and remove functionality
+ */
+const WalletChip = memo(({ wallet, onRemove, onKeyDown }) => {
+  const formattedAddress = formatWalletAddress(wallet);
+  
+  const handleCopy = useCallback(() => {
+    copyToClipboard(wallet);
+  }, [wallet]);
+  
+  return (
+    <div className={styles.walletChip}>
+      <span 
+        title="Copy to clipboard"
+        onClick={handleCopy}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => onKeyDown(e, wallet)}
+        aria-label={`Copy wallet ${formattedAddress}`}
+      >
+        {formattedAddress}
+      </span>
+      <button 
+        type="button"
+        className={styles.removeChip}
+        onClick={() => onRemove(wallet)}
+        aria-label={`Deactivate wallet ${formattedAddress}`}
+        title="Deactivate this wallet"
+      >
+        ✕
+      </button>
+    </div>
+  );
+});
+
+WalletChip.displayName = 'WalletChip';
 
 /**
  * Renders the section displaying currently active wallets as chips.
@@ -24,33 +61,18 @@ export function ActiveWalletsDisplay({
     <div className={styles.activeWallets}>
       <h3>Active Wallets ({activeWallets.length})</h3>
       <div className={styles.walletChips}>
-        {activeWallets.map((w, i) => (
-          <div key={i} className={styles.walletChip}>
-            <span 
-              title="Copy to clipboard"
-              onClick={() => copyToClipboard(w)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => handleChipKeyDown(e, w)}
-            >
-              {formatWalletAddress(w)}
-            </span>
-            <button 
-              type="button"
-              className={styles.removeChip}
-              onClick={() => toggleWalletActive(w)}
-              aria-label="Deactivate wallet"
-              title="Deactivate this wallet"
-            >
-              ✕
-            </button>
-          </div>
+        {activeWallets.map((wallet, index) => (
+          <WalletChip 
+            key={wallet || index}
+            wallet={wallet}
+            onRemove={toggleWalletActive}
+            onKeyDown={handleChipKeyDown}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-// Consider wrapping with React.memo if performance becomes an issue
-// export default React.memo(ActiveWalletsDisplay);
-export default ActiveWalletsDisplay; // Default export 
+// For backwards compatibility
+export default ActiveWalletsDisplay; 

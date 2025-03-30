@@ -27,16 +27,16 @@ This plan outlines a systematic approach to improve code readability and maintai
 - [x] Move business logic outside of render functions
 - [x] Refactor inline anonymous functions to named functions
 
-## Phase 2: JavaScript Cleanup 🟡
+## Phase 2: JavaScript Cleanup 🟢
 
 ### 1. Redundant Logic Removal 🟢
 - [x] Identify and eliminate duplicate code blocks
 - [x] Remove commented-out code that's no longer needed
 - [x] Check for and remove redundant null/undefined checks
 
-### 2. Performance Optimizations 🟡
+### 2. Performance Optimizations 🟢
 - [x] Use proper dependency arrays in useEffect and useCallback
-- [ ] Add memoization with useMemo for expensive calculations
+- [x] Add memoization with useMemo for expensive calculations
 - [x] Apply React.memo to appropriate components
 
 ### 3. Code Readability 🟢
@@ -74,9 +74,9 @@ This plan outlines a systematic approach to improve code readability and maintai
 - [ ] Remove any/unknown types where possible
 - [ ] Create reusable type definitions for common structures
 
-### 2. Documentation 🟡
+### 2. Documentation 🟢
 - [x] Add JSDoc comments to complex functions
-- [ ] Document component props with PropTypes or TypeScript
+- [x] Document component props with PropTypes or TypeScript
 - [x] Add examples for reusable components
 
 ### 3. File Organization 🟢
@@ -118,19 +118,19 @@ This plan outlines a systematic approach to improve code readability and maintai
 | common/Portal.js | 🟢 Completed | Added JSDoc comments, standardized structure |
 | history/HistoryConfirmationModal.js | 🟢 Completed | Extracted content components, created helper functions, improved accessibility |
 | history/HistoryToggle.js | 🟢 Completed | Added proper JSDoc, optimized handlers with useCallback, improved structure |
-| pnl/ClusterBar.js | 🔴 Not Started |  |
+| pnl/ClusterBar.js | 🟢 Completed | Extracted BarSegment and TooltipRow components, optimized with useMemo and useCallback, added aria attributes |
 | pnl/WalletForm.js | 🔴 Not Started |  |
-| pnl/SavedWalletsDropdown.js | 🔴 Not Started |  |
-| pnl/ActiveWalletsDisplay.js | 🔴 Not Started |  |
-| pnl/PriceBar.js | 🔴 Not Started |  |
+| pnl/SavedWalletsDropdown.js | 🟢 Completed | Extracted SavedWalletItem component, added keyboard navigation, optimized with useCallback and React.memo |
+| pnl/ActiveWalletsDisplay.js | 🟢 Completed | Extracted WalletChip component, applied React.memo, improved accessibility |
+| pnl/PriceBar.js | 🟢 Completed | Extracted PriceMarker and TooltipRow components, optimized with useMemo and useCallback, added aria attributes |
 | pnl/PnLCard.js | 🔴 Not Started |  |
-| pnl/AutoRefresh.js | 🔴 Not Started |  |
+| pnl/AutoRefresh.js | 🟢 Completed | Extracted subcomponents, added useCallback, improved accessibility |
 | pnl/PositionChart.js | 🔴 Not Started |  |
 | pnl/PositionsTable.js | 🔴 Not Started |  |
 | pnl/PositionsList.js | 🔴 Not Started |  |
-| pnl/DonationFooter.js | 🔴 Not Started |  |
-| pnl/TotalPnLDisplay.js | 🔴 Not Started |  |
-| pnl/PnLDisplay.js | 🔴 Not Started |  |
+| pnl/DonationFooter.js | 🟢 Completed | Added useCallback for handlers, improved accessibility with tabIndex |
+| pnl/TotalPnLDisplay.js | 🟢 Completed | Added useMemo for formatted values, improved accessibility |
+| pnl/PnLDisplay.js | 🟢 Completed | Added proper data validation with useMemo, improved component structure |
 
 ### Styles
 | Style File | Status | Notes |
@@ -194,7 +194,7 @@ This plan outlines a systematic approach to improve code readability and maintai
 
 ## Completion Checklist
 - [x] Phase 1: Component Structure & Organization
-- [ ] Phase 2: JavaScript Cleanup
+- [x] Phase 2: JavaScript Cleanup
 - [ ] Phase 3: CSS/Styling Cleanup
 - [ ] Phase 4: Project-wide Improvements
 - [x] Priority components initial refactor
@@ -203,3 +203,14 @@ This plan outlines a systematic approach to improve code readability and maintai
 - [ ] Enfore imported from index files instead of direct items under hooks and utils
 - [ ] Code review completed
 - [ ] Documentation updated
+
+## Progress Notes (March 30)
+- Completed 12 of 20 components (60%)
+- All common and history components refactored (100%)
+- 7 of 13 PNL components refactored (54%)
+- Applied consistent patterns across components
+- Enhanced accessibility throughout the application
+- Added thorough JSDoc documentation to all refactored components
+- Improved performance with React.memo, useCallback, and useMemo
+- Extracted reusable subcomponents to simplify complex components
+- Maintained backward compatibility for existing component imports

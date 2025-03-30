@@ -1,6 +1,53 @@
+import { useCallback } from 'react';
 import styles from './AutoRefresh.module.scss';
 import { HistoryToggle } from '../history/HistoryToggle';
 
+/**
+ * Displays the refresh status text based on loading state and countdown
+ */
+const RefreshStatus = ({ loading, countdown }) => (
+  <div className={styles.refreshStatus}>
+    {loading ? 
+      <span>Refreshing data...</span> : 
+      <span>Next refresh in {countdown} seconds</span>
+    }
+  </div>
+);
+
+/**
+ * Interval selector dropdown component
+ */
+const IntervalSelector = ({ value, onChange }) => (
+  <div className={styles.intervalSelector}>
+    <select 
+      value={value} 
+      onChange={onChange}
+      aria-label="Select refresh interval"
+      title="Select how often to refresh the data"
+    >
+      {process.env.NODE_ENV === 'development' && (
+        <option value="5">5 seconds</option>
+      )}
+      <option value="30">30 seconds</option>
+      <option value="60">1 minute</option>
+      <option value="300">5 minutes</option>
+    </select>
+  </div>
+);
+
+/**
+ * Component for controlling auto-refresh settings and historical data storage
+ * 
+ * @param {Object} props Component props
+ * @param {boolean} props.autoRefresh Whether auto-refresh is enabled
+ * @param {Function} props.setAutoRefresh Function to enable/disable auto-refresh
+ * @param {number} props.refreshInterval Current refresh interval in seconds
+ * @param {Function} props.onIntervalChange Handler for interval change
+ * @param {number} props.autoRefreshCountdown Seconds until next refresh
+ * @param {boolean} props.loading Whether data is currently refreshing
+ * @param {boolean} props.historyEnabled Whether historical data storage is enabled
+ * @param {Function} props.onHistoryToggle Handler for history toggle changes
+ */
 export const AutoRefresh = ({
   autoRefresh,
   setAutoRefresh,
@@ -11,6 +58,10 @@ export const AutoRefresh = ({
   historyEnabled,
   onHistoryToggle
 }) => {
+  const handleAutoRefreshToggle = useCallback((e) => {
+    setAutoRefresh(e.target.checked);
+  }, [setAutoRefresh]);
+
   return (
     <div className={styles.refreshControls}>
       <div className={styles.refreshToggles}>
@@ -21,7 +72,7 @@ export const AutoRefresh = ({
           <input 
             type="checkbox" 
             checked={autoRefresh} 
-            onChange={e => setAutoRefresh(e.target.checked)}
+            onChange={handleAutoRefreshToggle}
             aria-label="Enable auto-refresh"
           />
           <span>Auto-refresh</span>
@@ -35,30 +86,17 @@ export const AutoRefresh = ({
       </div>
 
       {autoRefresh && (
-        <div className={styles.intervalSelector}>
-          <select 
+        <>
+          <IntervalSelector 
             value={refreshInterval} 
             onChange={onIntervalChange}
-            aria-label="Select refresh interval"
-            title="Select how often to refresh the data"
-          >
-            {process.env.NODE_ENV == 'development' && (
-              <option value="5">5 seconds</option>
-            )}
-            <option value="30">30 seconds</option>
-            <option value="60">1 minute</option>
-            <option value="300">5 minutes</option>
-          </select>
-        </div>
-      )}
-      
-      {autoRefresh && (
-        <div className={styles.refreshStatus}>
-          {loading ? 
-            <span>Refreshing data...</span> : 
-            <span>Next refresh in {autoRefreshCountdown} seconds</span>
-          }
-        </div>
+          />
+          
+          <RefreshStatus 
+            loading={loading} 
+            countdown={autoRefreshCountdown} 
+          />
+        </>
       )}
     </div>
   );

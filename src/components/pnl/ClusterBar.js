@@ -1,6 +1,27 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
 import styles from './ClusterBar.module.scss';
 import { TooltipPortal } from '../common/TooltipPortal';
+
+/**
+ * Renders a bar segment with a specific width
+ */
+const BarSegment = ({ percentage, index, label }) => (
+  <div 
+    className={`${styles.barSegment} ${styles[`segment${index}`]}`}
+    style={{ width: `${percentage}%` }}
+    aria-label={`${label}: ${percentage.toFixed(1)}%`}
+  />
+);
+
+/**
+ * Renders a tooltip row with label and value
+ */
+const TooltipRow = ({ label, value, formatValue }) => (
+  <div className={styles.tooltipRow}>
+    <span className={styles.tooltipLabel}>{label}:</span>
+    <span className={styles.tooltipValue}>{formatValue(value)}</span>
+  </div>
+);
 
 /**
  * Renders a segmented bar representing the composition of a value (e.g., collateral, debt, interest).
@@ -14,16 +35,16 @@ import { TooltipPortal } from '../common/TooltipPortal';
  * @param {function(number): string} props.formatValue - Function to format currency values.
  */
 export const ClusterBar = ({ 
-  size = 0, // Default prop
-  collateral = { usd: 0 }, // Default prop
-  debt = { usd: 0 }, // Default prop
-  interest = { usd: 0 }, // Default prop
-  formatValue = (val) => val.toLocaleString() // Default prop
+  size = 0,
+  collateral = { usd: 0 },
+  debt = { usd: 0 },
+  interest = { usd: 0 },
+  formatValue = (val) => val.toLocaleString()
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const containerRef = useRef(null);
   
-  // Memoize calculations
+  // Memoize calculations for composition percentages
   const { 
     total, 
     collateralPercentage, 
@@ -53,48 +74,67 @@ export const ClusterBar = ({
     };
   }, [size, collateral, debt, interest]);
 
+  // Event handlers
+  const handleMouseEnter = useCallback(() => {
+    setShowTooltip(true);
+  }, []);
+  
+  const handleMouseLeave = useCallback(() => {
+    setShowTooltip(false);
+  }, []);
+
+  // Memoize segment data
+  const segments = useMemo(() => [
+    { percentage: collateralPercentage, label: 'Collateral' },
+    { percentage: debtPercentage, label: 'Debt' },
+    { percentage: interestPercentage, label: 'Interest' }
+  ], [collateralPercentage, debtPercentage, interestPercentage]);
+  
+  // Memoize tooltip data
+  const tooltipData = useMemo(() => [
+    { label: 'Total Size', value: size },
+    { label: 'Collateral', value: collateral?.usd ?? 0 },
+    { label: 'Debt', value: debt?.usd ?? 0 },
+    { label: 'Interest', value: interest?.usd ?? 0 }
+  ], [size, collateral, debt, interest]);
+
   // Memoize tooltip content
   const tooltipContent = useMemo(() => (
     <div className={styles.tooltipContent}>
-      <div className={styles.tooltipRow}>
-        <span className={styles.tooltipLabel}>Total Size:</span>
-        <span className={styles.tooltipValue}>{formatValue(size)}</span>
-      </div>
-      <div className={styles.tooltipRow}>
-        <span className={styles.tooltipLabel}>Collateral:</span>
-        <span className={styles.tooltipValue}>{formatValue(collateral?.usd ?? 0)}</span>
-      </div>
-      <div className={styles.tooltipRow}>
-        <span className={styles.tooltipLabel}>Debt:</span>
-        <span className={styles.tooltipValue}>{formatValue(debt?.usd ?? 0)}</span>
-      </div>
-      <div className={styles.tooltipRow}>
-        <span className={styles.tooltipLabel}>Interest:</span>
-        <span className={styles.tooltipValue}>{formatValue(interest?.usd ?? 0)}</span>
-      </div>
+      {tooltipData.map((item, index) => (
+        <TooltipRow 
+          key={index}
+          label={item.label}
+          value={item.value}
+          formatValue={formatValue}
+        />
+      ))}
     </div>
-  ), [size, collateral, debt, interest, formatValue]); // Include formatValue in deps
+  ), [tooltipData, formatValue]);
 
   return (
-    <div className={styles.clusterBarContainer}>
-      <div className={styles.barContainer}
-          ref={containerRef}
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}>
-        <div 
-          className={styles.barSegment}
-          style={{ width: `${collateralPercentage}%` }}
-        />
-        <div 
-          className={styles.barSegment}
-          style={{ width: `${debtPercentage}%` }}
-        />
-        <div 
-          className={styles.barSegment}
-          style={{ width: `${interestPercentage}%` }}
-        />
+    <div 
+      className={styles.clusterBarContainer}
+      aria-label="Position composition breakdown"
+    >
+      <div 
+        className={styles.barContainer}
+        ref={containerRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {segments.map((segment, index) => (
+          <BarSegment 
+            key={index}
+            percentage={segment.percentage}
+            index={index}
+            label={segment.label}
+          />
+        ))}
       </div>
-      <div className={styles.totalValue}>{formatValue(size)}</div>
+      <div className={styles.totalValue} aria-label={`Total: ${formatValue(size)}`}>
+        ${formatValue(size)}
+      </div>
       {showTooltip && containerRef.current && (
         <TooltipPortal
           targetRef={containerRef}
