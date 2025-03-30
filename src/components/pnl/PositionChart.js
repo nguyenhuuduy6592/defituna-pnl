@@ -8,6 +8,7 @@ import {
   Tooltip as RechartsTooltip,
   Legend,
   ResponsiveContainer,
+  ReferenceLine
 } from 'recharts';
 import { Portal } from '../common/Portal';
 import { Tooltip } from '../common/Tooltip';
@@ -236,6 +237,7 @@ export const PositionChart = ({ positionHistory, onClose }) => {
                     tickCount={8}
                     domain={['auto', 'auto']}
                   />
+                  <ReferenceLine y={0} stroke="#4dabf7" strokeWidth={1} />
                   <RechartsTooltip 
                     content={<CustomTooltip />}
                     isAnimationActive={false}
