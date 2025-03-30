@@ -117,9 +117,9 @@ This plan outlines a systematic approach to improve code readability and maintai
 | TotalPnLDisplay.js | 🟢 Completed | New component for displaying PnL summary with dedicated styles |
 | DonationFooter.js | 🟢 Completed | New component for donation section with dedicated styles |
 | PositionChart.js | 🟢 Completed | Refactored structure, improved calculations, moved formatting/tooltip to utils |
-| WalletForm.js | 🔴 Not Started | Wallet input and validation |
-| AutoRefresh.js | 🔴 Not Started | Auto-refresh functionality |
-| PnLCard.js | 🔴 Not Started | PnL display card component |
+| WalletForm.js | 🟢 Completed | Wallet input and validation, added JSDoc, memoized callbacks, extracted sub-components (Dropdown, ActiveDisplay) |
+| AutoRefresh.js | 🟢 Completed | Added JSDoc, improved accessibility and readability |
+| PnLCard.js | 🟢 Completed | Refactored structure, improved accessibility and error handling |
 | PriceBar.js | 🔴 Not Started | Price information display |
 | ClusterBar.js | 🔴 Not Started | Clustering visualization |
 
