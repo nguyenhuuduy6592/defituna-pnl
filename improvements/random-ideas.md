@@ -10,3 +10,7 @@
 10. Add chart for total values
 11. ✓ Add position status into the PnL card - DONE
 12. ✓ Improve chart to add position pair and allow exporting - DONE
+13. Show bigger/better chart on tooltip for price range which can make it easier to quickly understand the range. Readonly, no interaction, should has same indicators as what are already provided on the tooltip
+14. Fix total values UI on mobile
+15. Align position status with position pair to optimize space
+16. Display percentage on the Total PnL Card

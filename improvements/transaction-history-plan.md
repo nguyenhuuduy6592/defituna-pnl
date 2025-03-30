@@ -4,6 +4,112 @@
 
 This document outlines a comprehensive plan to implement transaction history tracking for all past and current positions of active wallets in DeFiTuna using the Helius API. The implementation will allow users to view the complete transaction history of their positions, providing deeper insights into their trading activities.
 
+## User Flow
+
+1. **Initial Access**
+   - User connects their wallet to DeFiTuna
+   - System automatically begins fetching transaction history in the background
+   - User sees a loading indicator while initial data is retrieved
+   - Once data is available, user is presented with transaction list view
+
+2. **Browsing Transaction History**
+   - User views their transaction list, sorted by most recent first
+   - Transactions are visually grouped by date
+   - User can scroll through the virtualized list without performance issues
+   - Each transaction shows essential information (type, pair, amount, time)
+
+3. **Filtering & Searching**
+   - User can tap/click filter icon to reveal filter options
+   - User selects filters based on transaction type, date range, or position
+   - Results update instantly as filters are applied
+   - User can search for specific transactions using search field
+   - Results highlight matching terms in the transaction list
+
+4. **Viewing Transaction Details**
+   - User taps/clicks on a transaction in the list
+   - Detail panel slides in from the right side
+   - User sees complete transaction information organized in tabs/sections
+   - User can view position state before and after the transaction
+   - Advanced users can access technical details and blockchain links
+   - User can close detail view by clicking close button or outside the panel
+
+5. **Data Exploration**
+   - User can switch between list and visualization views
+   - Timeline view shows position lifecycle with transaction points
+   - Charts display position performance over time
+   - User can export transaction data for record-keeping
+
+## Application Flow
+
+1. **Data Retrieval & Processing**
+   - On wallet connection, app initiates transaction history fetch
+   - App checks local storage for cached transaction data
+   - If cached data exists, app displays it immediately while updating in background
+   - If no cached data, app shows loading state while fetching from blockchain
+   - Transactions are fetched in batches to respect API rate limits
+   - All transactions are filtered to identify DeFiTuna-specific operations
+   - Transactions are parsed and classified by operation type
+   - Processed transactions are stored in IndexedDB for persistence
+
+2. **Data Management**
+   - App implements differential sync to fetch only new transactions
+   - Background sync occurs periodically when app is active
+   - Cache invalidation happens after configurable TTL period
+   - Storage optimizations prevent excessive memory usage
+
+3. **Rendering & UI Updates**
+   - React components use custom hooks to access transaction data
+   - List view uses virtualization to render only visible items
+   - Filter state changes trigger query updates to storage service
+   - UI reflects loading, error, and empty states appropriately
+   - Component re-renders are optimized to prevent performance issues
+
+4. **Error Handling**
+   - Network errors during data fetch trigger retry with exponential backoff
+   - Parsing errors for unknown transaction types are logged and skipped
+   - Storage errors attempt recovery strategies before failing
+   - UI displays appropriate error messages with retry options
+   - Failed syncs are retried automatically on next app activation
+
+5. **Performance Optimization**
+   - Initial data load prioritizes recent transactions
+   - Background fetching of older transactions occurs during idle periods
+   - Storage queries use indexes for optimal performance
+   - Render optimizations prevent UI jank during scrolling
+   - Memory usage is monitored and optimized for mobile devices
+
+## UI/UX Considerations
+
+1. **Non-Disruptive Sync Indicators**
+   - Use subtle sync indicators that don't block interaction with the app
+   - Implement a small, unobtrusive progress indicator in the corner of the transaction history view
+   - Allow users to continue browsing already loaded transactions while new ones sync
+   - Avoid full-screen loading states after initial data load
+
+2. **Progress Communication**
+   - Show clear percentage or progress bar for initial data load
+   - Display "Last synced" timestamp to indicate data freshness
+   - Use toast notifications for completed sync operations instead of modal dialogs
+   - Provide count of new transactions found during background sync
+
+3. **Staged Data Display**
+   - Show transactions as soon as they're processed rather than waiting for all data
+   - Implement "load more" functionality at list bottom for older transactions
+   - Use skeleton screens instead of spinners when possible to reduce perceived wait time
+   - Prioritize visible content loading over off-screen elements
+
+4. **Error Recovery States**
+   - Design non-blocking error states that allow partial functionality
+   - Implement inline retry buttons for failed operations
+   - Show specific error messages with actionable next steps
+   - Automatically retry background operations without user intervention
+
+5. **Responsive Feedback**
+   - Add micro-animations for state changes (new transactions appearing, filters applying)
+   - Ensure UI remains responsive even during data processing
+   - Implement optimistic UI updates for filter operations
+   - Provide immediate visual feedback for all user actions
+
 ## Requirements
 
 1. Track all transactions for the active wallet's positions
@@ -109,62 +215,77 @@ This document outlines a comprehensive plan to implement transaction history tra
     - Implement lazy loading and virtualization for large history lists
     - Optimize storage utilization for long-term use
 
-## Technical Details
+## Technical Implementation Details
 
-### Helius API Integration
+### Helius API Integration Architecture
 
-1. **Endpoint Selection**
-   - Use Helius `/v0/addresses/{address}/transactions` endpoint for history
-   - Leverage enhanced transaction data format for additional metadata
-   - Consider using webhook notifications for real-time updates
+1. **Extending Existing Helius Utilities**
+   - Create a function to fetch transaction history that extends the existing fetchWithRetry utility
+   - Implement signature-based transaction fetching to get all transactions for a wallet address
+   - Use the same batching approach as the existing getTransactionAges function to respect rate limits
+   - Apply consistent error handling and retry patterns as in the existing implementation
 
-2. **Transaction Parsing Strategy**
-   - First pass: Filter transactions by program ID (DeFiTuna's ID)
-   - Second pass: Parse instruction data using IDL
-   - Third pass: Classify and organize by position
+2. **Enhanced Caching Mechanism**
+   - Implement a transaction cache similar to the existing timestampCache
+   - Store transactions in memory with configurable time-to-live (TTL)
+   - Create functions to get and set cached transactions with proper cache invalidation
+   - Use cache to reduce redundant API calls during the same session
 
-3. **Data Extraction Points**
-   - Transaction signature (for unique identification)
-   - Block time (for chronological ordering)
-   - Instruction data (for operation details)
-   - Account references (for position identification)
-   - Inner instructions (for fee/yield tracking)
+### Transaction Parsing & Classification
 
-### Position History Reconstruction
+1. **DeFiTuna Instruction Parsing**
+   - Define a constant for the DeFiTuna program ID to identify program-specific transactions
+   - Create an instruction parser object with specific parsers for each instruction type
+   - Implement discriminator-based parsing to identify different operation types
+   - Extract relevant account information and instruction data for each transaction type
 
-1. **Position Lifecycle Tracking**
-   - Opening transaction: Initial parameters, collateral, leverage
-   - Modification transactions: Changes to position parameters
-   - Closing/liquidation: Final state and outcome
-   - Yield/fee transactions: Ongoing revenue or expenses
+2. **Transaction Classification System**
+   - Define transaction type constants for different operations (open, close, modify, etc.)
+   - Implement a classification function that examines transaction instructions
+   - Extract position addresses and details from the transaction data
+   - Build a comprehensive transaction object with type, address, and extracted details
 
-2. **Data Association Keys**
-   - Position address as primary key
-   - Wallet address as secondary key
-   - Trading pair as tertiary grouping
+### Storage Implementation
 
-### Storage Requirements
+1. **IndexedDB Schema**
+   - Design database schema with separate object stores for transactions, positions, and sync state
+   - Include appropriate indexes for efficient querying (by wallet, position, time, type)
+   - Implement database initialization with proper version handling
+   - Create helper functions for database connection and schema management
 
-1. **Transaction Data Schema**
-   ```
-   {
-     signature: string,           // Transaction signature
-     blockTime: number,           // Unix timestamp
-     positionAddress: string,     // Associated position
-     operationType: string,       // Open, close, modify, etc.
-     pair: string,                // Trading pair
-     details: {                   // Operation-specific details
-       // Varies by operation type
-     },
-     amount: number,              // Transaction amount (if applicable)
-     fees: number                 // Transaction fees
-   }
-   ```
+2. **Storage Service**
+   - Implement CRUD operations for transaction records
+   - Build query functions with filtering, sorting, and pagination support
+   - Create specialized methods for retrieving transactions by position or wallet
+   - Add synchronization state tracking for incremental updates
 
-2. **Estimated Storage Size**
-   - Average transaction: ~2KB
-   - 100 transactions: ~200KB
-   - 1000 transactions: ~2MB per wallet
+### UI Components Implementation
+
+1. **Transaction List Component**
+   - Implement a virtualized list component for efficient rendering of large transaction lists
+   - Create transaction list item component with appropriate visual indicators for different types
+   - Include formatted display of transaction amounts, times, and status
+   - Add proper click handlers for viewing transaction details
+
+2. **Transaction Detail Component**
+   - Create a modal component with tabs for different detail categories
+   - Implement sections for transaction summary, position details, and financial information
+   - Add technical details section for advanced users
+   - Include proper navigation and close functionality
+
+### Data Flow Architecture
+
+1. **Transaction History Service**
+   - Implement a service to coordinate between UI, storage, and API
+   - Create a wallet transaction synchronization function with differential sync support
+   - Add classification of transactions to extract and store only relevant data
+   - Implement proper error handling and reporting
+
+2. **React Hook Integration**
+   - Create a custom hook for transaction history data access
+   - Implement state management for loading, error, and transaction data
+   - Add dependency tracking to refresh data when filters change
+   - Provide clean interface for components to access transaction data
 
 ## Implementation Steps
 
@@ -260,17 +381,6 @@ This document outlines a comprehensive plan to implement transaction history tra
    - All data is kept client-side
    - No server storage of user transaction data
    - Clear storage options for users
-
-## Timeline Estimate
-
-- Phase 1 (Infrastructure): 1-2 weeks
-- Phase 2 (Data Retrieval): 2-3 weeks
-- Phase 3 (Storage): 1-2 weeks
-- Phase 4 (UI - List View MVP): 1-2 weeks
-- Phase 5 (UI - Detail View & Advanced Features): 2-3 weeks
-- Phase 6 (Testing & Optimization): 1-2 weeks
-
-Total estimated time: 8-14 weeks depending on complexity and resources, with initial MVP available to users after 5-9 weeks.
 
 ## Future Enhancements
 
