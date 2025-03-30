@@ -100,6 +100,7 @@ export const useWallet = () => {
     wallet,
     setWallet: handleSetWallet,
     activeWallets,
+    setActiveWallets,
     toggleWalletActive,
     savedWallets,
     addWallet,

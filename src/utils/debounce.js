@@ -41,7 +41,12 @@ export function debouncePromise(asyncFunc, wait) {
   let currentPromise = null;
   let queuedPromiseResolver = null;
   
-  return function(...args) {
+  // Capture the function reference to avoid `this` issues in setTimeout
+  let debouncedFunc = null;
+
+  debouncedFunc = function(...args) {
+    const self = this; // Preserve original context for asyncFunc call if needed
+
     // If we already have a current promise in flight and a new call comes in,
     // queue up a promise resolver for after the current call finishes
     if (currentPromise) {
@@ -66,7 +71,8 @@ export function debouncePromise(asyncFunc, wait) {
           timeout = setTimeout(() => {
             timeout = null;
             const { args, resolve } = queued;
-            resolve(this(...args)); // Recursive call with saved args
+            // Use the captured function reference for the recursive call
+            resolve(debouncedFunc.apply(self, args)); // Use captured func and original context
           }, wait);
         }
       });
@@ -93,11 +99,14 @@ export function debouncePromise(asyncFunc, wait) {
             timeout = setTimeout(() => {
               timeout = null;
               const { args, resolve } = queued;
-              resolve(this(...args));
+              // Use the captured function reference for the recursive call
+              resolve(debouncedFunc.apply(self, args)); // Use captured func and original context
             }, wait);
           }
         });
       }, wait);
     });
   };
+
+  return debouncedFunc; // Return the captured function reference
 } 

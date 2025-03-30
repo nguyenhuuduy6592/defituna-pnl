@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import styles from './AutoRefresh.module.scss';
 import { HistoryToggle } from '../history/HistoryToggle';
 
@@ -34,7 +33,7 @@ export const AutoRefresh = ({
           setAutoRefresh={setAutoRefresh}
         />
       </div>
-      
+
       {autoRefresh && (
         <div className={styles.intervalSelector}>
           <select 
@@ -43,6 +42,9 @@ export const AutoRefresh = ({
             aria-label="Select refresh interval"
             title="Select how often to refresh the data"
           >
+            {process.env.NODE_ENV == 'development' && (
+              <option value="5">5 seconds</option>
+            )}
             <option value="30">30 seconds</option>
             <option value="60">1 minute</option>
             <option value="300">5 minutes</option>

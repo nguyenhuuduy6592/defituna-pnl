@@ -8,6 +8,7 @@ export function WalletForm({
   wallet,
   onWalletChange,
   activeWallets,
+  setActiveWallets,
   toggleWalletActive,
   onSubmit,
   loading,
@@ -19,7 +20,6 @@ export function WalletForm({
   onClearWallets
 }) {
   const inputRef = useRef(null);
-  const [error, setError] = useState('');
   
   // Filter out duplicate wallets
   const uniqueSavedWallets = useMemo(() => {
@@ -32,9 +32,6 @@ export function WalletForm({
       e.preventDefault();
     }
     
-    // Clear previous error
-    setError('');
-
     // Check if we have active wallets
     if (!wallet.trim()) {
       showNotification('Please enter or select at least one wallet address', 'error');
@@ -46,9 +43,8 @@ export function WalletForm({
       showNotification('Invalid Solana wallet address format', 'error');
       return;
     }
-    
-    // Add the current wallet as active if none are active
-    toggleWalletActive(wallet.trim());
+
+    setActiveWallets([...new Set([...activeWallets, wallet.trim()])]);
 
     onSubmit(e);
   };
@@ -83,7 +79,10 @@ export function WalletForm({
                       <button 
                         type="button"
                         className={styles.checkboxButton}
-                        onClick={() => toggleWalletActive(w)}
+                        onClick={() => {
+                          toggleWalletActive(w);
+                          onWalletChange('');
+                        }}
                         aria-label={activeWallets.includes(w) ? "Deactivate wallet" : "Activate wallet"}
                         title={activeWallets.includes(w) ? "Deactivate this wallet" : "Activate this wallet"}
                       >

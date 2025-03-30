@@ -1,0 +1,32 @@
+/* src/components/common/LoadingOverlay.module.scss */
+.container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(150, 210, 250, 0.00000000001); /* Semi-transparent blue - Reduced opacity */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #000000;
+  font-weight: bold;
+  z-index: 10;
+  border-radius: inherit;
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  opacity: 1;
+  visibility: visible;
+}
+
+.overlayHidden {
+  opacity: 0;
+  visibility: hidden;
+} 
