@@ -139,7 +139,6 @@ export default () => {
           );
 
           if (newPositionAddresses.length > 0) {
-            console.log('Fetching timestamps for new positions:', newPositionAddresses);
             try {
               const tsRes = await fetch('/api/fetch-position-age', {
                 method: 'POST',

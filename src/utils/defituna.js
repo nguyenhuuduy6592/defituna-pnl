@@ -33,10 +33,8 @@ export async function fetchPositions(wallet) {
 export async function fetchPoolData(poolAddress) {
   // Pool data has a short TTL since it contains the dynamic tick_current_index
   if (poolCache.has(poolAddress) && isCacheValid(poolCache.get(poolAddress).timestamp, POOL_CACHE_TTL)) {
-    // console.log(`Cache hit for pool: ${poolAddress}`);
     return poolCache.get(poolAddress).data;
   }
-  // console.log(`Cache miss for pool: ${poolAddress}`);
 
   const response = await fetch(`${process.env.DEFITUNA_API_URL}/pools/${poolAddress}`);
   if (!response.ok) {
@@ -50,10 +48,8 @@ export async function fetchPoolData(poolAddress) {
 export async function fetchMarketData() {
   // Market data has a long TTL since it changes infrequently
   if (marketCache.data && isCacheValid(marketCache.timestamp, MARKET_CACHE_TTL)) {
-    // console.log('Cache hit for market data');
     return marketCache.data;
   }
-  // console.log('Cache miss for market data');
 
   const response = await fetch(`${process.env.DEFITUNA_API_URL}/markets`);
   if (!response.ok) {
@@ -68,10 +64,8 @@ export async function fetchMarketData() {
 export async function fetchTokenData(mintAddress) {
   // Token data is practically permanent
   if (tokenCache.has(mintAddress) && isCacheValid(tokenCache.get(mintAddress).timestamp, TOKEN_CACHE_TTL)) {
-    // console.log(`Cache hit for token: ${mintAddress}`);
     return tokenCache.get(mintAddress).data;
   }
-  // console.log(`Cache miss for token: ${mintAddress}`);
 
   try {
     const response = await fetch(`${process.env.DEFITUNA_API_URL}/mints/${mintAddress}`);
@@ -98,28 +92,23 @@ export async function fetchTokenData(mintAddress) {
 }
 
 export async function processPositionsData(positionsData) {
-  console.time(`processPositionsData_total (${positionsData.length} positions)`);
   try {
     // 1. Fetch market data (can often be fetched concurrently with others)
-    console.time('processPositionsData_fetchMarketData');
     const marketDataPromise = fetchMarketData(); // Start fetching, don't await yet
     
     // 2. Get unique pools from positions
     const uniquePools = [...new Set(positionsData.map(d => d.pool))];
     
     // 3. Fetch pool data in parallel
-    console.time(`processPositionsData_fetchPools (${uniquePools.length} pools)`);
     const poolPromises = uniquePools.map(poolAddress => fetchPoolData(poolAddress));
     const poolResponses = await Promise.all(poolPromises);
     const poolsData = uniquePools.reduce((acc, poolAddress, index) => {
       acc[poolAddress] = poolResponses[index];
       return acc;
     }, {});
-    console.timeEnd(`processPositionsData_fetchPools (${uniquePools.length} pools)`);
     
     // Ensure market data is resolved before proceeding (if needed for token fetching)
     const marketData = await marketDataPromise;
-    console.timeEnd('processPositionsData_fetchMarketData');
 
     // 4. Get unique token mints from all pools
     const uniqueMints = new Set();
@@ -135,17 +124,14 @@ export async function processPositionsData(positionsData) {
     const uniqueMintsArray = Array.from(uniqueMints);
     
     // 5. Fetch token data in parallel
-    console.time(`processPositionsData_fetchTokens (${uniqueMintsArray.length} mints)`);
     const tokenPromises = uniqueMintsArray.map(mintAddress => fetchTokenData(mintAddress));
     const tokenResults = await Promise.all(tokenPromises);
     const tokensData = uniqueMintsArray.reduce((acc, mintAddress, index) => {
       acc[mintAddress] = tokenResults[index];
       return acc;
     }, {});
-    console.timeEnd(`processPositionsData_fetchTokens (${uniqueMintsArray.length} mints)`);
     
     // 6. Process each position with all the gathered data
-    console.time(`processPositionsData_mapPositions (${positionsData.length} positions)`);
     const processed = positionsData.map((position) => { // Removed unused index
       const poolAddress = position.pool;
       const poolData = poolsData[poolAddress];
@@ -180,14 +166,11 @@ export async function processPositionsData(positionsData) {
         state: position.state,
       };
     }).filter(Boolean); 
-    console.timeEnd(`processPositionsData_mapPositions (${positionsData.length} positions)`);
     
     return processed;
 
   } catch (error) {
     console.error('Error processing positions data:', error);
     throw error;
-  } finally {
-      console.timeEnd(`processPositionsData_total (${positionsData.length} positions)`);
   }
 }
