@@ -111,32 +111,31 @@ This plan outlines a systematic approach to improve code readability and maintai
 ### Components
 | Component/File | Status | Notes |
 |----------------|--------|-------|
-| PositionsList.js | 🟢 Completed | Extracted table component, reorganized structure, added custom hooks, removed unused imports |
-| PositionsTable.js | 🟢 Completed | New component with dedicated styles and proper CSS modules |
-| PnLDisplay.js | 🟢 Completed | Simplified component, extracted sub-components, added error handling |
-| TotalPnLDisplay.js | 🟢 Completed | New component for displaying PnL summary with dedicated styles |
-| DonationFooter.js | 🟢 Completed | New component for donation section with dedicated styles |
-| PositionChart.js | 🟢 Completed | Refactored structure, improved calculations, moved formatting/tooltip to utils |
-| WalletForm.js | 🟢 Completed | Wallet input and validation, added JSDoc, memoized callbacks, extracted sub-components (Dropdown, ActiveDisplay) |
-| AutoRefresh.js | 🟢 Completed | Added JSDoc, improved accessibility and readability |
-| PnLCard.js | 🟢 Completed | Refactored structure, improved accessibility and error handling |
-| PriceBar.js | 🟢 Completed | Price information display, refactored structure, calculations, accessibility |
-| ClusterBar.js | 🟢 Completed | Clustering visualization, added JSDoc, memoized calculations, refactored styles |
+| common/LoadingOverlay.js | 🟢 Completed | Added proper JSDoc, improved readability, extracted overlay class name |
+| common/DisclaimerModal.js | 🟢 Completed | Extracted subcomponents, added useCallback for event handlers, improved readability |
+| common/Tooltip.js | 🟢 Completed | Added JSDoc, improved accessibility |
+| common/TooltipPortal.js | 🟢 Completed | Extracted positioning logic with useCallback, improved performance with memoization |
+| common/Portal.js | 🟢 Completed | Added JSDoc comments, standardized structure |
+| history/HistoryConfirmationModal.js | 🟢 Completed | Extracted content components, created helper functions, improved accessibility |
+| history/HistoryToggle.js | 🟢 Completed | Added proper JSDoc, optimized handlers with useCallback, improved structure |
+| pnl/ClusterBar.js | 🔴 Not Started |  |
+| pnl/WalletForm.js | 🔴 Not Started |  |
+| pnl/SavedWalletsDropdown.js | 🔴 Not Started |  |
+| pnl/ActiveWalletsDisplay.js | 🔴 Not Started |  |
+| pnl/PriceBar.js | 🔴 Not Started |  |
+| pnl/PnLCard.js | 🔴 Not Started |  |
+| pnl/AutoRefresh.js | 🔴 Not Started |  |
+| pnl/PositionChart.js | 🔴 Not Started |  |
+| pnl/PositionsTable.js | 🔴 Not Started |  |
+| pnl/PositionsList.js | 🔴 Not Started |  |
+| pnl/DonationFooter.js | 🔴 Not Started |  |
+| pnl/TotalPnLDisplay.js | 🔴 Not Started |  |
+| pnl/PnLDisplay.js | 🔴 Not Started |  |
 
 ### Styles
 | Style File | Status | Notes |
 |----------------|--------|-------|
 | PositionsTable.module.scss | 🟢 Completed | Dedicated styles with proper scoping and SASS variables |
-| PositionsList.module.scss | 🟢 Completed | Cleaned up and removed duplicate styles |
-| PnLDisplay.module.scss | 🟢 Completed | Simplified and organized styles with proper SASS variables |
-| TotalPnLDisplay.module.scss | 🟢 Completed | New styles for PnL display header with proper structure |
-| DonationFooter.module.scss | 🟢 Completed | New styles for donation section with improved hover effects |
-| PositionChart.module.scss | 🟢 Completed | Cleaned up styles, used SASS functions consistently |
-| WalletForm.module.scss | 🔴 Not Started | Form styles |
-| AutoRefresh.module.scss | 🔴 Not Started | Refresh component styles |
-| PnLCard.module.scss | 🟢 Completed | Card component styles, refactored structure, used SASS variables, corrected color functions |
-| PriceBar.module.scss | 🟢 Completed | Price display styles, refactored structure, used SASS variables, corrected color functions |
-| ClusterBar.module.scss | 🟢 Completed | Cluster visualization styles, refactored using SASS variables/functions |
 
 ### Hooks
 | Hook File | Status | Notes |

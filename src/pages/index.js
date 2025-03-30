@@ -273,15 +273,13 @@ export default () => {
       <title>{title}</title>
       <div className={styles.titleContainer}>
         <h1>{title}</h1>
-        <Tooltip content={`
-• View Defituna positions and PnL
+        <Tooltip content={`• View Defituna positions and PnL
 • No transactions needed - just enter wallet address
 • Support for multiple wallets
 • Auto-refresh data with configurable intervals
 • Historical data tracking for positions
 • Position age tracking
-• PnL card to share with friends
-        `}>
+• PnL card to share with friends`}>
           <div className={styles.infoIcon}>
             <BsInfoCircle />
           </div>
