@@ -1,3 +1,13 @@
+/**
+ * Application constants.
+ * This module provides centralized constants for use throughout the application.
+ * Constants are grouped by functionality.
+ */
+
+/**
+ * Time period options for data fetching and display
+ * @type {Object}
+ */
 export const TIME_PERIODS = {
   MINUTE_1: { value: '1min', label: '1 minute' },
   MINUTE_5: { value: '5min', label: '5 minutes' },
@@ -10,6 +20,10 @@ export const TIME_PERIODS = {
   MONTH_1: { value: '1month', label: '1 month' }
 };
 
+/**
+ * Default chart styling properties
+ * @type {Object}
+ */
 export const CHART_STYLES = {
   grid: {
     stroke: '#cccccc',
@@ -25,4 +39,4 @@ export const CHART_STYLES = {
     axisLine: { stroke: '#666666' },
     padding: { left: 10, right: 10 }
   }
-}; 
+};

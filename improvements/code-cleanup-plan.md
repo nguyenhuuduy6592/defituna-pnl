@@ -155,17 +155,17 @@ This plan outlines a systematic approach to improve code readability and maintai
 | sortUtils.js | 🟢 Completed | New utility file for sorting functions |
 | positionUtils.js | 🟢 Completed | Refactored decoding, status calculation, and styling utils |
 | defituna.js | 🟡 In Progress | Main API integration utilities |
-| formulas.js | 🔴 Not Started | Financial calculations |
-| helius.js | 🔴 Not Started | Helius API integration |
-| debounce.js | 🔴 Not Started | Debouncing utilities |
-| validation.js | 🔴 Not Started | Form validation |
-| notifications.js | 🔴 Not Started | User notifications |
-| pairUtils.js | 🔴 Not Started | Token pair utilities |
+| formulas.js | 🟢 Completed | Added error handling, validation and documentation for financial calculations |
+| helius.js | 🟢 Completed | Enhanced with better error handling, input validation and documentation |
+| debounce.js | 🟢 Completed | Added input validation, error handling, and improved documentation |
+| validation.js | 🟢 Completed | Added new validation functions for numbers, arrays, strings, and URLs |
+| notifications.js | 🟢 Completed | Added accessibility features, improved error handling, and added more notification types |
+| pairUtils.js | 🟢 Completed | Added error handling, improved validation, and added new utility functions |
 | formatters.js | 🟢 Completed | Refactored number, value, duration, and address formatters |
-| constants.js | 🔴 Not Started | Global constants |
+| constants.js | 🟢 Completed | Organized constants with better documentation and added new constant categories |
 | chart.js | 🟢 Completed | Added chart-specific formatters and tooltip component logic |
-| export.js | 🔴 Not Started | Data export functions |
-| styles.js | 🔴 Not Started | Style utilities |
+| export.js | 🟢 Completed | Added input validation, improved error handling, and added fallback options |
+| styles.js | 🟢 Completed | Expanded with new utility functions and improved documentation |
 
 ### Pages
 | Page File | Status | Notes |
