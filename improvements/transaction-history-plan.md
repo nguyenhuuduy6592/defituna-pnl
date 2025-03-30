@@ -57,29 +57,52 @@ This document outlines a comprehensive plan to implement transaction history tra
 
 ### Phase 4: User Interface
 
-8. **Transaction History UI**
-   - Design transaction history list/table view
-   - Implement position-specific transaction history modal
-   - Develop transaction detail view for individual transactions
+8. **Transaction List Implementation**
+   - **Design transaction list similar to the existing active positions display for consistency**
+   - **Maintain familiar column structure and layout patterns users already understand**
+   - **Default to chronological order with newest transactions first**
+   - **Include essential information in list view:**
+     - Transaction type (with appropriate icon)
+     - Position pair
+     - Date/time
+     - Primary value change (+/- amount)
+     - Status indicator
+   - **Implement virtual scrolling for performance**
+   - **Add subtle visual grouping by date or position**
+   - **Use familiar patterns like pull-to-refresh on mobile**
 
-9. **Filtering and Sorting**
-   - Implement filters for transaction type, date range, position, etc.
-   - Create sorting options for various transaction attributes
-   - Develop search functionality for transaction history
+9. **Transaction Detail View**
+   - **Design a modal or slide-in panel for transaction details (similar to position details)**
+   - **Show complete history of all interactions with the position**
+   - **Display transaction sequence in chronological order**
+   - **Organize details into logical sections with clear headings:**
+     - Transaction summary (type, time, status)
+     - Position information (pair, size, leverage)
+     - Financial details (amount, fees, total)
+     - Technical details (collapsible section for advanced users)
+   - **Include a visual summary at the top (transaction type, status, amount)**
+   - **Provide contextual information (position state before/after)**
+   - **Include blockchain verification link for advanced users**
+   - **Use tooltips for technical terms**
 
-10. **Data Visualization**
+10. **Filtering and Sorting**
+    - Implement filters for transaction type, date range, position, etc.
+    - Create sorting options for various transaction attributes
+    - Develop search functionality for transaction history
+
+11. **Data Visualization**
     - Design timeline visualization for position lifecycle
     - Implement charts to show position changes over time
     - Create visual indicators for significant events (liquidation risks, etc.)
 
 ### Phase 5: Testing and Optimization
 
-11. **Testing**
+12. **Testing**
     - Create test cases for different transaction scenarios
     - Test with various wallet histories and position types
     - Implement load testing for large transaction volumes
 
-12. **Performance Optimization**
+13. **Performance Optimization**
     - Optimize API call frequency and data fetching
     - Implement lazy loading and virtualization for large history lists
     - Optimize storage utilization for long-term use
@@ -171,10 +194,24 @@ This document outlines a comprehensive plan to implement transaction history tra
 
 ### Step 5: UI Implementation
 1. Design transaction history UI components
-2. Implement transaction list with virtual scrolling
-3. Create transaction detail view
-4. Add filtering and sorting controls
-5. Implement search functionality
+2. **Implement transaction list with clarity and simplicity**
+   - **Base design on existing positions table for familiarity and consistency**
+   - **Default sort order: newest transactions first (descending chronological order)**
+   - Use virtual list component for performance (react-window or similar)
+   - Implement clear date-based section headers
+   - Design compact but readable list items with visual hierarchy
+   - Include subtle hover effects and active states
+   - Add empty state and loading state designs
+   - Ensure keyboard navigation works properly
+
+3. **Create transaction detail view with progressive disclosure**
+   - Implement a slide-in panel or modal for transaction details
+   - **Show comprehensive history of all interactions with the position**
+   - **Maintain consistent styling with position details modal**
+   - Group details into collapsible sections (transaction overview, position details, fee details)
+   - Show visual comparison of before/after state where applicable
+   - Add option to view raw transaction data for advanced users (behind "View technical details" button)
+   - Include verification link to block explorer
 
 ### Step 6: Testing & Optimization
 1. Test with various wallet profiles
