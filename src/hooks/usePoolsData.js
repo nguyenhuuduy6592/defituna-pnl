@@ -92,8 +92,6 @@ export default function usePoolsData() {
           if (cachedPoolsData) {
             const parsedCache = JSON.parse(cachedPoolsData);
             if (isCacheValid(parsedCache, POOL_CACHE_TTL)) {
-              console.log('[usePoolsData] Using cached pools data');
-              
               // Set pools from cache
               setPools(parsedCache.data);
               
@@ -104,8 +102,6 @@ export default function usePoolsData() {
               
               setLoading(false);
               return;
-            } else {
-              console.log('[usePoolsData] Cache expired, fetching fresh data');
             }
           }
         } catch (cacheError) {
@@ -201,7 +197,6 @@ export default function usePoolsData() {
           filterOptions: newFilterOptions
         };
         localStorage.setItem('poolsData', JSON.stringify(cacheData));
-        console.log('[usePoolsData] Saved fresh data to cache');
       } catch (saveError) {
         console.error('[usePoolsData] Error saving to cache:', saveError);
         // Continue even if cache saving fails

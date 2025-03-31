@@ -112,14 +112,6 @@ export async function fetchPoolData(poolAddress) {
       throw new Error('API response missing data field');
     }
     
-    // Log successful fetch
-    console.log(`[fetchPoolData] Successfully fetched data for ${poolAddress}:`, {
-      address: poolData.address,
-      tvl: poolData.tvl_usdc,
-      hasFees: !!poolData.stats?.['24h']?.fees,
-      hasVolume: !!poolData.stats?.['24h']?.volume
-    });
-    
     // Store in cache
     poolCache.set(poolAddress, { data: poolData, timestamp: Date.now() });
     return poolData;
@@ -226,20 +218,23 @@ export async function processPositionsData(positionsData) {
       return acc;
     }, {});
     
-    // Ensure market data is resolved before proceeding (if needed for token fetching)
+    // Ensure market data is resolved before proceeding
     const marketData = await marketDataPromise;
 
     // 4. Get unique token mints from all pools
     const uniqueMints = new Set();
+    
     Object.values(poolsData).forEach(poolResponse => {
-      if (poolResponse && poolResponse.data) { // Check if pool data is valid
-          const pool = poolResponse.data;
-          if (pool.token_a_mint) uniqueMints.add(pool.token_a_mint);
-          if (pool.token_b_mint) uniqueMints.add(pool.token_b_mint);
+      // Adapted to handle the new API structure - poolResponse is now the direct data object
+      if (poolResponse) {
+        // Access token mints directly from the pool object
+        if (poolResponse.token_a_mint) uniqueMints.add(poolResponse.token_a_mint);
+        if (poolResponse.token_b_mint) uniqueMints.add(poolResponse.token_b_mint);
       } else {
-          console.warn("[processPositionsData] Invalid pool response encountered while extracting mints:", poolResponse);
+        console.warn("[processPositionsData] Invalid pool response encountered while extracting mints:", poolResponse);
       }
     });
+    
     const uniqueMintsArray = Array.from(uniqueMints);
     
     // 5. Fetch token data in parallel
@@ -259,25 +254,27 @@ export async function processPositionsData(positionsData) {
 
       const poolAddress = position.pool;
       const poolData = poolsData[poolAddress];
-      // Add checks for poolData and poolData.data existence
-      if (!poolData || !poolData.data) {
-        console.error('[processPositionsData] Missing or invalid pool data for position:', position);
-        return null; 
-      }
-      const pool = poolData.data;
       
-      const tokenA = tokensData[pool.token_a_mint];
-      const tokenB = tokensData[pool.token_b_mint];
+      // Check if pool data exists - with the new API structure
+      if (!poolData) {
+        console.error('[processPositionsData] Missing or invalid pool data for position:', position);
+        return null;
+      }
+      
+      // Get token data using the mints from the pool
+      const tokenA = tokensData[poolData.token_a_mint];
+      const tokenB = tokensData[poolData.token_b_mint];
       
       if (!tokenA || !tokenB) {
         console.error('[processPositionsData] Missing token data for position:', position);
         return null;
       }
       
+      // Process the position with the updated data structure
       const processedPosition = processTunaPosition(
         { data: position },
-        poolData,
-        marketData, // Use resolved marketData
+        { data: poolData }, // Preserve the expected structure for the formulas
+        marketData,
         tokenA,
         tokenB
       );
@@ -360,17 +357,21 @@ export async function fetchAllPools() {
       throw new Error(`Failed to fetch pools data: ${response.status} ${response.statusText}`);
     }
     
-    // Parse the response
+    // Parse the response - handle both array response directly or data wrapper
     const responseJson = await response.json();
     
-    // Create a consistent structure for the response, mimicking the API structure
-    // but ensuring there's always a 'data' array property
-    const poolsData = {
-      data: Array.isArray(responseJson.data) ? responseJson.data : []
-    };
+    // API might return pools directly as an array now
+    let poolsData;
+    if (Array.isArray(responseJson)) {
+      poolsData = responseJson;
+    } else if (responseJson.data && Array.isArray(responseJson.data)) {
+      poolsData = responseJson.data;
+    } else {
+      console.error('[fetchAllPools] Unexpected response format:', responseJson);
+      poolsData = [];
+    }
     
-    console.log(`[fetchAllPools] Successfully fetched ${poolsData.data.length} pools`);
-    
+    // Store in cache with consistent structure
     allPoolsCache.data = poolsData;
     allPoolsCache.timestamp = Date.now();
     return poolsData;

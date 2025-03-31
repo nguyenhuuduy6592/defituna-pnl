@@ -1,10 +1,4 @@
-import { fetchPoolData, fetchAllPools } from '../../utils/defituna';
-import { decodeValue } from '../../utils/positionUtils';
-
-const DEFITUNA_API = process.env.DEFITUNA_API_URL;
-
-// Constants for value encoding/decoding
-const USD_MULTIPLIER = 100; // Convert dollars to cents (2 decimal places)
+import { fetchAllPools } from '../../utils/defituna';
 
 /**
  * Calculates the Fee APR for a pool based on fees and TVL
@@ -18,8 +12,6 @@ function calculateFeeAPR(pool, timeframe) {
     const fees = pool.fees?.[timeframe]?.usd || 0;
     const tvl = pool.tvl_usdc || 0;
     
-    console.log(`[APR] Fees (${timeframe}): ${fees}, TVL: ${tvl}`);
-
     // Prevent division by zero
     if (tvl <= 0) return 0;
 
@@ -31,7 +23,6 @@ function calculateFeeAPR(pool, timeframe) {
     }[timeframe] || 1;
 
     const apr = (fees / tvl) * (365 / days) * 100;
-    console.log(`[APR] Calculated APR: ${apr}%`);
     return apr;
   } catch (error) {
     console.error('[calculateFeeAPR] Error:', error.message);
@@ -50,13 +41,10 @@ function calculateVolumeTVLRatio(pool, timeframe) {
     const volume = pool.volume?.[timeframe]?.usd || 0;
     const tvl = pool.tvl_usdc || 0;
     
-    console.log(`[Ratio] Volume (${timeframe}): ${volume}, TVL: ${tvl}`);
-
     // Prevent division by zero
     if (tvl <= 0) return 0;
 
     const ratio = volume / tvl;
-    console.log(`[Ratio] Calculated Volume/TVL Ratio: ${ratio}`);
     return ratio;
   } catch (error) {
     console.error('[calculateVolumeTVLRatio] Error:', error.message);
@@ -77,8 +65,6 @@ function calculateVolatilityIndicator(pool, timeframe) {
                         pool.price_change?.[timeframe] || 0;
     const absChange = Math.abs(priceChange);
     
-    console.log(`[Volatility] Price change (${timeframe}): ${priceChange}%`);
-
     if (absChange < 5) return 'low';
     if (absChange < 15) return 'medium';
     return 'high';
@@ -135,13 +121,6 @@ function processPoolData(pool) {
       processedPool.volume[timeframe].usd = processedPool.stats[timeframe].volume || 0;
     });
 
-    // Display key metrics after parsing
-    console.log('Processed pool data:', {
-      tvl: processedPool.tvl_usdc,
-      fees24h: processedPool.fees?.['24h']?.usd,
-      volume24h: processedPool.volume?.['24h']?.usd
-    });
-
     // Add derived metrics for each timeframe
     const timeframes = ['24h', '7d', '30d'];
     const metrics = {};
@@ -181,7 +160,6 @@ export default async function handler(req, res) {
     const address = req.query.poolAddress || req.query.address;
 
     // Fetch all pools regardless of whether an address is provided
-    console.log('[pools API] Fetching all pools data');
     const poolsData = await fetchAllPools();
     
     // Verify pools data exists
@@ -190,14 +168,11 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'Invalid pools data structure from API' });
     }
     
-    console.log(`[pools API] Processing ${poolsData.data.length} pools`);
-    
     // Process each pool to add derived metrics
     const processedPools = poolsData.data.map(pool => processPoolData(pool));
 
     // If address is provided, filter to return just that pool
     if (address) {
-      console.log(`[pools API] Filtering data for pool ${address}`);
       const filteredPool = processedPools.find(pool => pool.address === address);
       
       if (!filteredPool) {
