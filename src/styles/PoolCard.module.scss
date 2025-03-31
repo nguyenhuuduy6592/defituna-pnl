@@ -1,19 +1,8 @@
 @use './variables.module.scss' as variables;
 
-:root {
-  --card-bg: #ffffff;
-  --text-primary: #333333;
-  --text-secondary: #666666;
-  --token-logo-bg: #f0f0f0;
-  --price-bg: #f5f5f5;
-  --border-color: #eaeaea;
-  --bg-secondary: #f5f5f5;
-  --primary: #333333;
-}
-
 .cardLink {
   text-decoration: none;
-  color: var(--text-primary);
+  color: variables.text-color('primary');
   display: block;
   width: 100%;
 }
@@ -37,28 +26,28 @@
 .cardActions {
   display: flex;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: variables.spacing('sm');
   width: 100%;
   z-index: 2;
 }
 
 .card {
-  background: var(--card-bg);
-  border-radius: 10px;
+  background: variables.bg-color('white');
+  border-radius: map-get(variables.$border-radius, 'md');
   padding: 12px;
   transition: all 0.2s ease;
-  border: 1px solid var(--border-color);
+  border: 1px solid variables.color('border');
   text-decoration: none;
   color: inherit;
   display: block;
   cursor: pointer;
   width: 100%;
   box-sizing: border-box;
-  margin-bottom: 8px;
+  margin-bottom: variables.spacing('sm');
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px variables.color('shadow');
   }
 }
 
@@ -66,7 +55,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: variables.spacing('sm');
 }
 
 .tokenPair {
@@ -74,7 +63,7 @@
   align-items: center;
   gap: 6px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: variables.font-size('base');
 }
 
 .tokenInfo {
@@ -87,7 +76,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: var(--token-logo-bg);
+  background: variables.bg-color('light');
   display: flex;
   align-items: center;
   justify-content: center;
@@ -102,32 +91,32 @@
 
 .tokenSymbol {
   font-weight: 500;
-  font-size: 14px;
+  font-size: variables.font-size('sm');
 }
 
 .separator {
-  color: var(--text-secondary);
+  color: variables.text-color('secondary');
 }
 
 .price {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  background: var(--bg-secondary);
+  font-size: variables.font-size('xs');
+  color: variables.text-color('secondary');
+  background: variables.bg-color('light');
   padding: 3px 6px;
-  border-radius: 4px;
+  border-radius: map-get(variables.$border-radius, 'sm');
 }
 
 .metrics {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: variables.spacing('sm');
 }
 
 .metric {
   position: relative;
   padding: 6px;
-  background: var(--bg-secondary);
-  border-radius: 6px;
+  background: variables.bg-color('light');
+  border-radius: map-get(variables.$border-radius, 'sm');
   transition: background-color 0.2s ease;
 
   &.sortAsc::before,
@@ -144,32 +133,32 @@
   }
 
   &.sortAsc::before {
-    border-bottom: 3px solid var(--primary);
+    border-bottom: 3px solid variables.color('primary');
     border-top: none;
   }
 
   &.sortDesc::before {
-    border-top: 3px solid var(--primary);
+    border-top: 3px solid variables.color('primary');
     border-bottom: none;
   }
 }
 
 .metricLabel {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-size: variables.font-size('xs');
+  color: variables.text-color('secondary');
   margin-bottom: 3px;
 }
 
 .metricValue {
-  font-size: 0.9rem;
+  font-size: variables.font-size('sm');
   font-weight: 500;
-  color: var(--text-primary);
+  color: variables.text-color('primary');
 }
 
 .stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: variables.spacing('sm');
 }
 
 .stat {
@@ -179,8 +168,8 @@
 }
 
 .statLabel {
-  color: var(--text-secondary);
-  font-size: 12px;
+  color: variables.text-color('secondary');
+  font-size: variables.font-size('xs');
 }
 
 .statValue {
@@ -188,11 +177,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 3px;
-  font-size: 14px;
+  font-size: variables.font-size('sm');
   font-weight: 500;
   position: relative;
   padding: 2px 5px;
-  border-radius: 3px;
+  border-radius: map-get(variables.$border-radius, 'sm');
 }
 
 /* Responsive adjustments */
@@ -220,7 +209,7 @@
   }
 
   .tokenPair {
-    font-size: 0.9rem;
+    font-size: variables.font-size('sm');
   }
 
   .metrics {
@@ -232,6 +221,6 @@
   }
 
   .metricValue {
-    font-size: 0.85rem;
+    font-size: variables.font-size('xs');
   }
-} 
+}
