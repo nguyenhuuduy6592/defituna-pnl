@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from '../../styles/PoolCard.module.scss';
 
 /**
@@ -53,9 +54,13 @@ export default function PoolCard({ pool, timeframe = '24h' }) {
   
   const formattedFeeRate = (pool.fee_rate / 10000).toFixed(2) + '%'; // Convert basis points to percentage
   
-  // Determine token addresses (placeholders until we get token metadata)
-  const tokenA = pool.token_a_mint.slice(0, 4) + '...' + pool.token_a_mint.slice(-4);
-  const tokenB = pool.token_b_mint.slice(0, 4) + '...' + pool.token_b_mint.slice(-4);
+  // Get token symbols from metadata if available, or fallback to address placeholders
+  const tokenASymbol = pool.tokenA ? pool.tokenA.symbol : pool.token_a_mint.slice(0, 4) + '...' + pool.token_a_mint.slice(-4);
+  const tokenBSymbol = pool.tokenB ? pool.tokenB.symbol : pool.token_b_mint.slice(0, 4) + '...' + pool.token_b_mint.slice(-4);
+  
+  // Get token logos if available
+  const tokenALogo = pool.tokenA?.logoURI;
+  const tokenBLogo = pool.tokenB?.logoURI;
   
   // Determine yield class based on value
   const getYieldClass = (value) => {
@@ -65,16 +70,56 @@ export default function PoolCard({ pool, timeframe = '24h' }) {
     return '';
   };
   
+  // Format price if available
+  const formattedPrice = pool.currentPrice 
+    ? pool.currentPrice > 0.01 
+      ? `1 ${tokenASymbol} = ${pool.currentPrice.toFixed(2)} ${tokenBSymbol}`
+      : `1 ${tokenBSymbol} = ${(1/pool.currentPrice).toFixed(2)} ${tokenASymbol}`
+    : '';
+  
   return (
     <Link href={`/pools/${pool.address}`} className={styles.cardLink}>
       <div className={styles.poolCard}>
         <div className={styles.poolHeader}>
           <div className={styles.tokenPair}>
-            <span className={styles.tokenSymbol}>{tokenA}</span> / 
-            <span className={styles.tokenSymbol}>{tokenB}</span>
+            <div className={styles.tokenInfo}>
+              {tokenALogo && (
+                <div className={styles.tokenLogo}>
+                  <Image 
+                    src={tokenALogo} 
+                    alt={tokenASymbol} 
+                    width={20} 
+                    height={20} 
+                    onError={(e) => { e.target.style.display = 'none' }}
+                  />
+                </div>
+              )}
+              <span className={styles.tokenSymbol}>{tokenASymbol}</span>
+            </div>
+            <span className={styles.separator}>/</span>
+            <div className={styles.tokenInfo}>
+              {tokenBLogo && (
+                <div className={styles.tokenLogo}>
+                  <Image 
+                    src={tokenBLogo} 
+                    alt={tokenBSymbol} 
+                    width={20} 
+                    height={20}
+                    onError={(e) => { e.target.style.display = 'none' }}
+                  />
+                </div>
+              )}
+              <span className={styles.tokenSymbol}>{tokenBSymbol}</span>
+            </div>
           </div>
           <div className={styles.provider}>{pool.provider}</div>
         </div>
+        
+        {formattedPrice && (
+          <div className={styles.priceInfo}>
+            {formattedPrice}
+          </div>
+        )}
         
         <div className={styles.poolStats}>
           <div className={styles.statItem}>

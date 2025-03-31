@@ -1,4 +1,4 @@
-import { fetchAllPools } from '../../utils/defituna';
+const DEFITUNA_API = process.env.DEFITUNA_API_URL;
 
 /**
  * API endpoint to fetch all available pools 
@@ -10,11 +10,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get all pools data
-    const poolsData = await fetchAllPools();
-    
+    const response = await fetch(`${DEFITUNA_API}/pools`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch pools from DeFiTuna API');
+    }
+    const pools = await response.json();
+
     // If we don't have data or it's not in the expected format
-    if (!poolsData || !poolsData.data || !Array.isArray(poolsData.data)) {
+    if (!pools || !pools.data || !Array.isArray(pools.data)) {
       return res.status(500).json({ 
         error: 'Invalid pools data received',
         details: 'The API returned data in an unexpected format'
@@ -22,7 +25,7 @@ export default async function handler(req, res) {
     }
     
     // Apply any filtering from query parameters
-    let filteredPools = poolsData.data;
+    let filteredPools = pools.data;
     const { query } = req;
     
     // Filter by token if specified
@@ -112,10 +115,7 @@ export default async function handler(req, res) {
     // Return the filtered and sorted pools
     res.status(200).json({ data: filteredPools });
   } catch (error) {
-    console.error('Error in /api/pools:', error);
-    res.status(500).json({ 
-      error: error.message || 'Failed to fetch pools data',
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+    console.error('Error fetching pools:', error);
+    res.status(500).json({ error: 'Failed to fetch pools' });
   }
 } 

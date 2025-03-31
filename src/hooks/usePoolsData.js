@@ -1,100 +1,105 @@
 import { useState, useEffect, useCallback } from 'react';
+import { calculatePriceFromSqrtPrice } from '../utils/tokens';
 
 /**
  * Custom hook to fetch and manage pools data
- * @param {Object} options - Configuration options
- * @param {boolean} options.initialFetch - Whether to fetch data on mount (default: true)
- * @param {string} options.sortBy - Field to sort by (default: 'tvl')
- * @param {string} options.sortOrder - Sort order ('asc' or 'desc', default: 'desc')
- * @param {string} options.token - Token filter (optional)
- * @param {string} options.provider - Provider filter (optional)
- * @param {number} options.minTvl - Minimum TVL filter (optional)
  * @returns {Object} Pools data state and control functions
  */
-export default function usePoolsData({
-  initialFetch = true,
-  sortBy = 'tvl',
-  sortOrder = 'desc',
-  token = '',
-  provider = '',
-  minTvl = 0
-} = {}) {
-  // State
-  const [poolsData, setPoolsData] = useState([]);
-  const [loading, setLoading] = useState(false);
+export default function usePoolsData() {
+  const [pools, setPools] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
-    sortBy,
-    sortOrder,
-    token,
-    provider,
-    minTvl
+    sortBy: 'tvl',
+    sortOrder: 'desc',
+    token: '',
+    provider: '',
+    minTvl: 0
   });
 
-  // Function to fetch pools data
   const fetchPools = useCallback(async (customFilters = {}) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Combine current filters with any custom filters
-      const appliedFilters = { ...filters, ...customFilters };
-      
+      // Fetch token metadata first
+      const tokenResponse = await fetch('/api/tokens');
+      if (!tokenResponse.ok) {
+        throw new Error('Failed to fetch token metadata');
+      }
+      const tokenMetadata = await tokenResponse.json();
+
       // Build query string from filters
       const queryParams = new URLSearchParams();
+      const appliedFilters = { ...filters, ...customFilters };
+      
       if (appliedFilters.sortBy) queryParams.append('sort', appliedFilters.sortBy);
       if (appliedFilters.sortOrder) queryParams.append('order', appliedFilters.sortOrder);
       if (appliedFilters.token) queryParams.append('token', appliedFilters.token);
       if (appliedFilters.provider) queryParams.append('provider', appliedFilters.provider);
       if (appliedFilters.minTvl > 0) queryParams.append('minTvl', appliedFilters.minTvl);
-      
-      // Fetch data from API
-      const url = `/api/pools?${queryParams.toString()}`;
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch pools data');
+
+      // Fetch pools data
+      const poolsResponse = await fetch(`/api/pools?${queryParams.toString()}`);
+      if (!poolsResponse.ok) {
+        throw new Error('Failed to fetch pools');
       }
+
+      const { data } = await poolsResponse.json();
+
+      // Enhance pools with token metadata
+      const enhancedPools = data.map(pool => {
+        const tokenA = tokenMetadata[pool.token_a_mint] || {
+          symbol: pool.token_a_mint.slice(0, 4) + '...' + pool.token_a_mint.slice(-4),
+          decimals: 9
+        };
+        const tokenB = tokenMetadata[pool.token_b_mint] || {
+          symbol: pool.token_b_mint.slice(0, 4) + '...' + pool.token_b_mint.slice(-4),
+          decimals: 9
+        };
+
+        const currentPrice = calculatePriceFromSqrtPrice(
+          pool.sqrt_price,
+          tokenA.decimals,
+          tokenB.decimals
+        );
+
+        return {
+          ...pool,
+          tokenA,
+          tokenB,
+          currentPrice
+        };
+      });
+
+      setPools(enhancedPools);
       
-      const data = await response.json();
-      
-      if (!data || !data.data || !Array.isArray(data.data)) {
-        throw new Error('Invalid data format received from API');
-      }
-      
-      setPoolsData(data.data);
-      
-      // Update filters state if custom filters were used
+      // Update filters if custom filters were provided
       if (Object.keys(customFilters).length > 0) {
-        setFilters(prevFilters => ({ ...prevFilters, ...customFilters }));
+        setFilters(prev => ({ ...prev, ...customFilters }));
       }
     } catch (err) {
-      console.error('Error fetching pools data:', err);
-      setError(err.message || 'Failed to fetch pools data');
+      console.error('Error fetching pools:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   }, [filters]);
-  
-  // Apply filters and refetch data
+
+  // Initial fetch
+  useEffect(() => {
+    fetchPools();
+  }, [fetchPools]);
+
   const applyFilters = useCallback((newFilters) => {
     fetchPools(newFilters);
   }, [fetchPools]);
-  
-  // Initial fetch on mount if enabled
-  useEffect(() => {
-    if (initialFetch) {
-      fetchPools();
-    }
-  }, [initialFetch, fetchPools]);
-  
-  return {
-    pools: poolsData,
-    loading,
-    error,
+
+  return { 
+    pools, 
+    loading, 
+    error, 
     filters,
-    fetchPools,
     applyFilters
   };
 } 

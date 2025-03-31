@@ -111,6 +111,17 @@
   gap: variables.spacing(xs);
 }
 
+.tokenLogo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: variables.bg-color(light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .tokenSymbol {
   font-size: variables.font-size(lg);
   font-weight: 600;
@@ -120,6 +131,26 @@
 .separator {
   color: variables.text-color(secondary);
   font-size: variables.font-size(lg);
+}
+
+.priceInfo {
+  display: flex;
+  align-items: center;
+  gap: variables.spacing(sm);
+  font-size: variables.font-size(base);
+  color: variables.text-color(secondary);
+  background: variables.bg-color(light);
+  padding: variables.spacing(sm);
+  border-radius: variables.spacing(sm);
+}
+
+.priceLabel {
+  font-weight: 500;
+}
+
+.priceValue {
+  font-family: monospace;
+  color: variables.text-color(primary);
 }
 
 .provider {

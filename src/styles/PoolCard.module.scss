@@ -33,15 +33,37 @@
 }
 
 .tokenPair {
-  font-size: variables.font-size(lg);
-  font-weight: 600;
-  color: variables.text-color(primary);
+  display: flex;
+  align-items: center;
+  gap: variables.spacing(xs);
+}
+
+.tokenInfo {
+  display: flex;
+  align-items: center;
+  gap: variables.spacing(xs);
+}
+
+.tokenLogo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
   overflow: hidden;
-  text-overflow: ellipsis;
+  background-color: variables.bg-color(light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .tokenSymbol {
+  font-size: variables.font-size(base);
+  font-weight: 600;
   color: variables.text-color(primary);
+}
+
+.separator {
+  color: variables.text-color(secondary);
+  margin: 0 variables.spacing(xs);
 }
 
 .provider {
@@ -53,6 +75,15 @@
   text-transform: capitalize;
   white-space: nowrap;
   margin-left: variables.spacing(sm);
+}
+
+.priceInfo {
+  font-size: variables.font-size(xs);
+  color: variables.text-color(secondary);
+  margin-bottom: variables.spacing(sm);
+  padding-bottom: variables.spacing(xs);
+  text-align: left;
+  border-bottom: 1px dashed variables.color(border);
 }
 
 .poolStats {
