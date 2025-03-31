@@ -6,6 +6,12 @@ import styles from '../../styles/PoolDetail.module.scss';
 import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
 import { PoolMetrics } from '../../components/pools/PoolMetrics';
 import usePoolsData from '../../hooks/usePoolsData';
+import ImpermanentLossExplainer from '../../components/education/ImpermanentLossExplainer';
+import InfoIcon from '../../components/common/InfoIcon';
+import { 
+  getImpermanentLossTooltip,
+  getPriceImpactTooltip
+} from '../../utils/tooltipContent';
 
 const TIMEFRAMES = [
   { value: '24h', label: '24 Hours' },
@@ -265,6 +271,29 @@ export default function PoolDetailPage() {
                   </div>
                 </div>
               </div>
+            </div>
+            
+            <div className={styles.educationSection}>
+              <h2 className={styles.educationHeader}>
+                LP Education
+                <div className={styles.keyConceptsInfo}>
+                  <InfoIcon 
+                    content={getPriceImpactTooltip()} 
+                    position="top" 
+                    size="medium" 
+                  />
+                  <span>Price Impact</span>
+                  
+                  <InfoIcon 
+                    content={getImpermanentLossTooltip()} 
+                    position="top" 
+                    size="medium" 
+                  />
+                  <span>Impermanent Loss</span>
+                </div>
+              </h2>
+              
+              <ImpermanentLossExplainer />
             </div>
             
             <div className={styles.actions}>

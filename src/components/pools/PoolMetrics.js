@@ -1,82 +1,122 @@
-import { memo } from 'react';
-import { BsInfoCircle } from 'react-icons/bs';
-import { Tooltip } from '../common/Tooltip';
-import { usePoolData } from '../../hooks/usePoolData';
-import styles from './PoolMetrics.module.scss';
+import React from 'react';
+import PropTypes from 'prop-types';
+import styles from '../../styles/PoolMetrics.module.scss';
+import EnhancedTooltip from '../common/EnhancedTooltip';
+import InfoIcon from '../common/InfoIcon';
+import { formatNumber } from '../../utils/formatters';
+import usePoolData from '../../hooks/usePoolData';
+import classNames from 'classnames';
+import { 
+  getFeeAPRTooltip, 
+  getVolumeTVLTooltip, 
+  getVolatilityTooltip,
+  getTVLTooltip,
+  getVolumeTooltip,
+  getYieldTooltip,
+  getFeeRateTooltip,
+  getImpermanentLossTooltip
+} from '../../utils/tooltipContent';
 
-/**
- * Metric display component with tooltip
- */
-const MetricDisplay = memo(({ label, value, tooltip, className }) => (
-  <div className={`${styles.metric} ${className || ''}`}>
-    <div className={styles.metricHeader}>
-      <span className={styles.label}>{label}</span>
-      <Tooltip content={tooltip} position="top-center">
-        <span className={styles.infoIcon}>
-          <BsInfoCircle />
-        </span>
-      </Tooltip>
+const MetricDisplay = ({ label, value, tooltipContent, className, prefix = '', suffix = '', textColor = '' }) => {
+  return (
+    <div className={classNames(styles.metricContainer, className)}>
+      <div className={styles.metricLabel}>
+        {label}
+        {tooltipContent && (
+          <EnhancedTooltip title={label} content={tooltipContent}>
+            <InfoIcon size="small" />
+          </EnhancedTooltip>
+        )}
+      </div>
+      <div className={classNames(styles.metricValue, textColor ? styles[textColor] : '')}>
+        {prefix}{value}{suffix}
+      </div>
     </div>
-    <div className={styles.value}>{value}</div>
-  </div>
-));
+  );
+};
 
-MetricDisplay.displayName = 'MetricDisplay';
+MetricDisplay.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  tooltipContent: PropTypes.string,
+  className: PropTypes.string,
+  prefix: PropTypes.string,
+  suffix: PropTypes.string,
+  textColor: PropTypes.string
+};
 
-/**
- * Component for displaying pool metrics with visual indicators
- * @param {Object} props Component props
- * @param {string} props.poolAddress The address of the pool
- * @param {string} props.timeframe The timeframe for metrics ('24h', '7d', '30d')
- */
-export const PoolMetrics = memo(({ poolAddress, timeframe = '24h' }) => {
-  const {
-    loading,
-    error,
-    feeAPR,
-    volumeTVLRatio,
-    volatility
-  } = usePoolData(poolAddress, timeframe);
+const PoolMetrics = ({ poolId, timeframe, className }) => {
+  const { loading, error, data } = usePoolData(poolId, timeframe);
 
-  if (loading) {
-    return <div className={styles.loading}>Loading metrics...</div>;
-  }
+  if (loading) return <div className={styles.loading}>Loading pool data...</div>;
+  if (error) return <div className={styles.error}>Error loading pool data</div>;
+  if (!data) return null;
 
-  if (error) {
-    return <div className={styles.error}>Error loading metrics: {error}</div>;
-  }
-
-  // Format values
-  const formattedFeeAPR = `${feeAPR.toFixed(2)}%`;
-  const formattedVolumeTVL = volumeTVLRatio.toFixed(2);
-
-  // Get volatility class for styling
-  const volatilityClass = styles[`volatility${volatility.charAt(0).toUpperCase() + volatility.slice(1)}`];
+  // Format data for display
+  const formattedData = {
+    tvl: formatNumber(data.tvl, 'currency'),
+    volume: formatNumber(data.volume, 'currency'),
+    yield: formatNumber(data.yield, 'percentage', 2),
+    fee: formatNumber(data.fee, 'percentage', 2),
+    feeAPR: formatNumber(data.feeAPR, 'percentage', 2),
+    volumeTVL: formatNumber(data.volumeTVL, 'number', 2),
+    volatility: data.volatility || 'N/A'
+  };
 
   return (
-    <div className={styles.metricsContainer}>
-      <MetricDisplay
-        label="Fee APR"
-        value={formattedFeeAPR}
-        tooltip="Annual Percentage Rate of fees earned by liquidity providers based on recent activity"
-        className={styles.feeAPR}
+    <div className={classNames(styles.metricsContainer, className)}>
+      <MetricDisplay 
+        label="TVL" 
+        value={formattedData.tvl} 
+        tooltipContent={getTVLTooltip(formattedData.tvl)}
       />
-      
-      <MetricDisplay
-        label="Volume/TVL"
-        value={formattedVolumeTVL}
-        tooltip="Ratio of trading volume to total value locked, indicating capital efficiency"
-        className={styles.volumeTVL}
+      <MetricDisplay 
+        label="Volume" 
+        value={formattedData.volume} 
+        tooltipContent={getVolumeTooltip(timeframe)}
       />
-      
-      <MetricDisplay
-        label="Volatility"
-        value={volatility}
-        tooltip="Price volatility indicator based on recent price changes"
-        className={`${styles.volatility} ${volatilityClass}`}
+      <MetricDisplay 
+        label="Yield" 
+        value={formattedData.yield} 
+        tooltipContent={getYieldTooltip(timeframe)}
+      />
+      <MetricDisplay 
+        label="Fee" 
+        value={formattedData.fee} 
+        tooltipContent={getFeeRateTooltip()}
+      />
+      <MetricDisplay 
+        label="Fee APR" 
+        value={formattedData.feeAPR} 
+        tooltipContent={getFeeAPRTooltip(data.feeAPR)}
+      />
+      <MetricDisplay 
+        label="Volume/TVL" 
+        value={formattedData.volumeTVL} 
+        tooltipContent={getVolumeTVLTooltip(data.volumeTVL)}
+      />
+      <MetricDisplay 
+        label="Volatility" 
+        value={formattedData.volatility}
+        tooltipContent={getVolatilityTooltip(data.volatility)}
+        textColor={
+          data.volatility === 'High' ? 'textDanger' : 
+          data.volatility === 'Medium' ? 'textWarning' : 
+          data.volatility === 'Low' ? 'textSuccess' : ''
+        }
       />
     </div>
   );
-});
+};
 
-PoolMetrics.displayName = 'PoolMetrics'; 
+PoolMetrics.propTypes = {
+  poolId: PropTypes.string.isRequired,
+  timeframe: PropTypes.string,
+  className: PropTypes.string
+};
+
+PoolMetrics.defaultProps = {
+  timeframe: '24h'
+};
+
+export default PoolMetrics; 

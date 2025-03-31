@@ -4,6 +4,15 @@ import styles from '../../styles/PoolCard.module.scss';
 import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
 import { usePoolData } from '../../hooks/usePoolData';
 import CompareButton from './CompareButton';
+import InfoIcon from '../common/InfoIcon';
+import { 
+  getFeeAPRTooltip, 
+  getVolumeTVLTooltip, 
+  getTVLTooltip,
+  getVolumeTooltip,
+  getYieldTooltip,
+  getFeeRateTooltip 
+} from '../../utils/tooltipContent';
 
 /**
  * Pool Card Component
@@ -65,33 +74,51 @@ export default function PoolCard({ pool, timeframe = '24h', sortBy, sortOrder })
 
           <div className={styles.metrics}>
             <div className={`${styles.metric} ${getSortIndicatorClass('tvl')}`}>
-              <div className={styles.metricLabel}>TVL</div>
+              <div className={styles.metricLabel}>
+                TVL
+                <InfoIcon content={getTVLTooltip(formattedTVL)} position="top" />
+              </div>
               <div className={styles.metricValue}>{formattedTVL}</div>
             </div>
 
             <div className={`${styles.metric} ${getSortIndicatorClass(`volume${timeframe}`)}`}>
-              <div className={styles.metricLabel}>Volume</div>
+              <div className={styles.metricLabel}>
+                Volume
+                <InfoIcon content={getVolumeTooltip(timeframe)} position="top" />
+              </div>
               <div className={styles.metricValue}>{formattedVolume}</div>
             </div>
 
             <div className={`${styles.metric} ${getSortIndicatorClass(`yield_over_tvl${timeframe}`)}`}>
-              <div className={styles.metricLabel}>Yield</div>
+              <div className={styles.metricLabel}>
+                Yield
+                <InfoIcon content={getYieldTooltip(timeframe)} position="top" />
+              </div>
               <div className={styles.metricValue}>{formattedYield}</div>
             </div>
 
             <div className={`${styles.metric} ${getSortIndicatorClass('fee')}`}>
-              <div className={styles.metricLabel}>Fee</div>
+              <div className={styles.metricLabel}>
+                Fee
+                <InfoIcon content={getFeeRateTooltip()} position="top" />
+              </div>
               <div className={styles.metricValue}>{formattedFeeRate}</div>
             </div>
             
             {/* Add derived metrics */}
             <div className={styles.metric}>
-              <div className={styles.metricLabel}>Fee APR</div>
+              <div className={styles.metricLabel}>
+                Fee APR
+                <InfoIcon content={getFeeAPRTooltip(feeAPR)} position="top" />
+              </div>
               <div className={styles.metricValue}>{formattedFeeAPR}</div>
             </div>
             
             <div className={styles.metric}>
-              <div className={styles.metricLabel}>Volume/TVL</div>
+              <div className={styles.metricLabel}>
+                Volume/TVL
+                <InfoIcon content={getVolumeTVLTooltip(volumeTVLRatio)} position="top" />
+              </div>
               <div className={styles.metricValue}>{formattedVolumeTVL}</div>
             </div>
           </div>
