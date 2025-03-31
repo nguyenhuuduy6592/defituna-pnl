@@ -1,7 +1,7 @@
 # DeFiTuna Pools Feature Plan
 
 ## Overview & Goals
-Display all available pools on DeFiTuna with detailed information, filtering capabilities, and data visualizations to help users make informed decisions.
+Provide a simple, robust, and user-friendly interface to explore DeFiTuna pools. Go beyond raw data display by offering **derived insights, contextual information, and intuitive visualizations** to help users quickly identify opportunities and understand risks, ultimately enabling better-informed decisions.
 
 ## Implementation Status & Next Steps
 
@@ -91,30 +91,41 @@ Display all available pools on DeFiTuna with detailed information, filtering cap
      - Create compact single-line filter controls
      - Stack elements appropriately on small screens
 
-### Phase 5: Advanced Features 📝 PENDING
-1. 📝 Implement data visualizations
-   - Create yield history charts
-   - Add volume comparison visuals
-   - Build liquidity distribution graph
-   - **Action Item**: Create base chart components for yield data
+### Phase 5: Insightful Analytics & Visualization 🔄 PRIORITY
+*Focus: Transform raw data into actionable insights.*
 
-2. 📝 Add user interaction features
-   - Implement "Create Position" functionality
-   - Add favorites system
-   - Create pool sharing mechanism
-   - **Action Item**: Implement position link generator with pre-filled data
+1.  🔄 **Implement Key Derived Metrics**:
+    *   Calculate and display **Fee APR** (based on `fees` / `tvl_usdc` over the selected timeframe, annualized).
+    *   Calculate and display **Volume / TVL Ratio** (indicates capital efficiency).
+    *   Add simple **Volatility Indicators** for underlying tokens (e.g., Low/Medium/High based on recent price action - requires token price data).
+    *   **Value add**: Provide clearer performance indicators (Fee APR) and risk context (Volatility) than raw stats alone.
+    *   **Action Item**: Implement calculations for Fee APR and Volatility indicators. Integrate into Pool Card and Detail Page.
 
-3. 📝 Add Helius integration
-   - Set up transaction history for pools
-   - Show creation date and significant events
-   - Display whale activity and patterns
-   - **Action Item**: Set up Helius API connection in backend
+2.  🔄 **Create Focused Historical Charts**:
+    *   Implement time-series charts on the Pool Detail page for **Fee APR** and **TVL**.
+    *   Keep timeframe selection simple (7d, 30d, 90d).
+    *   **Value add**: Visualize the stability and trend of returns and pool size.
+    *   **Action Item**: Integrate charting library and create reusable chart components for Fee APR and TVL.
 
-4. 📝 Optimize performance
-   - Implement pagination for large lists
-   - Add virtualized scrolling
-   - Create background refresh mechanism
-   - **Action Item**: Research and implement pagination with cursor
+3.  🔄 **Develop Contextual Tooltips & Explanations**:
+    *   Enhance all metric tooltips to explain *what the metric means for the user* and *how to interpret it* (e.g., "High Fee APR suggests good returns for LPs based on recent activity, but check volatility").
+    *   Add info icons with brief explanations for key concepts like impermanent loss risk (without complex calculations yet).
+    *   **Value add**: Educate users and build confidence in interpreting the data.
+    *   **Action Item**: Review and rewrite all tooltips with a focus on user implications.
+
+### Phase 6: User Convenience & Decision Support 📝 HIGH VALUE
+*Focus: Make it easier for users to track, compare, and act.*
+
+1.  📝 **Enhance Pool Comparison**:
+    *   Create a simple mechanism to select 2-3 pools for a direct side-by-side comparison view.
+    *   Focus the comparison on key differentiating metrics (Fee APR, TVL, Volume/TVL, Volatility Indicators, Fees).
+    *   **Value add**: Streamline the process of choosing between specific pools.
+    *   **Action Item**: Design and implement the comparison selection and view.
+
+2.  📝 **Add "Quick Filter" Presets**:
+    *   Create predefined filter buttons for common scenarios (e.g., "High Yield Stablecoins", "Top Volume Pools", "Newer Pools < 30d old" - requires pool age data if available).
+    *   **Value add**: Help users quickly discover pools matching popular strategies.
+    *   **Action Item**: Define useful presets and implement one-click filter application.
 
 ## Completed Improvements
 1. ✅ Enhanced Pool Cards
@@ -135,21 +146,14 @@ Display all available pools on DeFiTuna with detailed information, filtering cap
    - Optimized responsive behavior for different screen sizes
    - Reduced visual clutter while maintaining functionality
 
-## Next Features to Consider
-1. 🔄 Implement data visualizations for key metrics
-2. 🔄 Add user interaction features (favorites, sharing)
-3. 🔄 Implement transaction history
-4. 🔄 Add pagination for scaling to larger pool sets
+## Core Principles for Added Value
+*   **Simplicity**: Prioritize clarity over complexity. Avoid overwhelming users with too many numbers.
+*   **Context**: Explain what metrics mean and why they matter.
+*   **Actionability**: Focus on data and features that directly help users compare pools and make decisions.
+*   **Robustness**: Ensure calculations are sound and the application is reliable.
 
-## Key Data Structure
-The pool data contains these key fields:
-- `address`: Pool contract address
-- `provider`: Provider name (e.g., "orca")
-- `token_a_mint`/`token_b_mint`: Token mint addresses
-- `tvl_usdc`: Total Value Locked in USDC
-- `fee_rate`: Fee rate in basis points
-- `sqrt_price`: Square root price for calculations
-- `stats`: Metrics for different time periods (24h, 7d, 30d)
-  - `volume`: Trading volume
-  - `fees`: Fees generated
-  - `yield_over_tvl`: Yield over TVL ratio 
+## Success Metrics
+*   User feedback indicating the tool helps them make **better/faster decisions** compared to raw data sources.
+*   Active use of **derived metrics** (Fee APR) and **risk indicators** in filtering/sorting.
+*   High usage of **comparison** and **watchlist** features.
+*   Low bounce rate, indicating users find the presented information valuable and engaging.
