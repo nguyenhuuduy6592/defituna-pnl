@@ -1,11 +1,11 @@
 @use './variables.module.scss' as variables;
 
 .filterContainer {
-  background: var(--card-bg);
+  background: variables.bg-color(card);
   border-radius: 8px;
   padding: 10px;
   margin-bottom: 16px;
-  border: 1px solid var(--border-color);
+  border: 1px solid variables.color(border);
 }
 
 .filtersForm {
@@ -28,35 +28,35 @@
 
 .filterLabel {
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: variables.text-color(secondary);
   font-weight: 500;
 }
 
 .filterSelect {
   padding: 6px 8px;
-  border: 1px solid var(--border-color);
+  border: 1px solid variables.color(border);
   border-radius: 4px;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+  background: variables.bg-color(secondary);
+  color: variables.text-color(primary);
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
   height: 30px;
 
   &:hover {
-    border-color: var(--primary);
+    border-color: variables.color(primary);
   }
 
   &:focus {
     outline: none;
-    border-color: var(--primary);
+    border-color: variables.color(primary);
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   }
 
   option {
     padding: 6px;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+    background: variables.bg-color(secondary);
+    color: variables.text-color(primary);
   }
 }
 
@@ -67,10 +67,10 @@
 
 .resetButton {
   padding: 6px 10px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background: variables.bg-color(secondary);
+  border: 1px solid variables.color(border);
   border-radius: 4px;
-  color: var(--text-secondary);
+  color: variables.text-color(secondary);
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -78,7 +78,7 @@
 
   &:hover {
     background: var(--bg-hover);
-    color: var(--text-primary);
+    color: variables.text-color(primary);
   }
 }
 
@@ -139,19 +139,19 @@
 }
 
 .saveButton {
-  background-color: var(--primary);
+  background-color: variables.color(primary);
   color: white;
   border: none;
   
   &:hover {
-    background-color: var(--primary-dark);
+    background-color: variables.color(primary-dark);
   }
 }
 
 .resetButton {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background-color: variables.bg-color(secondary);
+  color: variables.text-color(primary);
+  border: 1px solid variables.color(border);
   
   &:hover {
     background-color: var(--danger-light);
@@ -225,7 +225,7 @@
 .savedFiltersRow {
   margin-bottom: 12px;
   padding: 8px 12px;
-  background-color: var(--bg-secondary);
+  background-color: variables.bg-color(secondary);
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -236,7 +236,7 @@
 .savedFiltersLabel {
   font-weight: 500;
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: variables.text-color(secondary);
   margin-right: 4px;
 }
 
@@ -249,7 +249,7 @@
 
 .savedFilter {
   background-color: var(--bg-white);
-  border: 1px solid var(--border-color);
+  border: 1px solid variables.color(border);
   border-radius: 4px;
   padding: 4px 8px;
   font-size: 0.8rem;
@@ -260,7 +260,7 @@
   transition: all 0.2s ease;
   
   &:hover {
-    border-color: var(--primary);
+    border-color: variables.color(primary);
     background-color: var(--bg-hover);
   }
 }
@@ -275,7 +275,7 @@
 .deleteFilterButton {
   background: none;
   border: none;
-  color: var(--text-secondary);
+  color: variables.text-color(secondary);
   font-size: 14px;
   line-height: 1;
   cursor: pointer;
@@ -287,7 +287,7 @@
 }
 
 .saveButton {
-  background-color: var(--primary);
+  background-color: variables.color(primary);
   color: white;
   border: none;
   padding: 6px 12px;
@@ -296,14 +296,14 @@
   font-size: 0.85rem;
   
   &:hover {
-    background-color: var(--primary-dark);
+    background-color: variables.color(primary-dark);
   }
 }
 
 .resetButton {
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background-color: variables.bg-color(secondary);
+  color: variables.text-color(primary);
+  border: 1px solid variables.color(border);
   padding: 6px 12px;
   border-radius: 4px;
   cursor: pointer;
@@ -314,4 +314,4 @@
     border-color: var(--danger);
     color: var(--danger);
   }
-} 
+}

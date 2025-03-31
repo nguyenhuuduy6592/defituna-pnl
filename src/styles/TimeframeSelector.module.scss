@@ -1,3 +1,5 @@
+@use './variables.module.scss' as variables;
+
 .timeframeSelector {
   display: flex;
   gap: 8px;
@@ -7,10 +9,10 @@
 
 .timeframeButton {
   padding: 6px 12px;
-  border: 1px solid var(--border-color);
+  border: 1px solid variables.color(border);
   border-radius: 6px;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
+  background: variables.bg-color(secondary);
+  color: variables.text-color(secondary);
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -18,15 +20,15 @@
   text-align: center;
 
   &:hover:not(.active) {
-    background: var(--bg-hover);
-    border-color: var(--primary);
-    color: var(--primary);
+    background: variables.bg-color(hover);
+    border-color: variables.color(primary);
+    color: variables.color(primary);
   }
 
   &.active {
-    background: var(--primary);
+    background: variables.color(primary);
     color: white;
-    border-color: var(--primary);
+    border-color: variables.color(primary);
   }
 }
 
@@ -40,4 +42,4 @@
     font-size: 0.8rem;
     min-width: 50px;
   }
-} 
+}
