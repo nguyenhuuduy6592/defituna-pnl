@@ -52,7 +52,7 @@ export default function PoolsPage() {
         <PoolFilters 
           filters={filters}
           onApplyFilters={applyFilters}
-          providers={providers}
+          pools={pools}
           activeTimeframe={timeframe}
           onTimeframeChange={handleTimeframeChange}
         />
@@ -79,12 +79,6 @@ export default function PoolsPage() {
         {!loading && !error && pools && pools.length === 0 && (
           <div className={styles.emptyContainer}>
             <p>No pools found matching your filters.</p>
-          </div>
-        )}
-        
-        {!loading && !error && pools && pools.length > 0 && (
-          <div className={styles.poolStats}>
-            <p>Showing {pools.length} pools</p>
           </div>
         )}
         

@@ -55,6 +55,9 @@
   grid-template-columns: 1fr;
   gap: variables.spacing(md);
   margin-top: variables.spacing(lg);
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .loadingContainer {
@@ -137,6 +140,7 @@
 @media (min-width: map-get(variables.$breakpoints, lg)) {
   .poolsGrid {
     grid-template-columns: repeat(3, 1fr);
+    gap: variables.spacing(md); /* Smaller gap for better fit */
   }
   
   .heading {

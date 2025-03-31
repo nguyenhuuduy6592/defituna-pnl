@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../../styles/PoolDetail.module.scss';
 import { enhancePoolWithTokenMetadata } from '../../utils/tokens';
-import { formatNumber, formatWalletAddress, formatPercentage } from '../../utils/formatters';
+import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
 
 export default function PoolDetailPage() {
   const router = useRouter();
@@ -60,9 +60,9 @@ export default function PoolDetailPage() {
     const stats = poolData.stats[timeframe] || {};
     
     return {
-      tvl: '$' + formatNumber(poolData.tvl_usdc, true),
-      volume: '$' + formatNumber(stats.volume || 0, true),
-      fees: '$' + formatNumber(stats.fees || 0, true),
+      tvl: formatFee(poolData.tvl_usdc, true),
+      volume: formatFee(stats.volume || 0, true),
+      fees: formatFee(stats.fees || 0),
       yield: formatPercentage(stats.yield_over_tvl || 0),
       feeRate: formatPercentage(poolData.fee_rate / 10000),
       protocolFeeRate: formatPercentage(poolData.protocol_fee_rate / 10000),

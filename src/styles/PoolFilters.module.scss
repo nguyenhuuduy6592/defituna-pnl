@@ -2,21 +2,26 @@
 
 .filterContainer {
   @include variables.card;
-  padding: variables.spacing(md) variables.spacing(md) variables.spacing(lg);
-  margin-bottom: variables.spacing(lg);
+  padding: variables.spacing(sm);
+  margin-bottom: variables.spacing(md);
 }
 
 .filtersForm {
+  width: 100%;
+}
+
+.filterControls {
   display: flex;
-  flex-direction: column;
-  gap: variables.spacing(md);
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: variables.spacing(sm);
+  justify-content: flex-start;
 }
 
 .timeframeSelector {
   display: flex;
-  justify-content: center;
-  gap: variables.spacing(sm);
-  margin-bottom: variables.spacing(md);
+  gap: variables.spacing(xxs);
+  flex-shrink: 0;
 }
 
 .timeframeButton {
@@ -24,8 +29,8 @@
   color: variables.text-color(secondary);
   border: 1px solid variables.color(border);
   border-radius: variables.spacing(md);
-  padding: variables.spacing(sm) variables.spacing(md);
-  font-size: variables.font-size(base);
+  padding: variables.spacing(xs) variables.spacing(xs);
+  font-size: variables.font-size(xs);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -42,52 +47,82 @@
   }
 }
 
-.filterRow {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: variables.spacing(md);
-}
-
-.filterItem {
+.filterGroup {
   display: flex;
-  flex-direction: column;
+  flex-wrap: nowrap;
   gap: variables.spacing(sm);
+  align-items: center;
+  justify-content: flex-start;
+  flex-shrink: 1;
 }
 
-.filterLabel {
-  font-size: variables.font-size(sm);
-  font-weight: 500;
-  color: variables.text-color(secondary);
-}
-
-.filterSelect,
-.filterInput {
+.filterSelect {
   @extend %input-base;
   background: variables.bg-color(white);
   color: variables.text-color(primary);
-  padding: variables.spacing(sm);
-  font-size: variables.font-size(base);
+  padding: variables.spacing(xs) variables.spacing(xs);
+  font-size: variables.font-size(xs);
+  min-width: 100px;
+  max-width: 150px;
+  width: auto;
+  flex: 0 1 auto;
   
   &:focus {
     border-color: variables.color(primary);
   }
 }
 
-.buttonRow {
+.searchWrapper {
+  position: relative;
+  flex: 0.8;
+  min-width: 100px;
+}
+
+.filterInput {
+  @extend %input-base;
+  background: variables.bg-color(white);
+  color: variables.text-color(primary);
+  padding: variables.spacing(xs) variables.spacing(xs);
+  font-size: variables.font-size(xs);
+  width: 100%;
+  padding-right: variables.spacing(md);
+  
+  &:focus {
+    border-color: variables.color(primary);
+  }
+}
+
+.clearButton {
+  position: absolute;
+  right: variables.spacing(xs);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: variables.text-color(secondary);
+  font-size: variables.font-size(sm);
+  cursor: pointer;
+  padding: 0;
+  
+  &:hover {
+    color: variables.color(primary);
+  }
+}
+
+.buttonGroup {
   display: flex;
-  gap: variables.spacing(md);
-  justify-content: center;
-  margin-top: variables.spacing(md);
+  gap: variables.spacing(xs);
+  flex-shrink: 0;
 }
 
 .applyButton,
 .resetButton {
   @extend %button-base;
-  padding: variables.spacing(sm) variables.spacing(lg);
+  padding: variables.spacing(xs) variables.spacing(xs);
   border-radius: variables.spacing(md);
-  font-size: variables.font-size(base);
+  font-size: variables.font-size(xs);
   font-weight: 500;
-  min-width: 120px;
+  min-width: 50px;
 }
 
 .applyButton {
@@ -100,6 +135,12 @@
 }
 
 .resetButton {
+  @extend %button-base;
+  padding: variables.spacing(xs) variables.spacing(sm);
+  border-radius: variables.spacing(md);
+  font-size: variables.font-size(xs);
+  font-weight: 500;
+  min-width: 60px;
   background-color: variables.bg-color(white);
   color: variables.text-color(secondary);
   border: 1px solid variables.color(border);
@@ -112,14 +153,67 @@
 }
 
 /* Responsive adjustments */
-@media (min-width: map-get(variables.$breakpoints, md)) {
-  .filterRow {
-    grid-template-columns: repeat(2, 1fr);
+@media (max-width: 768px) {
+  .filterControls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: variables.spacing(sm);
+  }
+  
+  .filterGroup {
+    width: 100%;
+  }
+  
+  .timeframeSelector,
+  .buttonGroup {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .searchWrapper {
+    max-width: none;
+    width: 100%;
   }
 }
 
-@media (min-width: map-get(variables.$breakpoints, xl)) {
-  .filterRow {
-    grid-template-columns: repeat(4, 1fr);
+@media (max-width: 992px) {
+  .filterControls {
+    flex-wrap: wrap;
+    gap: variables.spacing(xs);
+  }
+  
+  .timeframeSelector, 
+  .buttonGroup {
+    flex: 0 0 auto;
+  }
+  
+  .filterGroup {
+    flex: 1 0 100%;
+    order: 3;
+    margin-top: variables.spacing(xs);
+  }
+}
+
+@media (max-width: 576px) {
+  .filterControls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: variables.spacing(sm);
+  }
+  
+  .timeframeSelector,
+  .buttonGroup,
+  .filterGroup {
+    width: 100%;
+  }
+  
+  .filterGroup {
+    flex-wrap: wrap;
+  }
+  
+  .filterSelect,
+  .searchWrapper {
+    flex: 1 0 100%;
+    margin-bottom: variables.spacing(xs);
   }
 } 

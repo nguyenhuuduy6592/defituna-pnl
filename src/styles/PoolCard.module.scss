@@ -1,150 +1,223 @@
 @use './variables.module.scss' as variables;
 
-.cardLink {
-  text-decoration: none;
-  color: inherit;
-  display: block;
-  height: 100%;
+:root {
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --token-logo-bg: #f0f0f0;
+  --price-bg: #f5f5f5;
+  --success: #00c853;
+  --success-bg: rgba(0, 200, 83, 0.1);
+  --warning: #ffa726;
+  --warning-bg: rgba(255, 167, 38, 0.1);
+  --error: #ff1744;
+  --error-bg: rgba(255, 23, 68, 0.1);
 }
 
-.poolCard {
-  @include variables.card;
-  padding: variables.spacing(md);
-  margin-bottom: variables.spacing(md);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.cardLink {
+  text-decoration: none;
+  color: var(--text-primary);
+  display: block;
+  width: 100%;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 14px;
+  transition: all 0.2s ease;
   cursor: pointer;
+  border: 1px solid #eaeaea;
   height: 100%;
-  display: flex;
-  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px variables.color(shadow);
-    border: 1px solid variables.color(primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 }
 
-.poolHeader {
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: variables.spacing(sm);
-  padding-bottom: variables.spacing(sm);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .tokenPair {
   display: flex;
   align-items: center;
-  gap: variables.spacing(xs);
+  gap: 8px;
 }
 
 .tokenInfo {
   display: flex;
   align-items: center;
-  gap: variables.spacing(xs);
+  gap: 4px;
 }
 
 .tokenLogo {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  overflow: hidden;
-  background-color: variables.bg-color(light);
+  background: var(--token-logo-bg);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }
 
 .tokenSymbol {
-  font-size: variables.font-size(base);
-  font-weight: 600;
-  color: variables.text-color(primary);
+  font-weight: 500;
+  font-size: 16px;
 }
 
 .separator {
-  color: variables.text-color(secondary);
-  margin: 0 variables.spacing(xs);
-}
-
-.provider {
-  font-size: variables.font-size(xs);
-  color: variables.text-color(secondary);
-  background: variables.bg-color(light);
-  padding: variables.spacing(xs) variables.spacing(sm);
-  border-radius: variables.spacing(md);
-  text-transform: capitalize;
-  white-space: nowrap;
-  margin-left: variables.spacing(sm);
+  color: var(--text-secondary);
+  font-size: 16px;
 }
 
 .priceInfo {
-  font-size: variables.font-size(xs);
-  color: variables.text-color(secondary);
-  margin-bottom: variables.spacing(sm);
-  padding-bottom: variables.spacing(xs);
-  text-align: left;
-  border-bottom: 1px dashed variables.color(border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--price-bg);
+  border-radius: 6px;
 }
 
-.poolStats {
+.priceLabel {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.priceValue {
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.stats {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: variables.spacing(sm);
-  flex-grow: 1;
+  gap: 10px;
 }
 
-.statItem {
+.stat {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: variables.spacing(xs);
+  gap: 4px;
 }
 
 .statLabel {
-  font-size: variables.font-size(xs);
-  color: variables.text-color(secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .statValue {
-  font-size: variables.font-size(base);
-  font-weight: 600;
-  color: variables.text-color(primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  position: relative;
+  padding: 3px 6px;
+  border-radius: 4px;
   
-  &.highlight {
-    color: variables.color(primary);
+  &.high {
+    color: var(--success);
+    background: var(--success-bg);
+  }
+  
+  &.medium {
+    color: var(--warning);
+    background: var(--warning-bg);
+  }
+  
+  &.low {
+    color: var(--error);
+    background: var(--error-bg);
   }
   
   &.positive {
-    color: variables.color(positive);
-  }
-  
-  &.negative {
-    color: variables.color(negative);
+    color: var(--success);
+    background: var(--success-bg);
   }
   
   &.neutral {
-    color: variables.color(primary);
+    color: var(--warning);
+    background: var(--warning-bg);
+  }
+  
+  &.negative {
+    color: var(--error);
+    background: var(--error-bg);
+  }
+}
+
+.trendWrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: 10px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.trendLabel {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.trendingIndicator {
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  position: relative;
+  margin-left: 4px;
+  
+  &.up {
+    border-bottom: 4px solid var(--success);
+  }
+  
+  &.down {
+    border-top: 4px solid var(--error);
+  }
+  
+  &.neutral {
+    width: 8px;
+    height: 2px;
+    background: var(--warning);
+    margin-top: 2px;
   }
 }
 
 /* Responsive adjustments */
-@media (min-width: map-get(variables.$breakpoints, md)) {
-  .poolStats {
-    grid-template-columns: repeat(3, 1fr);
+@media (min-width: map-get(variables.$breakpoints, sm)) {
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: map-get(variables.$breakpoints, xl)) {
-  .poolStats {
-    grid-template-columns: repeat(5, 1fr);
+@media (min-width: map-get(variables.$breakpoints, md)) {
+  .stats {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
 @media (max-width: 480px) {
-  .poolStats {
+  .stats {
     grid-template-columns: 1fr;
   }
 } 

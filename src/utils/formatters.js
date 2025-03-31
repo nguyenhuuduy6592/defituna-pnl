@@ -124,4 +124,16 @@ export const formatDuration = (ageSeconds) => {
 export const formatWalletAddress = (address) => {
   if (!address || typeof address !== 'string' || address.length < 10) return 'Unknown';
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
+};
+
+/**
+ * Formats a fee value with dollar sign and appropriate abbreviations
+ * @param {number} fee - The fee value
+ * @param {boolean} abbreviate - Whether to abbreviate large values with K, M, B
+ * @returns {string} Formatted fee with $ prefix
+ */
+export const formatFee = (fee, abbreviate = true) => {
+  if (fee === null || fee === undefined) return '$0.00';
+  
+  return '$' + formatNumber(fee, abbreviate);
 }; 
