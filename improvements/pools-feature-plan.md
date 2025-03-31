@@ -54,13 +54,19 @@ Display all available pools on DeFiTuna with detailed information, filtering cap
    - Add formatting for decimals and number values
    - Ensure consistent token representation
    
-2. 🚧 Improve mobile responsiveness
+2. ✅ Improve value formatting
+   - Create centralized formatting utilities
+   - Add number abbreviations (K, M, B) for large values
+   - Implement specialized fee formatter for consistent display
+   - Handle small values with appropriate precision
+
+3. 🚧 Improve mobile responsiveness
    - Optimize layout for small screens
    - Adjust font sizes and spacing
    - Enhance touch targets for mobile
 
-3. 🚧 Add visual indicators
-   - Implement color coding for metrics
+4. 🚧 Add visual indicators
+   - Implement color coding for metrics (started with yield)
    - Add trending indicators for changes
    - Create sorting indicators for active sorts
 
@@ -91,9 +97,10 @@ Display all available pools on DeFiTuna with detailed information, filtering cap
 
 ## Current Focus Items
 1. ✅ Complete token metadata display with proper symbols
-2. 🔄 Enhance visual indicators for metrics
-3. 🔄 Finalize mobile responsiveness
-4. 🔄 Begin chart component implementation
+2. ✅ Implement consistent value formatting system
+3. 🔄 Finalize visual indicators for metrics
+4. 🔄 Complete mobile responsiveness optimization
+5. 🔄 Begin chart component implementation
 
 ## Key Data Structure
 The pool data contains these key fields:
