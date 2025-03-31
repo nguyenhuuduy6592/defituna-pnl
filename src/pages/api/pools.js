@@ -163,13 +163,13 @@ export default async function handler(req, res) {
     const poolsData = await fetchAllPools();
     
     // Verify pools data exists
-    if (!poolsData || !poolsData.data || !Array.isArray(poolsData.data)) {
+    if (!poolsData || !Array.isArray(poolsData)) {
       console.error('[pools API] Invalid pools data structure:', poolsData);
       return res.status(500).json({ error: 'Invalid pools data structure from API' });
     }
     
     // Process each pool to add derived metrics
-    const processedPools = poolsData.data.map(pool => processPoolData(pool));
+    const processedPools = poolsData.map(pool => processPoolData(pool));
 
     // If address is provided, filter to return just that pool
     if (address) {
