@@ -91,15 +91,24 @@ Provide a simple, robust, and user-friendly interface to explore DeFiTuna pools.
      - Create compact single-line filter controls
      - Stack elements appropriately on small screens
 
-### Phase 5: Insightful Analytics & Visualization 🔄 PRIORITY
+### Phase 5: Insightful Analytics & Visualization 🔄 IN PROGRESS
 *Focus: Transform raw data into actionable insights.*
 
-1.  🔄 **Implement Key Derived Metrics**:
-    *   Calculate and display **Fee APR** (based on `fees` / `tvl_usdc` over the selected timeframe, annualized).
-    *   Calculate and display **Volume / TVL Ratio** (indicates capital efficiency).
-    *   Add simple **Volatility Indicators** for underlying tokens (e.g., Low/Medium/High based on recent price action - requires token price data).
-    *   **Value add**: Provide clearer performance indicators (Fee APR) and risk context (Volatility) than raw stats alone.
-    *   **Action Item**: Implement calculations for Fee APR and Volatility indicators. Integrate into Pool Card and Detail Page.
+1.  ✅ **Implement Key Derived Metrics**: (completed)
+    *   ✅ Created API backend in `/api/pools.js` for:
+        * Fee APR calculation (based on `fees` / `tvl_usdc` over timeframes)
+        * Volume/TVL Ratio calculation (capital efficiency indicator)
+        * Volatility classification (Low/Medium/High)
+    *   ✅ Implemented usePoolData hook with caching for efficient data retrieval
+    *   ✅ Created PoolMetrics component to display derived metrics
+    *   ✅ Fixed data fetching and calculation issues:
+        * Corrected API data structure handling for DeFiTuna API responses
+        * Properly parsed string numeric values returned by the API
+        * Implemented proper error handling throughout the data flow
+        * Added detailed logging for troubleshooting
+    *   ✅ Integration completed:
+        * Added metrics to Pool Detail page with Performance Metrics section
+        * Added metrics to Pool Cards
 
 2.  🔄 **Create Focused Historical Charts**:
     *   Implement time-series charts on the Pool Detail page for **Fee APR** and **TVL**.

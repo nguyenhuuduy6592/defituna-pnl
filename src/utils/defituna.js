@@ -100,9 +100,29 @@ export async function fetchPoolData(poolAddress) {
     if (!response.ok) {
       throw new Error(`Failed to fetch pool data: ${response.status} ${response.statusText}`);
     }
-    const data = await response.json();
-    poolCache.set(poolAddress, { data: data, timestamp: Date.now() });
-    return data;
+    
+    // Parse the response and extract the data field
+    const responseJson = await response.json();
+    
+    // Access the nested 'data' field
+    const poolData = responseJson.data;
+    
+    if (!poolData) {
+      console.error(`[fetchPoolData] No data field in API response for ${poolAddress}`);
+      throw new Error('API response missing data field');
+    }
+    
+    // Log successful fetch
+    console.log(`[fetchPoolData] Successfully fetched data for ${poolAddress}:`, {
+      address: poolData.address,
+      tvl: poolData.tvl_usdc,
+      hasFees: !!poolData.stats?.['24h']?.fees,
+      hasVolume: !!poolData.stats?.['24h']?.volume
+    });
+    
+    // Store in cache
+    poolCache.set(poolAddress, { data: poolData, timestamp: Date.now() });
+    return poolData;
   } catch (error) {
     console.error(`[fetchPoolData] Error fetching pool data for ${poolAddress}:`, error.message);
     throw error;
@@ -324,7 +344,7 @@ export async function processPositionsData(positionsData) {
 }
 
 /**
- * Fetches data for all available pools
+ * Fetches all available pools
  * @returns {Promise<Object>} - Pools data
  * @throws {Error} If the API request fails
  */
@@ -339,11 +359,21 @@ export async function fetchAllPools() {
     if (!response.ok) {
       throw new Error(`Failed to fetch pools data: ${response.status} ${response.statusText}`);
     }
-    const data = await response.json();
     
-    allPoolsCache.data = data;
+    // Parse the response
+    const responseJson = await response.json();
+    
+    // Create a consistent structure for the response, mimicking the API structure
+    // but ensuring there's always a 'data' array property
+    const poolsData = {
+      data: Array.isArray(responseJson.data) ? responseJson.data : []
+    };
+    
+    console.log(`[fetchAllPools] Successfully fetched ${poolsData.data.length} pools`);
+    
+    allPoolsCache.data = poolsData;
     allPoolsCache.timestamp = Date.now();
-    return data;
+    return poolsData;
   } catch (error) {
     console.error('[fetchAllPools] Error:', error.message);
     throw error;

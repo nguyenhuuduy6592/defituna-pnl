@@ -1,182 +1,165 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import styles from '../../styles/PoolFilters.module.scss';
+import TimeframeSelector from '../common/TimeframeSelector';
+
+const TIMEFRAMES = ['24h', '7d', '30d'];
+
+// Default filter options
+const DEFAULT_FILTER_OPTIONS = {
+  tokens: [],
+  tvlRanges: [
+    { value: 0, label: 'Any TVL' },
+    { value: 10000, label: '$10K+' },
+    { value: 50000, label: '$50K+' },
+    { value: 100000, label: '$100K+' },
+    { value: 250000, label: '$250K+' },
+    { value: 500000, label: '$500K+' },
+    { value: 1000000, label: '$1M+' },
+    { value: 5000000, label: '$5M+' }
+  ]
+};
 
 /**
  * Pool Filters Component
  * @param {Object} props
  * @param {Object} props.filters - Current filter settings
- * @param {Function} props.onApplyFilters - Callback for when filters are applied
- * @param {Array} props.pools - All pools data for calculating TVL ranges
- * @param {string} props.activeTimeframe - Active timeframe for stats display
- * @param {Function} props.onTimeframeChange - Callback for timeframe change
+ * @param {Function} props.onFilterChange - Callback for when filters are changed
+ * @param {Object} props.filterOptions - Available filter options
  */
 export default function PoolFilters({ 
   filters, 
-  onApplyFilters,
-  pools = [],
-  activeTimeframe,
-  onTimeframeChange
+  onFilterChange, 
+  filterOptions = DEFAULT_FILTER_OPTIONS
 }) {
-  // Local state for filter inputs (to avoid applying filters on every change)
-  const [localFilters, setLocalFilters] = useState({ ...filters });
-  const [tvlOptions, setTvlOptions] = useState([]);
-  
-  // Extract unique tokens from pools data
-  const tokenOptions = useMemo(() => {
-    if (!pools || pools.length === 0) return [];
-    
-    const tokenSet = new Set();
-    pools.forEach(pool => {
-      if (pool.tokenA?.symbol) tokenSet.add(pool.tokenA.symbol);
-      if (pool.tokenB?.symbol) tokenSet.add(pool.tokenB.symbol);
-    });
-    
-    const tokens = Array.from(tokenSet).sort();
-    return [
-      { value: '', label: 'All Tokens' },
-      ...tokens.map(token => ({ value: token, label: token }))
-    ];
-  }, [pools]);
-  
-  // Calculate TVL options based on actual pool data
+  // Load saved filters from localStorage on mount
   useEffect(() => {
-    if (pools && pools.length > 0) {
-      const tvlValues = pools.map(pool => pool.tvl_usdc).sort((a, b) => a - b);
-      const min = Math.floor(tvlValues[0] / 1000) * 1000;
-      const max = Math.ceil(tvlValues[tvlValues.length - 1] / 1000) * 1000;
-      
-      // Create sensible TVL range options
-      const options = [
-        { value: 0, label: 'Any TVL' },
-        { value: 10000, label: '$10K+' },
-        { value: 50000, label: '$50K+' },
-        { value: 100000, label: '$100K+' },
-        { value: 250000, label: '$250K+' },
-        { value: 500000, label: '$500K+' },
-        { value: 1000000, label: '$1M+' },
-        { value: 5000000, label: '$5M+' }
-      ];
-      
-      setTvlOptions(options);
+    const savedFilters = localStorage.getItem('poolFilters');
+    if (savedFilters) {
+      onFilterChange(JSON.parse(savedFilters));
     }
-  }, [pools]);
-  
-  // Handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    const newFilters = { ...localFilters, [name]: value };
-    setLocalFilters(newFilters);
-    
-    // Auto-apply filters for dropdowns
-    onApplyFilters(newFilters);
-  };
-  
-  // Handle sort change
+  }, []);
+
+  // Save filters to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem('poolFilters', JSON.stringify(filters));
+  }, [filters]);
+
   const handleSortChange = (e) => {
-    const value = e.target.value;
-    const [sortBy, sortOrder] = value.split('-');
-    const newFilters = { ...localFilters, sortBy, sortOrder };
-    setLocalFilters(newFilters);
-    onApplyFilters(newFilters);
+    const [field, order] = e.target.value.split(':');
+    onFilterChange({
+      ...filters,
+      sortBy: field,
+      sortOrder: order
+    });
   };
-  
-  // Apply filters when form is submitted
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onApplyFilters(localFilters);
+
+  const handleTokenChange = (e) => {
+    onFilterChange({
+      ...filters,
+      token: e.target.value
+    });
   };
-  
-  // Reset filters
+
+  const handleTvlChange = (e) => {
+    onFilterChange({
+      ...filters,
+      minTvl: Number(e.target.value)
+    });
+  };
+
+  const handleTimeframeChange = (timeframe) => {
+    // If sortBy contains a timeframe (like volume24h or yield_over_tvl7d),
+    // we need to update it to the new timeframe
+    let updatedSortBy = filters.sortBy;
+    
+    if (filters.sortBy.includes('24h') || filters.sortBy.includes('7d') || filters.sortBy.includes('30d')) {
+      // Get the base metric without timeframe
+      const baseMetric = filters.sortBy.replace(/24h|7d|30d/g, '');
+      // Create new sortBy with the new timeframe
+      updatedSortBy = `${baseMetric}${timeframe}`;
+    }
+    
+    const newFilters = {
+      ...filters,
+      timeframe,
+      sortBy: updatedSortBy
+    };
+    
+    onFilterChange(newFilters);
+  };
+
   const handleReset = () => {
-    const resetFilters = {
+    onFilterChange({
       sortBy: 'tvl',
       sortOrder: 'desc',
       token: '',
-      minTvl: 0
-    };
-    setLocalFilters(resetFilters);
-    onApplyFilters(resetFilters);
+      minTvl: 0,
+      timeframe: '24h'
+    });
   };
-  
+
   return (
     <div className={styles.filterContainer}>
-      <form onSubmit={handleSubmit} className={styles.filtersForm}>
+      <div className={styles.filtersForm}>
         <div className={styles.filterControls}>
           <div className={styles.timeframeSelector}>
-            <button 
-              type="button"
-              className={`${styles.timeframeButton} ${activeTimeframe === '24h' ? styles.active : ''}`}
-              onClick={() => onTimeframeChange('24h')}
-            >
-              24h
-            </button>
-            <button 
-              type="button"
-              className={`${styles.timeframeButton} ${activeTimeframe === '7d' ? styles.active : ''}`}
-              onClick={() => onTimeframeChange('7d')}
-            >
-              7d
-            </button>
-            <button 
-              type="button"
-              className={`${styles.timeframeButton} ${activeTimeframe === '30d' ? styles.active : ''}`}
-              onClick={() => onTimeframeChange('30d')}
-            >
-              30d
-            </button>
+            <TimeframeSelector
+              timeframes={TIMEFRAMES}
+              selected={filters.timeframe}
+              onChange={handleTimeframeChange}
+            />
           </div>
-          
+
           <div className={styles.filterGroup}>
-            <select 
-              className={styles.filterSelect}
-              value={`${localFilters.sortBy}-${localFilters.sortOrder}`}
-              onChange={handleSortChange}
-              aria-label="Sort by"
-            >
-              <option value="tvl-desc">TVL ↓</option>
-              <option value="tvl-asc">TVL ↑</option>
-              <option value={`volume${activeTimeframe}-desc`}>Volume ↓</option>
-              <option value={`volume${activeTimeframe}-asc`}>Volume ↑</option>
-              <option value={`yield${activeTimeframe}-desc`}>Yield ↓</option>
-              <option value={`yield${activeTimeframe}-asc`}>Yield ↑</option>
-              <option value="fee-desc">Fee ↓</option>
-              <option value="fee-asc">Fee ↑</option>
-            </select>
-            
-            <select 
-              className={styles.filterSelect}
-              name="minTvl"
-              value={localFilters.minTvl}
-              onChange={handleInputChange}
-              aria-label="Minimum TVL"
-            >
-              {tvlOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
-              ))}
-            </select>
-            
+            <label className={styles.filterLabel}>Sort By</label>
             <select
+              value={`${filters.sortBy}:${filters.sortOrder}`}
+              onChange={handleSortChange}
               className={styles.filterSelect}
-              name="token"
-              value={localFilters.token}
-              onChange={handleInputChange}
-              aria-label="Filter by token"
             >
-              {tokenOptions.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              <option value="tvl:desc">TVL (High to Low)</option>
+              <option value="tvl:asc">TVL (Low to High)</option>
+              <option value={`volume${filters.timeframe}:desc`}>Volume (High to Low)</option>
+              <option value={`volume${filters.timeframe}:asc`}>Volume (Low to High)</option>
+              <option value={`yield_over_tvl${filters.timeframe}:desc`}>Yield (High to Low)</option>
+              <option value={`yield_over_tvl${filters.timeframe}:asc`}>Yield (Low to High)</option>
+              <option value="fee:desc">Fee Rate (High to Low)</option>
+              <option value="fee:asc">Fee Rate (Low to High)</option>
+            </select>
+          </div>
+
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Token</label>
+            <select
+              value={filters.token}
+              onChange={handleTokenChange}
+              className={styles.filterSelect}
+            >
+              <option value="">All Tokens</option>
+              {filterOptions.tokens?.map(token => (
+                <option key={token} value={token}>{token}</option>
               ))}
             </select>
-            
-            <button 
-              type="button" 
-              className={styles.resetButton}
-              onClick={handleReset}
-            >
-              Reset
-            </button>
           </div>
+
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Min TVL</label>
+            <select
+              value={filters.minTvl}
+              onChange={handleTvlChange}
+              className={styles.filterSelect}
+            >
+              {filterOptions.tvlRanges?.map(range => (
+                <option key={range.value} value={range.value}>{range.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <button onClick={handleReset} className={styles.resetButton}>
+            Reset
+          </button>
         </div>
-      </form>
+      </div>
     </div>
   );
 } 

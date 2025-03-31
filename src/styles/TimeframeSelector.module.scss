@@ -1,0 +1,42 @@
+.timeframeSelector {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.timeframeButton {
+  padding: 6px 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 60px;
+  text-align: center;
+
+  &:hover:not(.active) {
+    background: var(--bg-hover);
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+
+  &.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+}
+
+@media (max-width: 768px) {
+  .timeframeSelector {
+    gap: 4px;
+  }
+
+  .timeframeButton {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    min-width: 50px;
+  }
+} 

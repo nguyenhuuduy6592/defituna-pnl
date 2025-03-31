@@ -16,6 +16,7 @@ export default function PoolsPage() {
     loading, 
     error, 
     filters, 
+    filterOptions,
     applyFilters 
   } = usePoolsData();
   
@@ -51,10 +52,8 @@ export default function PoolsPage() {
         
         <PoolFilters 
           filters={filters}
-          onApplyFilters={applyFilters}
-          pools={pools}
-          activeTimeframe={timeframe}
-          onTimeframeChange={handleTimeframeChange}
+          onFilterChange={applyFilters}
+          filterOptions={filterOptions}
         />
         
         {loading && (
@@ -87,7 +86,9 @@ export default function PoolsPage() {
             <PoolCard 
               key={pool.address} 
               pool={pool} 
-              timeframe={timeframe}
+              timeframe={filters.timeframe}
+              sortBy={filters.sortBy}
+              sortOrder={filters.sortOrder}
             />
           ))}
         </div>

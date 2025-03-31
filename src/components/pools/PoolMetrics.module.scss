@@ -1,0 +1,115 @@
+@use '../../styles/variables.module.scss' as variables;
+
+.metricsContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: variables.spacing(md);
+  width: 100%;
+  margin-bottom: variables.spacing(lg);
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  padding: variables.spacing(md);
+  background-color: variables.bg-color(white);
+  border-radius: variables.spacing(sm);
+  box-shadow: 0 2px 4px variables.color(shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid variables.color(border);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px variables.color(shadow);
+  }
+}
+
+.metricHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: variables.spacing(sm);
+}
+
+.label {
+  font-size: variables.font-size(sm);
+  font-weight: 500;
+  color: variables.text-color(secondary);
+}
+
+.infoIcon {
+  color: variables.text-color(secondary);
+  cursor: help;
+  font-size: variables.font-size(sm);
+  
+  &:hover {
+    color: variables.color(primary);
+  }
+}
+
+.value {
+  font-size: variables.font-size(xl);
+  font-weight: 600;
+  color: variables.text-color(primary);
+}
+
+.feeAPR {
+  // Base styles for Fee APR metric
+}
+
+.volumeTVL {
+  // Base styles for Volume/TVL metric
+}
+
+.volatility {
+  // Base styles for volatility metric
+}
+
+.volatilityLow {
+  color: variables.color(positive);
+  background-color: rgba(variables.color(positive), 0.1);
+  padding: 3px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.volatilityMedium {
+  color: variables.color(warning);
+  background-color: rgba(variables.color(warning), 0.1);
+  padding: 3px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.volatilityHigh {
+  color: variables.color(negative);
+  background-color: rgba(variables.color(negative), 0.1);
+  padding: 3px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.loading {
+  grid-column: 1 / -1;
+  padding: variables.spacing(md);
+  text-align: center;
+  color: variables.text-color(secondary);
+}
+
+.error {
+  grid-column: 1 / -1;
+  padding: variables.spacing(md);
+  text-align: center;
+  color: variables.color(negative);
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .metricsContainer {
+    grid-template-columns: 1fr;
+  }
+  
+  .value {
+    font-size: variables.font-size(lg);
+  }
+} 

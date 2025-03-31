@@ -253,22 +253,6 @@
   font-size: variables.font-size(xl);
   font-weight: 600;
   color: variables.text-color(primary);
-  
-  &.highlight {
-    color: variables.color(primary);
-  }
-  
-  &.positive {
-    color: variables.color(positive);
-  }
-  
-  &.negative {
-    color: variables.color(negative);
-  }
-  
-  &.neutral {
-    color: variables.color(primary);
-  }
 }
 
 .poolDetails {
@@ -366,5 +350,18 @@
   
   .actions {
     justify-content: flex-end;
+  }
+}
+
+.derivedMetricsSection {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: variables.color(background-secondary);
+  border-radius: 10px;
+  
+  h2 {
+    font-size: variables.font-size(lg);
+    margin-bottom: 1rem;
+    color: variables.text-color(primary);
   }
 } 

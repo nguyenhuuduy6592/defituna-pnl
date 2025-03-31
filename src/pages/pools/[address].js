@@ -5,6 +5,13 @@ import Link from 'next/link';
 import styles from '../../styles/PoolDetail.module.scss';
 import { enhancePoolWithTokenMetadata } from '../../utils/tokens';
 import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
+import { PoolMetrics } from '../../components/pools/PoolMetrics';
+
+const TIMEFRAMES = [
+  { value: '24h', label: '24 Hours' },
+  { value: '7d', label: '7 Days' },
+  { value: '30d', label: '30 Days' }
+];
 
 export default function PoolDetailPage() {
   const router = useRouter();
@@ -82,15 +89,10 @@ export default function PoolDetailPage() {
       : 'Price unavailable'
     : 'Price unavailable';
   
-  const getYieldClass = (value) => {
-    if (!value) return '';
-    const yieldValue = value * 100;
-    if (yieldValue > 20) return styles.positive;
-    if (yieldValue > 10) return styles.neutral;
-    if (yieldValue < 5) return styles.negative;
-    return '';
-  };
-  
+  if (!address) {
+    return <div className={styles.error}>No pool address provided</div>;
+  }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -195,10 +197,15 @@ export default function PoolDetailPage() {
               </button>
             </div>
             
+            <div className={styles.derivedMetricsSection}>
+              <h2>Performance Metrics</h2>
+              <PoolMetrics poolAddress={address} timeframe={timeframe} />
+            </div>
+            
             <div className={styles.statsGrid}>
               <div className={styles.statCard}>
                 <div className={styles.statLabel}>TVL</div>
-                <div className={`${styles.statValue} ${styles.highlight}`}>{formattedValues.tvl}</div>
+                <div className={styles.statValue}>{formattedValues.tvl}</div>
               </div>
               
               <div className={styles.statCard}>
@@ -213,7 +220,7 @@ export default function PoolDetailPage() {
               
               <div className={styles.statCard}>
                 <div className={styles.statLabel}>Yield ({timeframe})</div>
-                <div className={`${styles.statValue} ${getYieldClass(poolData.stats[timeframe]?.yield_over_tvl)}`}>
+                <div className={styles.statValue}>
                   {formattedValues.yield}
                 </div>
               </div>
