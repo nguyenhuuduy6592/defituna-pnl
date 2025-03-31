@@ -28,6 +28,27 @@
   gap: variables.spacing(sm);
 }
 
+.navButton {
+  display: flex;
+  align-items: center;
+  gap: variables.spacing(xs);
+  padding: variables.spacing(xs) variables.spacing(sm);
+  background: variables.bg-color(white);
+  border: 1px solid variables.color(border);
+  border-radius: 16px;
+  font-size: variables.font-size(sm);
+  color: variables.text-color(primary);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(77, 91, 236, 0.1);
+    border-color: #4d5bec;
+    color: #4d5bec;
+  }
+}
+
 .disclaimerButton {
   display: flex;
   align-items: center;

@@ -19,6 +19,7 @@ import {
   decodeValue 
 } from '../utils';
 import styles from './index.module.scss';
+import Link from 'next/link';
 
 export default () => {
   const [loading, setLoading] = useState(false);
@@ -313,6 +314,9 @@ export default () => {
           </div>
         </Tooltip>
         <div className={styles.titleActions}>
+          <Link href="/pools" className={styles.navButton}>
+            <span>Pools</span>
+          </Link>
           <button 
             className={styles.disclaimerButton} 
             onClick={() => setDisclaimerOpen(true)}

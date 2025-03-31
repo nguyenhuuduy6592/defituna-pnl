@@ -1,0 +1,119 @@
+@use './variables.module.scss' as variables;
+
+.cardLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  height: 100%;
+}
+
+.poolCard {
+  @include variables.card;
+  padding: variables.spacing(md);
+  margin-bottom: variables.spacing(md);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px variables.color(shadow);
+    border: 1px solid variables.color(primary);
+  }
+}
+
+.poolHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: variables.spacing(sm);
+  padding-bottom: variables.spacing(sm);
+}
+
+.tokenPair {
+  font-size: variables.font-size(lg);
+  font-weight: 600;
+  color: variables.text-color(primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tokenSymbol {
+  color: variables.text-color(primary);
+}
+
+.provider {
+  font-size: variables.font-size(xs);
+  color: variables.text-color(secondary);
+  background: variables.bg-color(light);
+  padding: variables.spacing(xs) variables.spacing(sm);
+  border-radius: variables.spacing(md);
+  text-transform: capitalize;
+  white-space: nowrap;
+  margin-left: variables.spacing(sm);
+}
+
+.poolStats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: variables.spacing(sm);
+  flex-grow: 1;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: variables.spacing(xs);
+}
+
+.statLabel {
+  font-size: variables.font-size(xs);
+  color: variables.text-color(secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statValue {
+  font-size: variables.font-size(base);
+  font-weight: 600;
+  color: variables.text-color(primary);
+  
+  &.highlight {
+    color: variables.color(primary);
+  }
+  
+  &.positive {
+    color: variables.color(positive);
+  }
+  
+  &.negative {
+    color: variables.color(negative);
+  }
+  
+  &.neutral {
+    color: variables.color(primary);
+  }
+}
+
+/* Responsive adjustments */
+@media (min-width: map-get(variables.$breakpoints, md)) {
+  .poolStats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: map-get(variables.$breakpoints, xl)) {
+  .poolStats {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .poolStats {
+    grid-template-columns: 1fr;
+  }
+} 

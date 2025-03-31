@@ -1,0 +1,125 @@
+@use './variables.module.scss' as variables;
+
+.filterContainer {
+  @include variables.card;
+  padding: variables.spacing(md) variables.spacing(md) variables.spacing(lg);
+  margin-bottom: variables.spacing(lg);
+}
+
+.filtersForm {
+  display: flex;
+  flex-direction: column;
+  gap: variables.spacing(md);
+}
+
+.timeframeSelector {
+  display: flex;
+  justify-content: center;
+  gap: variables.spacing(sm);
+  margin-bottom: variables.spacing(md);
+}
+
+.timeframeButton {
+  background: variables.bg-color(light);
+  color: variables.text-color(secondary);
+  border: 1px solid variables.color(border);
+  border-radius: variables.spacing(md);
+  padding: variables.spacing(sm) variables.spacing(md);
+  font-size: variables.font-size(base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &.active {
+    background-color: variables.color(primary);
+    color: white;
+    border-color: variables.color(primary);
+  }
+  
+  &:hover:not(.active) {
+    background-color: rgba(variables.color(primary), 0.1);
+    color: variables.color(primary);
+  }
+}
+
+.filterRow {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: variables.spacing(md);
+}
+
+.filterItem {
+  display: flex;
+  flex-direction: column;
+  gap: variables.spacing(sm);
+}
+
+.filterLabel {
+  font-size: variables.font-size(sm);
+  font-weight: 500;
+  color: variables.text-color(secondary);
+}
+
+.filterSelect,
+.filterInput {
+  @extend %input-base;
+  background: variables.bg-color(white);
+  color: variables.text-color(primary);
+  padding: variables.spacing(sm);
+  font-size: variables.font-size(base);
+  
+  &:focus {
+    border-color: variables.color(primary);
+  }
+}
+
+.buttonRow {
+  display: flex;
+  gap: variables.spacing(md);
+  justify-content: center;
+  margin-top: variables.spacing(md);
+}
+
+.applyButton,
+.resetButton {
+  @extend %button-base;
+  padding: variables.spacing(sm) variables.spacing(lg);
+  border-radius: variables.spacing(md);
+  font-size: variables.font-size(base);
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.applyButton {
+  background-color: variables.color(primary);
+  color: white;
+  
+  &:hover {
+    background-color: variables.color(hover);
+  }
+}
+
+.resetButton {
+  background-color: variables.bg-color(white);
+  color: variables.text-color(secondary);
+  border: 1px solid variables.color(border);
+  
+  &:hover {
+    background: rgba(variables.color(primary), 0.1);
+    border-color: variables.color(primary);
+    color: variables.color(primary);
+  }
+}
+
+/* Responsive adjustments */
+@media (min-width: map-get(variables.$breakpoints, md)) {
+  .filterRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: map-get(variables.$breakpoints, xl)) {
+  .filterRow {
+    grid-template-columns: repeat(4, 1fr);
+  }
+} 

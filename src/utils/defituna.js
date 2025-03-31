@@ -9,6 +9,7 @@ import { processTunaPosition } from './formulas.js';
 const POOL_CACHE_TTL = 30 * 1000;       // 30 seconds for pool data (contains dynamic ticks)
 const MARKET_CACHE_TTL = 60 * 60 * 1000; // 1 hour for market data (changes infrequently)
 const TOKEN_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours for token data (extremely static)
+const ALL_POOLS_CACHE_TTL = 60 * 1000;  // 1 minute for all pools data
 
 // --- Value Encoding Constants ---
 const USD_MULTIPLIER = 100;       // Convert dollars to cents (2 decimal places)
@@ -33,6 +34,7 @@ function encodeValue(value, multiplier) {
 const marketCache = { data: null, timestamp: 0 };
 const poolCache = new Map();
 const tokenCache = new Map();
+const allPoolsCache = { data: null, timestamp: 0 };
 
 /**
  * Checks if a cached item is still valid based on its timestamp and TTL
@@ -317,6 +319,33 @@ export async function processPositionsData(positionsData) {
     return processed;
   } catch (error) {
     console.error('[processPositionsData] Error processing positions data:', error.message);
+    throw error;
+  }
+}
+
+/**
+ * Fetches data for all available pools
+ * @returns {Promise<Object>} - Pools data
+ * @throws {Error} If the API request fails
+ */
+export async function fetchAllPools() {
+  try {
+    // Pools data can be cached for a short period
+    if (allPoolsCache.data && isCacheValid(allPoolsCache.timestamp, ALL_POOLS_CACHE_TTL)) {
+      return allPoolsCache.data;
+    }
+
+    const response = await fetch(`${process.env.DEFITUNA_API_URL}/pools`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch pools data: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    
+    allPoolsCache.data = data;
+    allPoolsCache.timestamp = Date.now();
+    return data;
+  } catch (error) {
+    console.error('[fetchAllPools] Error:', error.message);
     throw error;
   }
 }
