@@ -6,6 +6,9 @@ let tokenMetadataCache = null;
 let lastFetchTime = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+// Pool data cache TTL (1 hour)
+const POOL_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
 // Default filter options
 const DEFAULT_FILTER_OPTIONS = {
   tokens: [],
@@ -19,6 +22,20 @@ const DEFAULT_FILTER_OPTIONS = {
     { value: 1000000, label: '$1M+' },
     { value: 5000000, label: '$5M+' }
   ]
+};
+
+/**
+ * Check if cached data is still valid
+ * @param {Object} cachedData - The cached data with timestamp
+ * @param {number} ttl - Time to live in milliseconds
+ * @returns {boolean} - Whether the cache is valid
+ */
+const isCacheValid = (cachedData, ttl) => {
+  return (
+    cachedData && 
+    cachedData.timestamp && 
+    Date.now() - cachedData.timestamp < ttl
+  );
 };
 
 /**
@@ -64,9 +81,39 @@ export default function usePoolsData() {
     }
   }, []);
 
-  const fetchPools = useCallback(async () => {
+  const fetchPools = useCallback(async (forceRefresh = false) => {
     try {
       setLoading(true);
+      
+      // Check localStorage cache first if not forcing refresh
+      if (!forceRefresh) {
+        try {
+          const cachedPoolsData = localStorage.getItem('poolsData');
+          if (cachedPoolsData) {
+            const parsedCache = JSON.parse(cachedPoolsData);
+            if (isCacheValid(parsedCache, POOL_CACHE_TTL)) {
+              console.log('[usePoolsData] Using cached pools data');
+              
+              // Set pools from cache
+              setPools(parsedCache.data);
+              
+              // Set filter options from cache
+              if (parsedCache.filterOptions) {
+                setFilterOptions(parsedCache.filterOptions);
+              }
+              
+              setLoading(false);
+              return;
+            } else {
+              console.log('[usePoolsData] Cache expired, fetching fresh data');
+            }
+          }
+        } catch (cacheError) {
+          console.error('[usePoolsData] Error reading cache:', cacheError);
+          // Continue with fetch if cache reading fails
+        }
+      }
+
       setError(null);
 
       // Fetch token metadata with caching
@@ -139,10 +186,26 @@ export default function usePoolsData() {
         { value: 5000000, label: '$5M+' }
       ].filter(range => range.value <= maxTvl);
 
-      setFilterOptions({
+      const newFilterOptions = {
         tokens: Array.from(tokens).sort(),
         tvlRanges
-      });
+      };
+      
+      setFilterOptions(newFilterOptions);
+      
+      // Save to localStorage cache
+      try {
+        const cacheData = {
+          timestamp: Date.now(),
+          data: enhancedPools,
+          filterOptions: newFilterOptions
+        };
+        localStorage.setItem('poolsData', JSON.stringify(cacheData));
+        console.log('[usePoolsData] Saved fresh data to cache');
+      } catch (saveError) {
+        console.error('[usePoolsData] Error saving to cache:', saveError);
+        // Continue even if cache saving fails
+      }
 
     } catch (err) {
       console.error('Error fetching pools:', err);
@@ -155,6 +218,13 @@ export default function usePoolsData() {
   // Initial fetch
   useEffect(() => {
     fetchPools();
+    
+    // Optional: Set up periodic refresh
+    const intervalId = setInterval(() => {
+      fetchPools();
+    }, POOL_CACHE_TTL);
+    
+    return () => clearInterval(intervalId);
   }, [fetchPools]);
 
   // Apply filters and sorting
@@ -169,11 +239,13 @@ export default function usePoolsData() {
       );
     }
 
-    // Apply TVL filter
+    // Apply TVL filter - Ensure numeric comparison
     if (filters.minTvl > 0) {
-      result = result.filter(pool => 
-        pool.tvl_usdc >= filters.minTvl
-      );
+      result = result.filter(pool => {
+        const poolTvl = typeof pool.tvl_usdc === 'string' ? 
+          parseFloat(pool.tvl_usdc) : (pool.tvl_usdc || 0);
+        return poolTvl >= filters.minTvl;
+      });
     }
 
     // Apply sorting
@@ -214,8 +286,8 @@ export default function usePoolsData() {
         
         // Handle TVL sorting
         if (filters.sortBy === 'tvl') {
-          const aValue = a.tvl_usdc || 0;
-          const bValue = b.tvl_usdc || 0;
+          const aValue = typeof a.tvl_usdc === 'string' ? parseFloat(a.tvl_usdc) : (a.tvl_usdc || 0);
+          const bValue = typeof b.tvl_usdc === 'string' ? parseFloat(b.tvl_usdc) : (b.tvl_usdc || 0);
           return (aValue - bValue) * multiplier;
         }
 
@@ -233,6 +305,10 @@ export default function usePoolsData() {
     setFilters(prev => ({ ...prev, ...newFilters }));
   }, []);
 
+  const refreshPools = useCallback(() => {
+    return fetchPools(true);
+  }, [fetchPools]);
+
   return { 
     pools: filteredAndSortedPools, 
     loading, 
@@ -240,6 +316,6 @@ export default function usePoolsData() {
     filters,
     filterOptions,
     applyFilters,
-    refresh: fetchPools
+    refresh: refreshPools
   };
 } 

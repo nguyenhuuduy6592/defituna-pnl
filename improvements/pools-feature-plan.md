@@ -21,11 +21,21 @@ Provide a simple, robust, and user-friendly interface to explore DeFiTuna pools.
    - Implement `usePoolsData` hook with filtering
    - Add token metadata enhancement
    - Set up in-memory caching with TTL
+   - Implemented client-side caching with localStorage:
+     * Added 1-hour TTL for pool data to reduce API calls
+     * Store complete pools data and filter options in browser storage
+     * Automatic refresh when cache expires or on manual refresh
+     * Improved performance with client-side filtering and sorting
    
 2. ✅ Build token metadata system
    - Create token metadata resolution from mints endpoint
    - Implement fallbacks for unknown tokens
    - Add error boundaries for metadata lookups
+
+3. ✅ Optimize API handling
+   - Eliminated redundant API calls for individual pools
+   - Consolidated pool data fetching to use a single API endpoint
+   - Improved pool detail page to use data from the all pools cache
 
 ### Phase 3: Core UI Components ✅ COMPLETE
 1. ✅ Create main pools listing page
@@ -122,19 +132,31 @@ Provide a simple, robust, and user-friendly interface to explore DeFiTuna pools.
     *   **Value add**: Educate users and build confidence in interpreting the data.
     *   **Action Item**: Review and rewrite all tooltips with a focus on user implications.
 
-### Phase 6: User Convenience & Decision Support 📝 HIGH VALUE
+### Phase 6: User Convenience & Decision Support 🔄 IN PROGRESS
 *Focus: Make it easier for users to track, compare, and act.*
 
-1.  📝 **Enhance Pool Comparison**:
+1.  🔄 **Enhance Pool Comparison**:
     *   Create a simple mechanism to select 2-3 pools for a direct side-by-side comparison view.
     *   Focus the comparison on key differentiating metrics (Fee APR, TVL, Volume/TVL, Volatility Indicators, Fees).
     *   **Value add**: Streamline the process of choosing between specific pools.
     *   **Action Item**: Design and implement the comparison selection and view.
 
-2.  📝 **Add "Quick Filter" Presets**:
-    *   Create predefined filter buttons for common scenarios (e.g., "High Yield Stablecoins", "Top Volume Pools", "Newer Pools < 30d old" - requires pool age data if available).
-    *   **Value add**: Help users quickly discover pools matching popular strategies.
-    *   **Action Item**: Define useful presets and implement one-click filter application.
+2.  ✅ **Add Filter Management**:
+    *   ✅ Implemented the ability to save current filter and sorting settings:
+        * Created a "Save" button next to Reset to store current filters
+        * Added automatic labeling based on filter selections
+        * Saved filters use localStorage for persistence between sessions
+        * Implemented duplicate detection to prevent redundant filters
+    *   ✅ Enhanced the filter interface:
+        * Added a dedicated "Saved Filters" area visible when filters exist
+        * Provided one-click application of saved filters
+        * Added the ability to delete saved filters
+    *   ✅ UI Refinements:
+        * Improved filter labels with readable names for metrics (e.g., "Yield" instead of "yield_over_tvl")
+        * Added proper labeling for the Timeframe selector
+        * Enhanced alignment of filter controls for better visual consistency
+        * Fixed vertical alignment of buttons with other form elements
+    *   **Value add**: Help users quickly find pools matching their criteria and save custom views.
 
 ## Completed Improvements
 1. ✅ Enhanced Pool Cards
@@ -154,6 +176,13 @@ Provide a simple, robust, and user-friendly interface to explore DeFiTuna pools.
    - Improved visual hierarchy with color coding
    - Optimized responsive behavior for different screen sizes
    - Reduced visual clutter while maintaining functionality
+
+4. ✅ Optimized Performance
+   - Implemented client-side caching to reduce API calls
+   - Fixed redundant data fetching in individual pool pages
+   - Improved data consistency by using a single data source
+   - Reduced server load with smarter fetching strategy
+   - Enhanced app responsiveness with client-side filtering
 
 ## Core Principles for Added Value
 *   **Simplicity**: Prioritize clarity over complexity. Avoid overwhelming users with too many numbers.

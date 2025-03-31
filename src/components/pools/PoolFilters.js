@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '../../styles/PoolFilters.module.scss';
 import TimeframeSelector from '../common/TimeframeSelector';
 
@@ -19,6 +19,23 @@ const DEFAULT_FILTER_OPTIONS = {
   ]
 };
 
+// Helper function to get readable sort field names
+const getSortFieldName = (field) => {
+  // Remove timeframe suffix from field
+  const baseField = field.replace(/24h|7d|30d/g, '');
+  
+  // Map to readable names
+  const fieldNames = {
+    'tvl': 'TVL',
+    'volume': 'Volume',
+    'yield_over_tvl': 'Yield',
+    'fee': 'Fee Rate',
+    'fee_apr': 'Fee APR'
+  };
+  
+  return fieldNames[baseField] || baseField;
+};
+
 /**
  * Pool Filters Component
  * @param {Object} props
@@ -31,8 +48,18 @@ export default function PoolFilters({
   onFilterChange, 
   filterOptions = DEFAULT_FILTER_OPTIONS
 }) {
-  // Load saved filters from localStorage on mount
+  // State for saved filters
+  const [savedFilters, setSavedFilters] = useState([]);
+
+  // Load saved filters and current filters from localStorage on mount
   useEffect(() => {
+    // Load saved filters
+    const savedFiltersFromStorage = localStorage.getItem('poolSavedFilters');
+    if (savedFiltersFromStorage) {
+      setSavedFilters(JSON.parse(savedFiltersFromStorage));
+    }
+    
+    // Load current filters
     const savedFilters = localStorage.getItem('poolFilters');
     if (savedFilters) {
       onFilterChange(JSON.parse(savedFilters));
@@ -61,9 +88,10 @@ export default function PoolFilters({
   };
 
   const handleTvlChange = (e) => {
+    const minTvl = Number(e.target.value);
     onFilterChange({
       ...filters,
-      minTvl: Number(e.target.value)
+      minTvl
     });
   };
 
@@ -98,11 +126,104 @@ export default function PoolFilters({
     });
   };
 
+  // Generate a descriptive label for the current filter
+  const getFilterLabel = () => {
+    const parts = [];
+    
+    // Add sorting info with readable field name and direction
+    const sortFieldName = getSortFieldName(filters.sortBy);
+    const sortDirection = filters.sortOrder === 'asc' ? 'Low to High' : 'High to Low';
+    parts.push(`${sortFieldName} (${sortDirection})`);
+    
+    // Add timeframe
+    parts.push(`Time: ${filters.timeframe}`);
+    
+    // Add token if selected
+    if (filters.token) {
+      parts.push(`Token: ${filters.token}`);
+    }
+    
+    // Add TVL if not default
+    if (filters.minTvl > 0) {
+      const tvlOption = filterOptions.tvlRanges.find(r => r.value === filters.minTvl);
+      parts.push(`Min TVL: ${tvlOption ? tvlOption.label : `$${filters.minTvl}`}`);
+    }
+    
+    return parts.join(' | ');
+  };
+
+  // Save current filter
+  const handleSaveFilter = () => {
+    const label = getFilterLabel();
+    
+    // Check if this filter is already saved
+    const isDuplicate = savedFilters.some(f => 
+      f.filters.sortBy === filters.sortBy &&
+      f.filters.sortOrder === filters.sortOrder &&
+      f.filters.token === filters.token &&
+      f.filters.minTvl === filters.minTvl &&
+      f.filters.timeframe === filters.timeframe
+    );
+    
+    if (isDuplicate) return; // Don't save duplicates
+    
+    const newSavedFilter = {
+      id: Date.now(), // Use timestamp as unique ID
+      label,
+      filters: { ...filters }
+    };
+    
+    const updatedSavedFilters = [...savedFilters, newSavedFilter];
+    setSavedFilters(updatedSavedFilters);
+    localStorage.setItem('poolSavedFilters', JSON.stringify(updatedSavedFilters));
+  };
+
+  // Apply a saved filter
+  const handleApplySavedFilter = (savedFilter) => {
+    onFilterChange(savedFilter.filters);
+  };
+
+  // Delete a saved filter
+  const handleDeleteSavedFilter = (id, e) => {
+    e.stopPropagation(); // Prevent triggering apply filter
+    
+    const updatedSavedFilters = savedFilters.filter(f => f.id !== id);
+    setSavedFilters(updatedSavedFilters);
+    localStorage.setItem('poolSavedFilters', JSON.stringify(updatedSavedFilters));
+  };
+
   return (
     <div className={styles.filterContainer}>
+      {/* Saved filters row - only show if there are saved filters */}
+      {savedFilters.length > 0 && (
+        <div className={styles.savedFiltersRow}>
+          <div className={styles.savedFiltersLabel}>Saved Filters:</div>
+          <div className={styles.savedFilters}>
+            {savedFilters.map(filter => (
+              <div
+                key={filter.id}
+                className={styles.savedFilter}
+                onClick={() => handleApplySavedFilter(filter)}
+                title="Click to apply this filter"
+              >
+                <span className={styles.savedFilterLabel}>{filter.label}</span>
+                <button
+                  className={styles.deleteFilterButton}
+                  onClick={(e) => handleDeleteSavedFilter(filter.id, e)}
+                  title="Delete this saved filter"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className={styles.filtersForm}>
         <div className={styles.filterControls}>
-          <div className={styles.timeframeSelector}>
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Timeframe</label>
             <TimeframeSelector
               timeframes={TIMEFRAMES}
               selected={filters.timeframe}
@@ -155,9 +276,17 @@ export default function PoolFilters({
             </select>
           </div>
 
-          <button onClick={handleReset} className={styles.resetButton}>
-            Reset
-          </button>
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>&nbsp;</label>
+            <div className={styles.buttonGroup}>
+              <button onClick={handleSaveFilter} className={styles.saveButton} title="Save current filter">
+                Save
+              </button>
+              <button onClick={handleReset} className={styles.resetButton}>
+                Reset
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

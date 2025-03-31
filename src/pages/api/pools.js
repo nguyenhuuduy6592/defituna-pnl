@@ -180,31 +180,7 @@ export default async function handler(req, res) {
     // Accept both "poolAddress" and "address" as parameter names for compatibility
     const address = req.query.poolAddress || req.query.address;
 
-    // If address is provided, fetch single pool
-    if (address) {
-      console.log(`[pools API] Fetching pool data for ${address}`);
-      try {
-        const poolData = await fetchPoolData(address);
-        console.log(`[pools API] Raw pool data fetched for ${address}`);
-        
-        // Process the pool data to add derived metrics
-        const processedPool = processPoolData(poolData);
-        console.log(`[pools API] Processed pool data for ${address}`, {
-          metrics24h: processedPool.metrics?.['24h'],
-          metrics7d: processedPool.metrics?.['7d'] 
-        });
-        
-        // Return in the same format as the all pools endpoint for consistency
-        return res.status(200).json({ data: [processedPool] });
-      } catch (error) {
-        console.error(`[pools API] Error processing pool ${address}:`, error.message);
-        return res.status(404).json({ 
-          error: `Pool not found or error processing pool data: ${error.message}`
-        });
-      }
-    }
-
-    // Otherwise, fetch all pools
+    // Fetch all pools regardless of whether an address is provided
     console.log('[pools API] Fetching all pools data');
     const poolsData = await fetchAllPools();
     
@@ -219,6 +195,22 @@ export default async function handler(req, res) {
     // Process each pool to add derived metrics
     const processedPools = poolsData.data.map(pool => processPoolData(pool));
 
+    // If address is provided, filter to return just that pool
+    if (address) {
+      console.log(`[pools API] Filtering data for pool ${address}`);
+      const filteredPool = processedPools.find(pool => pool.address === address);
+      
+      if (!filteredPool) {
+        console.error(`[pools API] Pool ${address} not found in the fetched pools`);
+        return res.status(404).json({ 
+          error: `Pool not found: ${address}`
+        });
+      }
+      
+      return res.status(200).json({ data: [filteredPool] });
+    }
+
+    // Otherwise return all pools
     res.status(200).json({ data: processedPools });
   } catch (error) {
     console.error('Error in pools API:', error);

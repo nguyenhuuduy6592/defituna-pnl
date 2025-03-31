@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
 import styles from '../../styles/PoolDetail.module.scss';
-import { enhancePoolWithTokenMetadata } from '../../utils/tokens';
 import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
 import { PoolMetrics } from '../../components/pools/PoolMetrics';
+import usePoolsData from '../../hooks/usePoolsData';
 
 const TIMEFRAMES = [
   { value: '24h', label: '24 Hours' },
@@ -16,6 +16,7 @@ const TIMEFRAMES = [
 export default function PoolDetailPage() {
   const router = useRouter();
   const { address } = router.query;
+  const { pools, loading: poolsLoading, error: poolsError } = usePoolsData();
   
   const [poolData, setPoolData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,37 +24,36 @@ export default function PoolDetailPage() {
   const [timeframe, setTimeframe] = useState('24h');
   
   useEffect(() => {
-    // Only fetch if we have an address
-    if (!address) return;
-    
-    async function fetchPoolDetail() {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = await fetch(`/api/pools?address=${address}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch pool data');
-        }
-        
-        const data = await response.json();
-        if (!data.data || !data.data.length) {
-          throw new Error('Pool not found');
-        }
-        
-        // Enhance with token metadata
-        const enhancedPool = await enhancePoolWithTokenMetadata(data.data[0]);
-        setPoolData(enhancedPool);
-      } catch (err) {
-        console.error('Error fetching pool detail:', err);
-        setError(err.message || 'Failed to load pool data');
-      } finally {
-        setLoading(false);
-      }
+    // Only process if we have an address and pools are loaded
+    if (!address || poolsLoading) {
+      setLoading(true);
+      return;
     }
     
-    fetchPoolDetail();
-  }, [address]);
+    if (poolsError) {
+      setError(poolsError);
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      // Find the pool in the pools data
+      const foundPool = pools.find(pool => pool.address === address);
+      
+      if (!foundPool) {
+        throw new Error('Pool not found');
+      }
+      
+      setPoolData(foundPool);
+      setError(null);
+    } catch (err) {
+      console.error('Error finding pool detail:', err);
+      setError(err.message || 'Failed to find pool data');
+      setPoolData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [address, pools, poolsLoading, poolsError]);
   
   // Handle timeframe change
   const handleTimeframeChange = (newTimeframe) => {

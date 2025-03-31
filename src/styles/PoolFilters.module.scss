@@ -14,9 +14,9 @@
 
 .filterControls {
   display: flex;
+  align-items: center;
+  gap: 12px;
   flex-wrap: wrap;
-  gap: 10px;
-  align-items: flex-end;
 }
 
 .filterGroup {
@@ -122,45 +122,41 @@
 
 .buttonGroup {
   display: flex;
-  gap: variables.spacing(xs);
-  flex-shrink: 0;
-}
-
-.applyButton,
-.resetButton {
-  @extend %button-base;
-  padding: variables.spacing(xs) variables.spacing(xs);
-  border-radius: 4px;
-  font-size: variables.font-size(xs);
-  font-weight: 500;
-  min-width: 50px;
+  gap: 8px;
   height: 30px;
 }
 
-.applyButton {
-  background-color: variables.color(primary);
+.saveButton, 
+.resetButton {
+  height: 100%;
+  padding: 0 12px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.saveButton {
+  background-color: var(--primary);
   color: white;
+  border: none;
   
   &:hover {
-    background-color: variables.color(hover);
+    background-color: var(--primary-dark);
   }
 }
 
 .resetButton {
-  @extend %button-base;
-  padding: 6px 10px;
-  border-radius: 4px;
-  font-size: variables.font-size(xs);
-  font-weight: 500;
-  min-width: 50px;
-  background-color: variables.bg-color(white);
-  color: variables.text-color(secondary);
-  border: 1px solid variables.color(border);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
   
   &:hover {
-    background: rgba(variables.color(primary), 0.1);
-    border-color: variables.color(primary);
-    color: variables.color(primary);
+    background-color: var(--danger-light);
+    border-color: var(--danger);
+    color: var(--danger);
   }
 }
 
@@ -222,5 +218,100 @@
   .searchWrapper {
     flex: 1 0 100%;
     margin-bottom: 8px;
+  }
+}
+
+// Saved filters section
+.savedFiltersRow {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background-color: var(--bg-secondary);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.savedFiltersLabel {
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-right: 4px;
+}
+
+.savedFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.savedFilter {
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: var(--primary);
+    background-color: var(--bg-hover);
+  }
+}
+
+.savedFilterLabel {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deleteFilterButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  
+  &:hover {
+    color: var(--danger);
+  }
+}
+
+.saveButton {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  
+  &:hover {
+    background-color: var(--primary-dark);
+  }
+}
+
+.resetButton {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  
+  &:hover {
+    background-color: var(--danger-light);
+    border-color: var(--danger);
+    color: var(--danger);
   }
 } 
