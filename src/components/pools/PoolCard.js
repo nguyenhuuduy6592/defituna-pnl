@@ -1,35 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import styles from '../../styles/PoolCard.module.scss';
-
-/**
- * Formats large numbers for display with appropriate suffixes
- * @param {number} num - Number to format
- * @param {number} digits - Number of digits after decimal point
- * @returns {string} Formatted number
- */
-function formatNumber(num, digits = 2) {
-  const absNum = Math.abs(Number(num));
-  if (isNaN(absNum)) return "N/A";
-  
-  if (absNum >= 1e9) return (absNum / 1e9).toFixed(digits) + 'B';
-  if (absNum >= 1e6) return (absNum / 1e6).toFixed(digits) + 'M';
-  if (absNum >= 1e3) return (absNum / 1e3).toFixed(digits) + 'K';
-  return absNum.toFixed(digits);
-}
-
-/**
- * Formats percentage values
- * @param {number} value - Percentage value in decimal form
- * @returns {string} Formatted percentage
- */
-function formatPercentage(value) {
-  const percentValue = Number(value) * 100;
-  if (isNaN(percentValue)) return "N/A";
-  
-  return percentValue.toFixed(2) + '%';
-}
+import { formatNumber, formatWalletAddress, formatPercentage } from '../../utils/formatters';
 
 /**
  * Pool Card Component
@@ -44,23 +16,26 @@ export default function PoolCard({ pool, timeframe = '24h' }) {
   const stats = pool.stats?.[timeframe] || {};
   
   // Format values for display
-  const formattedTVL = '$' + formatNumber(pool.tvl_usdc);
-  const formattedVolume = '$' + formatNumber(stats.volume || 0);
-  const formattedFees = '$' + formatNumber(stats.fees || 0);
+  const formattedTVL = '$' + formatNumber(pool.tvl_usdc, true);
+  const formattedVolume = '$' + formatNumber(stats.volume || 0, true);
+  const formattedFees = '$' + formatNumber(stats.fees || 0, true);
   
   // Get the actual yield value and formatted string
   const yieldValue = (stats.yield_over_tvl || 0) * 100;
-  const formattedYield = yieldValue.toFixed(2) + '%';
+  const formattedYield = formatPercentage(stats.yield_over_tvl || 0);
   
-  const formattedFeeRate = (pool.fee_rate / 10000).toFixed(2) + '%'; // Convert basis points to percentage
+  const formattedFeeRate = formatPercentage(pool.fee_rate / 10000); // Convert basis points to percentage
   
   // Get token symbols from metadata if available, or fallback to address placeholders
-  const tokenASymbol = pool.tokenA ? pool.tokenA.symbol : pool.token_a_mint.slice(0, 4) + '...' + pool.token_a_mint.slice(-4);
-  const tokenBSymbol = pool.tokenB ? pool.tokenB.symbol : pool.token_b_mint.slice(0, 4) + '...' + pool.token_b_mint.slice(-4);
+  const tokenASymbol = pool.tokenA?.symbol || formatWalletAddress(pool.token_a_mint);
+  const tokenBSymbol = pool.tokenB?.symbol || formatWalletAddress(pool.token_b_mint);
   
-  // Get token logos if available
-  const tokenALogo = pool.tokenA?.logoURI;
-  const tokenBLogo = pool.tokenB?.logoURI;
+  // Format price if available
+  const formattedPrice = pool.currentPrice 
+    ? Number(pool.currentPrice) > 0 
+      ? `1 ${tokenASymbol} = ${formatNumber(pool.currentPrice)} ${tokenBSymbol}`
+      : `Price unavailable`
+    : '';
   
   // Determine yield class based on value
   const getYieldClass = (value) => {
@@ -70,45 +45,16 @@ export default function PoolCard({ pool, timeframe = '24h' }) {
     return '';
   };
   
-  // Format price if available
-  const formattedPrice = pool.currentPrice 
-    ? pool.currentPrice > 0.01 
-      ? `1 ${tokenASymbol} = ${pool.currentPrice.toFixed(2)} ${tokenBSymbol}`
-      : `1 ${tokenBSymbol} = ${(1/pool.currentPrice).toFixed(2)} ${tokenASymbol}`
-    : '';
-  
   return (
     <Link href={`/pools/${pool.address}`} className={styles.cardLink}>
       <div className={styles.poolCard}>
         <div className={styles.poolHeader}>
           <div className={styles.tokenPair}>
             <div className={styles.tokenInfo}>
-              {tokenALogo && (
-                <div className={styles.tokenLogo}>
-                  <Image 
-                    src={tokenALogo} 
-                    alt={tokenASymbol} 
-                    width={20} 
-                    height={20} 
-                    onError={(e) => { e.target.style.display = 'none' }}
-                  />
-                </div>
-              )}
               <span className={styles.tokenSymbol}>{tokenASymbol}</span>
             </div>
             <span className={styles.separator}>/</span>
             <div className={styles.tokenInfo}>
-              {tokenBLogo && (
-                <div className={styles.tokenLogo}>
-                  <Image 
-                    src={tokenBLogo} 
-                    alt={tokenBSymbol} 
-                    width={20} 
-                    height={20}
-                    onError={(e) => { e.target.style.display = 'none' }}
-                  />
-                </div>
-              )}
               <span className={styles.tokenSymbol}>{tokenBSymbol}</span>
             </div>
           </div>

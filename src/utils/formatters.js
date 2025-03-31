@@ -14,15 +14,26 @@ const MAX_FRACTION_DIGITS_DEFAULT = 2;
 
 /**
  * Formats a number with appropriate decimal places based on its magnitude.
- * Uses `toLocaleString` for locale-aware formatting.
+ * For large numbers, uses K, M, B suffixes for thousands, millions, billions.
+ * For small numbers, uses more decimal places for precision.
  * 
  * @param {number|null|undefined} num - The number to format.
+ * @param {boolean} abbreviate - Whether to abbreviate large numbers with K, M, B (default: true).
  * @returns {string} The formatted number as a string (defaults to '0.00' if input is invalid).
  */
-export const formatNumber = (num) => {
+export const formatNumber = (num, abbreviate = true) => {
   if (num === null || num === undefined) return '0.00';
   
-  const absNum = Math.abs(num);
+  const absNum = Math.abs(Number(num));
+  
+  // Handle large number abbreviations if requested
+  if (abbreviate) {
+    if (absNum >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+    if (absNum >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+    if (absNum >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+  }
+  
+  // Handle small numbers with more precision
   const options = {
     minimumFractionDigits: MIN_FRACTION_DIGITS_DEFAULT,
     maximumFractionDigits: MAX_FRACTION_DIGITS_DEFAULT,
@@ -33,7 +44,22 @@ export const formatNumber = (num) => {
     options.maximumFractionDigits = MAX_FRACTION_DIGITS_SMALL;
   }
   
-  return num.toLocaleString(DEFAULT_LOCALE, options);
+  return absNum.toLocaleString(DEFAULT_LOCALE, options);
+};
+
+/**
+ * Formats a percentage value
+ * @param {number} value - Percentage value in decimal form (e.g., 0.15 for 15%)
+ * @param {number} digits - Number of decimal places
+ * @returns {string} Formatted percentage with % suffix
+ */
+export const formatPercentage = (value, digits = 2) => {
+  if (value === null || value === undefined) return '0.00%';
+  
+  const percentValue = Number(value) * 100;
+  if (isNaN(percentValue)) return 'N/A';
+  
+  return percentValue.toFixed(digits) + '%';
 };
 
 /**

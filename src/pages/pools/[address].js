@@ -2,27 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
-import Image from 'next/image';
 import styles from '../../styles/PoolDetail.module.scss';
 import { enhancePoolWithTokenMetadata } from '../../utils/tokens';
-
-// Helper functions for formatting
-function formatNumber(num, digits = 2) {
-  const absNum = Math.abs(Number(num));
-  if (isNaN(absNum)) return "N/A";
-  
-  if (absNum >= 1e9) return (absNum / 1e9).toFixed(digits) + 'B';
-  if (absNum >= 1e6) return (absNum / 1e6).toFixed(digits) + 'M';
-  if (absNum >= 1e3) return (absNum / 1e3).toFixed(digits) + 'K';
-  return absNum.toFixed(digits);
-}
-
-function formatPercentage(value) {
-  const percentValue = Number(value) * 100;
-  if (isNaN(percentValue)) return "N/A";
-  
-  return percentValue.toFixed(2) + '%';
-}
+import { formatNumber, formatWalletAddress, formatPercentage } from '../../utils/formatters';
 
 export default function PoolDetailPage() {
   const router = useRouter();
@@ -78,26 +60,26 @@ export default function PoolDetailPage() {
     const stats = poolData.stats[timeframe] || {};
     
     return {
-      tvl: '$' + formatNumber(poolData.tvl_usdc),
-      volume: '$' + formatNumber(stats.volume || 0),
-      fees: '$' + formatNumber(stats.fees || 0),
+      tvl: '$' + formatNumber(poolData.tvl_usdc, true),
+      volume: '$' + formatNumber(stats.volume || 0, true),
+      fees: '$' + formatNumber(stats.fees || 0, true),
       yield: formatPercentage(stats.yield_over_tvl || 0),
-      feeRate: (poolData.fee_rate / 10000).toFixed(2) + '%',
-      protocolFeeRate: (poolData.protocol_fee_rate / 10000).toFixed(2) + '%',
+      feeRate: formatPercentage(poolData.fee_rate / 10000),
+      protocolFeeRate: formatPercentage(poolData.protocol_fee_rate / 10000),
     };
   };
   
   const formattedValues = getFormattedValues();
   
   // Determine token symbols from metadata
-  const tokenASymbol = poolData?.tokenA?.symbol || (poolData?.token_a_mint ? `${poolData.token_a_mint.slice(0, 4)}...${poolData.token_a_mint.slice(-4)}` : '');
-  const tokenBSymbol = poolData?.tokenB?.symbol || (poolData?.token_b_mint ? `${poolData.token_b_mint.slice(0, 4)}...${poolData.token_b_mint.slice(-4)}` : '');
+  const tokenASymbol = poolData?.tokenA?.symbol || (poolData?.token_a_mint ? formatWalletAddress(poolData.token_a_mint) : '');
+  const tokenBSymbol = poolData?.tokenB?.symbol || (poolData?.token_b_mint ? formatWalletAddress(poolData.token_b_mint) : '');
   
   // Format price if available
   const formattedPrice = poolData?.currentPrice 
-    ? poolData.currentPrice > 0.01 
-      ? `1 ${tokenASymbol} = ${poolData.currentPrice.toFixed(6)} ${tokenBSymbol}`
-      : `1 ${tokenBSymbol} = ${(1/poolData.currentPrice).toFixed(6)} ${tokenASymbol}`
+    ? Number(poolData.currentPrice) > 0 
+      ? `1 ${tokenASymbol} = ${formatNumber(poolData.currentPrice)} ${tokenBSymbol}`
+      : 'Price unavailable'
     : 'Price unavailable';
   
   const getYieldClass = (value) => {
@@ -150,34 +132,12 @@ export default function PoolDetailPage() {
               <div className={styles.poolIdentity}>
                 <div className={styles.tokenPair}>
                   <div className={styles.tokenInfo}>
-                    {poolData.tokenA?.logoURI && (
-                      <div className={styles.tokenLogo}>
-                        <Image 
-                          src={poolData.tokenA.logoURI} 
-                          alt={tokenASymbol} 
-                          width={24} 
-                          height={24} 
-                          onError={(e) => { e.target.style.display = 'none' }}
-                        />
-                      </div>
-                    )}
                     <span className={styles.tokenSymbol}>{tokenASymbol}</span>
                   </div>
                   
                   <span className={styles.separator}>/</span>
                   
                   <div className={styles.tokenInfo}>
-                    {poolData.tokenB?.logoURI && (
-                      <div className={styles.tokenLogo}>
-                        <Image 
-                          src={poolData.tokenB.logoURI} 
-                          alt={tokenBSymbol} 
-                          width={24} 
-                          height={24}
-                          onError={(e) => { e.target.style.display = 'none' }}
-                        />
-                      </div>
-                    )}
                     <span className={styles.tokenSymbol}>{tokenBSymbol}</span>
                   </div>
                 </div>
@@ -195,17 +155,21 @@ export default function PoolDetailPage() {
               <div className={styles.addressSection}>
                 <div className={styles.addressItem}>
                   <div className={styles.addressLabel}>Pool Address</div>
-                  <div className={styles.addressValue}>{poolData.address}</div>
+                  <div className={styles.addressValue} title={poolData.address}>{formatWalletAddress(poolData.address)}</div>
                 </div>
                 
                 <div className={styles.addressItem}>
                   <div className={styles.addressLabel}>Token A Mint</div>
-                  <div className={styles.addressValue}>{poolData.token_a_mint}</div>
+                  <div className={styles.addressValue} title={poolData.token_a_mint}>
+                    {tokenASymbol} ({formatWalletAddress(poolData.token_a_mint)})
+                  </div>
                 </div>
                 
                 <div className={styles.addressItem}>
                   <div className={styles.addressLabel}>Token B Mint</div>
-                  <div className={styles.addressValue}>{poolData.token_b_mint}</div>
+                  <div className={styles.addressValue} title={poolData.token_b_mint}>
+                    {tokenBSymbol} ({formatWalletAddress(poolData.token_b_mint)})
+                  </div>
                 </div>
               </div>
             </div>
@@ -249,7 +213,9 @@ export default function PoolDetailPage() {
               
               <div className={styles.statCard}>
                 <div className={styles.statLabel}>Yield ({timeframe})</div>
-                <div className={`${styles.statValue} ${getYieldClass(poolData.stats[timeframe].yield_over_tvl)}`}>{formattedValues.yield}</div>
+                <div className={`${styles.statValue} ${getYieldClass(poolData.stats[timeframe]?.yield_over_tvl)}`}>
+                  {formattedValues.yield}
+                </div>
               </div>
               
               <div className={styles.statCard}>
@@ -258,63 +224,45 @@ export default function PoolDetailPage() {
               </div>
             </div>
             
-            <div className={styles.poolDetails}>
-              <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>Technical Details</h2>
-                <div className={styles.detailGrid}>
+            <div className={styles.technicalDetails}>
+              <h2>Technical Details</h2>
+              <div className={styles.detailsGrid}>
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Liquidity</div>
+                  <div className={styles.detailValue}>{formatNumber(poolData.liquidity, true)}</div>
+                </div>
+                
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Sqrt Price</div>
+                  <div className={styles.detailValue}>{poolData.sqrt_price}</div>
+                </div>
+                
+                {poolData.protocol_fee_rate !== undefined && (
                   <div className={styles.detailItem}>
-                    <div className={styles.detailLabel}>Protocol Fee Rate</div>
+                    <div className={styles.detailLabel}>Protocol Fee</div>
                     <div className={styles.detailValue}>{formattedValues.protocolFeeRate}</div>
                   </div>
-                  
-                  <div className={styles.detailItem}>
-                    <div className={styles.detailLabel}>Tick Spacing</div>
-                    <div className={styles.detailValue}>{poolData.tick_spacing}</div>
+                )}
+                
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Token A Decimals</div>
+                  <div className={styles.detailValue}>
+                    {poolData.tokenA?.decimals !== undefined ? poolData.tokenA.decimals : 'Unknown'}
                   </div>
-                  
-                  <div className={styles.detailItem}>
-                    <div className={styles.detailLabel}>Current Tick Index</div>
-                    <div className={styles.detailValue}>{poolData.tick_current_index}</div>
-                  </div>
-                  
-                  <div className={styles.detailItem}>
-                    <div className={styles.detailLabel}>Sqrt Price</div>
-                    <div className={styles.detailValue} title={poolData.sqrt_price}>
-                      {poolData.sqrt_price.slice(0, 10)}...
-                    </div>
-                  </div>
-                  
-                  <div className={styles.detailItem}>
-                    <div className={styles.detailLabel}>Liquidity</div>
-                    <div className={styles.detailValue} title={poolData.liquidity}>
-                      {poolData.liquidity.slice(0, 10)}...
-                    </div>
-                  </div>
-                  
-                  <div className={styles.detailItem}>
-                    <div className={styles.detailLabel}>Token A Vault</div>
-                    <div className={styles.detailValue} title={poolData.token_a_vault}>
-                      {poolData.token_a_vault.slice(0, 10)}...
-                    </div>
-                  </div>
-                  
-                  <div className={styles.detailItem}>
-                    <div className={styles.detailLabel}>Token B Vault</div>
-                    <div className={styles.detailValue} title={poolData.token_b_vault}>
-                      {poolData.token_b_vault.slice(0, 10)}...
-                    </div>
+                </div>
+                
+                <div className={styles.detailItem}>
+                  <div className={styles.detailLabel}>Token B Decimals</div>
+                  <div className={styles.detailValue}>
+                    {poolData.tokenB?.decimals !== undefined ? poolData.tokenB.decimals : 'Unknown'}
                   </div>
                 </div>
               </div>
-              
-              <div className={styles.actions}>
-                <button className={styles.actionButton}>
-                  Create Position
-                </button>
-                <button className={styles.actionButton}>
-                  Share Pool
-                </button>
-              </div>
+            </div>
+            
+            <div className={styles.actions}>
+              <button className={styles.actionButton}>Create Position</button>
+              <button className={styles.actionButton}>Share Pool</button>
             </div>
           </>
         )}

@@ -97,11 +97,19 @@ export async function batchGetTokenMetadata(tokenAddresses) {
  */
 export function calculatePriceFromSqrtPrice(sqrtPrice, tokenADecimals = 6, tokenBDecimals = 6) {
   try {
+    // Convert the square root price to a BigInt
     const sqrtPriceBigInt = BigInt(sqrtPrice);
-    const price = (sqrtPriceBigInt * sqrtPriceBigInt).toString();
-    const decimalPrice = Number(price) / 2 ** 128;
-    const adjustedPrice = decimalPrice * (10 ** (tokenBDecimals - tokenADecimals));
-    return adjustedPrice;
+    
+    // Square the sqrt price to get the actual price (X64 fixed point)
+    const priceBigInt = (sqrtPriceBigInt * sqrtPriceBigInt) >> BigInt(64);
+    
+    // Convert to JavaScript number for easier manipulation
+    const price = Number(priceBigInt) / 2 ** 64;
+    
+    // Adjust for token decimals
+    // For price in terms of token B per token A, divide by 10^(b-a)
+    const decimalAdjustment = 10 ** (tokenADecimals - tokenBDecimals);
+    return price * decimalAdjustment;
   } catch (error) {
     console.error('Error calculating price from sqrt_price:', error);
     return 0;

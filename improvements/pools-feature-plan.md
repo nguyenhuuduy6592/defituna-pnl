@@ -49,7 +49,7 @@ Display all available pools on DeFiTuna with detailed information, filtering cap
    - Add technical details section
 
 ### Phase 4: Visual and UX Refinements 🚧 IN PROGRESS
-1. 🚧 Enhance token display
+1. ✅ Enhance token display
    - Replace placeholder addresses with proper symbols
    - Add formatting for decimals and number values
    - Ensure consistent token representation
@@ -90,7 +90,7 @@ Display all available pools on DeFiTuna with detailed information, filtering cap
    - **Action Item**: Research and implement pagination with cursor
 
 ## Current Focus Items
-1. 🔄 Complete token metadata display with proper symbols
+1. ✅ Complete token metadata display with proper symbols
 2. 🔄 Enhance visual indicators for metrics
 3. 🔄 Finalize mobile responsiveness
 4. 🔄 Begin chart component implementation
