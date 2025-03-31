@@ -1,11 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import usePoolsData from './usePoolsData';
-
-// Cache TTL in milliseconds (5 minutes)
-const CACHE_TTL = 5 * 60 * 1000;
-
-// In-memory cache for pool data
-const poolCache = new Map();
 
 /**
  * Custom hook for managing pool data with derived metrics

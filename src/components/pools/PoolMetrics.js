@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from '../../styles/PoolMetrics.module.scss';
+import styles from './PoolMetrics.module.scss';
 import EnhancedTooltip from '../common/EnhancedTooltip';
 import InfoIcon from '../common/InfoIcon';
 import { formatNumber } from '../../utils/formatters';
-import usePoolData from '../../hooks/usePoolData';
+import { usePoolData } from '../../hooks/usePoolData';
 import classNames from 'classnames';
 import { 
   getFeeAPRTooltip, 
@@ -14,7 +14,6 @@ import {
   getVolumeTooltip,
   getYieldTooltip,
   getFeeRateTooltip,
-  getImpermanentLossTooltip
 } from '../../utils/tooltipContent';
 
 const MetricDisplay = ({ label, value, tooltipContent, className, prefix = '', suffix = '', textColor = '' }) => {

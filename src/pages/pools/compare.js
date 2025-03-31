@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useComparison } from '../../contexts/ComparisonContext';
-import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
-import { PoolMetrics } from '../../components/pools/PoolMetrics';
+import { formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
+import PoolMetrics from '../../components/pools/PoolMetrics';
 import styles from '../../styles/PoolsCompare.module.scss';
 
 const TIMEFRAMES = ['24h', '7d', '30d'];
