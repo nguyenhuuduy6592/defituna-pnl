@@ -3,6 +3,7 @@ import Link from 'next/link';
 import styles from '../../styles/PoolCard.module.scss';
 import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
 import { usePoolData } from '../../hooks/usePoolData';
+import CompareButton from './CompareButton';
 
 /**
  * Pool Card Component
@@ -50,48 +51,56 @@ export default function PoolCard({ pool, timeframe = '24h', sortBy, sortOrder })
   };
 
   return (
-    <Link href={`/pools/${pool.address}`} className={styles.card}>
-      <div className={styles.cardHeader}>
-        <div className={styles.tokenPair}>
-          <span className={styles.tokenSymbol}>{tokenASymbol}</span>
-          <span className={styles.separator}>/</span>
-          <span className={styles.tokenSymbol}>{tokenBSymbol}</span>
-        </div>
-        <div className={styles.price}>{formattedPrice}</div>
-      </div>
+    <div className={styles.cardContainer}>
+      <div className={styles.cardWrapper}>
+        <Link href={`/pools/${pool.address}`} className={styles.card}>
+          <div className={styles.cardHeader}>
+            <div className={styles.tokenPair}>
+              <span className={styles.tokenSymbol}>{tokenASymbol}</span>
+              <span className={styles.separator}>/</span>
+              <span className={styles.tokenSymbol}>{tokenBSymbol}</span>
+            </div>
+            <div className={styles.price}>{formattedPrice}</div>
+          </div>
 
-      <div className={styles.metrics}>
-        <div className={`${styles.metric} ${getSortIndicatorClass('tvl')}`}>
-          <div className={styles.metricLabel}>TVL</div>
-          <div className={styles.metricValue}>{formattedTVL}</div>
-        </div>
+          <div className={styles.metrics}>
+            <div className={`${styles.metric} ${getSortIndicatorClass('tvl')}`}>
+              <div className={styles.metricLabel}>TVL</div>
+              <div className={styles.metricValue}>{formattedTVL}</div>
+            </div>
 
-        <div className={`${styles.metric} ${getSortIndicatorClass(`volume${timeframe}`)}`}>
-          <div className={styles.metricLabel}>Volume</div>
-          <div className={styles.metricValue}>{formattedVolume}</div>
-        </div>
+            <div className={`${styles.metric} ${getSortIndicatorClass(`volume${timeframe}`)}`}>
+              <div className={styles.metricLabel}>Volume</div>
+              <div className={styles.metricValue}>{formattedVolume}</div>
+            </div>
 
-        <div className={`${styles.metric} ${getSortIndicatorClass(`yield_over_tvl${timeframe}`)}`}>
-          <div className={styles.metricLabel}>Yield</div>
-          <div className={styles.metricValue}>{formattedYield}</div>
-        </div>
+            <div className={`${styles.metric} ${getSortIndicatorClass(`yield_over_tvl${timeframe}`)}`}>
+              <div className={styles.metricLabel}>Yield</div>
+              <div className={styles.metricValue}>{formattedYield}</div>
+            </div>
 
-        <div className={`${styles.metric} ${getSortIndicatorClass('fee')}`}>
-          <div className={styles.metricLabel}>Fee</div>
-          <div className={styles.metricValue}>{formattedFeeRate}</div>
-        </div>
+            <div className={`${styles.metric} ${getSortIndicatorClass('fee')}`}>
+              <div className={styles.metricLabel}>Fee</div>
+              <div className={styles.metricValue}>{formattedFeeRate}</div>
+            </div>
+            
+            {/* Add derived metrics */}
+            <div className={styles.metric}>
+              <div className={styles.metricLabel}>Fee APR</div>
+              <div className={styles.metricValue}>{formattedFeeAPR}</div>
+            </div>
+            
+            <div className={styles.metric}>
+              <div className={styles.metricLabel}>Volume/TVL</div>
+              <div className={styles.metricValue}>{formattedVolumeTVL}</div>
+            </div>
+          </div>
+        </Link>
         
-        {/* Add derived metrics */}
-        <div className={styles.metric}>
-          <div className={styles.metricLabel}>Fee APR</div>
-          <div className={styles.metricValue}>{formattedFeeAPR}</div>
-        </div>
-        
-        <div className={styles.metric}>
-          <div className={styles.metricLabel}>Volume/TVL</div>
-          <div className={styles.metricValue}>{formattedVolumeTVL}</div>
+        <div className={styles.cardActions}>
+          <CompareButton pool={pool} />
         </div>
       </div>
-    </Link>
+    </div>
   );
 } 

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import usePoolsData from '../../hooks/usePoolsData';
 import PoolCard from '../../components/pools/PoolCard';
 import PoolFilters from '../../components/pools/PoolFilters';
+import { useComparison } from '../../contexts/ComparisonContext';
 import styles from '../../styles/Pools.module.scss';
 
 export default function PoolsPage() {
@@ -19,6 +20,9 @@ export default function PoolsPage() {
     filterOptions,
     applyFilters 
   } = usePoolsData();
+  
+  // Get comparison context
+  const { comparisonPools } = useComparison();
   
   // Extract unique providers from pools data
   const providers = useMemo(() => {
@@ -41,9 +45,16 @@ export default function PoolsPage() {
       <main className={styles.main}>
         <div className={styles.pageHeader}>
           <h1 className={styles.heading}>All Pools</h1>
-          <Link href="/" className={styles.homeLink}>
-            Back to PnL Viewer
-          </Link>
+          <div className={styles.headerActions}>
+            {comparisonPools.length > 0 && (
+              <Link href="/pools/compare" className={styles.compareLink}>
+                Compare Pools ({comparisonPools.length})
+              </Link>
+            )}
+            <Link href="/" className={styles.homeLink}>
+              Back to PnL Viewer
+            </Link>
+          </div>
         </div>
         
         <p className={styles.description}>

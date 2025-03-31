@@ -1,5 +1,6 @@
 import '@/styles/globals.scss'
 import { useEffect } from 'react'
+import { ComparisonProvider } from '../contexts/ComparisonContext'
 
 export default function App({ Component, pageProps }) {
   useEffect(() => {
@@ -17,5 +18,9 @@ export default function App({ Component, pageProps }) {
     }
   }, [])
 
-  return <Component {...pageProps} />
+  return (
+    <ComparisonProvider>
+      <Component {...pageProps} />
+    </ComparisonProvider>
+  )
 }

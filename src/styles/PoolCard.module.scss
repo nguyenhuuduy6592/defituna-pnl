@@ -18,6 +18,30 @@
   width: 100%;
 }
 
+.cardWrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.cardContainer {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.cardActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  width: 100%;
+  z-index: 2;
+}
+
 .card {
   background: var(--card-bg);
   border-radius: 10px;
@@ -28,9 +52,9 @@
   color: inherit;
   display: block;
   cursor: pointer;
-  height: 100%;
   width: 100%;
   box-sizing: border-box;
+  margin-bottom: 8px;
   
   &:hover {
     transform: translateY(-2px);

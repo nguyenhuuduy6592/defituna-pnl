@@ -1,0 +1,49 @@
+@import '../../styles/variables.module.scss';
+
+.compareButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: spacing(xs);
+  padding: spacing(sm) spacing(md);
+  border-radius: spacing(md);
+  border: 2px solid color(primary);
+  background-color: bg-color(white);
+  color: color(primary);
+  font-size: font-size(sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  position: relative;
+  min-width: 120px;
+  height: 36px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: color(primary-light);
+    color: color(primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.active {
+    background-color: color(primary);
+    color: white;
+
+    &:hover {
+      background-color: color(primary-dark);
+    }
+  }
+
+  .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: font-size(md);
+  }
+  
+  .text {
+    font-weight: 500;
+  }
+} 

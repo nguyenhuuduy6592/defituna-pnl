@@ -15,7 +15,28 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: variables.spacing(sm);
+  margin-bottom: variables.spacing(md);
+}
+
+.headerActions {
+  display: flex;
+  gap: variables.spacing(md);
+}
+
+.compareLink {
+  display: inline-flex;
+  align-items: center;
+  background-color: variables.color(primary);
+  color: white;
+  text-decoration: none;
+  padding: variables.spacing(xs) variables.spacing(sm);
+  border-radius: variables.spacing(md);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: darken(variables.color(primary), 10%);
+  }
 }
 
 .homeLink {
@@ -33,6 +54,7 @@
     background: rgba(variables.color(primary), 0.1);
     border-color: variables.color(primary);
     color: variables.color(primary);
+    text-decoration: underline;
   }
 }
 
@@ -53,11 +75,17 @@
 .poolsGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: variables.spacing(md);
+  gap: variables.spacing(xl);
   margin-top: variables.spacing(lg);
   overflow-x: hidden; /* Prevent horizontal scrolling */
   width: 100%;
   box-sizing: border-box;
+  
+  > div {
+    display: flex;
+    flex-direction: column;
+    min-height: 200px; /* Provide enough height for the card and button */
+  }
 }
 
 .loadingContainer {
