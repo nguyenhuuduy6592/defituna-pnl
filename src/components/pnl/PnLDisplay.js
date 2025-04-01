@@ -18,14 +18,12 @@ const defaultData = {
  * 
  * @param {Object} props Component props
  * @param {Object} props.data Data containing PnL and positions information
- * @param {Object} props.positionTimestamps Timestamps for position creation
  * @param {boolean} props.historyEnabled Whether position history is enabled
  * @param {boolean} props.loading Whether data is currently loading
  * @returns {JSX.Element} Rendered component
  */
 export const PnLDisplay = ({ 
   data, 
-  positionTimestamps, 
   historyEnabled = false, 
   loading = false,
   positionsHistory = []
@@ -41,11 +39,8 @@ export const PnLDisplay = ({
     };
   }, [data]);
   
-  // Get positions with age data included
-  const positionsWithAge = usePositionAges(
-    displayData.positions, 
-    positionTimestamps
-  );
+  // Get positions with age data included (using only opened_at from API)
+  const positionsWithAge = usePositionAges(displayData.positions);
 
   // Calculate total yield from all positions
   const { totalYield, totalCompounded } = useMemo(() => {

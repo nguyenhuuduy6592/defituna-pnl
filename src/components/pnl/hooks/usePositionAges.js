@@ -1,21 +1,15 @@
 import { useState, useEffect, useMemo } from 'react';
 
 /**
- * Hook for calculating position ages based on timestamps
+ * Hook for calculating position ages based on opened_at field from API
  * @param {Array} positions Array of position objects
- * @param {Object} positionTimestamps Object with position addresses as keys and timestamps as values
  * @returns {Array} Positions with age property added
  */
-export const usePositionAges = (positions = [], positionTimestamps = {}) => {
+export const usePositionAges = (positions = []) => {
   const [currentTime, setCurrentTime] = useState(() => Date.now());
 
   // Ensure positions is an array
   const safePositions = Array.isArray(positions) ? positions : [];
-  
-  // Ensure positionTimestamps is an object
-  const safeTimestamps = positionTimestamps && typeof positionTimestamps === 'object' 
-    ? positionTimestamps 
-    : {};
 
   // Update current time every second for live age calculation
   useEffect(() => {
@@ -25,7 +19,7 @@ export const usePositionAges = (positions = [], positionTimestamps = {}) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  // Merge ages into positions, calculating duration on the fly
+  // Add ages to positions, calculating duration on the fly from opened_at
   const positionsWithAge = useMemo(() => {
     if (safePositions.length === 0) return [];
     
@@ -34,12 +28,19 @@ export const usePositionAges = (positions = [], positionTimestamps = {}) => {
     return safePositions.map(pos => {
       if (!pos) return { age: null };
       
-      const positionAddress = pos.positionAddress;
-      const creationTimestamp = positionAddress ? safeTimestamps[positionAddress] : null;
       let ageSeconds = null; 
       
-      if (typeof creationTimestamp === 'number' && creationTimestamp > 0) {
-        ageSeconds = nowSeconds - creationTimestamp;
+      // Use opened_at from the API
+      if (pos.opened_at) {
+        try {
+          // opened_at is in ISO format, convert to timestamp
+          const openedAtTimestamp = new Date(pos.opened_at).getTime() / 1000;
+          if (!isNaN(openedAtTimestamp)) {
+            ageSeconds = nowSeconds - openedAtTimestamp;
+          }
+        } catch (e) {
+          console.warn('Error parsing opened_at date:', e);
+        }
       }
       
       return {
@@ -47,7 +48,7 @@ export const usePositionAges = (positions = [], positionTimestamps = {}) => {
         age: ageSeconds // Pass calculated duration (or null)
       };
     });
-  }, [safePositions, safeTimestamps, currentTime]);
+  }, [safePositions, currentTime]);
 
   return positionsWithAge;
 }; 

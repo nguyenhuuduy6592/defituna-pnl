@@ -166,7 +166,10 @@ export const decodePosition = (position) => {
     },
     interest: {
       usd: decodeValue(position.int?.u, USD_MULTIPLIER)
-    }
+    },
+    
+    // Include opened_at if available in the position data
+    opened_at: position.opened_at
   };
   
   // Add derived/calculated properties (optional, can be done later)

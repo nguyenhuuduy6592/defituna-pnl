@@ -286,6 +286,9 @@ export async function processPositionsData(positionsData) {
         state: position.state,
         pair: `${tokenA.symbol}/${tokenB.symbol}`,
         
+        // Add opened_at if available
+        opened_at: position.opened_at,
+        
         // Price data with numeric encoding
         c_price: encodeValue(processedPosition.currentPrice, PRICE_MULTIPLIER), // currentPrice
         e_price: encodeValue(processedPosition.entryPrice, PRICE_MULTIPLIER),   // entryPrice

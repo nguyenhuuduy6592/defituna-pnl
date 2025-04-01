@@ -25,7 +25,6 @@ export default () => {
   const [loading, setLoading] = useState(false);
   const { countdown: fetchCooldown, startCountdown: startFetchCooldown } = useCountdown(0);
   const [aggregatedData, setAggregatedData] = useState(null);
-  const [positionTimestamps, setPositionTimestamps] = useState({});
   const [errorMessage, setErrorMessage] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
@@ -158,50 +157,19 @@ export default () => {
       if (combined) {
         setAggregatedData(combined);
         
-        // --- Fetch Creation Timestamps for NEW positions only --- 
-        if (combined.positions && combined.positions.length > 0) {
-          const allCurrentPositionAddresses = combined.positions.map(p => p.positionAddress);
-          const existingTimestampsKeys = Object.keys(positionTimestamps);
-          
-          const newPositionAddresses = allCurrentPositionAddresses.filter(
-            addr => !existingTimestampsKeys.includes(addr) || !positionTimestamps[addr] // Also fetch if timestamp is falsy (e.g., 0 from previous error)
-          );
-
-          if (newPositionAddresses.length > 0) {
-            try {
-              const tsRes = await fetch('/api/fetch-position-age', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ positionAddresses: newPositionAddresses })
-              });
-              if (tsRes.ok) {
-                const newTimestampsData = await tsRes.json();
-                setPositionTimestamps(prevTs => ({
-                  ...prevTs, 
-                  ...newTimestampsData
-                }));
-              } else {
-                console.error('Failed to fetch new position timestamps:', await tsRes.text());
-              }
-            } catch (tsErr) {
-              console.error('Error fetching new position timestamps:', tsErr);
-            }
-          }
-        }
-        // --- End Fetch Creation Timestamps ---
-
+        // Handle history data if enabled
         if (historyEnabled) {
           await savePositionSnapshot(combined.positions);
         }
+        
+        // Handle wallet form submission
         if (isSubmission && wallet) {
           addWallet(wallet);
           setWallet('');
           startFetchCooldown(30);
         }
-      } else if (fetchErrors.length === 0) { 
+      } else if (fetchErrors.length === 0) {
         setErrorMessage('No position data found for the provided wallet(s).');
-        // Clear timestamps if no positions are found at all?
-        setPositionTimestamps({});
       }
 
     } catch (err) {
@@ -221,9 +189,7 @@ export default () => {
     wallet, 
     addWallet, 
     setWallet, 
-    debouncedExecuteFetchWalletPnL,
-    positionTimestamps,
-    setPositionTimestamps
+    debouncedExecuteFetchWalletPnL
   ]);
 
   const {
@@ -363,7 +329,6 @@ export default () => {
       {activeWallets.length > 0 && (
         <PnLDisplay
           data={aggregatedData}
-          positionTimestamps={positionTimestamps}
           historyEnabled={historyEnabled}
           loading={loading}
           positionsHistory={allPositionsHistory}
