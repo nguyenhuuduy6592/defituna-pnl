@@ -126,8 +126,9 @@ export const PnLCard = ({ position, onClose }) => {
 
   // Handle export button click
   const handleExport = useCallback(() => {
+    // Pass the ref pointing to the content div
     exportCardAsImage(exportContentRef, `${displayPair}-pnl-${Date.now()}.png`);
-  }, [displayPair, exportContentRef]);
+  }, [displayPair, exportContentRef]); // Dependencies include the ref
 
   // Handle share button click
   const handleShare = useCallback(() => {

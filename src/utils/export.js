@@ -10,13 +10,13 @@ import html2canvas from 'html2canvas';
 const DEFAULT_CANVAS_OPTIONS = {
   scale: 2,
   useCORS: true,
-  backgroundColor: '#1E293B',
+  backgroundColor: null,
   logging: false
 };
 
 /**
  * Exports a DOM element as an image file
- * @param {React.RefObject} elementRef - React ref to the DOM element
+ * @param {React.RefObject} elementRef - React ref to the DOM element to capture (e.g., the modal container)
  * @param {string} fileName - Name for the downloaded file
  * @returns {Promise<boolean>} Whether the export was successful
  */
@@ -35,17 +35,6 @@ export const exportCardAsImage = async (elementRef, fileName) => {
 
     const canvas = await html2canvas(elementRef.current, {
       ...DEFAULT_CANVAS_OPTIONS,
-      width: elementRef.current.offsetWidth,
-      height: elementRef.current.offsetHeight,
-      onclone: (clonedDoc) => {
-        const clonedContent = clonedDoc.querySelector('[data-export-content]');
-        if (clonedContent) {
-          clonedContent.style.width = `${elementRef.current.offsetWidth}px`;
-          clonedContent.style.height = `${elementRef.current.offsetHeight}px`;
-          clonedContent.style.position = 'relative';
-          clonedContent.style.transform = 'none';
-        }
-      }
     });
 
     const link = document.createElement('a');
