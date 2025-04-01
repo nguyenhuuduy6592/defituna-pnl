@@ -4,6 +4,7 @@
  * and share content through the Web Share API.
  */
 
+import { toPng } from 'html-to-image';
 import html2canvas from 'html2canvas';
 
 // Default canvas options
@@ -20,7 +21,7 @@ const DEFAULT_CANVAS_OPTIONS = {
  * @param {string} fileName - Name for the downloaded file
  * @returns {Promise<boolean>} Whether the export was successful
  */
-export const exportCardAsImage = async (elementRef, fileName) => {
+export const exportChartAsImage = async (elementRef, fileName) => {
   try {
     // Input validation
     if (!elementRef || !elementRef.current) {
@@ -40,6 +41,42 @@ export const exportCardAsImage = async (elementRef, fileName) => {
     const link = document.createElement('a');
     link.download = fileName;
     link.href = canvas.toDataURL('image/png');
+    link.click();
+    
+    return true;
+  } catch (error) {
+    console.error('[exportCardAsImage] Error exporting card:', error);
+    return false;
+  }
+};
+
+/**
+ * Exports a DOM element as an image file
+ * @param {React.RefObject} contentRef - React ref to the specific DOM element containing the content to export
+ * @param {string} fileName - Name for the downloaded file
+ * @returns {Promise<boolean>} Whether the export was successful
+ */
+export const exportCardAsImage = async (contentRef, fileName) => {
+  try {
+    if (!contentRef || !contentRef.current) {
+      console.error('[exportCardAsImage] Invalid content element reference');
+      return false;
+    }
+
+    if (!fileName) {
+      fileName = `export-${new Date().toISOString().slice(0, 10)}.png`;
+      console.warn('[exportCardAsImage] No file name provided, using default:', fileName);
+    }
+
+    const dataUrl = await toPng(contentRef.current, {
+      quality: 1.0,
+      pixelRatio: 2,
+      skipAutoScale: true
+    });
+
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = dataUrl;
     link.click();
     
     return true;

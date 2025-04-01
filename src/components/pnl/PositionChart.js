@@ -15,7 +15,7 @@ import { Tooltip } from '../common/Tooltip';
 import { BsInfoCircle } from 'react-icons/bs';
 import { HiDownload, HiShare } from 'react-icons/hi';
 import { prepareChartData, groupChartData, formatXAxisLabel, CustomChartTooltip, formatNumber, TIME_PERIODS } from '../../utils';
-import { exportCardAsImage, shareCard } from '../../utils/export';
+import { exportChartAsImage, shareCard } from '../../utils/export';
 import styles from './PositionChart.module.scss';
 
 // --- Constants ---
@@ -258,7 +258,7 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
   const handleExport = useCallback(() => {
     // Use position.pairDisplay if available, otherwise fall back to position.pair
     const displayPair = position?.pairDisplay || position?.pair || "position";
-    exportCardAsImage(exportWrapperRef, `${displayPair}-chart-${Date.now()}.png`);
+    exportChartAsImage(exportWrapperRef, `${displayPair}-chart-${Date.now()}.png`);
   }, [position]);
 
   // Handle share button click
