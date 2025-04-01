@@ -18,7 +18,7 @@
   background: rgba(30, 41, 59, 0.95);
   padding: variables.spacing(md);
   width: 100%;
-  max-width: 380px;
+  max-width: 420px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 
@@ -42,6 +42,23 @@
   gap: variables.spacing(md);
   transform: translateZ(0);
   backface-visibility: hidden;
+  max-height: 70vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
 }
 
 .header {
@@ -54,6 +71,73 @@
     font-weight: 600;
     color: rgba(255, 255, 255, 0.9);
   }
+}
+
+.cardHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: variables.spacing(sm);
+  margin-bottom: variables.spacing(md);
+  
+  .poolInfo {
+    display: flex;
+    align-items: center;
+    gap: variables.spacing(sm);
+    margin-top: variables.spacing(xs);
+    
+    .platformBadge {
+      background: rgba(0, 122, 255, 0.2);
+      color: #60A5FA;
+      padding: variables.spacing(xs) variables.spacing(sm);
+      border-radius: 4px;
+      font-size: variables.font-size(xs);
+      font-weight: 600;
+    }
+    
+    .positionAddress {
+      font-size: variables.font-size(xs);
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      
+      &:hover {
+        color: rgba(255, 255, 255, 0.9);
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: variables.spacing(xs);
+  margin-top: variables.spacing(md);
+  padding-bottom: variables.spacing(xs);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  
+  .sectionIcon {
+    font-size: 1rem;
+    color: variables.color(success);
+    opacity: 0.8;
+  }
+  
+  .sectionTitle {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+  }
+}
+
+.detailedStats {
+  padding: variables.spacing(sm);
+  gap: variables.spacing(xs);
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  margin: 0;
 }
 
 .closeButton {
@@ -268,7 +352,6 @@
   font-size: variables.font-size(sm);
 }
 
-// Status classes - match PositionsTable styles
 .stateInRange {
   color: variables.bg-color(white);
   background: variables.color(success);

@@ -2,9 +2,10 @@ import { useRef, useEffect, useCallback } from 'react';
 import { HiX } from 'react-icons/hi';
 import { HiDownload, HiShare } from 'react-icons/hi';
 import { BsCurrencyDollar, BsClock } from 'react-icons/bs';
+import { FaWarehouse, FaChartLine, FaMoneyBillWave, FaCalendarAlt } from 'react-icons/fa';
 import { Portal } from '../common/Portal';
 import styles from './PnLCard.module.scss';
-import { formatNumber, formatDuration } from '../../utils/formatters';
+import { formatNumber, formatDuration, formatPercentage } from '../../utils/formatters';
 import { getValueClass } from '../../utils/styles';
 import { getStateClass } from '../../utils/positionUtils';
 import { exportCardAsImage, shareCard } from '../../utils/export';
@@ -21,6 +22,16 @@ const StatRow = ({ icon: Icon, label, value, valueClass }) => (
     <dd className={`${styles.value} ${valueClass ? styles[valueClass] : ''}`}>
       {value}
     </dd>
+  </div>
+);
+
+/**
+ * Renders a section header for the modal
+ */
+const SectionHeader = ({ icon: Icon, title }) => (
+  <div className={styles.sectionHeader}>
+    <Icon className={styles.sectionIcon} />
+    <h4 className={styles.sectionTitle}>{title}</h4>
   </div>
 );
 
@@ -141,6 +152,26 @@ export const PnLCard = ({ position, onClose }) => {
   const yieldValueClass = getValueClass(position.yield.usd);
   const compoundedValueClass = getValueClass(position.compounded.usd);
   
+  // Format price range for display if available
+  let priceRangeDisplay = 'Unknown';
+  if (position.rangePrices?.lower != null && position.rangePrices?.upper != null) {
+    priceRangeDisplay = `$${formatNumber(position.rangePrices.lower)} - $${formatNumber(position.rangePrices.upper)}`;
+  }
+  
+  // Determine if position is in range
+  let inRangeStatus = 'Unknown';
+  if (position.currentPrice != null && position.rangePrices?.lower != null && position.rangePrices?.upper != null) {
+    const isInRange = position.currentPrice >= position.rangePrices.lower && 
+                      position.currentPrice <= position.rangePrices.upper;
+    inRangeStatus = isInRange ? 'In range' : 'Out of range';
+  }
+  
+  // Calculate total position value
+  const totalValue = (position.collateral?.usd || 0) + (position.debt?.usd || 0);
+  
+  // Platform detection (we're using Orca as mentioned)
+  const platform = position.platform || 'Orca';
+  
   return (
     <Portal>
       <div 
@@ -165,10 +196,22 @@ export const PnLCard = ({ position, onClose }) => {
           </div>
 
           <div className={styles.cardContent} ref={exportContentRef} data-export-content>
-            <h3 className={styles.pairTitle}>{displayPair}</h3>
+            {/* Header Section */}
+            <div className={styles.cardHeader}>
+              <h3 className={styles.pairTitle}>{displayPair}</h3>
+              <StatusDisplay status={position.displayStatus} />
+              <div className={styles.poolInfo}>
+                <span className={styles.platformBadge}>{platform}</span>
+                {position.positionAddress && (
+                  <span className={styles.positionAddress} title={position.positionAddress}>
+                    {position.positionAddress.slice(0, 4)}...{position.positionAddress.slice(-4)}
+                  </span>
+                )}
+              </div>
+            </div>
             
-            <StatusDisplay status={position.displayStatus} />
-            
+            {/* Performance Metrics Section */}
+            <SectionHeader icon={FaChartLine} title="Performance Metrics" />
             <div className={styles.mainInfo}>
               <PnLDisplay 
                 value={position.pnl.usd} 
@@ -184,18 +227,76 @@ export const PnLCard = ({ position, onClose }) => {
                 />
                 <StatRow 
                   icon={BsCurrencyDollar}
-                  label="Yield"
-                  value={`$${formatNumber(position.yield.usd)}`}
-                  valueClass={yieldValueClass}
-                />
-                <StatRow 
-                  icon={BsCurrencyDollar}
-                  label="Compounded"
-                  value={`$${formatNumber(position.compounded.usd)}`}
-                  valueClass={compoundedValueClass}
+                  label="Current Price"
+                  value={position.currentPrice ? `$${formatNumber(position.currentPrice)}` : 'Unknown'}
                 />
               </dl>
             </div>
+            
+            {/* Financial Details Section */}
+            <SectionHeader icon={FaMoneyBillWave} title="Financial Details" />
+            <dl className={styles.detailedStats}>
+              <StatRow 
+                icon={BsCurrencyDollar}
+                label="Initial Deposit"
+                value={position.collateral?.usd ? `$${formatNumber(position.collateral.usd)}` : 'Unknown'}
+              />
+              <StatRow 
+                icon={BsCurrencyDollar}
+                label="Leverage"
+                value={position.leverage ? `${formatNumber(position.leverage)}x` : 'Unknown'}
+              />
+              <StatRow 
+                icon={BsCurrencyDollar}
+                label="Fees Earned"
+                value={`$${formatNumber(position.yield.usd)}`}
+                valueClass={yieldValueClass}
+              />
+              <StatRow 
+                icon={BsCurrencyDollar}
+                label="Compounded Yield"
+                value={`$${formatNumber(position.compounded.usd)}`}
+                valueClass={compoundedValueClass}
+              />
+              <StatRow 
+                icon={BsCurrencyDollar}
+                label="Current Value"
+                value={`$${formatNumber(totalValue)}`}
+              />
+            </dl>
+            
+            {/* Position Parameters Section */}
+            <SectionHeader icon={FaWarehouse} title="Position Parameters" />
+            <dl className={styles.detailedStats}>
+              <StatRow 
+                icon={BsCurrencyDollar}
+                label="Price Range"
+                value={priceRangeDisplay}
+              />
+              <StatRow 
+                icon={BsCurrencyDollar}
+                label="Range Status"
+                value={inRangeStatus}
+                valueClass={inRangeStatus === 'In range' ? 'positive' : (inRangeStatus === 'Out of range' ? 'negative' : '')}
+              />
+            </dl>
+            
+            {/* Timeline Section */}
+            <SectionHeader icon={FaCalendarAlt} title="Timeline" />
+            <dl className={styles.detailedStats}>
+              <StatRow 
+                icon={BsClock}
+                label="Opened At"
+                value={position.openedAt ? new Date(position.openedAt).toLocaleString() : 'Unknown'}
+              />
+              {position.closedAt && (
+                <StatRow 
+                  icon={BsClock}
+                  label="Closed At"
+                  value={new Date(position.closedAt).toLocaleString()}
+                />
+              )}
+            </dl>
           </div>
 
           <CardActions 

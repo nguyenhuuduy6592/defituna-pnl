@@ -14,3 +14,28 @@
 14. Fix total values UI on mobile
 15. Align position status with position pair to optimize space
 16. Display percentage on the Total PnL Card
+17. ✓ Add more details to the PnL Card modal: - DONE (added comprehensive sections with financial details, position parameters, and timeline using existing data and formatters)
+    - **Reuse existing data and components:**
+      * Leverage the existing position data from DefiTuna API response
+      * Reuse existing utility functions for formatting/displaying values
+      * Use existing formatters for displaying percentages, prices, and USD values
+    - **Content sections (all using existing data where available):**
+      * **Header:**
+        - Pool pair name (reuse existing pair name resolver from PositionTable)
+        - Position Status badge (reuse existing status formatter)
+      * **Performance Metrics:**
+        - Net PnL in USD (reuse `position.pnl.usd` and existing formatter)
+        - Net PnL percentage (reuse `displayPnlPercentage` function)
+        - Position Duration (reuse existing duration calculator if available)
+      * **Financial Details:**
+        - Initial Deposit (reuse `position.deposited_collateral_usd.amount` formatter)
+        - Leverage (reuse existing leverage calculation if implemented in PositionTable)
+        - Fees Earned (reuse existing yield formatter for `yield_a.usd` and `yield_b.usd`)
+        - Current Value (reuse existing formatter for total position value)
+      * **Position Parameters:**
+        - Platform indicator (reuse existing platform detection)
+        - Price Range (reuse existing tick-to-price conversion utility)
+        - Current Price in Range indicator (reuse existing in-range detection)
+      * **Timeline:**
+        - Opened At timestamp (reuse existing timestamp formatter)
+        - Closed At timestamp (reuse existing closed position detection)
