@@ -9,14 +9,14 @@
   background: rgba(0, 0, 0, 0.85);
   @include variables.flex-center;
   z-index: 1000;
-  padding: variables.spacing(lg);
+  padding: variables.spacing(md);
   animation: fadeIn 0.3s ease-out;
   overflow-y: auto;
 }
 
 .modalContainer {
   background: rgba(30, 41, 59, 0.95);
-  padding: variables.spacing(md);
+  padding: variables.spacing(sm);
   width: 100%;
   max-width: 420px;
   backdrop-filter: blur(20px);
@@ -27,23 +27,21 @@
   color: white;
   position: relative;
   animation: slideUp 0.4s ease-out;
-  margin: variables.spacing(md) 0;
+  margin: variables.spacing(sm) 0;
 }
 
 .cardContent {
-  background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
-  padding: variables.spacing(lg) variables.spacing(md);
-  margin-bottom: variables.spacing(sm);
+  background: linear-gradient(145deg, #243145 0%, #0F172A 100%);
+  padding: variables.spacing(sm) variables.spacing(xs);
+  margin-bottom: variables.spacing(xs);
   box-shadow: 
     0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
-  gap: variables.spacing(md);
+  gap: variables.spacing(xs);
   transform: translateZ(0);
   backface-visibility: hidden;
-  max-height: 70vh;
-  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
   
@@ -63,11 +61,11 @@
 
 .header {
   @include variables.flex-between;
-  margin-bottom: variables.spacing(md);
+  margin-bottom: variables.spacing(sm);
 
   h2 {
     margin: 0;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: rgba(255, 255, 255, 0.9);
   }
@@ -77,74 +75,33 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: variables.spacing(sm);
-  margin-bottom: variables.spacing(md);
+  gap: 2px;
+  margin-bottom: variables.spacing(xs);
   
-  .poolInfo {
+  .titleWrapper {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: variables.spacing(sm);
-    margin-top: variables.spacing(xs);
-    
-    .platformBadge {
-      background: rgba(0, 122, 255, 0.2);
-      color: #60A5FA;
-      padding: variables.spacing(xs) variables.spacing(sm);
-      border-radius: 4px;
-      font-size: variables.font-size(xs);
-      font-weight: 600;
-    }
-    
-    .positionAddress {
-      font-size: variables.font-size(xs);
-      color: rgba(255, 255, 255, 0.6);
-      cursor: pointer;
-      
-      &:hover {
-        color: rgba(255, 255, 255, 0.9);
-        text-decoration: underline;
-      }
-    }
-  }
-}
-
-.sectionHeader {
-  display: flex;
-  align-items: center;
-  gap: variables.spacing(xs);
-  margin-top: variables.spacing(md);
-  padding-bottom: variables.spacing(xs);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  
-  .sectionIcon {
-    font-size: 1rem;
-    color: variables.color(success);
-    opacity: 0.8;
-  }
-  
-  .sectionTitle {
-    font-size: 1rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.8);
-    margin: 0;
+    width: 100%;
   }
 }
 
 .detailedStats {
-  padding: variables.spacing(sm);
-  gap: variables.spacing(xs);
+  padding: variables.spacing(xs);
+  gap: 1px;
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
   margin: 0;
 }
 
 .closeButton {
   background: rgba(255, 255, 255, 0.1);
   border: none;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   transition: all 0.2s ease;
   backdrop-filter: blur(10px);
@@ -155,8 +112,8 @@
 
   svg {
     color: rgba(255, 255, 255, 0.8);
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   &:hover {
@@ -170,42 +127,30 @@
 
 .pairTitle {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.9);
-  text-align: center;
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: variables.spacing(xs);
-}
-
-.mainInfo {
-  display: flex;
-  flex-direction: column;
-  gap: variables.spacing(md);
 }
 
 .pnl {
   @include variables.flex-center;
   flex-direction: column;
-  padding: variables.spacing(md);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
 
   .label {
-    font-size: variables.font-size(xs);
+    font-size: 0.65rem;
     color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
 
   .value {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     letter-spacing: -0.02em;
     display: flex;
@@ -213,14 +158,14 @@
     gap: variables.spacing(xs);
 
     .currencyIcon {
-      font-size: 1.75rem;
+      font-size: 1.5rem;
       opacity: 0.8;
     }
     
     .percentage {
-      font-size: 1rem;
+      font-size: 0.8rem;
       font-weight: 500;
-      opacity: 0.8;
+      opacity: 0.7;
       margin-left: 4px;
     }
   }
@@ -238,20 +183,10 @@
   }
 }
 
-.stats {
-  padding: variables.spacing(md);
-  gap: variables.spacing(xs);
-  display: flex;
-  flex-direction: column;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-  margin: 0;
-}
-
 .statRow {
   @include variables.flex-between;
-  padding: variables.spacing(xs) 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2px 0;
+  border-bottom: none;
 
   &:last-child {
     border-bottom: none;
@@ -261,19 +196,35 @@
     color: rgba(255, 255, 255, 0.5);
     display: flex;
     align-items: center;
-    gap: variables.spacing(xs);
-    font-size: variables.font-size(sm);
-
+    gap: 4px;
+    font-size: 0.7rem;
+    font-weight: 400;
+    white-space: nowrap;
+    flex-shrink: 0;
+    
     .icon {
-      font-size: 1em;
+      font-size: 0.9em;
       opacity: 0.7;
+      margin-right: 2px;
     }
   }
 
   .value {
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
-    font-size: variables.font-size(sm);
+    font-size: 0.75rem;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    span.positive {
+      color: #10B981;
+    }
+
+    span.negative {
+      color: #EF4444;
+    }
 
     &.positive {
       color: #10B981;
@@ -289,46 +240,28 @@
   }
 }
 
-.qrSection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  :global(.qrcode) {
-    background: white;
-    border-radius: 8px;
-    height: 64px;
-    width: 64px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  .qrLabel {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: variables.font-size(xs);
-  }
-}
-
 .actions {
   display: flex;
   gap: variables.spacing(xs);
   justify-content: flex-end;
+  margin-top: variables.spacing(sm);
 
   button {
     @extend %button-base;
     background: rgba(255, 255, 255, 0.1);
     color: white;
     font-weight: 500;
-    padding: variables.spacing(xs) variables.spacing(md);
-    border-radius: 10px;
+    padding: 4px 8px;
+    border-radius: 6px;
     backdrop-filter: blur(10px);
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    gap: variables.spacing(xs);
-    font-size: variables.font-size(sm);
+    gap: 4px;
+    font-size: 0.75rem;
 
     .buttonIcon {
-      font-size: 1.1em;
+      font-size: 1em;
     }
 
     &:hover {
@@ -343,13 +276,13 @@
 }
 
 .statusBadge {
-  font-weight: 700;
+  font-weight: 600;
   text-align: center;
-  padding: variables.spacing(xs) variables.spacing(sm);
-  border-radius: 8px;
+  padding: 2px 6px;
+  border-radius: 6px;
   width: max-content;
-  margin: 0 auto;
-  font-size: variables.font-size(sm);
+  font-size: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
 }
 
 .stateInRange {
@@ -400,4 +333,25 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.performanceSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  margin-bottom: variables.spacing(xs);
+}
+
+.detailsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: variables.spacing(sm);
+  margin-top: variables.spacing(xs);
+}
+
+.detailsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: variables.spacing(xs);
 }

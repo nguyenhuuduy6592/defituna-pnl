@@ -2,7 +2,11 @@ import { useRef, useEffect, useCallback } from 'react';
 import { HiX } from 'react-icons/hi';
 import { HiDownload, HiShare } from 'react-icons/hi';
 import { BsCurrencyDollar, BsClock } from 'react-icons/bs';
-import { FaWarehouse, FaChartLine, FaMoneyBillWave, FaCalendarAlt } from 'react-icons/fa';
+import { 
+  FaBalanceScale, FaCoins, FaSyncAlt, FaWallet, FaArrowsAltH, FaInfoCircle, FaCalendarCheck,
+  FaExclamationTriangle,
+  FaArrowsAltV
+} from 'react-icons/fa';
 import { Portal } from '../common/Portal';
 import styles from './PnLCard.module.scss';
 import { formatNumber, formatDuration, formatPercentage } from '../../utils/formatters';
@@ -16,7 +20,7 @@ import { exportCardAsImage, shareCard } from '../../utils/export';
 const StatRow = ({ icon: Icon, label, value, valueClass }) => (
   <div className={styles.statRow}>
     <dt className={styles.label}>
-      <Icon className={styles.icon} />
+      {Icon && <Icon className={styles.icon} />}
       {label}:
     </dt>
     <dd className={`${styles.value} ${valueClass ? styles[valueClass] : ''}`}>
@@ -26,20 +30,9 @@ const StatRow = ({ icon: Icon, label, value, valueClass }) => (
 );
 
 /**
- * Renders a section header for the modal
- */
-const SectionHeader = ({ icon: Icon, title }) => (
-  <div className={styles.sectionHeader}>
-    <Icon className={styles.sectionIcon} />
-    <h4 className={styles.sectionTitle}>{title}</h4>
-  </div>
-);
-
-/**
  * Renders the main PnL value display
  */
 const PnLDisplay = ({ value, valueClass, displayPnlPercentage }) => {
-  // Only hide percentage if it's invalid
   const percentageDisplay = displayPnlPercentage != null ? (
     <span className={styles.percentage}>
       ({displayPnlPercentage}%)
@@ -52,7 +45,6 @@ const PnLDisplay = ({ value, valueClass, displayPnlPercentage }) => {
       role="status"
       aria-live="polite"
     >
-      <span className={styles.label}>PnL</span>
       <span className={styles.value}>
         <BsCurrencyDollar className={styles.currencyIcon} />
         {formatNumber(value)}
@@ -172,6 +164,19 @@ export const PnLCard = ({ position, onClose }) => {
   // Platform detection (we're using Orca as mentioned)
   const platform = position.platform || 'Orca';
   
+  // Format liquidation price range
+  const formatLiqPrice = (price) => price != null ? `$${formatNumber(price)}` : '-';
+  const liqLower = formatLiqPrice(position.liquidationPrice?.lower);
+  const liqUpper = formatLiqPrice(position.liquidationPrice?.upper);
+  const liqPriceDisplay = `${liqLower} / ${liqUpper}`;
+  const showLiqPrice = position.liquidationPrice?.lower != null || position.liquidationPrice?.upper != null;
+
+  // Format limit order prices
+  const formatLimitPrice = (price) => price != null ? `$${formatNumber(price)}` : '-';
+  const limitLower = formatLimitPrice(position.limitOrderPrices?.lower);
+  const limitUpper = formatLimitPrice(position.limitOrderPrices?.upper);
+  const showLimits = position.limitOrderPrices?.lower != null || position.limitOrderPrices?.upper != null;
+  
   return (
     <Portal>
       <div 
@@ -183,7 +188,7 @@ export const PnLCard = ({ position, onClose }) => {
       >
         <div className={styles.modalContainer} ref={cardRef}>
           <div className={styles.header}>
-            <h2 id="modal-title">PnL Card</h2>
+            <h2 id="modal-title">Position Details</h2>
             <button 
               className={styles.closeButton} 
               onClick={onClose}
@@ -196,107 +201,97 @@ export const PnLCard = ({ position, onClose }) => {
           </div>
 
           <div className={styles.cardContent} ref={exportContentRef} data-export-content>
-            {/* Header Section */}
+            {/* Combined Header Section */}
             <div className={styles.cardHeader}>
-              <h3 className={styles.pairTitle}>{displayPair}</h3>
-              <StatusDisplay status={position.displayStatus} />
-              <div className={styles.poolInfo}>
-                <span className={styles.platformBadge}>{platform}</span>
-                {position.positionAddress && (
-                  <span className={styles.positionAddress} title={position.positionAddress}>
-                    {position.positionAddress.slice(0, 4)}...{position.positionAddress.slice(-4)}
-                  </span>
-                )}
+              <div className={styles.titleWrapper}>
+                <h3 className={styles.pairTitle}>{displayPair}</h3>
+                <StatusDisplay status={position.displayStatus} />
               </div>
             </div>
             
-            {/* Performance Metrics Section */}
-            <SectionHeader icon={FaChartLine} title="Performance Metrics" />
-            <div className={styles.mainInfo}>
+            {/* Performance Metrics Section - Combined PnL and Duration */}
+            <div className={styles.performanceSection}>
               <PnLDisplay 
                 value={position.pnl.usd} 
                 valueClass={pnlValueClass} 
                 displayPnlPercentage={position.displayPnlPercentage}
               />
-              
-              <dl className={styles.stats}>
-                <StatRow 
-                  icon={BsClock}
-                  label="Position Age"
-                  value={formatDuration(position.age)}
-                />
-                <StatRow 
-                  icon={BsCurrencyDollar}
-                  label="Current Price"
-                  value={position.currentPrice ? `$${formatNumber(position.currentPrice)}` : 'Unknown'}
-                />
-              </dl>
             </div>
             
-            {/* Financial Details Section */}
-            <SectionHeader icon={FaMoneyBillWave} title="Financial Details" />
-            <dl className={styles.detailedStats}>
-              <StatRow 
-                icon={BsCurrencyDollar}
-                label="Initial Deposit"
-                value={position.collateral?.usd ? `$${formatNumber(position.collateral.usd)}` : 'Unknown'}
-              />
-              <StatRow 
-                icon={BsCurrencyDollar}
-                label="Leverage"
-                value={position.leverage ? `${formatNumber(position.leverage)}x` : 'Unknown'}
-              />
-              <StatRow 
-                icon={BsCurrencyDollar}
-                label="Fees Earned"
-                value={`$${formatNumber(position.yield.usd)}`}
-                valueClass={yieldValueClass}
-              />
-              <StatRow 
-                icon={BsCurrencyDollar}
-                label="Compounded Yield"
-                value={`$${formatNumber(position.compounded.usd)}`}
-                valueClass={compoundedValueClass}
-              />
-              <StatRow 
-                icon={BsCurrencyDollar}
-                label="Current Value"
-                value={`$${formatNumber(totalValue)}`}
-              />
-            </dl>
-            
-            {/* Position Parameters Section */}
-            <SectionHeader icon={FaWarehouse} title="Position Parameters" />
-            <dl className={styles.detailedStats}>
-              <StatRow 
-                icon={BsCurrencyDollar}
-                label="Price Range"
-                value={priceRangeDisplay}
-              />
-              <StatRow 
-                icon={BsCurrencyDollar}
-                label="Range Status"
-                value={inRangeStatus}
-                valueClass={inRangeStatus === 'In range' ? 'positive' : (inRangeStatus === 'Out of range' ? 'negative' : '')}
-              />
-            </dl>
-            
-            {/* Timeline Section */}
-            <SectionHeader icon={FaCalendarAlt} title="Timeline" />
-            <dl className={styles.detailedStats}>
-              <StatRow 
-                icon={BsClock}
-                label="Opened At"
-                value={position.openedAt ? new Date(position.openedAt).toLocaleString() : 'Unknown'}
-              />
-              {position.closedAt && (
-                <StatRow 
-                  icon={BsClock}
-                  label="Closed At"
-                  value={new Date(position.closedAt).toLocaleString()}
-                />
-              )}
-            </dl>
+            {/* Details Grid Section */}
+            <div className={styles.detailsGrid}>
+              {/* Financial Details Column */}
+              <div className={styles.detailsColumn}>
+                <dl className={styles.detailedStats}>
+                  <StatRow 
+                    icon={BsCurrencyDollar}
+                    label="Collateral"
+                    value={position.collateral?.usd ? `$${formatNumber(position.collateral.usd)}` : 'N/A'}
+                  />
+                  <StatRow 
+                    icon={FaBalanceScale}
+                    label="Leverage"
+                    value={position.leverage ? `${formatNumber(position.leverage)}x` : 'N/A'}
+                  />
+                  <StatRow 
+                    icon={FaCoins}
+                    label="Fees Earned"
+                    value={`$${formatNumber(position.yield.usd)}`}
+                    valueClass={yieldValueClass}
+                  />
+                  <StatRow 
+                    icon={FaSyncAlt}
+                    label="Compounded"
+                    value={`$${formatNumber(position.compounded.usd)}`}
+                    valueClass={compoundedValueClass}
+                  />
+                </dl>
+              </div>
+              
+              {/* Position Parameters Column */}
+              <div className={styles.detailsColumn}>
+                <dl className={styles.detailedStats}>
+                  <StatRow 
+                    icon={FaArrowsAltH}
+                    label="Range"
+                    value={priceRangeDisplay !== 'Unknown' ? priceRangeDisplay : 'N/A'}
+                  />
+                  {showLimits && (
+                    <StatRow 
+                      icon={FaArrowsAltV}
+                      label="LL / UL"
+                      value={
+                        <span>
+                          <span className={styles.negative}>{limitLower}</span>
+                          {' / '}
+                          <span className={styles.positive}>{limitUpper}</span>
+                        </span>
+                      }
+                    />
+                  )}
+                  {showLiqPrice && (
+                    <StatRow 
+                      icon={FaExclamationTriangle}
+                      label="Liq Price"
+                      value={liqPriceDisplay}
+                      valueClass={'negative'}
+                    />
+                  )}
+                  <StatRow 
+                    icon={BsClock}
+                    label="Duration"
+                    value={formatDuration(position.age)}
+                  />
+                  {position.closedAt && (
+                    <StatRow 
+                      icon={FaCalendarCheck}
+                      label="Closed At"
+                      value={new Date(position.closedAt).toLocaleString()}
+                    />
+                  )}
+                </dl>
+              </div>
+            </div>
           </div>
 
           <CardActions 
