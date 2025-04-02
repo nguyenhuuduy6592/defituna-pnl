@@ -1,4 +1,140 @@
-# DeFiTuna Transaction History Implementation Plan
+# DeFiTuna Transaction History - Incremental MVP Plan
+
+## Phase 1: Basic Transaction List (MVP)
+**Focus: Just get a functional list working with minimal effort**
+
+1. **Minimal Helius API Integration**
+   - Set up basic Helius API calls to fetch recent transactions (last 7 days only)
+   - Simple filtering to identify DeFiTuna transactions
+   - No complex caching - just use in-memory storage during session
+
+2. **Simple Transaction List UI**
+   - Create a basic table similar to existing position list
+   - Show only essential columns: date, transaction type, position pair, amount
+   - Use existing CSS styles where possible
+   - Simple descending chronological order (newest first)
+
+3. **Basic Transaction Parsing**
+   - Identify basic transaction types (open, close, liquidate)
+   - Extract minimal position details from transactions
+   - Skip complex parsing logic for edge cases
+
+**Deliverable:** A functional transaction list showing recent position history with minimal styling and features.
+
+## Phase 2: Enhanced Transaction Details
+**Focus: Improve utility while keeping implementation simple**
+
+1. **Expanded Transaction Information**
+   - Add more transaction details to the list view (fees, PnL where available)
+   - Improve transaction type identification
+   - Display basic status indicators (success/failed)
+
+2. **Basic Filtering**
+   - Add simple dropdown for filtering by transaction type
+   - Implement basic date range selector (last day, week, month)
+   - Keep UI controls minimal and functional
+
+3. **Extend Helius API Usage**
+   - Increase history range to 30 days
+   - Implement basic retry logic for API failures
+   - Simple localStorage caching to reduce redundant API calls
+
+**Deliverable:** More informative transaction list with basic filtering capabilities.
+
+## Phase 3: Transaction Detail View
+**Focus: Allow users to explore individual transactions**
+
+1. **Simple Detail Modal**
+   - Add click handler to transaction rows
+   - Create basic modal showing all available transaction data
+   - Include link to block explorer for verification
+
+2. **Position Context**
+   - Show position state before/after transaction where possible
+   - Display related transactions for the same position
+   - Simple chronological view of position history
+
+3. **Improved Data Parsing**
+   - Handle more transaction types and edge cases
+   - Extract more detailed information from transaction data
+   - Improve error handling for malformed transactions
+
+**Deliverable:** Users can click on transactions to view details and understand position context.
+
+## Phase 4: UI Improvements & Advanced Filtering
+**Focus: Make the experience more intuitive and useful**
+
+1. **UI Organization**
+   - Group transactions by date with clear headers
+   - Improve visual hierarchy and readability
+   - Add simple loading indicators and empty states
+
+2. **Advanced Filtering**
+   - Implement searchable transaction history
+   - Add multi-select filters for transaction types
+   - Allow filtering by position pair or ID
+
+3. **Pagination & Loading**
+   - Add basic pagination controls
+   - Implement "load more" functionality
+   - Improve loading states and feedback
+
+**Deliverable:** More polished UI with improved organization and filtering capabilities.
+
+## Phase 5: Persistent Storage
+**Focus: Handle larger transaction volumes reliably**
+
+1. **IndexedDB Implementation**
+   - Set up proper IndexedDB schema for transactions
+   - Implement CRUD operations and queries
+   - Migrate from localStorage to IndexedDB
+
+2. **Extended History Support**
+   - Remove time limitations on history retrieval
+   - Implement batched loading of historical data
+   - Support differential syncing of new transactions
+
+3. **Background Syncing**
+   - Add automatic refresh of transaction data
+   - Implement background fetching of older transactions
+   - Show sync status indicators
+
+**Deliverable:** Reliable storage solution supporting larger transaction volumes with background syncing.
+
+## Phase 6: Performance Optimization & Polish
+**Focus: Handle edge cases and optimize performance**
+
+1. **List Virtualization**
+   - Implement virtual scrolling for large transaction lists
+   - Optimize rendering performance
+   - Handle large datasets efficiently
+
+2. **Advanced Error Handling**
+   - Implement comprehensive error states
+   - Add retry mechanisms with exponential backoff
+   - Provide helpful error messaging
+
+3. **Visual Polish**
+   - Refine UI styling and animations
+   - Add micro-interactions and visual feedback
+   - Ensure consistent design language with the rest of the application
+
+4. **Advanced Features**
+   - Implement data visualizations and charts
+   - Add export functionality
+   - Support deeper analytics on transaction history
+
+**Deliverable:** Fully optimized, production-ready transaction history feature.
+
+## Implementation Priorities
+
+1. **Start with absolute minimum** - Just show a list of transactions
+2. **Focus on functionality over aesthetics** early on
+3. **Deliver working features at each phase**
+4. **Defer complex optimizations** until later phases
+5. **Reuse existing UI patterns** where possible to minimize new CSS
+
+# Original Detailed Implementation Plan 
 
 ## Overview
 
@@ -388,4 +524,4 @@ This document outlines a comprehensive plan to implement transaction history tra
 2. Transaction anomaly detection
 3. Performance analytics based on transaction history
 4. Export functionality for tax reporting
-5. Integration with portfolio tracking tools 
+5. Integration with portfolio tracking tools
