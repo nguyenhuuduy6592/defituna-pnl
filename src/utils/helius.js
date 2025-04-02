@@ -252,7 +252,6 @@ export async function fetchTransactionSignatures(address, limit = 100) {
   }
 
   try {
-    console.log(`[fetchTransactionSignatures] Fetching up to ${limit} signatures for ${address}`);
     const response = await fetchWithRetry({
       jsonrpc: '2.0',
       id: 1,
@@ -275,8 +274,6 @@ export async function fetchTransactionSignatures(address, limit = 100) {
 
     // Filter signatures by blockTime (must be within the last 7 days)
     const recentSignatures = result.filter(sig => sig.blockTime && sig.blockTime >= sevenDaysAgoTimestamp);
-
-    console.log(`[fetchTransactionSignatures] Found ${result.length} signatures ${JSON.stringify(result)}, ${recentSignatures.length} within last 7 days for ${address}`);
 
     // Cache the filtered signatures
     transactionHistoryCache.set(cacheKey, { 
@@ -326,11 +323,8 @@ export async function fetchTransactionsDetails(signatures) {
 
   // If all details are cached and valid, return them in the correct order
   if (signaturesToFetch.length === 0) {
-    console.log('[fetchTransactionsDetails] All transaction details found in cache.');
     return signatures.map(sig => cachedDetailsMap.get(sig)).filter(details => details !== null && details !== undefined); // Ensure order and filter nulls
   }
-
-  console.log(`[fetchTransactionsDetails] Fetching details for ${signaturesToFetch.length} signatures.`);
 
   // Prepare batch requests for all signatures needing fetch
   signaturesToFetch.forEach((signature, index) => {
@@ -423,7 +417,6 @@ export function filterDeFiTunaTransactions(transactions) {
       !Array.isArray(tx.transaction.message.instructions) ||
       tx.transaction.message.instructions.length === 0 // Also check if instructions array is empty
     ) {
-      // console.log(`[Filter] Skipping malformed or empty tx: ${tx?.transaction?.signatures?.[0]}`);
       return false; // Skip malformed or irrelevant transactions
     }
 
@@ -454,7 +447,6 @@ export async function fetchRecentDeFiTunaTransactions(address, limit = 20) {
     // 1. Fetch recent signatures
     const recentSignaturesInfo = await fetchTransactionSignatures(address, limit);
     if (!recentSignaturesInfo || recentSignaturesInfo.length === 0) {
-      console.log(`[fetchRecentDeFiTunaTransactions] No recent signatures found for ${address}`);
       return [];
     }
 
@@ -464,15 +456,12 @@ export async function fetchRecentDeFiTunaTransactions(address, limit = 20) {
     // 2. Fetch details for these signatures
     const transactionDetails = await fetchTransactionsDetails(signatures);
     if (!transactionDetails || transactionDetails.length === 0) {
-      console.log(`[fetchRecentDeFiTunaTransactions] No details found for recent signatures of ${address}`);
       return [];
     }
 
     // 3. Filter for DeFiTuna transactions
     const defiTunaTransactions = filterDeFiTunaTransactions(transactionDetails);
     
-    console.log(`[fetchRecentDeFiTunaTransactions] Found ${defiTunaTransactions.length} DeFiTuna transactions for ${address} from the last ${limit} signatures checked.`);
-
     // 4. Return the filtered transactions (still need parsing later)
     return defiTunaTransactions;
 
