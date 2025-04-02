@@ -33,118 +33,99 @@
 - ✓ Loading states and error handling
 - ✓ Manual parse functionality for debugging
 
-## Phase 2: Enhanced Transaction Details
-**Focus: Improve utility while keeping implementation simple**
+## Phase 2: Position Context & Basic Filtering
+**Focus: Organize transactions by position and improve visual feedback**
 
-1. **Expanded Transaction Information**
-   - Add more transaction details to the list view (fees, PnL where available)
-   - Improve transaction type identification
-   - Display basic status indicators (success/failed)
+1. **Position Information**
+   - Add position pair display (e.g., "SOL/USDC")
+   - Group transactions by position
+   - Show position lifecycle context (opening → modifications → closing)
+   - Add "Load More" button when more historical data is available
 
-2. **Basic Filtering**
-   - Add simple dropdown for filtering by transaction type
-   - Implement basic date range selector (last day, week, month)
-   - Keep UI controls minimal and functional
+2. **Visual Enhancements**
+   - Color-code transaction types based on sentiment:
+     - Open Position: Green (positive/creation)
+     - Close Position: Orange (neutral/completion)
+     - Liquidate: Red (negative/forced)
+     - Add Liquidity: Blue (positive/growth)
+     - Remove Liquidity: Yellow (neutral/adjustment)
+     - Collect Rewards: Purple (positive/gain)
 
-3. **Extend Helius API Usage**
-   - Increase history range to 30 days
-   - Implement basic retry logic for API failures
-   - Simple localStorage caching to reduce redundant API calls
+3. **Basic Filtering**
+   - Add dropdown filter for position pairs
+   - Add multi-select filter for transaction types
+   - Implement client-side filtering
+   - Preserve filter state in session storage
 
-**Deliverable:** More informative transaction list with basic filtering capabilities.
+**Deliverable:** Transactions organized by position with intuitive visual feedback and basic filtering.
 
-## Phase 3: Transaction Detail View
-**Focus: Allow users to explore individual transactions**
+## Phase 3: Enhanced Data Management
+**Focus: Improve data handling and user experience**
 
-1. **Simple Detail Modal**
-   - Add click handler to transaction rows
-   - Create basic modal showing all available transaction data
-   - Include link to block explorer for verification
+1. **Data Organization**
+   - Implement proper IndexedDB schema for position-based queries
+   - Add position metadata storage
+   - Optimize data retrieval by position
 
-2. **Position Context**
-   - Show position state before/after transaction where possible
-   - Display related transactions for the same position
-   - Simple chronological view of position history
+2. **Loading Optimization**
+   - Implement intelligent batch loading
+   - Cache position metadata for faster grouping
+   - Add background sync for new transactions
 
-3. **Improved Data Parsing**
-   - Handle more transaction types and edge cases
-   - Extract more detailed information from transaction data
-   - Improve error handling for malformed transactions
+3. **Error Recovery**
+   - Add retry mechanisms for failed loads
+   - Implement partial data display on errors
+   - Show helpful error messages with recovery options
 
-**Deliverable:** Users can click on transactions to view details and understand position context.
+**Deliverable:** Robust data management with improved loading and error handling.
 
-## Phase 4: UI Improvements & Advanced Filtering
-**Focus: Make the experience more intuitive and useful**
+## Phase 4: Advanced Features
+**Focus: Add power user features and optimizations**
 
-1. **UI Organization**
-   - Group transactions by date with clear headers
-   - Improve visual hierarchy and readability
-   - Add simple loading indicators and empty states
+1. **Advanced Position Context**
+   - Show position performance metrics
+   - Display related market data
+   - Add position timeline visualization
 
-2. **Advanced Filtering**
-   - Implement searchable transaction history
-   - Add multi-select filters for transaction types
-   - Allow filtering by position pair or ID
+2. **Data Export & Sharing**
+   - Add CSV/JSON export options
+   - Implement shareable transaction views
+   - Add integration with portfolio trackers
 
-3. **Pagination & Loading**
-   - Add basic pagination controls
-   - Implement "load more" functionality
-   - Improve loading states and feedback
+3. **Performance Optimization**
+   - Implement virtual scrolling for large lists
+   - Optimize render performance
+   - Add request caching and batching
 
-**Deliverable:** More polished UI with improved organization and filtering capabilities.
+**Deliverable:** Feature-rich transaction history with advanced capabilities.
 
-## Phase 5: Persistent Storage
-**Focus: Handle larger transaction volumes reliably**
+## Phase 5: Analytics & Insights
+**Focus: Help users understand their trading patterns**
 
-1. **IndexedDB Implementation**
-   - Set up proper IndexedDB schema for transactions
-   - Implement CRUD operations and queries
-   - Migrate from localStorage to IndexedDB
+1. **Transaction Analytics**
+   - Add basic statistics per position
+   - Show success/failure patterns
+   - Display fee analysis
 
-2. **Extended History Support**
-   - Remove time limitations on history retrieval
-   - Implement batched loading of historical data
-   - Support differential syncing of new transactions
+2. **Trading Insights**
+   - Add performance visualization
+   - Show risk metrics
+   - Provide trading pattern analysis
 
-3. **Background Syncing**
-   - Add automatic refresh of transaction data
-   - Implement background fetching of older transactions
-   - Show sync status indicators
+3. **Customization**
+   - Add user preferences for views
+   - Implement custom grouping options
+   - Allow metric customization
 
-**Deliverable:** Reliable storage solution supporting larger transaction volumes with background syncing.
-
-## Phase 6: Performance Optimization & Polish
-**Focus: Handle edge cases and optimize performance**
-
-1. **List Virtualization**
-   - Implement virtual scrolling for large transaction lists
-   - Optimize rendering performance
-   - Handle large datasets efficiently
-
-2. **Advanced Error Handling**
-   - Implement comprehensive error states
-   - Add retry mechanisms with exponential backoff
-   - Provide helpful error messaging
-
-3. **Visual Polish**
-   - Refine UI styling and animations
-   - Add micro-interactions and visual feedback
-   - Ensure consistent design language with the rest of the application
-
-4. **Advanced Features**
-   - Implement data visualizations and charts
-   - Add export functionality
-   - Support deeper analytics on transaction history
-
-**Deliverable:** Fully optimized, production-ready transaction history feature.
+**Deliverable:** Analytical tools to help users improve their trading.
 
 ## Implementation Priorities
 
-1. **Start with absolute minimum** - Just show a list of transactions
-2. **Focus on functionality over aesthetics** early on
-3. **Deliver working features at each phase**
-4. **Defer complex optimizations** until later phases
-5. **Reuse existing UI patterns** where possible to minimize new CSS
+1. **Focus on position context first** - Group and organize by position
+2. **Prioritize visual feedback** - Clear color coding and state indication
+3. **Keep filtering simple but effective** - Start with most-used filters
+4. **Build for scale** - Design data structures for efficient position-based queries
+5. **Add power features incrementally** - Layer in advanced features after core functionality
 
 # Original Detailed Implementation Plan 
 

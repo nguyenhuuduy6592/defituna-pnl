@@ -53,6 +53,36 @@
         color: variables.text-color(secondary);
         font-style: italic;
       }
+
+      // Transaction type colors
+      &.txTypeOpen {
+        color: variables.color(success);
+        font-weight: 600;
+      }
+      &.txTypeClose {
+        color: variables.color(warning);
+        font-weight: 600;
+      }
+      &.txTypeLiquidate {
+        color: variables.color(negative);
+        font-weight: 600;
+      }
+      &.txTypeAddLiquidity {
+        color: variables.color(info);
+        font-weight: 600;
+      }
+      &.txTypeRemoveLiquidity {
+        color: variables.color(warning);
+        font-weight: 600;
+      }
+      &.txTypeCollectRewards {
+        color: variables.color(purple);
+        font-weight: 600;
+      }
+      &.txTypeSetLimitOrders {
+        color: variables.color(blue);
+        font-weight: 600;
+      }
     }
   }
 
@@ -75,4 +105,52 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+// Add transaction type icon styles
+.txTypeIcon {
+  display: inline-flex;
+  align-items: center;
+  gap: variables.spacing(xs);
+  white-space: nowrap;
+  width: 100%;
+
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: variables.spacing(xs);
+    flex-shrink: 0;
+  }
+
+  &.txTypeOpen::before {
+    background-color: variables.color(success);
+  }
+  &.txTypeClose::before {
+    background-color: variables.color(warning);
+  }
+  &.txTypeLiquidate::before {
+    background-color: variables.color(negative);
+  }
+  &.txTypeAddLiquidity::before {
+    background-color: variables.color(info);
+  }
+  &.txTypeRemoveLiquidity::before {
+    background-color: variables.color(warning);
+  }
+  &.txTypeCollectRewards::before {
+    background-color: variables.color(purple);
+  }
+  &.txTypeSetLimitOrders::before {
+    background-color: variables.color(blue);
+  }
+}
+
+// Add specific cell styles for the type column
+.typeCell {
+  padding-left: variables.spacing(sm) !important;
+  padding-right: variables.spacing(sm) !important;
+  min-width: 160px; // Ensure enough space for the type text
 } 

@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import styles from './TransactionsTable.module.scss';
 import { formatWalletAddress } from '../../utils'; // Import address formatter
 import tunaIdl from '../../idl/tuna_idl.json';
+import classNames from 'classnames';
 
 /**
  * Formats a Unix timestamp (seconds) into a readable date/time string.
@@ -75,6 +76,27 @@ const formatIxName = (name) => {
 };
 
 /**
+ * Gets the transaction type class based on instruction name.
+ */
+const getTransactionTypeClass = (ixName) => {
+  if (!ixName) return '';
+  
+  const typeMap = {
+    'open_position': 'txTypeOpen',
+    'close_position': 'txTypeClose',
+    'liquidate_position': 'txTypeLiquidate',
+    'add_liquidity': 'txTypeAddLiquidity',
+    'remove_liquidity': 'txTypeRemoveLiquidity',
+    'collect_rewards': 'txTypeCollectRewards',
+    'set_limit_orders': 'txTypeSetLimitOrders'
+  };
+
+  // Remove _orca suffix if present
+  const baseIxName = ixName?.replace('_orca', '') || '';
+  return styles[typeMap[baseIxName]] || '';
+};
+
+/**
  * Renders a single transaction row, handling loading state and parsed data.
  */
 const TransactionRow = memo(({ transaction }) => {
@@ -85,6 +107,7 @@ const TransactionRow = memo(({ transaction }) => {
   
   // Get the transaction type from the parsed instruction name
   const txType = isLoading ? '-' : formatIxName(parsedInfo?.ixName);
+  const txTypeClass = getTransactionTypeClass(parsedInfo?.ixName);
   
   // Get the position account by searching through the accounts metadata
   const tunaPosition = !isLoading ? getTunaPositionAccount(parsedInfo) : null;
@@ -103,7 +126,11 @@ const TransactionRow = memo(({ transaction }) => {
   return (
     <tr className={isLoading ? styles.loadingRow : ''}>
       <td>{formatTimestamp(timestamp)}</td>
-      <td>{txType}</td>
+      <td className={styles.typeCell}>
+        <span className={classNames(txTypeClass, styles.txTypeIcon)}>
+          {txType}
+        </span>
+      </td>
       <td title={tunaPosition || ''}>{tunaPosition ? formatWalletAddress(tunaPosition) : (isLoading ? '-' : 'N/A')}</td>
       <td className={styles.signatureCell}>
         {signature !== 'N/A' ? 
