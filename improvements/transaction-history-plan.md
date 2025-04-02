@@ -3,23 +3,35 @@
 ## Phase 1: Basic Transaction List (MVP)
 **Focus: Just get a functional list working with minimal effort**
 
-1. **Minimal Helius API Integration**
-   - Set up basic Helius API calls to fetch recent transactions (last 7 days only)
-   - Simple filtering to identify DeFiTuna transactions
-   - No complex caching - just use in-memory storage during session
+**STATUS: COMPLETE**
 
-2. **Simple Transaction List UI**
-   - Create a basic table similar to existing position list
-   - Show only essential columns: date, transaction type, position pair, amount
-   - Use existing CSS styles where possible
-   - Simple descending chronological order (newest first)
+1. **Minimal Helius API Integration** - **DONE**
+   - Set up basic Helius API calls to fetch recent transactions (last 7 days only) ✓
+   - Simple filtering to identify DeFiTuna transactions ✓
+   - No complex caching - just use in-memory storage during session ✓
+   - ADDED: Implemented **IndexedDB caching** (`idb` library) for transaction details early to mitigate rate limits and improve subsequent loads ✓
+   - ADDED: Implemented progressive loading client-side with delays to further avoid rate limits ✓
 
-3. **Basic Transaction Parsing**
-   - Identify basic transaction types (open, close, liquidate)
-   - Extract minimal position details from transactions
-   - Skip complex parsing logic for edge cases
+2. **Simple Transaction List UI** - **DONE**
+   - Create a basic table similar to existing position list ✓
+   - Show only essential columns: date, transaction type, signature, status ✓
+   - Use existing CSS styles where possible ✓
+   - Simple descending chronological order (newest first) ✓
+   - Added handling for loading states (overall and per-row) ✓
 
-**Deliverable:** A functional transaction list showing recent position history with minimal styling and features.
+3. **Basic Transaction Parsing** - **DONE**
+   - Identify basic transaction types (open, close, liquidate) ✓
+   - Extract minimal position details from transactions ✓
+   - Skip complex parsing logic for edge cases ✓
+   - ADDED: Implemented fallback to log messages for instruction identification ✓
+   - ADDED: Filter out non-DeFiTuna transactions ✓
+
+**Deliverable Status: COMPLETE**
+- ✓ Functional transaction list showing recent DeFiTuna transactions
+- ✓ Progressive loading with client-side caching
+- ✓ Basic transaction type identification
+- ✓ Loading states and error handling
+- ✓ Manual parse functionality for debugging
 
 ## Phase 2: Enhanced Transaction Details
 **Focus: Improve utility while keeping implementation simple**

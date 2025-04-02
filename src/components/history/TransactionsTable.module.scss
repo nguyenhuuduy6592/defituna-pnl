@@ -1,0 +1,78 @@
+@use "sass:map";
+@use '../../styles/variables.module.scss';
+
+.transactionsTable {
+  width: 100%;
+  min-width: 800px; 
+  max-width: 100%;
+  border-collapse: collapse;
+  background: variables.bg-color(white);
+  box-shadow: 0 1px 3px variables.color(shadow);
+  font-size: variables.font-size(sm);
+  margin-top: variables.spacing(md); // Add some top margin
+
+  @include variables.responsive(md) {
+    font-size: variables.font-size(base);
+  }
+
+  th, td {
+    border: 1px solid variables.color(border);
+    padding: variables.spacing(sm);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  th {
+    background: variables.bg-color(light);
+    font-weight: 700;
+    color: variables.text-color(secondary);
+    position: sticky;
+    top: 0; // Adjust if needed based on layout context
+    z-index: 1;
+  }
+
+  tr {
+    &:nth-child(even) {
+      background: variables.bg-color(light);
+    }
+
+    td {
+      color: variables.text-color(primary);
+      font-family: monospace; // Use browser default monospace font
+      font-size: variables.font-size(xs);
+
+      &.statusSuccess {
+        color: variables.color(success);
+        font-weight: 700;
+      }
+      &.statusFailed {
+        color: variables.color(negative);
+        font-weight: 700;
+      }
+      &.statusLoading { // Style for loading status
+        color: variables.text-color(secondary);
+        font-style: italic;
+      }
+    }
+  }
+
+  tbody tr {
+    &:hover {
+      background-color: variables.bg-color(hover);
+    }
+    // Style for rows that are still loading details
+    &.loadingRow {
+      opacity: 0.6;
+      td {
+        background-color: variables.bg-color(light); // Slightly different background
+      }
+    }
+  }
+}
+
+.signatureCell {
+  max-width: 200px; // Limit width and allow overflow ellipsis
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+} 

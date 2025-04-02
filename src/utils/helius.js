@@ -9,9 +9,15 @@ const BATCH_SIZE = 3;
 const MAX_RETRIES = 5;
 const RETRY_BASE_DELAY_MS = 1000;
 const CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes cache
+const DEFITUNA_PROGRAM_ID = 'tuna4uSQZncNeeiAMKbstuxA9CUkHH6HmC64wgmnogD';
 
 // Enhanced cache with timestamps
 const timestampCache = new Map();
+const transactionHistoryCache = new Map(); // Cache for transaction signatures
+const transactionDetailCache = new Map(); // Cache for full transaction details
+
+// Time constants
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
  * Creates a delay using a promise
@@ -219,4 +225,259 @@ export async function getTransactionAges(addresses) {
   }
   
   return results;
+}
+
+/**
+ * Fetches recent transaction signatures for a given address within the last 7 days.
+ * Uses in-memory caching.
+ * @param {string} address - The blockchain address to query.
+ * @param {number} limit - The maximum number of signatures to fetch initially.
+ * @returns {Promise<Array<Object>>} Array of transaction signature objects within the last 7 days.
+ */
+export async function fetchTransactionSignatures(address, limit = 100) {
+  if (!address || typeof address !== 'string') {
+    console.error('[fetchTransactionSignatures] Invalid address provided:', address);
+    return [];
+  }
+
+  const cacheKey = `${address}-${limit}`;
+  // Check cache first
+  if (transactionHistoryCache.has(cacheKey)) {
+    const cached = transactionHistoryCache.get(cacheKey);
+    // Use the same CACHE_DURATION_MS for this cache for now
+    if (Date.now() - cached.fetchTime < CACHE_DURATION_MS) {
+      return cached.signatures;
+    }
+    transactionHistoryCache.delete(cacheKey);
+  }
+
+  try {
+    console.log(`[fetchTransactionSignatures] Fetching up to ${limit} signatures for ${address}`);
+    const response = await fetchWithRetry({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getSignaturesForAddress',
+      params: [
+        address.toString(),
+        { limit: limit }
+      ]
+    });
+
+    const { result } = response;
+    if (!result || !Array.isArray(result)) {
+      console.warn(`[fetchTransactionSignatures] No signature results found for address: ${address}`);
+      // Cache empty result to avoid refetching quickly
+      transactionHistoryCache.set(cacheKey, { signatures: [], fetchTime: Date.now() });
+      return [];
+    }
+
+    const sevenDaysAgoTimestamp = Math.floor((Date.now() - SEVEN_DAYS_MS) / 1000);
+
+    // Filter signatures by blockTime (must be within the last 7 days)
+    const recentSignatures = result.filter(sig => sig.blockTime && sig.blockTime >= sevenDaysAgoTimestamp);
+
+    console.log(`[fetchTransactionSignatures] Found ${result.length} signatures ${JSON.stringify(result)}, ${recentSignatures.length} within last 7 days for ${address}`);
+
+    // Cache the filtered signatures
+    transactionHistoryCache.set(cacheKey, { 
+      signatures: recentSignatures, 
+      fetchTime: Date.now() 
+    });
+
+    return recentSignatures;
+
+  } catch (error) {
+    console.error(`[fetchTransactionSignatures] Error fetching signatures for ${address}:`, error.message);
+    // Don't cache errors, allow retrying later
+    return []; // Return empty array on error
+  }
+}
+
+/**
+ * Fetches full transaction details for a given list of signatures.
+ * Uses batching and in-memory caching.
+ * @param {Array<string>} signatures - Array of transaction signatures.
+ * @returns {Promise<Array<Object>>} Array of transaction detail objects.
+ */
+export async function fetchTransactionsDetails(signatures) {
+  if (!signatures || !Array.isArray(signatures) || signatures.length === 0) {
+    console.warn('[fetchTransactionsDetails] No valid signatures provided');
+    return [];
+  }
+
+  const requests = [];
+  const signaturesToFetch = [];
+  const cachedDetailsMap = new Map(); // Store cached results temporarily
+
+  // Check cache first and identify signatures needing fetch
+  for (const signature of signatures) {
+    if (transactionDetailCache.has(signature)) {
+      const cached = transactionDetailCache.get(signature);
+      if (Date.now() - cached.fetchTime < CACHE_DURATION_MS) {
+        cachedDetailsMap.set(signature, cached.details); // Store valid cached details
+      } else {
+        transactionDetailCache.delete(signature); // Cache expired
+        signaturesToFetch.push(signature);
+      }
+    } else {
+      signaturesToFetch.push(signature);
+    }
+  }
+
+  // If all details are cached and valid, return them in the correct order
+  if (signaturesToFetch.length === 0) {
+    console.log('[fetchTransactionsDetails] All transaction details found in cache.');
+    return signatures.map(sig => cachedDetailsMap.get(sig)).filter(details => details !== null && details !== undefined); // Ensure order and filter nulls
+  }
+
+  console.log(`[fetchTransactionsDetails] Fetching details for ${signaturesToFetch.length} signatures.`);
+
+  // Prepare batch requests for all signatures needing fetch
+  signaturesToFetch.forEach((signature, index) => {
+      requests.push({
+          jsonrpc: '2.0',
+          id: `tx-${signature.slice(0, 8)}-${index}`, // Unique ID per request
+          method: 'getTransaction',
+          params: [
+            signature,
+            { maxSupportedTransactionVersion: 0 } // Ensure compatibility
+          ]
+      });
+  });
+
+  const fetchedDetailsMap = new Map();
+
+  try {
+    // Make a SINGLE batch request using fetchWithRetry
+    const batchResponse = await fetchWithRetry(requests);
+
+    // Process the response array
+    if (Array.isArray(batchResponse)) {
+      batchResponse.forEach((responseItem, index) => {
+        // Find the original signature corresponding to this response item
+        // This relies on Helius returning responses in the same order as requests in the batch
+        const originalSignature = signaturesToFetch[index]; 
+        if (!originalSignature) return; // Should not happen
+
+        if (responseItem.result) {
+          const details = responseItem.result;
+          fetchedDetailsMap.set(originalSignature, details); // Store successful fetches
+          // Cache the result
+          transactionDetailCache.set(originalSignature, { 
+            details: details, 
+            fetchTime: Date.now() 
+          });
+        } else if (responseItem.error) {
+          console.error(`[fetchTransactionsDetails] Error in batch response for signature ${originalSignature}:`, responseItem.error.message);
+          fetchedDetailsMap.set(originalSignature, null); // Indicate fetch failure
+        }
+      });
+    } else if (batchResponse.error) {
+      // Handle potential error for the entire batch request itself
+      console.error('[fetchTransactionsDetails] Error fetching batch:', batchResponse.error);
+      // Mark all signatures in this batch as failed
+      signaturesToFetch.forEach(sig => fetchedDetailsMap.set(sig, null));
+    } else {
+      // Handle unexpected response format
+      console.error('[fetchTransactionsDetails] Unexpected response format for batch request:', batchResponse);
+      signaturesToFetch.forEach(sig => fetchedDetailsMap.set(sig, null));
+    }
+  } catch (error) {
+    console.error(`[fetchTransactionsDetails] Error processing batch request:`, error.message);
+    // Mark all signatures in this batch as failed on catch
+    signaturesToFetch.forEach(sig => fetchedDetailsMap.set(sig, null));
+  }
+
+  // Combine cached and newly fetched results, maintaining original order
+  const finalResults = signatures.map(sig => {
+      if (cachedDetailsMap.has(sig)) {
+          return cachedDetailsMap.get(sig); // Use initially cached result
+      }
+      // If it was fetched (successfully or not), return the result
+      if (fetchedDetailsMap.has(sig)) {
+           return fetchedDetailsMap.get(sig);
+      }
+      // Should not happen if logic is correct, but as a fallback for uncached/unfetched:
+      return null; 
+  }).filter(details => details !== null); // Filter out any nulls from failures or misses
+
+  return finalResults;
+}
+
+/**
+ * Filters an array of transaction details to include only those interacting with the DeFiTuna program.
+ * @param {Array<Object>} transactions - Array of transaction detail objects from Helius.
+ * @returns {Array<Object>} Filtered array of DeFiTuna transaction details.
+ */
+export function filterDeFiTunaTransactions(transactions) {
+  if (!transactions || !Array.isArray(transactions)) {
+    return [];
+  }
+
+  return transactions.filter(tx => {
+    // Add more robust checks for nested properties
+    if (
+      !tx || 
+      !tx.transaction || 
+      !tx.transaction.message || 
+      !Array.isArray(tx.transaction.message.instructions) ||
+      tx.transaction.message.instructions.length === 0 // Also check if instructions array is empty
+    ) {
+      // console.log(`[Filter] Skipping malformed or empty tx: ${tx?.transaction?.signatures?.[0]}`);
+      return false; // Skip malformed or irrelevant transactions
+    }
+
+    // Check if any instruction in the transaction involves the DeFiTuna program
+    return tx.transaction.message.instructions.some(instruction => 
+      instruction && instruction.programId === DEFITUNA_PROGRAM_ID
+    );
+  });
+}
+
+/**
+ * Fetches recent (last 7 days) transactions for a wallet address
+ * and filters them to include only those interacting with the DeFiTuna program.
+ * This combines signature fetching, detail fetching, and filtering.
+ * Does not yet parse instruction data.
+ * 
+ * @param {string} address - The wallet address to fetch transactions for.
+ * @param {number} limit - The maximum number of recent signatures to initially check.
+ * @returns {Promise<Array<Object>>} Filtered array of DeFiTuna transaction detail objects.
+ */
+export async function fetchRecentDeFiTunaTransactions(address, limit = 20) {
+  if (!address || typeof address !== 'string') {
+    console.error('[fetchRecentDeFiTunaTransactions] Invalid address provided:', address);
+    return [];
+  }
+
+  try {
+    // 1. Fetch recent signatures
+    const recentSignaturesInfo = await fetchTransactionSignatures(address, limit);
+    if (!recentSignaturesInfo || recentSignaturesInfo.length === 0) {
+      console.log(`[fetchRecentDeFiTunaTransactions] No recent signatures found for ${address}`);
+      return [];
+    }
+
+    // Extract just the signature strings
+    const signatures = recentSignaturesInfo.map(sigInfo => sigInfo.signature);
+
+    // 2. Fetch details for these signatures
+    const transactionDetails = await fetchTransactionsDetails(signatures);
+    if (!transactionDetails || transactionDetails.length === 0) {
+      console.log(`[fetchRecentDeFiTunaTransactions] No details found for recent signatures of ${address}`);
+      return [];
+    }
+
+    // 3. Filter for DeFiTuna transactions
+    const defiTunaTransactions = filterDeFiTunaTransactions(transactionDetails);
+    
+    console.log(`[fetchRecentDeFiTunaTransactions] Found ${defiTunaTransactions.length} DeFiTuna transactions for ${address} from the last ${limit} signatures checked.`);
+
+    // 4. Return the filtered transactions (still need parsing later)
+    return defiTunaTransactions;
+
+  } catch (error) {
+    console.error(`[fetchRecentDeFiTunaTransactions] Error fetching or filtering transactions for ${address}:`, error.message);
+    return []; // Return empty array on error
+  }
 }

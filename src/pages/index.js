@@ -13,6 +13,7 @@ import {
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
+import { TransactionHistory } from '../components/history';
 import { 
   addWalletAddressToPositions, 
   decodePositions, 
@@ -333,6 +334,10 @@ export default () => {
           loading={loading}
           positionsHistory={allPositionsHistory}
         />
+      )}
+
+      {activeWallets.length > 0 && (
+        <TransactionHistory activeWallets={activeWallets} />
       )}
 
       {!loading && !errorMessage && !aggregatedData && activeWallets.length > 0 && (
