@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { format } from 'date-fns';
 import styles from './TransactionsTable.module.scss';
 import { formatWalletAddress } from '../../utils'; // Import address formatter
+import tunaIdl from '../../idl/tuna_idl.json';
 
 /**
  * Formats a Unix timestamp (seconds) into a readable date/time string.
@@ -16,6 +17,33 @@ const formatTimestamp = (timestamp) => {
   } catch (error) {
     return 'Invalid Date';
   }
+};
+
+/**
+ * Gets the tuna position account from the parsed instruction accounts.
+ * @param {Object} parsedInfo - The parsed instruction info containing accounts and their metadata
+ * @returns {string|null} The tuna position account address or null if not found
+ */
+const getTunaPositionAccount = (parsedInfo) => {
+  if (!parsedInfo?.ixName || !parsedInfo?.accounts || !Array.isArray(parsedInfo.accounts)) {
+    return null;
+  }
+
+  // Find the instruction in the IDL
+  const instruction = tunaIdl.instructions.find(ix => ix.name === parsedInfo.ixName);
+  if (!instruction) {
+    console.log('Unknown instruction:', parsedInfo.ixName);
+    return null;
+  }
+
+  // Find the index of the tuna_position account in the instruction's accounts
+  const positionIndex = instruction.accounts.findIndex(acc => acc.name === 'tuna_position');
+  if (positionIndex === -1) {
+    return null;
+  }
+
+  // Return the corresponding account address
+  return parsedInfo.accounts[positionIndex] || null;
 };
 
 /**
@@ -58,9 +86,9 @@ const TransactionRow = memo(({ transaction }) => {
   // Get the transaction type from the parsed instruction name
   const txType = isLoading ? '-' : formatIxName(parsedInfo?.ixName);
   
-  // Get the position from the accounts array (first account is usually the position)
-  const tunaPosition = !isLoading && parsedInfo?.accounts ? parsedInfo.accounts[0] : null;
-  
+  // Get the position account by searching through the accounts metadata
+  const tunaPosition = !isLoading ? getTunaPositionAccount(parsedInfo) : null;
+
   let status = transaction?.status || 'N/A';
   let statusClass = styles.statusLoading;
   
