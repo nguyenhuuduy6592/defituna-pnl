@@ -1,6 +1,13 @@
 @use "sass:map";
 @use 'variables.module.scss';
 
+// Chart colors as CSS variables
+:root {
+  --chart-positive: #{variables.color(positive)};
+  --chart-negative: #{variables.color(negative)};
+  --chart-neutral: #{variables.color(neutral)};
+}
+
 // Reset and base styles
 html, 
 body {

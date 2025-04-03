@@ -144,10 +144,3 @@ $font-sizes: (
     border-color: color(primary);
   }
 }
-
-// Chart colors as CSS variables
-:root {
-  --chart-positive: #{color(positive)};
-  --chart-negative: #{color(negative)};
-  --chart-neutral: #{color(neutral)};
-}
