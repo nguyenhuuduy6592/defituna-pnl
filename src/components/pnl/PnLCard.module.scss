@@ -28,6 +28,13 @@
   position: relative;
   animation: slideUp 0.4s ease-out;
   margin: variables.spacing(sm) 0;
+  
+  @media (max-width: 480px) {
+    padding: variables.spacing(xs);
+    margin: variables.spacing(xs);
+    max-height: calc(100vh - variables.spacing(md));
+    overflow-y: auto;
+  }
 }
 
 .cardContent {
@@ -39,6 +46,10 @@
   display: flex;
   flex-direction: column;
   gap: variables.spacing(xs);
+  
+  @media (max-width: 480px) {
+    padding: variables.spacing(xs);
+  }
 }
 
 .header {
@@ -76,6 +87,7 @@
   flex-direction: column;
   background-color: rgba(15, 23, 42, 0.6);
   margin: 0;
+  // width: 100%;
 }
 
 .closeButton {
@@ -158,6 +170,8 @@
   @include variables.flex-between;
   padding: 2px 0;
   border-bottom: none;
+  width: 100%;
+  min-width: 0;
 
   &:last-child {
     border-bottom: none;
@@ -172,6 +186,7 @@
     font-weight: 400;
     white-space: nowrap;
     flex-shrink: 0;
+    // margin-right: variables.spacing(xs);
     
     .icon {
       font-size: 0.9em;
@@ -185,6 +200,7 @@
     color: rgba(255, 255, 255, 0.9);
     font-size: 0.75rem;
     text-align: right;
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -320,12 +336,15 @@
 .detailsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: variables.spacing(sm);
-  margin-top: variables.spacing(xs);
+  gap: variables.spacing(xs);
+  width: 100%;
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .detailsColumn {
-  display: flex;
-  flex-direction: column;
-  gap: variables.spacing(xs);
+  width: 100%;
+  min-width: 0;
 }

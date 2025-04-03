@@ -159,12 +159,6 @@ export const PnLCard = ({ position, onClose }) => {
     inRangeStatus = isInRange ? 'In range' : 'Out of range';
   }
   
-  // Calculate total position value
-  const totalValue = (position.collateral?.usd || 0) + (position.debt?.usd || 0);
-  
-  // Platform detection (we're using Orca as mentioned)
-  const platform = position.platform || 'Orca';
-  
   // Format liquidation price range
   const formatLiqPrice = (price) => price != null ? `$${formatNumber(price)}` : '-';
   const liqLower = formatLiqPrice(position.liquidationPrice?.lower);

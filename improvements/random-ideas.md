@@ -11,9 +11,9 @@
 11. ✓ Add position status into the PnL card - DONE
 12. ✓ Improve chart to add position pair and allow exporting - DONE
 13. Show bigger/better chart on tooltip for price range which can make it easier to quickly understand the range. Readonly, no interaction, should has same indicators as what are already provided on the tooltip
-14. Fix total values UI on mobile
-15. Align position status with position pair to optimize space
-16. Display percentage on the Total PnL Card
+14. Fix total values UI on mobile - IGNORED
+15. ✓ Align position status with position pair to optimize space - DONE
+16. ✓ Display percentage on the Total PnL Card - DONE
 17. ✓ Add more details to the PnL Card modal: - DONE
     - **Layout:** Compact, two-column grid for details, header with inline status.
     - **Data Source:** Uses existing DefiTuna position data and shared formatters.
