@@ -19,7 +19,6 @@ import { exportChartAsImage, shareCard } from '../../utils/export';
 import styles from './PositionChart.module.scss';
 
 // --- Constants ---
-const Y_AXIS_TICK_COUNT = 8;
 const Y_AXIS_DOMAIN_PADDING_FACTOR = 0.1;
 
 /**
@@ -180,26 +179,15 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
             name="PnL ($)"
           />
         )}
-        {activeMetrics.yield && (
+        {activeMetrics.totalYield && (
           <Line 
             type="monotone" 
-            dataKey="yield" 
+            dataKey="totalYield"
             stroke="var(--chart-positive)"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 6 }}
-            name="Yield ($)"
-          />
-        )}
-        {activeMetrics.compounded && (
-          <Line 
-            type="monotone" 
-            dataKey="compounded" 
-            stroke="var(--chart-neutral)"
-            strokeWidth={2}
-            dot={false}
-            activeDot={{ r: 6 }}
-            name="Compounded ($)"
+            name="Yield + Compound ($)"
           />
         )}
       </LineChart>
@@ -223,8 +211,7 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
   const [activePeriod, setActivePeriod] = useState(TIME_PERIODS.MINUTE_5.value);
   const [activeMetrics, setActiveMetrics] = useState({
     pnl: true,
-    yield: true,
-    compounded: true
+    totalYield: true
   });
   
   const chartContainerRef = useRef(null);
@@ -240,24 +227,23 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
       const preparedData = prepareChartData(positionHistory);
       const groupedData = groupChartData(preparedData, activePeriod);
       
-      // Enhanced validation: Ensure items have valid timestamp and some non-zero metric
+      // Enhanced validation and add totalYield calculation
       const validData = groupedData.filter(item => 
         item &&
         typeof item.timestamp === 'number' && 
         !isNaN(item.timestamp) &&
-        (Math.abs(item.pnl) > 1e-9 || Math.abs(item.yield) > 1e-9 || Math.abs(item.compounded) > 1e-9) // Use epsilon for float comparison
-      );
+        (Math.abs(item.pnl) > 1e-9 || Math.abs(item.yield) > 1e-9 || Math.abs(item.compounded) > 1e-9)
+      ).map(item => ({
+        ...item,
+        totalYield: (item.yield || 0) + (item.compounded || 0)
+      }));
       
       setChartData(validData);
     } catch (error) {
       console.error('Error processing chart data:', error);
-      setChartData([]); // Reset data on error
+      setChartData([]);
     }
   }, [positionHistory, activePeriod]);
-
-  const handleMetricToggle = useCallback((metric) => {
-    setActiveMetrics(prev => ({ ...prev, [metric]: !prev[metric] }));
-  }, []);
 
   const handleOverlayClick = useCallback((e) => {
     // Close only if the click is directly on the overlay, not its children
