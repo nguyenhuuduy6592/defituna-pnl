@@ -110,6 +110,10 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
     return <NoChartData />;
   }
   
+  // Get the last PnL value to determine the line color
+  const lastPnL = chartData[chartData.length - 1]?.pnl || 0;
+  const pnlColor = lastPnL >= 0 ? 'var(--chart-positive)' : 'var(--chart-negative)';
+  
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
@@ -172,7 +176,7 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
           <Line 
             type="monotone" 
             dataKey="pnl" 
-            stroke="var(--chart-negative)"
+            stroke={pnlColor}
             strokeWidth={2}
             dot={false} 
             activeDot={{ r: 6 }}
