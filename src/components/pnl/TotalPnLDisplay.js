@@ -28,7 +28,7 @@ export const TotalPnLDisplay = ({ label, totalValue }) => {
           </div>
           <div 
             className={`${styles.value} ${styles[valueClass]}`}
-            aria-label={`Total profit and loss: ${formattedValue} dollars`}
+            aria-label={`${label}: ${formattedValue} dollars`}
           >
             ${formattedValue}
           </div>

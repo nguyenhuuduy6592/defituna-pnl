@@ -173,7 +173,7 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
           <Line 
             type="monotone" 
             dataKey="pnl" 
-            stroke="#8884d8" 
+            stroke="var(--chart-negative)"
             strokeWidth={2}
             dot={false} 
             activeDot={{ r: 6 }}
@@ -184,11 +184,22 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
           <Line 
             type="monotone" 
             dataKey="yield" 
-            stroke="#82ca9d" 
+            stroke="var(--chart-positive)"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 6 }}
             name="Yield ($)"
+          />
+        )}
+        {activeMetrics.compounded && (
+          <Line 
+            type="monotone" 
+            dataKey="compounded" 
+            stroke="var(--chart-neutral)"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 6 }}
+            name="Compounded ($)"
           />
         )}
       </LineChart>
@@ -212,7 +223,8 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
   const [activePeriod, setActivePeriod] = useState(TIME_PERIODS.MINUTE_5.value);
   const [activeMetrics, setActiveMetrics] = useState({
     pnl: true,
-    yield: true
+    yield: true,
+    compounded: true
   });
   
   const chartContainerRef = useRef(null);
@@ -233,7 +245,7 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
         item &&
         typeof item.timestamp === 'number' && 
         !isNaN(item.timestamp) &&
-        (Math.abs(item.pnl) > 1e-9 || Math.abs(item.yield) > 1e-9) // Use epsilon for float comparison
+        (Math.abs(item.pnl) > 1e-9 || Math.abs(item.yield) > 1e-9 || Math.abs(item.compounded) > 1e-9) // Use epsilon for float comparison
       );
       
       setChartData(validData);
