@@ -17,8 +17,7 @@
 .modalContainer {
   background: rgba(30, 41, 59, 0.95);
   padding: variables.spacing(sm);
-  width: 100%;
-  max-width: 450px;
+  width: auto;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 
@@ -87,7 +86,6 @@
   flex-direction: column;
   background-color: rgba(15, 23, 42, 0.6);
   margin: 0;
-  // width: 100%;
 }
 
 .closeButton {
@@ -186,7 +184,6 @@
     font-weight: 400;
     white-space: nowrap;
     flex-shrink: 0;
-    // margin-right: variables.spacing(xs);
     
     .icon {
       font-size: 0.9em;
