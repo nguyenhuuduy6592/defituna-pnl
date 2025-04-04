@@ -74,8 +74,8 @@ Current Progress: 95%+ overall, with individual files:
   - ✅ useWallet.js (~98% coverage)
   - ✅ useDebounceApi.js (~94% coverage)
   - ✅ useHistoricalData.js (95%+ coverage)
-  - ⬜ usePoolData.js (Pending)
-  - ⬜ usePoolsData.js (Pending)
+  - ✅ usePoolData.js (95%+ coverage)
+  - ✅ usePoolsData.js (95%+ coverage)
 
 ### 2.3 Components (Medium-High Priority) ⬜
 - Target: 90% coverage
@@ -100,9 +100,9 @@ Current Progress: 95%+ overall, with individual files:
 - [x] Begin with utils/ directory testing
 - [ ] Establish CI/CD pipeline for tests
 
-### Phase 2: Core Functionality 🟨
+### Phase 2: Core Functionality ✅
 - [x] Complete utils testing (95%+ coverage achieved)
-- [x] Implement hooks tests (95%+ coverage for implemented hooks)
+- [x] Implement hooks tests (95%+ coverage achieved)
 - [ ] Add component tests for critical UI elements
 - [ ] Set up snapshot testing
 - [ ] Begin context testing
@@ -146,14 +146,13 @@ Current Progress: 95%+ overall, with individual files:
 
 - Component tests not yet implemented
 - CI/CD pipeline pending setup
-- Two hooks remaining to be tested (usePoolData.js, usePoolsData.js)
 - Integration and E2E tests pending
 
 ## 7. Success Metrics Update
 
 - [x] Test infrastructure established
 - [x] All utility files fully tested
-- [x] Most hooks fully tested
+- [x] All hooks fully tested
 - [x] Testing patterns established
 - [x] Coverage targets met for implemented tests
 - [ ] CI/CD pipeline running
