@@ -1,14 +1,14 @@
 import { calculateStatus } from './positionUtils';
 
 export const SORT_FIELD_CONFIG = {
-  pnl: position => position.pnl.usd,
-  yield: position => position.yield.usd,
+  pnl: position => position?.pnl?.usd || 0,
+  yield: position => position?.yield?.usd || 0,
   status: position => calculateStatus(position),
-  pair: position => String(position.pair || ''),
-  state: position => String(position.state || ''),
-  walletAddress: position => String(position.walletAddress || ''),
-  age: position => position.age,
-  size: position => Number(position.size || 0)
+  pair: position => String(position?.pair || ''),
+  state: position => String(position?.state || ''),
+  walletAddress: position => String(position?.walletAddress || ''),
+  age: position => position?.age,
+  size: position => Number(position?.size || 0)
 };
 
 export const sortPositions = (positions, sortField, sortDirection) => {

@@ -21,7 +21,13 @@ export const invertPairString = (pair) => {
       return pair;
     }
     
-    const [tokenA, tokenB] = pair.split('/');
+    const parts = pair.split('/');
+    if (parts.length !== 2 || !parts[0] || !parts[1]) {
+      console.warn('[invertPairString] Malformed pair format:', pair);
+      return pair;
+    }
+    
+    const [tokenA, tokenB] = parts;
     return `${tokenB}/${tokenA}`;
   } catch (error) {
     console.error('[invertPairString] Error inverting pair:', error);

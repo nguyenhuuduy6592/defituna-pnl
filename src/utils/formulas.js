@@ -14,7 +14,7 @@
  * @param {number} params.totalB - Total amount of token B
  * @returns {number} The calculated leverage value, capped at 100 for display
  */
-function calculateLeverage({ price, debtA, debtB, totalA, totalB }) {
+export function calculateLeverage({ price, debtA, debtB, totalA, totalB }) {
     try {
         if (!price || price <= 0 || isNaN(price)) {
             console.warn('[calculateLeverage] Invalid price:', price);
@@ -63,7 +63,7 @@ function calculateLeverage({ price, debtA, debtB, totalA, totalB }) {
  * @param {number} params.liquidationThreshold - Liquidation threshold (e.g., 0.05 for 5%)
  * @returns {Object} Object containing lower and upper liquidation prices
  */
-function computeLiquidationPrices({ lowerPrice, upperPrice, debtA, debtB, liquidity, liquidationThreshold }) {
+export function computeLiquidationPrices({ lowerPrice, upperPrice, debtA, debtB, liquidity, liquidationThreshold }) {
     try {
         // Input validation
         if (!lowerPrice || !upperPrice || lowerPrice >= upperPrice) {
@@ -118,7 +118,7 @@ function computeLiquidationPrices({ lowerPrice, upperPrice, debtA, debtB, liquid
  * @param {number} decimalsB - Decimals of token B
  * @returns {number} Converted price
  */
-function tickToPrice(tick, decimalsA, decimalsB) {
+export function tickToPrice(tick, decimalsA = 0, decimalsB = 0) {
     try {
         if (tick === undefined || tick === null) {
             console.warn('[tickToPrice] Tick is undefined or null');
@@ -129,9 +129,6 @@ function tickToPrice(tick, decimalsA, decimalsB) {
             return Infinity;
         }
 
-        if (!decimalsA && decimalsA !== 0) decimalsA = 0;
-        if (!decimalsB && decimalsB !== 0) decimalsB = 0;
-
         const price = Math.pow(1.0001, tick);
         return price * (10 ** (decimalsA - decimalsB));
     } catch (error) {
@@ -140,12 +137,11 @@ function tickToPrice(tick, decimalsA, decimalsB) {
     }
 }
 
-
 /**
  * Creates an empty position template with default values
  * @returns {Object} Empty position template
  */
-function createEmptyPositionTemplate() {
+export function createEmptyPositionTemplate() {
     return {
         leverage: 1,
         size: 0,

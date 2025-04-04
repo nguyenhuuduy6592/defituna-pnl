@@ -24,13 +24,15 @@ const MAX_FRACTION_DIGITS_DEFAULT = 2;
 export const formatNumber = (num, abbreviate = true) => {
   if (num === null || num === undefined) return '0.00';
   
-  const absNum = Math.abs(Number(num));
+  const number = Number(num);
+  const absNum = Math.abs(number);
+  const sign = number < 0 ? '-' : '';
   
   // Handle large number abbreviations if requested
   if (abbreviate) {
-    if (absNum >= 1e9) return (num / 1e9).toFixed(2) + 'B';
-    if (absNum >= 1e6) return (num / 1e6).toFixed(2) + 'M';
-    if (absNum >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+    if (absNum >= 1e9) return sign + (absNum / 1e9).toFixed(2) + 'B';
+    if (absNum >= 1e6) return sign + (absNum / 1e6).toFixed(2) + 'M';
+    if (absNum >= 1e3) return sign + (absNum / 1e3).toFixed(2) + 'K';
   }
   
   // Handle small numbers with more precision
@@ -39,12 +41,12 @@ export const formatNumber = (num, abbreviate = true) => {
     maximumFractionDigits: MAX_FRACTION_DIGITS_DEFAULT,
   };
 
-  if (absNum < SMALL_NUMBER_THRESHOLD && num !== 0) {
+  if (absNum < SMALL_NUMBER_THRESHOLD && number !== 0) {
     options.minimumFractionDigits = MIN_FRACTION_DIGITS_SMALL;
     options.maximumFractionDigits = MAX_FRACTION_DIGITS_SMALL;
   }
   
-  return absNum.toLocaleString(DEFAULT_LOCALE, options);
+  return sign + absNum.toLocaleString(DEFAULT_LOCALE, options);
 };
 
 /**
@@ -82,7 +84,7 @@ export const formatValue = (val) => {
     formattedVal = absVal.toFixed(MIN_FRACTION_DIGITS_DEFAULT);
   }
   
-  return `${sign}${formattedVal}`.padStart(8); // Ensure consistent padding (adjust padStart value if needed)
+  return `${sign}${formattedVal}    `; // Add consistent padding with 4 spaces
 };
 
 /**
@@ -97,22 +99,30 @@ export const formatDuration = (ageSeconds) => {
   const days = Math.floor(ageSeconds / 86400);
   const hours = Math.floor((ageSeconds % 86400) / 3600);
   const minutes = Math.floor((ageSeconds % 3600) / 60);
-  const seconds = Math.floor(ageSeconds % 60); // Use floor for consistency
+  const seconds = Math.floor(ageSeconds % 60);
   
   const parts = [];
   if (days > 0) parts.push(`${days}d`);
   if (hours > 0) parts.push(`${hours}h`);
   if (minutes > 0) parts.push(`${minutes}m`);
   
-  // Only show seconds if duration is less than a minute
-  if (parts.length === 0 && seconds > 0) {
-    parts.push(`${seconds}s`);
+  // Show seconds in these cases:
+  // 1. When there are no larger units
+  // 2. When we have exactly minutes and seconds (e.g., "1m 30s")
+  // 3. When we have days/hours, minutes, and significant seconds (>= 10s)
+  if (seconds > 0 && (
+    parts.length === 0 || // No larger units
+    (parts.length === 1 && minutes > 0) || // Only minutes present
+    (parts.length === 2 && ((days > 0 && minutes > 0) || (hours > 0 && minutes > 0)) && seconds >= 10) || // Days/hours and minutes present, and at least 10 seconds
+    (parts.length === 3 && seconds >= 10) // All larger units present and at least 10 seconds
+  )) {
+    parts.push(`${Math.max(1, seconds)}s`);
   }
   
-  // If still no parts (e.g., ageSeconds was between 0 and 1), default to 1s or keep Unknown?
-  if (parts.length === 0) return '1s'; // Or decide if 'Unknown' is better for < 1s
-
-  return parts.slice(0, 3).join(' '); // Join up to 3 most significant parts
+  // If no parts (e.g., ageSeconds was between 0 and 1), default to 1s
+  if (parts.length === 0) return '1s';
+  
+  return parts.join(' ');
 };
 
 /**

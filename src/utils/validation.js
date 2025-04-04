@@ -5,7 +5,11 @@
  */
 
 // Constants for validation
-const WALLET_ADDRESS_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+const MIN_ADDRESS_LENGTH = 32;
+const MAX_ADDRESS_LENGTH = 44;
+const VALID_CHARS = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+const WALLET_ADDRESS_REGEX = new RegExp(`^[${VALID_CHARS}]{${MIN_ADDRESS_LENGTH},${MAX_ADDRESS_LENGTH}}$`);
+const INVALID_CHARS_REGEX = /[0IOl]/;
 
 /**
  * Validates a Solana wallet address
@@ -13,6 +17,27 @@ const WALLET_ADDRESS_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
  * @returns {boolean} - Whether the address is valid
  */
 export const isValidWalletAddress = (address) => {
+  // Check for null, undefined, or non-string types
   if (!address || typeof address !== 'string') return false;
-  return WALLET_ADDRESS_REGEX.test(address.trim());
+
+  // Trim whitespace
+  const trimmed = address.trim();
+
+  // Check length before any other validation
+  const length = trimmed.length;
+  if (length !== 44) {
+    return false;
+  }
+
+  // Check for invalid characters (0, I, O, l)
+  if (INVALID_CHARS_REGEX.test(trimmed)) {
+    return false;
+  }
+
+  // Check that all characters are valid base58 characters
+  if (!WALLET_ADDRESS_REGEX.test(trimmed)) {
+    return false;
+  }
+
+  return true;
 };

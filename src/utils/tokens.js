@@ -24,7 +24,9 @@ async function fetchAllTokenMetadata() {
     return metadata;
   } catch (error) {
     console.error('Error fetching token metadata:', error);
-    return {};
+    lastFetchTime = 0;
+    tokenMetadataCache.clear();
+    return null;
   }
 }
 
@@ -34,31 +36,38 @@ async function fetchAllTokenMetadata() {
  * @returns {Promise<Object>} Token metadata
  */
 export async function getTokenMetadata(tokenAddress) {
+  if (!tokenAddress) {
+    return createPlaceholder('unknown');
+  }
+
   // Check if cache needs refresh
   if (Date.now() - lastFetchTime > CACHE_TTL) {
     const metadata = await fetchAllTokenMetadata();
-    tokenMetadataCache.clear();
-    Object.entries(metadata).forEach(([address, data]) => {
-      tokenMetadataCache.set(address, data);
-    });
+    if (metadata) {
+      tokenMetadataCache.clear();
+      Object.entries(metadata).forEach(([address, data]) => {
+        tokenMetadataCache.set(address, data);
+      });
+    }
   }
   
-  // If in cache, return immediately
-  if (tokenMetadataCache.has(tokenAddress)) {
+  // If in cache and not in error state, return immediately
+  if (tokenMetadataCache.has(tokenAddress) && lastFetchTime > 0) {
     return tokenMetadataCache.get(tokenAddress);
   }
   
-  // For unknown tokens, create a placeholder
-  const shortAddress = `${tokenAddress.slice(0, 4)}...${tokenAddress.slice(-4)}`;
-  const placeholder = {
+  // For unknown tokens or error state, create a placeholder
+  return createPlaceholder(tokenAddress);
+}
+
+function createPlaceholder(tokenAddress) {
+  const shortAddress = tokenAddress === 'unknown' ? 'unknown' : 
+    `${tokenAddress.slice(0, 4)}...${tokenAddress.slice(-4)}`;
+  return {
     symbol: shortAddress,
     name: shortAddress,
     decimals: 9
   };
-  
-  // Add to cache
-  tokenMetadataCache.set(tokenAddress, placeholder);
-  return placeholder;
 }
 
 /**
@@ -74,10 +83,12 @@ export async function batchGetTokenMetadata(tokenAddresses) {
   // Check if cache needs refresh
   if (Date.now() - lastFetchTime > CACHE_TTL) {
     const metadata = await fetchAllTokenMetadata();
-    tokenMetadataCache.clear();
-    Object.entries(metadata).forEach(([address, data]) => {
-      tokenMetadataCache.set(address, data);
-    });
+    if (metadata) {
+      tokenMetadataCache.clear();
+      Object.entries(metadata).forEach(([address, data]) => {
+        tokenMetadataCache.set(address, data);
+      });
+    }
   }
   
   const result = {};
@@ -96,19 +107,19 @@ export async function batchGetTokenMetadata(tokenAddresses) {
  * @returns {number} Current price of token B in terms of token A
  */
 export function calculatePriceFromSqrtPrice(sqrtPrice, tokenADecimals = 6, tokenBDecimals = 6) {
+  if (!sqrtPrice || typeof sqrtPrice !== 'string') {
+    return 0;
+  }
+
   try {
-    // Convert the square root price to a BigInt
-    const sqrtPriceBigInt = BigInt(sqrtPrice);
+    // Convert the square root price to a number
+    const sqrtPriceNum = Number(sqrtPrice) / 1000000; // Scale down from 1M = 1.0
     
-    // Square the sqrt price to get the actual price (X64 fixed point)
-    const priceBigInt = (sqrtPriceBigInt * sqrtPriceBigInt) >> BigInt(64);
-    
-    // Convert to JavaScript number for easier manipulation
-    const price = Number(priceBigInt) / 2 ** 64;
+    // Square the sqrt price to get the actual price
+    const price = sqrtPriceNum * sqrtPriceNum;
     
     // Adjust for token decimals
-    // For price in terms of token B per token A, divide by 10^(b-a)
-    const decimalAdjustment = 10 ** (tokenADecimals - tokenBDecimals);
+    const decimalAdjustment = Math.pow(10, tokenBDecimals - tokenADecimals);
     return price * decimalAdjustment;
   } catch (error) {
     console.error('Error calculating price from sqrt_price:', error);
@@ -122,6 +133,10 @@ export function calculatePriceFromSqrtPrice(sqrtPrice, tokenADecimals = 6, token
  * @returns {Promise<Object>} Enhanced pool with token metadata
  */
 export async function enhancePoolWithTokenMetadata(pool) {
+  if (!pool || !pool.token_a_mint || !pool.token_b_mint) {
+    return pool;
+  }
+
   try {
     const tokenAMeta = await getTokenMetadata(pool.token_a_mint);
     const tokenBMeta = await getTokenMetadata(pool.token_b_mint);
