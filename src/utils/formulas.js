@@ -234,8 +234,7 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
         const collateral = {
             tokenA: totalA - debtA,
             tokenB: totalB - debtB,
-            usd: Number(position.total_a?.usd || 0) - Number(position.current_loan_a?.usd || 0) + 
-                 Number(position.total_b?.usd || 0) - Number(position.current_loan_b?.usd || 0)
+            usd: position.deposited_collateral_usd?.amount
         };
 
         // Calculate debt and interest
