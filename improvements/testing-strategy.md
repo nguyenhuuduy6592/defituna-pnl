@@ -58,7 +58,13 @@ Current Progress: 21.39% overall, with individual files:
   - **Known Issue/Refactoring Suggestion:**
     - `calculateYAxisDomain` appears to incorrectly include values from metrics not specified in the `metrics` parameter (e.g., includes `yield` values when only `pnl` is true). The logic for filtering values based on the `metrics` object needs review and potential refactoring.
     - `prepareChartData` produces `NaN` timestamps for invalid date strings (instead of using fallback) and throws a `TypeError` if the input array contains `null`. Tests currently assert this behavior, but the function should ideally filter/handle these cases more gracefully.
-- ⬜ debounce.js (0% coverage)
+- 🟨 debounce.js (~70% coverage) - Tested (Existing Code - Partial)
+  - `debounce` function fully tested and covered.
+  - `debouncePromise` tests pass for basic scenarios but fail for complex queuing and error handling cases due to intricate recursive logic within `finally`/`setTimeout` blocks, making reliable testing with fake timers difficult.
+  - **Refactoring Suggestions for Improved Testability:**
+    - Simplify state management (`currentPromise`, `timeout`, `queuedPromiseResolver`) in `debouncePromise`.
+    - Avoid recursive calls (`debouncedFunc.apply`) within `setTimeout` inside `finally` blocks.
+    - Consider extracting the queuing logic into a separate, more testable state machine or helper function.
 - ⬜ defituna.js (0% coverage)
 - ⬜ export.js (0% coverage)
 - ⬜ notifications.js (0% coverage)
@@ -132,6 +138,10 @@ Next priorities:
    - Implement tokens.js tests
    - Implement chart.js tests
    - Implement debounce.js tests
+   - Implement defituna.js tests
+   - Implement export.js tests
+   - Implement notifications.js tests
+   - Implement tooltipContent.js tests
 
 2. Infrastructure:
    - Set up GitHub Actions for automated testing
@@ -148,6 +158,7 @@ Next priorities:
 - CI/CD pipeline pending setup
 - Large number of untested utility functions
 - Potential bugs/unexpected behavior in `chart.js` (`calculateYAxisDomain`, `prepareChartData` error handling) noted for future refactoring.
+- `debouncePromise` implementation in `debounce.js` is overly complex, hindering full testing and potentially containing edge case bugs; refactoring recommended.
 
 ## 7. Success Metrics Update
 
