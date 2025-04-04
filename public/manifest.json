@@ -1,6 +1,6 @@
 {
-  "name": "DeFi Tuna PnL",
-  "short_name": "DeFi Tuna",
+  "name": "Defituna PnL Viewer",
+  "short_name": "DefiTuna PnL",
   "description": "Track your DeFi positions and PnL",
   "start_url": "/",
   "display": "standalone",
