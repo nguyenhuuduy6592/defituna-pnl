@@ -17,6 +17,7 @@
 *   **Promote Speed:** Leverage test utilities, effective mocking (especially for external dependencies like APIs or complex libraries), and consider snapshot testing for components to accelerate test writing. Focus on testing the most critical paths first.
 *   **Separate Testing from Refactoring:** If potential refactorings or improvements to the source code are identified during test writing that would enhance testability, functionality, or clarity, **do not modify the source file immediately**. Instead, document these suggestions within the relevant file's status section in this plan (e.g., under "Next Priorities" or "Known Issues") for later review, prioritization, and implementation as separate tasks.
 *   **Handling Coverage Targets:** Strive to meet the defined coverage targets for each file/directory. However, if a target proves unreachable *solely by testing the existing, unmodified code paths*, mark the file's testing status as "Tested (Existing Code)". In such cases, add specific, actionable suggestions to this plan detailing how the *source file* could be refactored (e.g., breaking down large functions, injecting dependencies, making error paths more explicit) to improve its testability and allow coverage targets to be met in a subsequent refactoring effort.
+* **Keep plan up-to-date:** Always keep the plan up-to-date. Update the plan after every step, every change.
 
 ## 2. Testing Priorities by Directory (Ordered by Impact/Effort)
 
@@ -50,7 +51,13 @@ Current Progress: 21.39% overall, with individual files:
     - Inject `fetch` (or an API client) into `fetchAllTokenMetadata` instead of using global `fetch`.
     - Potentially extract cache logic (TTL check, get, set, clear) into separate, directly testable functions.
     - Add tests specifically for successful API paths and cache validation (fresh/expired data retrieval) *after* refactoring.
-- ⬜ chart.js (0% coverage)
+- ✅ chart.js (~85% coverage) - Tested (Existing Code)
+  - Initial tests for `prepareChartData`, `groupChartData`, `formatXAxisLabel`, `calculateYAxisDomain` implemented.
+  - Tests for `getYAxisTicks`, `getGridStyling`, `getAxisStyling`, `CustomChartTooltip` added.
+  - All functions tested, coverage meets target for existing code.
+  - **Known Issue/Refactoring Suggestion:**
+    - `calculateYAxisDomain` appears to incorrectly include values from metrics not specified in the `metrics` parameter (e.g., includes `yield` values when only `pnl` is true). The logic for filtering values based on the `metrics` object needs review and potential refactoring.
+    - `prepareChartData` produces `NaN` timestamps for invalid date strings (instead of using fallback) and throws a `TypeError` if the input array contains `null`. Tests currently assert this behavior, but the function should ideally filter/handle these cases more gracefully.
 - ⬜ debounce.js (0% coverage)
 - ⬜ defituna.js (0% coverage)
 - ⬜ export.js (0% coverage)
@@ -58,9 +65,10 @@ Current Progress: 21.39% overall, with individual files:
 - ⬜ tooltipContent.js (0% coverage)
 
 Next priorities:
-1. Implement tokens.js tests
-2. Implement chart.js tests
-3. Implement debounce.js tests
+- Implement tokens.js tests
+- Implement chart.js tests
+- Implement debounce.js tests
+- Implement remaining chart.js tests (`getYAxisTicks`, `CustomChartTooltip`, styling functions)
 
 ### 2.2 Hooks (High Priority) ⬜
 - Target: 95% coverage
@@ -139,6 +147,7 @@ Next priorities:
 - formulas.js branch coverage needs significant improvement
 - CI/CD pipeline pending setup
 - Large number of untested utility functions
+- Potential bugs/unexpected behavior in `chart.js` (`calculateYAxisDomain`, `prepareChartData` error handling) noted for future refactoring.
 
 ## 7. Success Metrics Update
 
