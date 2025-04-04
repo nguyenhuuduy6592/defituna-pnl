@@ -82,7 +82,8 @@ Next priorities:
 - Files:
   - ✅ useSortState.js (100% coverage)
   - ✅ useCountdown.js (100% coverage)
-  - ⬜ useInvertedPairs.js
+  - 🟨 useInvertedPairs.js (100% coverage) - Tested (Existing Code)
+    - **Refactoring Suggestion:** Add try...catch around JSON.parse in initialization useEffect.
   - ⬜ useAutoRefresh.js
   - ⬜ useDebounceApi.js
   - ⬜ useHistoricalData.js
