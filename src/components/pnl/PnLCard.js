@@ -160,11 +160,14 @@ export const PnLCard = ({ position, onClose }) => {
   }
   
   // Format liquidation price range
-  const formatLiqPrice = (price) => price != null ? `$${formatNumber(price)}` : '-';
+  const formatLiqPrice = (price) => {
+    if (position.closedAt || price == null || price === 0) return '-';
+    return `$${formatNumber(price)}`;
+  };
   const liqLower = formatLiqPrice(position.liquidationPrice?.lower);
   const liqUpper = formatLiqPrice(position.liquidationPrice?.upper);
   const liqPriceDisplay = `${liqLower} / ${liqUpper}`;
-  const showLiqPrice = position.liquidationPrice?.lower != null || position.liquidationPrice?.upper != null;
+  const showLiqPrice = !position.closedAt && (position.liquidationPrice?.lower != null || position.liquidationPrice?.upper != null);
 
   // Format limit order prices
   const formatLimitPrice = (price) => price != null ? `$${formatNumber(price)}` : '-';
@@ -269,7 +272,7 @@ export const PnLCard = ({ position, onClose }) => {
                       icon={FaExclamationTriangle}
                       label="Liq Price"
                       value={liqPriceDisplay}
-                      valueClass={'negative'}
+                      valueClass={position.closedAt ? 'neutral' : 'negative'}
                     />
                   )}
                   <StatRow 

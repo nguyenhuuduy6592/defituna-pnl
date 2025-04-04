@@ -25,8 +25,7 @@ const defaultData = {
 export const PnLDisplay = ({ 
   data, 
   historyEnabled = false, 
-  loading = false,
-  positionsHistory = []
+  loading = false
 }) => {
   // Use provided data or default data
   const displayData = useMemo(() => {

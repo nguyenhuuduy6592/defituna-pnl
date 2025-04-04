@@ -45,7 +45,7 @@ export const invertPrice = (price) => {
     }
     
     if (price === 0 || price === -0) {
-      return Infinity;
+      return 0;
     }
     
     return 1 / price;
