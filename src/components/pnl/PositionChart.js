@@ -151,14 +151,14 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
         />
         <ReferenceLine 
           y={0} 
-          stroke="#4dabf7" 
+          stroke="var(--chart-neutral)" 
           strokeWidth={1.5}
           strokeDasharray="3 3"
           ifOverflow="extendDomain"
           label={{
             value: "Break-even ($0)",
             position: "insideBottomRight",
-            fill: "#4dabf7",
+            fill: "var(--chart-neutral)",
             fontSize: 11,
             fontWeight: "500"
           }}
@@ -185,9 +185,9 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
         )}
         {activeMetrics.totalYield && (
           <Line 
-            type="monotone" 
+            type="monotone"
             dataKey="totalYield"
-            stroke="var(--chart-positive)"
+            stroke="var(--chart-primary)"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 6 }}
