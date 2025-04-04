@@ -10,6 +10,14 @@
 - [x] Configure test coverage reporting
 - [ ] Set up GitHub Actions for automated testing
 
+## 2. Testing Principles and Guidelines
+
+*   **Test Existing Code First:** Prioritize writing tests that verify the current behavior of the code *as it exists*, without modifying the source file initially. The primary goal is to lock in current functionality before any refactoring.
+*   **Focus on Accuracy:** Design tests to validate core logic, known edge cases (null/undefined inputs, empty arrays/objects, boundary values), and expected error handling based *only* on the current implementation.
+*   **Promote Speed:** Leverage test utilities, effective mocking (especially for external dependencies like APIs or complex libraries), and consider snapshot testing for components to accelerate test writing. Focus on testing the most critical paths first.
+*   **Separate Testing from Refactoring:** If potential refactorings or improvements to the source code are identified during test writing that would enhance testability, functionality, or clarity, **do not modify the source file immediately**. Instead, document these suggestions within the relevant file's status section in this plan (e.g., under "Next Priorities" or "Known Issues") for later review, prioritization, and implementation as separate tasks.
+*   **Handling Coverage Targets:** Strive to meet the defined coverage targets for each file/directory. However, if a target proves unreachable *solely by testing the existing, unmodified code paths*, mark the file's testing status as "Tested (Existing Code)". In such cases, add specific, actionable suggestions to this plan detailing how the *source file* could be refactored (e.g., breaking down large functions, injecting dependencies, making error paths more explicit) to improve its testability and allow coverage targets to be met in a subsequent refactoring effort.
+
 ## 2. Testing Priorities by Directory (Ordered by Impact/Effort)
 
 ### 2.1 Utils (High Priority) ��
