@@ -157,4 +157,7 @@ export async function enhancePoolWithTokenMetadata(pool) {
     console.error('Error enhancing pool with token metadata:', error);
     return pool;
   }
-} 
+}
+
+// Add exports for other functions if they aren't already exported
+export { createPlaceholder, fetchAllTokenMetadata }; 
