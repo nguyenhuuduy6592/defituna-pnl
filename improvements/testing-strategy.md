@@ -68,16 +68,13 @@ Current Progress: 21.39% overall, with individual files:
 - ⬜ defituna.js (0% coverage)
 - ⬜ export.js (0% coverage)
 - ✅ notifications.js (100% coverage)
-- ⬜ tooltipContent.js (0% coverage)
+- ✅ tooltipContent.js (100% coverage)
 
 Next priorities:
 - Implement tokens.js tests
 - Implement chart.js tests
 - Implement debounce.js tests
 - Implement remaining chart.js tests (`getYAxisTicks`, `CustomChartTooltip`, styling functions)
-- Implement defituna.js tests
-- Implement export.js tests
-- Implement tooltipContent.js tests
 
 ### 2.2 Hooks (High Priority) ⬜
 - Target: 95% coverage
@@ -141,10 +138,6 @@ Next priorities:
    - Implement tokens.js tests
    - Implement chart.js tests
    - Implement debounce.js tests
-   - Implement defituna.js tests
-   - Implement export.js tests
-   - Implement notifications.js tests
-   - Implement tooltipContent.js tests
 
 2. Infrastructure:
    - Set up GitHub Actions for automated testing
@@ -185,7 +178,7 @@ Next priorities:
   - Skipped Test: `shareCard › should use default filename...` due to difficulties reliably mocking/asserting Blob creation in the Jest/JSDOM environment. Core functionality is still covered by other tests.
   - Uncovered lines: 106-107 (part of `navigator.share` existence check, branch adequately covered by fallback test).
 - ✅ notifications.js (100% coverage)
-- ⬜ tooltipContent.js (0% coverage)
+- ✅ tooltipContent.js (100% coverage)
 
 Next priorities:
 - Implement defituna.js tests
