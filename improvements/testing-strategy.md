@@ -79,6 +79,16 @@ Next priorities:
 ### 2.2 Hooks (High Priority) ⬜
 - Target: 95% coverage
 - Current: 0% coverage
+- Files:
+  - ✅ useSortState.js (100% coverage)
+  - ⬜ useCountdown.js
+  - ⬜ useInvertedPairs.js
+  - ⬜ useAutoRefresh.js
+  - ⬜ useDebounceApi.js
+  - ⬜ useHistoricalData.js
+  - ⬜ usePoolData.js
+  - ⬜ usePoolsData.js
+  - ⬜ useWallet.js
 - Pending implementation
 
 ### 2.3 Components (Medium-High Priority) ⬜
