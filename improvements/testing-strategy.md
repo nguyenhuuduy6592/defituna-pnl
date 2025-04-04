@@ -167,4 +167,14 @@ Next priorities:
 - [x] Testing patterns established
 - [ ] Coverage targets met (in progress)
 - [ ] CI/CD pipeline running
-- [ ] Documentation complete 
+- [ ] Documentation complete
+- ✅ defituna.js (~98% coverage)
+  - All functions tested, covering successful paths, error handling, caching, and main processing logic.
+  - Coverage: Stmts 97.95%, Branch 96.07%, Funcs 100%, Lines 97.88%
+  - Uncovered lines: 234, 260-261 (specific edge cases in `encodeValue` not hit explicitly, but main paths covered).
+  - **Refactoring/Improvement Suggestions:**
+    - `processPositionsData` doesn't gracefully handle errors from individual `fetchPoolData` calls within `Promise.all`. The entire function rejects instead of filtering the problematic position. Consider using `Promise.allSettled` for more robust error handling per position.
+    - The check for missing token data in `processPositionsData` (`if (!tokenA || !tokenB)`) is insufficient. `fetchTokenData` returns a default structure on error, which passes this check. The check should be more specific (e.g., check for `token.symbol === 'UNKNOWN'`) to correctly filter positions where token data fetching failed.
+    - `processPositionsData` does not catch errors thrown by `processTunaPosition` within the `.map()` loop individually. An error in processing one position causes the entire function to reject. Consider wrapping the `processTunaPosition` call and encoding logic within the `.map()` in a `try...catch` to allow filtering only the failing positions.
+- ⬜ export.js (0% coverage)
+- ⬜ notifications.js (0% coverage) 
