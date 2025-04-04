@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useInvertedPairs } from '../hooks/useInvertedPairs';
+import { useInvertedPairs } from '../../hooks/useInvertedPairs';
 
 // Mock localStorage
 let getItemSpy;

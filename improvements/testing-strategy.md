@@ -76,20 +76,22 @@ Next priorities:
 - Implement debounce.js tests
 - Implement remaining chart.js tests (`getYAxisTicks`, `CustomChartTooltip`, styling functions)
 
-### 2.2 Hooks (High Priority) ⬜
+### 2.2 Hooks (High Priority) ✅
 - Target: 95% coverage
-- Current: 0% coverage
+- Current: TODO% coverage
 - Files:
   - ✅ useSortState.js (100% coverage)
   - ✅ useCountdown.js (100% coverage)
-  - 🟨 useInvertedPairs.js (100% coverage) - Tested (Existing Code)
+  - ✅ useInvertedPairs.js (100% coverage) - Tested (Existing Code)
     - **Refactoring Suggestion:** Add try...catch around JSON.parse in initialization useEffect.
-  - ⬜ useAutoRefresh.js
-  - ⬜ useDebounceApi.js
+  - ✅ useAutoRefresh.js (100% coverage)
+  - ✅ useWallet.js (~98% coverage)
+    - **Coverage:** Stmts 98.43%, Branch 95%, Funcs 100%, Lines 98.27%.
+  - ✅ useDebounceApi.js (~94% coverage)
+    - **Coverage:** Stmts 94.44%, Branch 50% (mock bypasses some branches), Funcs 85.71%, Lines 94.44%. Uncovered lines relate to the unused `useDebounce` export.
   - ⬜ useHistoricalData.js
   - ⬜ usePoolData.js
   - ⬜ usePoolsData.js
-  - ⬜ useWallet.js
 - Pending implementation
 
 ### 2.3 Components (Medium-High Priority) ⬜

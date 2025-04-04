@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useSortState } from '../hooks/useSortState';
+import { useSortState } from '../../hooks/useSortState';
 
 describe('useSortState Hook', () => {
   it('should initialize with default values', () => {
