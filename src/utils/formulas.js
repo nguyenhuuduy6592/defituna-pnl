@@ -230,7 +230,8 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
         const leverage = calculateLeverage({ price: currentPrice, debtA, debtB, totalA, totalB });
 
         // Calculate size and collateral
-        const size = Number(position.total_a?.usd || 0) + Number(position.total_b?.usd || 0);
+        const size = Number(position.total_a?.usd || 0) + Number(position.total_b?.usd || 0) +
+            Number(position.leftovers_a?.usd || 0) + Number(position.leftovers_b?.usd || 0);
         const collateral = {
             tokenA: totalA - debtA,
             tokenB: totalB - debtB,
