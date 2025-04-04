@@ -81,7 +81,7 @@ Next priorities:
 - Current: 0% coverage
 - Files:
   - ✅ useSortState.js (100% coverage)
-  - ⬜ useCountdown.js
+  - ✅ useCountdown.js (100% coverage)
   - ⬜ useInvertedPairs.js
   - ⬜ useAutoRefresh.js
   - ⬜ useDebounceApi.js
