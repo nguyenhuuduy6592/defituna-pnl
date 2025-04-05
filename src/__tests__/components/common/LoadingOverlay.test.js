@@ -1,6 +1,14 @@
 import React from 'react';
-import { render, screen } from '../test-utils';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { LoadingOverlay } from '../../../components/common/LoadingOverlay';
+
+// Mock the LoadingOverlay styles
+jest.mock('../../../components/common/LoadingOverlay.module.scss', () => ({
+  loadingContainer: 'loadingContainer',
+  loadingOverlay: 'loadingOverlay',
+  loadingOverlayHidden: 'loadingOverlayHidden'
+}));
 
 describe('LoadingOverlay Component', () => {
   const childText = 'Child Content';
@@ -10,26 +18,38 @@ describe('LoadingOverlay Component', () => {
   it('renders children when not loading', () => {
     render(
       <LoadingOverlay loading={false}>
-        <div>{childText}</div>
+        <div data-testid="child-content">{childText}</div>
       </LoadingOverlay>
     );
 
+    expect(screen.getByTestId('child-content')).toBeInTheDocument();
     expect(screen.getByText(childText)).toBeInTheDocument();
     expect(screen.queryByText(defaultMessage)).not.toBeInTheDocument();
   });
 
-  it('renders children and loading message when loading', () => {
+  it('renders children when loading', () => {
+    render(
+      <LoadingOverlay loading={true}>
+        <div data-testid="child-content">{childText}</div>
+      </LoadingOverlay>
+    );
+
+    expect(screen.getByTestId('child-content')).toBeInTheDocument();
+    expect(screen.getByText(childText)).toBeInTheDocument();
+    expect(screen.getByText(defaultMessage)).toBeInTheDocument();
+  });
+
+  it('displays the default message when loading', () => {
     render(
       <LoadingOverlay loading={true}>
         <div>{childText}</div>
       </LoadingOverlay>
     );
 
-    expect(screen.getByText(childText)).toBeInTheDocument();
     expect(screen.getByText(defaultMessage)).toBeInTheDocument();
   });
 
-  it('renders custom loading message when provided', () => {
+  it('displays a custom message when provided and loading', () => {
     render(
       <LoadingOverlay loading={true} message={customMessage}>
         <div>{childText}</div>
@@ -40,48 +60,62 @@ describe('LoadingOverlay Component', () => {
     expect(screen.queryByText(defaultMessage)).not.toBeInTheDocument();
   });
 
-  it('applies correct CSS classes based on loading state', () => {
-    const { rerender } = render(
-      <LoadingOverlay loading={true}>
+  it('does not display any message when not loading', () => {
+    render(
+      <LoadingOverlay loading={false} message="Custom loading message">
         <div>{childText}</div>
       </LoadingOverlay>
     );
 
-    // When loading
-    const overlayWhenLoading = screen.getByText(defaultMessage).parentElement;
-    expect(overlayWhenLoading).toHaveClass('loadingOverlay');
-    expect(overlayWhenLoading).not.toHaveClass('loadingOverlayHidden');
-
-    // When not loading
-    rerender(
-      <LoadingOverlay loading={false}>
-        <div>{childText}</div>
-      </LoadingOverlay>
-    );
-
-    const overlayWhenNotLoading = document.querySelector('[aria-hidden="true"]');
-    expect(overlayWhenNotLoading).toHaveClass('loadingOverlay');
-    expect(overlayWhenNotLoading).toHaveClass('loadingOverlayHidden');
+    expect(screen.queryByText('Custom loading message')).not.toBeInTheDocument();
+    expect(screen.queryByText(defaultMessage)).not.toBeInTheDocument();
   });
 
-  it('sets correct ARIA attributes', () => {
-    const { rerender } = render(
+  it('applies the correct CSS classes when loading', () => {
+    render(
       <LoadingOverlay loading={true}>
         <div>{childText}</div>
       </LoadingOverlay>
     );
+    
+    const overlay = screen.getByText(defaultMessage).parentElement;
+    expect(overlay).toHaveClass('loadingOverlay');
+    expect(overlay).not.toHaveClass('loadingOverlayHidden');
+  });
 
-    let overlay = screen.getByText(defaultMessage).parentElement;
-    expect(overlay).toHaveAttribute('aria-hidden', 'false');
-    expect(overlay).toHaveAttribute('aria-live', 'polite');
-
-    rerender(
+  it('applies the correct CSS classes when not loading', () => {
+    render(
       <LoadingOverlay loading={false}>
         <div>{childText}</div>
       </LoadingOverlay>
     );
+    
+    // Find the overlay div directly since there's no text
+    const overlay = document.querySelector('.loadingOverlay');
+    expect(overlay).toHaveClass('loadingOverlayHidden');
+  });
 
-    overlay = document.querySelector('[aria-hidden="true"]');
+  it('sets correct aria attributes when loading', () => {
+    render(
+      <LoadingOverlay loading={true}>
+        <div>{childText}</div>
+      </LoadingOverlay>
+    );
+    
+    const overlay = screen.getByText(defaultMessage).parentElement;
+    expect(overlay).toHaveAttribute('aria-hidden', 'false');
+    expect(overlay).toHaveAttribute('aria-live', 'polite');
+  });
+
+  it('sets correct aria attributes when not loading', () => {
+    render(
+      <LoadingOverlay loading={false}>
+        <div>{childText}</div>
+      </LoadingOverlay>
+    );
+    
+    // Find the overlay div directly
+    const overlay = document.querySelector('.loadingOverlay');
     expect(overlay).toHaveAttribute('aria-hidden', 'true');
     expect(overlay).toHaveAttribute('aria-live', 'polite');
   });

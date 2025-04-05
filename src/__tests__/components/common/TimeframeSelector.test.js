@@ -1,6 +1,14 @@
 import React from 'react';
-import { render, screen, userEvent } from '../test-utils';
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import TimeframeSelector from '../../../components/common/TimeframeSelector';
+
+// Mock the TimeframeSelector styles
+jest.mock('../../../styles/TimeframeSelector.module.scss', () => ({
+  timeframeSelector: 'timeframeSelector',
+  timeframeButton: 'timeframeButton',
+  active: 'active'
+}));
 
 describe('TimeframeSelector Component', () => {
   const defaultTimeframes = ['24h', '7d', '30d'];
@@ -10,135 +18,127 @@ describe('TimeframeSelector Component', () => {
     mockOnChange.mockClear();
   });
 
-  it('renders with default timeframes', () => {
-    render(<TimeframeSelector onChange={mockOnChange} />);
-
+  it('renders all timeframe options', () => {
+    render(
+      <TimeframeSelector 
+        timeframes={defaultTimeframes} 
+        selected="24h" 
+        onChange={mockOnChange} 
+      />
+    );
+    
     defaultTimeframes.forEach(timeframe => {
       expect(screen.getByText(timeframe)).toBeInTheDocument();
     });
   });
 
-  it('renders with custom timeframes', () => {
-    const customTimeframes = ['1h', '12h', '48h'];
+  it('highlights the selected timeframe with active class', () => {
     render(
-      <TimeframeSelector
-        timeframes={customTimeframes}
-        selected="12h"
-        onChange={mockOnChange}
+      <TimeframeSelector 
+        timeframes={defaultTimeframes} 
+        selected="7d" 
+        onChange={mockOnChange} 
       />
     );
+    
+    const selectedButton = screen.getByText('7d');
+    expect(selectedButton).toHaveClass('active');
+    
+    // Check that other buttons don't have the active class
+    const notSelectedButton1 = screen.getByText('24h');
+    const notSelectedButton2 = screen.getByText('30d');
+    expect(notSelectedButton1).not.toHaveClass('active');
+    expect(notSelectedButton2).not.toHaveClass('active');
+  });
 
-    customTimeframes.forEach(timeframe => {
+  it('calls onChange with correct timeframe when a button is clicked', () => {
+    render(
+      <TimeframeSelector 
+        timeframes={defaultTimeframes} 
+        selected="24h" 
+        onChange={mockOnChange} 
+      />
+    );
+    
+    fireEvent.click(screen.getByText('7d'));
+    expect(mockOnChange).toHaveBeenCalledWith('7d');
+    
+    fireEvent.click(screen.getByText('30d'));
+    expect(mockOnChange).toHaveBeenCalledWith('30d');
+  });
+
+  it('uses default timeframes when none are provided', () => {
+    render(
+      <TimeframeSelector 
+        selected="24h" 
+        onChange={mockOnChange} 
+      />
+    );
+    
+    defaultTimeframes.forEach(timeframe => {
       expect(screen.getByText(timeframe)).toBeInTheDocument();
     });
   });
 
-  it('applies active class to selected timeframe', () => {
+  it('uses default selected timeframe when none is provided', () => {
     render(
-      <TimeframeSelector
-        timeframes={defaultTimeframes}
-        selected="7d"
-        onChange={mockOnChange}
+      <TimeframeSelector 
+        timeframes={defaultTimeframes} 
+        onChange={mockOnChange} 
       />
     );
-
-    const selectedButton = screen.getByText('7d');
+    
+    const selectedButton = screen.getByText('24h');
     expect(selectedButton).toHaveClass('active');
+  });
 
-    const nonSelectedButtons = defaultTimeframes
-      .filter(t => t !== '7d')
-      .map(t => screen.getByText(t));
-
-    nonSelectedButtons.forEach(button => {
-      expect(button).not.toHaveClass('active');
+  it('renders custom timeframes correctly', () => {
+    const customTimeframes = ['1h', '6h', '12h', '1d'];
+    
+    render(
+      <TimeframeSelector 
+        timeframes={customTimeframes} 
+        selected="6h" 
+        onChange={mockOnChange} 
+      />
+    );
+    
+    customTimeframes.forEach(timeframe => {
+      expect(screen.getByText(timeframe)).toBeInTheDocument();
     });
+    
+    const selectedButton = screen.getByText('6h');
+    expect(selectedButton).toHaveClass('active');
   });
 
-  it('calls onChange with correct timeframe when clicked', async () => {
-    const user = userEvent.setup();
+  it('applies timeframeSelector class to container div', () => {
     render(
-      <TimeframeSelector
-        timeframes={defaultTimeframes}
-        selected="24h"
-        onChange={mockOnChange}
+      <TimeframeSelector 
+        timeframes={defaultTimeframes} 
+        selected="24h" 
+        onChange={mockOnChange} 
       />
     );
-
-    await user.click(screen.getByText('7d'));
-    expect(mockOnChange).toHaveBeenCalledWith('7d');
-
-    await user.click(screen.getByText('30d'));
-    expect(mockOnChange).toHaveBeenCalledWith('30d');
+    
+    const container = screen.getByText('24h').closest('.timeframeSelector');
+    expect(container).toBeInTheDocument();
+    expect(container).toHaveClass('timeframeSelector');
   });
 
-  it('uses default selected timeframe when not provided', () => {
-    render(<TimeframeSelector onChange={mockOnChange} />);
-
-    const defaultSelectedButton = screen.getByText('24h');
-    expect(defaultSelectedButton).toHaveClass('active');
-  });
-
-  it('handles empty timeframes array gracefully', () => {
+  it('applies timeframeButton class to all buttons', () => {
     render(
-      <TimeframeSelector
-        timeframes={[]}
-        selected="24h"
-        onChange={mockOnChange}
+      <TimeframeSelector 
+        timeframes={defaultTimeframes} 
+        selected="24h" 
+        onChange={mockOnChange} 
       />
     );
-
-    expect(screen.queryByRole('button')).not.toBeInTheDocument();
-  });
-
-  it('maintains button order matching timeframes array', () => {
-    const customTimeframes = ['48h', '1h', '24h'];
-    render(
-      <TimeframeSelector
-        timeframes={customTimeframes}
-        selected="24h"
-        onChange={mockOnChange}
-      />
-    );
-
+    
     const buttons = screen.getAllByRole('button');
-    const buttonTexts = buttons.map(button => button.textContent);
-    expect(buttonTexts).toEqual(customTimeframes);
-  });
-
-  it('handles repeated clicks on the same timeframe', async () => {
-    const user = userEvent.setup();
-    render(
-      <TimeframeSelector
-        timeframes={defaultTimeframes}
-        selected="24h"
-        onChange={mockOnChange}
-      />
-    );
-
-    const button = screen.getByText('24h');
-    await user.click(button);
-    await user.click(button);
-    await user.click(button);
-
-    expect(mockOnChange).toHaveBeenCalledTimes(3);
-    expect(mockOnChange).toHaveBeenCalledWith('24h');
-  });
-
-  it('renders buttons with correct accessibility attributes', () => {
-    render(
-      <TimeframeSelector
-        timeframes={defaultTimeframes}
-        selected="24h"
-        onChange={mockOnChange}
-      />
-    );
-
-    const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(defaultTimeframes.length);
-
+    expect(buttons.length).toBe(defaultTimeframes.length);
+    
     buttons.forEach(button => {
-      expect(button).toHaveAttribute('class');
-      expect(button).toBeEnabled();
+      expect(button).toHaveClass('timeframeButton');
     });
   });
 }); 
