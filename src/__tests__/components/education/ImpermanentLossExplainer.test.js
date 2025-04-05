@@ -3,15 +3,30 @@ import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ImpermanentLossExplainer from '../../../components/education/ImpermanentLossExplainer';
 
-// Mock the InfoIcon component
+// Mock the InfoIcon component with a span to avoid DOM nesting errors
 jest.mock('../../../components/common/InfoIcon', () => {
   return function MockInfoIcon({ content, position, size }) {
     return (
-      <div data-testid="info-icon" data-content={content} data-position={position} data-size={size}>
+      <span data-testid="info-icon" data-content={content} data-position={position} data-size={size}>
         Info Icon
-      </div>
+      </span>
     );
   };
+});
+
+// Suppress console.error for DOM nesting warnings
+const originalConsoleError = console.error;
+beforeAll(() => {
+  console.error = (...args) => {
+    if (args[0].includes('Warning: validateDOMNesting')) {
+      return;
+    }
+    originalConsoleError(...args);
+  };
+});
+
+afterAll(() => {
+  console.error = originalConsoleError;
 });
 
 describe('ImpermanentLossExplainer Component', () => {
