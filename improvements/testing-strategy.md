@@ -8,7 +8,6 @@
 - [x] Configure Jest for Next.js environment
 - [x] Set up test scripts in package.json
 - [x] Configure test coverage reporting
-- [ ] Set up GitHub Actions for automated testing
 
 ## 2. Testing Principles and Guidelines
 
