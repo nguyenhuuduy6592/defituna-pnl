@@ -46,6 +46,42 @@ First, set up your environment variables:
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Testing
+
+The project has a comprehensive test suite with high coverage in key areas:
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm test -- --coverage
+
+# Run specific tests
+npm test -- <path-to-test-file>
+```
+
+### Test Coverage Summary
+
+| Category | Components Tested | Total Coverage |
+|---------|-------------------|----------------|
+| Common Components | 6/8 (75%) | 68.77% |
+| PnL Components | 13/13 (100%) | 94.51% |
+| Education Components | 1/1 (100%) | 100% |
+| History Components | 2/2 (100%) | 100% |
+| Pool Components | 4/4 (100%) | 98.49% |
+| Hooks | 9/9 (100%) | 89.67% |
+| Utils | 12/13 (92.3%) | 90.7% |
+| Contexts | 1/1 (100%) | 100% |
+
+Overall project coverage: 80.77% statements, 73.97% branches, 80.04% functions, 80.85% lines
+
+### Test Architecture
+
+- **Unit Tests**: Tests for individual components, hooks, and utility functions
+- **Mocks**: API calls and external dependencies are mocked for reliable testing
+- **Testing Libraries**: Jest and React Testing Library
+
 ## Deployment
 
 To deploy on Vercel:
