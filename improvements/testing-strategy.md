@@ -82,7 +82,7 @@ Current Progress: 90.59% overall, with individual files:
 
 ### 3.3 Components (Low Priority) 🟨
 - Target: 90% coverage
-- Current Progress: 6.5% coverage
+- Current Progress:
   - Common Components:
     - ✅ LoadingOverlay (100% coverage)
       - Rendering with children
@@ -118,7 +118,46 @@ Current Progress: 90.59% overall, with individual files:
       - Interactivity modes
       - Content rendering
     - ✅ DisclaimerModal (100% coverage)
-  - PnL Components: Not started (0% coverage)
+  - PnL Components:
+    - ✅ TotalPnLDisplay (100% coverage)
+      - Tests cover label rendering
+      - Positive, negative, and zero value formatting
+      - Non-numeric input handling
+      - ARIA attributes
+      - Memoization of formatting calculations
+    - ✅ PnLDisplay (100% coverage)
+      - Tests cover rendering with LoadingOverlay
+      - Verification of TotalPnLDisplay components with correct data
+      - Rendering of PositionsList with correct props
+      - DonationFooter visibility based on positions
+      - Default data handling when no data is provided
+      - Invalid data handling with defaults
+      - Calculation of total yield and compounded with missing values
+    - ✅ DonationFooter (100% coverage)
+      - Tests cover conditional rendering based on visibility and donation wallet
+      - Wallet address formatting and display
+      - Copy to clipboard functionality
+      - Accessibility attributes
+      - CSS classes
+      - Default prop behavior
+    - ✅ AutoRefresh (100% coverage)
+      - Tests cover rendering with auto-refresh enabled/disabled
+      - Checkbox toggle functionality
+      - Interval selector with environment-specific options
+      - Refresh status display for loading/countdown states
+      - History toggle integration
+      - Accessibility attributes
+      - Subcomponent rendering and behavior
+    - ✅ ActiveWalletsDisplay (94% coverage)
+      - Tests cover rendering with and without wallets
+      - Wallet count display
+      - Wallet chip rendering
+      - Remove functionality
+      - Copy to clipboard functionality
+      - Keyboard events
+      - Accessibility attributes
+      - CSS classes
+    - ❌ Other PnL components (0% coverage)
   - Pool Components: Not started (0% coverage)
   - Education Components: Not started (0% coverage)
   - History Components: Not started (0% coverage)
@@ -159,6 +198,12 @@ Current Progress: 90.59% overall, with individual files:
   - [x] InfoIcon (100% coverage)
   - [x] EnhancedTooltip (75% coverage)
   - [x] DisclaimerModal (100% coverage)
+  - [x] TotalPnLDisplay (100% coverage)
+  - [x] PnLDisplay (100% coverage)
+  - [x] DonationFooter (100% coverage)
+  - [x] AutoRefresh (100% coverage)
+  - [x] ActiveWalletsDisplay (94% coverage)
+  - [ ] Continue with remaining PnL components
 - [ ] Set up snapshot testing
 - [ ] Begin context testing
 
@@ -171,10 +216,10 @@ Current Progress: 90.59% overall, with individual files:
 ## 5. Current Coverage Metrics vs Targets
 
 ### Overall Project Coverage
-- Statements: 34.5% (Target: >85%) ❌
-- Branches: 37.5% (Target: >80%) ❌
-- Functions: 21.5% (Target: >90%) ❌
-- Lines: 34.0% (Target: >85%) ❌
+- Statements: 36.2% (Target: >85%) ❌
+- Branches: 38.5% (Target: >80%) ❌
+- Functions: 23.2% (Target: >90%) ❌
+- Lines: 35.7% (Target: >85%) ❌
 
 ### Directory Coverage Breakdown
 - Utils: 90.59% coverage ✅
@@ -191,10 +236,12 @@ Current Progress: 90.59% overall, with individual files:
   - Lines: 82.25%
   - Critical hooks now tested and compatible with React 19
 
-- Components: 8.0% coverage 🟨
-  - 5/8 common components have substantial coverage (≥75%)
-  - 4/8 common components at 90-100% coverage
+- Components: 15.0% coverage 🟨
+  - 6/8 common components have substantial coverage (≥75%)
+  - 4/8 common components at 90-100% coverage 
   - Portal and TooltipPortal components have tests but are failing
+  - PnL Components: 5/13 (38.5%) at high coverage
+  - PnL Coverage: 16.46% statements, 10.08% branches, 10.61% functions, 15.81% lines
   - Other components at 0% coverage
 
 - Contexts: 0% coverage ❌
@@ -223,8 +270,13 @@ Current Progress: 90.59% overall, with individual files:
    - 🟨 TooltipPortal (12% coverage - test attempts made)
    - ✅ EnhancedTooltip (75% coverage)
    - ✅ DisclaimerModal (100% coverage)
+   - ✅ TotalPnLDisplay (100% coverage)
+   - ✅ PnLDisplay (100% coverage)
+   - ✅ DonationFooter (100% coverage)
+   - ✅ AutoRefresh (100% coverage)
+   - ✅ ActiveWalletsDisplay (94% coverage)
    - Next components to test:
-     - Begin with PnL components starting with simpler ones like TotalPnLDisplay
+     - Continue with PnL components, focusing on simpler ones like WalletForm
    - Add snapshot testing for UI components
 
 3. Implement Context Tests:
@@ -265,19 +317,20 @@ Current Progress: 90.59% overall, with individual files:
   - 5/9 hooks at 100% or near-100% coverage
   - 2/9 hooks (useHistoricalData, usePoolsData) updated for React 19 compatibility
   - Need to improve branch coverage (currently at 73.41%)
-- [🟨] Component testing progress (40.5% coverage of common components)
-  - 6/8 common components have comprehensive tests
-  - 4/6 tested components achieve ≥90% coverage
+- [🟨] Component testing progress
+  - Common Components: 6/8 components have comprehensive tests (75%)
+  - PnL Components: 5/13 components tested (38.5%)
   - Portal and TooltipPortal components still have testing challenges
 
 ## 9. Progress Summary (Updated)
 
 | Category | Components Tested | Total Coverage |
 |---------|-------------------|----------------|
-| Common Components | 6/8 (75%) | 40.5% |
+| Common Components | 6/8 (75%) | 68.8% |
+| PnL Components | 5/13 (38.5%) | 16.46% |
 | Hooks | 9/9 (100%) | 82.79% |
 | Utils | 12/13 (92.3%) | 90.59% |
-| Total Project | 27/61 (44.3%) | 34.5% |
+| Total Project | 32/74 (43.2%) | 36.2% |
 
 ### Components
 
@@ -291,6 +344,11 @@ Current Progress: 90.59% overall, with individual files:
 | TooltipPortal | 🟨 Tests failing | 12% |
 | EnhancedTooltip | ✅ Tested | 75% |
 | DisclaimerModal | ✅ Tested | 100% |
+| TotalPnLDisplay | ✅ Tested | 100% |
+| PnLDisplay | ✅ Tested | 100% |
+| DonationFooter | ✅ Tested | 100% |
+| AutoRefresh | ✅ Tested | 100% |
+| ActiveWalletsDisplay | ✅ Tested | 94% |
 
 ## 10. Next Actions
 
@@ -303,13 +361,19 @@ Current Progress: 90.59% overall, with individual files:
 6. 🟨 Test TooltipPortal component (tests failing due to DOM element issues)
 7. ✅ Test DisclaimerModal component
 8. ✅ Test EnhancedTooltip component
-9. Begin testing PnL components, starting with simpler ones like TotalPnLDisplay
+9. ✅ Test TotalPnLDisplay component
+10. ✅ Test PnLDisplay component
+11. ✅ Test DonationFooter component
+12. ✅ Test AutoRefresh component
+13. ✅ Test ActiveWalletsDisplay component
+14. Test WalletForm component
 
 ### Medium Priority
 1. ✅ Test hooks (useAutoRefresh, useCountdown, useDebounceApi)
 2. ✅ Test formatters.js utility functions
 3. ✅ Test validation.js utility functions
 4. Test smaller UI components in the PnL section
+5. ✅ Test DonationFooter component
 
 ### Lower Priority (Complex Components)
 1. Test complex UI components (PnLCard, PositionsTable)
@@ -333,7 +397,7 @@ Current Progress: 90.59% overall, with individual files:
   4. Use a custom wrapper around Testing Library's render function that includes a proper DOM container
 
 ### Coverage Thresholds
-- Current global coverage is 34.5%, below the required thresholds
-- While utils (90.59%) and hooks (82.79%) have good coverage, components are still at 40.5% (for common components)
+- Current global coverage is 36.2%, below the required thresholds
+- While utils (90.59%) and hooks (82.79%) have good coverage, components are still at low coverage (15.0% overall)
 - Will need to focus on high-impact files to increase coverage efficiently
 - May need to adjust coverage thresholds for certain complex components 
