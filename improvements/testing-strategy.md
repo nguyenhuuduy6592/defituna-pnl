@@ -185,36 +185,36 @@ Current Progress: 90.59% overall, with individual files:
 ## 5. Current Coverage Metrics vs Targets
 
 ### Overall Project Coverage
-- Statements: 36.2% (Target: >85%) ❌
-- Branches: 38.5% (Target: >80%) ❌
-- Functions: 23.2% (Target: >90%) ❌
-- Lines: 35.7% (Target: >85%) ❌
+- Statements: 73.68% (Target: >85%) ❌
+- Branches: 67.85% (Target: >80%) ❌
+- Functions: 71.71% (Target: >90%) ❌
+- Lines: 73.71% (Target: >85%) ❌
 
 ### Directory Coverage Breakdown
-- Utils: 90.59% coverage ✅
-  - Statements: 90.59%
+- Utils: 90.7% coverage ✅
+  - Statements: 90.7%
   - Branches: 92.13%
   - Functions: 90.47%
-  - Lines: 90.77%
+  - Lines: 90.88%
   - All test files are now passing
 
-- Hooks: 82.79% coverage ✅
-  - Statements: 82.79%
-  - Branches: 73.41%
-  - Functions: 88.76%
-  - Lines: 82.25%
+- Hooks: 89.67% coverage ✅
+  - Statements: 89.67%
+  - Branches: 75.31%
+  - Functions: 95.5%
+  - Lines: 89.61%
   - Critical hooks now tested and compatible with React 19
 
-- Components: 15.0% coverage 🟨
+- Components: 68.77% coverage for common components 🟨
   - 6/8 common components have substantial coverage (≥75%)
   - 4/8 common components at 90-100% coverage 
   - Portal and TooltipPortal components have tests but are failing
-  - PnL Components: 9/13 (69.2%) at high coverage
-  - PnL Coverage: 16.46% statements, 10.08% branches, 10.61% functions, 15.81% lines
+  - PnL Components: 94.51% coverage
+  - PnL Coverage: 94.51% statements, 78.29% branches, 89.38% functions, 94.85% lines
   - Other components at 0% coverage
 
-- Contexts: 25% coverage 🟨
-  - 1/4 contexts have comprehensive tests (25%)
+- Contexts: 100% coverage ✅
+  - 1/1 contexts have comprehensive tests (100%)
   - ComparisonContext at 100% coverage
 
 - Pages: 0% coverage ❌
@@ -270,20 +270,16 @@ Current Progress: 90.59% overall, with individual files:
 
 ## 7. Known Issues
 
-- Several mock implementations might be needed for useHistoricalData.js
-- Component testing requires proper DOM mocking setup
-- usePoolsData.js tests may need refactoring to handle async behavior better
-- Overall coverage significantly below targets
+- Several tests fail in Portal and TooltipPortal components due to "Target container is not a DOM element" errors
+  - This is likely related to React 19 and testing-library compatibility
+  - Need to update the test setup for these portal-based components
+- Overall coverage significantly below targets (73.68% vs 85% target)
 - Integration and E2E tests pending
 - Need to add snapshot testing for components
-- React act() warnings appear in tests for usePoolsData.js due to internal state updates
+- React act() warnings appear in tests for usePoolsData.js and useDebounceApi.js due to internal state updates
 - debounce.js has lower coverage (61.19%) due to complex async behavior that's difficult to test
 - tokens.js has lower coverage (73.01%) primarily in error handling paths
-- Portal component tests are challenging due to their interaction with the DOM
-  - Tests are failing with "Target container is not a DOM element" errors
-  - May require a more specific DOM environment setup for testing
-  - Consider using jsdom-global or a more specific Portal testing approach
-  - TooltipPortal component faces similar challenges
+- styles.js has minimal coverage (14.28%)
 
 ### Testing Adaptations Required
 Several components required testing adaptations to avoid modifying source code:
@@ -317,26 +313,26 @@ Several components required testing adaptations to avoid modifying source code:
 
 | Category | Components Tested | Total Coverage |
 |---------|-------------------|----------------|
-| Common Components | 6/8 (75%) | 68.8% |
-| PnL Components | 9/13 (69.2%) | 16.46% |
-| Hooks | 9/9 (100%) | 82.79% |
-| Utils | 12/13 (92.3%) | 90.59% |
-| Contexts | 1/4 (25%) | 25% |
-| Total Project | 38/78 (48.7%) | 37.1% |
+| Common Components | 6/8 (75%) | 68.77% |
+| PnL Components | 13/13 (100%) | 94.51% |
+| Hooks | 9/9 (100%) | 89.67% |
+| Utils | 12/13 (92.3%) | 90.7% |
+| Contexts | 1/1 (100%) | 100% |
+| Total Project | 41/78 (52.6%) | 73.68% |
 
 ## Component Status
 
 | Component                | Status      | Coverage                                | Notes                                               |
 |--------------------------|-------------|----------------------------------------|-----------------------------------------------------|
-| WalletForm               | ✅ Complete  | 100% statement, 93.75% branch, 100% function | Some branches for null checks hard to test  |
-| SavedWalletsDropdown     | ✅ Complete  | 100% statement, 100% branch, 100% function | Test covers all functionality including keyboard navigation |
+| WalletForm               | ✅ Complete  | 100% statement, 100% branch, 100% function | All test cases covered |
+| SavedWalletsDropdown     | ✅ Complete  | 96% statement, 100% branch, 100% function | Test covers all functionality including keyboard navigation |
 | PriceBar                 | ✅ Complete  | 100% statement, 100% branch, 100% function | Complete with tooltip testing and value formatting |
 | ClusterBar               | ✅ Complete  | 100% statement, 60% branch, 100% function | Branch coverage affected by optional chaining operators |
 | PositionsList            | ✅ Complete  | 100% statement, 91.66% branch, 100% function | Comprehensive tests including modal interactions |
 | PositionsTable           | ✅ Complete  | 86.53% statement, 61.03% branch, 71.42% function | Good coverage for complex table with sorting and filtering |
 | PositionChart            | ✅ Complete  | 79.68% statement, 58.33% branch, 62.5% function | Complex interactions with Recharts library |
 | PnLCard                  | ✅ Complete  | 100% statement, 97.61% branch, 100% function | Full coverage with edge case testing and modal behavior |
-| ActiveWalletsDisplay     | ✅ Complete  | 94% coverage | Tests for wallet status display |
+| ActiveWalletsDisplay     | ✅ Complete  | 93.75% statement, 80% branch, 100% function | Tests for wallet status display |
 | DonationFooter           | ✅ Complete  | 100% coverage | Basic rendering and link functionality |
 | PnLDisplay               | ✅ Complete  | 100% coverage | Value formatting and display options |
 | TotalPnLDisplay          | ✅ Complete  | 100% coverage | Aggregated data display |
@@ -351,27 +347,22 @@ Several components required testing adaptations to avoid modifying source code:
 
 ## 10. Next Steps
 
-1. Continue Context Tests:
-   - ✅ ComparisonContext (100% coverage)
-   - Start with PositionContext next
-   - Then implement tests for ThemeContext and WalletContext
+1. Address Portal component testing challenges:
+   - Implement jsdom-global or similar solution
+   - Create a specialized testing approach for portal components
+   - Focus on rendered content rather than implementation details
 
 2. Set up GitHub Actions for automated testing:
    - Create workflow file that runs tests on pull requests
    - Add test coverage reporting
    - Configure notifications for test failures
 
-3. Address Portal component testing challenges:
-   - Implement jsdom-global or similar solution
-   - Create a specialized testing approach for portal components
-   - Focus on rendered content rather than implementation details
-
-4. Begin Page Testing:
+3. Begin Page Testing:
    - Define approach for testing pages with complex integration needs
    - Start with simpler page tests
    - Create test utilities for common page patterns
 
-1. ✅ Complete Context Tests:
-   - ✅ ComparisonContext (100% coverage)
-   - ✓ Context testing is now complete (ComparisonContext is the only context in the codebase)
+4. Education and Pool Components:
+   - Define a strategy for testing the remaining component categories
+   - Start with simpler components first
 
