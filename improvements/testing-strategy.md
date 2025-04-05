@@ -135,39 +135,99 @@ Current Progress: 95%+ overall, with individual files:
 ## 4. Current Coverage Metrics vs Targets
 
 ### Overall Project Coverage
-- Statements: 85%+ (Target: >85%) ✅
-- Branches: 80%+ (Target: >80%) ✅
-- Functions: 90%+ (Target: >90%) ✅
-- Lines: 85%+ (Target: >85%) ✅
+- Statements: 32.79% (Target: >85%) ❌
+- Branches: 36.32% (Target: >80%) ❌
+- Functions: 27.19% (Target: >90%) ❌
+- Lines: 32.07% (Target: >85%) ❌
 
-### Component Coverage Progress
-- Common Components: ~25% (2/8 components)
-- PnL Components: 0%
-- Pool Components: 0%
-- History Components: 0%
-- Education Components: 0%
+### Directory Coverage Breakdown
+- Utils: 51.65% coverage
+  - ✅ positionUtils.js (100% coverage)
+  - ✅ formatters.js (98.63% coverage)
+  - ✅ formulas.js (92.79% coverage)
+  - ✅ pairUtils.js (95% coverage)
+  - ✅ sortUtils.js (100% coverage)
+  - ✅ validation.js (100% coverage)
+  - ✅ tokens.js (73.01% coverage)
+  - ✅ chart.js (84.66% coverage)
+  - ❌ debounce.js (0% coverage)
+  - ❌ defituna.js (0% coverage)
+  - ❌ export.js (0% coverage)
+  - ❌ notifications.js (0% coverage)
+  - ❌ tooltipContent.js (0% coverage)
+  - ❌ styles.js (0% coverage)
+
+- Hooks: 68.01% coverage
+  - ✅ useAutoRefresh.js (100% coverage)
+  - ✅ useCountdown.js (100% coverage)
+  - ✅ useInvertedPairs.js (100% coverage)
+  - ✅ usePoolData.js (100% coverage)
+  - ✅ useSortState.js (100% coverage)
+  - ✅ useWallet.js (98.43% coverage)
+  - ✅ usePoolsData.js (66.16% coverage)
+  - ❌ useDebounceApi.js (0% coverage)
+  - ❌ useHistoricalData.js (23.23% coverage)
+
+- Components: 4.21% coverage
+  - ✅ LoadingOverlay.js (100% coverage)
+  - ✅ TimeframeSelector.js (100% coverage)
+  - ❌ All other components (0% coverage)
+
+- Contexts: 0% coverage
+  - ❌ All context files (0% coverage)
+
+- Pages: 0% coverage
+  - ❌ All page files (0% coverage)
+
+### Failed Test Suites
+1. useDebounceApi.test.js
+2. defituna.test.js
+3. export.test.js
+4. notifications.test.js
+5. tooltipContent.test.js
+6. usePoolsData.test.js
+7. test-utils.js
+8. debounce.test.js
 
 ## 5. Next Steps (Prioritized)
 
-1. Component Testing:
-   - Continue with common components (Next: Tooltip & Portal components)
-   - Create test templates for more complex components
-   - Begin testing PnL components
+1. Fix Failed Test Suites:
+   - Fix module import paths in test files
+   - Implement missing test utilities
+   - Fix waitForNextUpdate issues in usePoolsData tests
 
-2. Infrastructure:
+2. Increase Component Coverage:
+   - Focus on common components first
+   - Implement tests for PnL components
+   - Add tests for Pool components
+
+3. Implement Context Tests:
+   - Start with ComparisonContext
+   - Add tests for other context providers
+
+4. Add Page Tests:
+   - Begin with critical pages
+   - Add integration tests
+
+5. Fix Low Coverage Areas:
+   - Implement tests for debounce.js
+   - Add tests for defituna.js
+   - Cover notifications.js functionality
+   - Add tests for tooltipContent.js
+
+6. Infrastructure:
    - Set up GitHub Actions for automated testing
    - Implement pre-commit hooks for test runs
 
-3. Documentation:
-   - Document component testing patterns
-   - Create templates for new component test files
-
 ## 6. Known Issues
 
+- Several test suites failing due to module import issues
+- waitForNextUpdate function not working in usePoolsData tests
 - Most component tests not yet implemented
 - CI/CD pipeline pending setup
 - Integration and E2E tests pending
 - Need to add snapshot testing for components
+- Overall coverage significantly below targets
 
 ## 7. Success Metrics Update
 
