@@ -279,4 +279,14 @@ export function mockHooks() {
       };
     })
   }));
-} 
+}
+
+// Add a simple test to prevent the "no tests" error
+describe('Test Setup', () => {
+  it('exports utility functions for testing', () => {
+    expect(typeof setupPageTests).toBe('function');
+    expect(typeof mockNextComponents).toBe('function');
+    expect(typeof renderWithAct).toBe('function');
+    expect(typeof createMockPools).toBe('function');
+  });
+}); 

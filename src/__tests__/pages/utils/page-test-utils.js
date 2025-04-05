@@ -200,4 +200,18 @@ export const mockPoolsData = [
       }
     }
   }
-]; 
+];
+
+// Add a simple test to prevent the "no tests" error
+describe('Page Test Utils', () => {
+  it('exports utility functions for testing', () => {
+    expect(typeof createLinkMock).toBe('function');
+    expect(typeof createHeadMock).toBe('function');
+    expect(typeof createRouterMock).toBe('function');
+    expect(typeof createLocalStorageMock).toBe('function');
+    expect(typeof createTimeframeSelectorMock).toBe('function');
+    expect(typeof createFetchMock).toBe('function');
+    expect(typeof setupPageTest).toBe('function');
+    expect(Array.isArray(mockPoolsData)).toBe(true);
+  });
+}); 
