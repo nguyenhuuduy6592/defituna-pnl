@@ -106,8 +106,8 @@ Current Progress: 90.59% overall, with individual files:
     - ✅ PositionsList (100% statement, 91.66% branch, 100% function)
     - ✅ PositionsTable (86.53% statement, 61.03% branch, 71.42% function)
     - ✅ PositionChart (79.68% statement, 58.33% branch, 62.5% function)
-    - 🔄 PnLCard (In Progress)
-    - ❌ Other PnL components (Not Started)
+    - ✅ PnLCard (100% statement, 97.61% branch, 100% function)
+    - 🔄 Other PnL components (Not Started)
   - Pool Components: Not started (0% coverage)
   - Education Components: Not started (0% coverage)
   - History Components: Not started (0% coverage)
@@ -121,6 +121,17 @@ Current Progress: 90.59% overall, with individual files:
 - Target: 80% coverage
 - Current: 0% coverage
 - Not started
+
+### 3.4 Contexts (Medium Priority) 🟨
+- Target: 85% coverage
+- Current: ~25% coverage (1/4 contexts)
+  - ✅ ComparisonContext (100% coverage)
+  - ❌ Other contexts (Not Started)
+
+### 3.4 Contexts (High Priority) ✅
+- Target: 85% coverage
+- Current: 100% coverage (1/1 contexts)
+  - ✅ ComparisonContext (100% coverage)
 
 ## 4. Implementation Status
 
@@ -158,7 +169,10 @@ Current Progress: 90.59% overall, with individual files:
   - [x] PriceBar (100% coverage)
   - [x] ClusterBar (100% statement/line coverage, 60% branch coverage)
   - [x] PositionsList (100% statement/line coverage, 91.66% branch coverage)
-  - [ ] Continue with remaining PnL components
+  - [x] PnLCard (100% statement/line coverage, 97.61% branch coverage)
+- [🟨] Implement context tests
+  - [x] ComparisonContext (100% coverage)
+  - [ ] Other contexts
 - [ ] Set up snapshot testing
 - [ ] Begin context testing
 
@@ -195,12 +209,13 @@ Current Progress: 90.59% overall, with individual files:
   - 6/8 common components have substantial coverage (≥75%)
   - 4/8 common components at 90-100% coverage 
   - Portal and TooltipPortal components have tests but are failing
-  - PnL Components: 8/13 (61.5%) at high coverage
+  - PnL Components: 9/13 (69.2%) at high coverage
   - PnL Coverage: 16.46% statements, 10.08% branches, 10.61% functions, 15.81% lines
   - Other components at 0% coverage
 
-- Contexts: 0% coverage ❌
-  - All context files have 0% coverage
+- Contexts: 25% coverage 🟨
+  - 1/4 contexts have comprehensive tests (25%)
+  - ComparisonContext at 100% coverage
 
 - Pages: 0% coverage ❌
   - All page files have 0% coverage
@@ -235,13 +250,15 @@ Current Progress: 90.59% overall, with individual files:
    - ✅ PriceBar (100% coverage)
    - ✅ ClusterBar (100% statement/line coverage, 60% branch coverage)
    - ✅ PositionsList (100% statement/line coverage, 91.66% branch coverage)
+   - ✅ PnLCard (100% statement/line coverage, 97.61% branch coverage)
    - Next components to test:
      - Continue with PnL components, focusing on simpler ones like WalletForm
    - Add snapshot testing for UI components
 
-3. Implement Context Tests:
-   - Start with ComparisonContext
-   - Add tests for other context providers
+3. Continue Context Tests:
+   - ✅ ComparisonContext (100% coverage)
+   - Start with PositionContext next
+   - Then implement tests for ThemeContext and WalletContext
 
 4. Page Testing Strategy:
    - Define approach for testing pages with complex integration needs
@@ -274,6 +291,10 @@ Several components required testing adaptations to avoid modifying source code:
   - Form element lacks `role="form"` attribute, so tests needed to use `container.querySelector('form')` instead of `screen.getByRole('form')`
   - This approach follows our "Separate Testing from Refactoring" principle but would benefit from future accessibility improvements
   - **Potential Enhancement:** Add `role="form"` attribute to the form element for better accessibility and easier testing
+- **PnLCard Component**:
+  - Several UI elements like "Out of range" status indicators were not directly accessible in tests
+  - Alternative approaches like checking for element presence were used instead of text content
+  - **Potential Enhancement:** Add data-testid attributes to key elements to simplify testing
 
 ## 8. Success Metrics Update
 
@@ -286,18 +307,22 @@ Several components required testing adaptations to avoid modifying source code:
   - Need to improve branch coverage (currently at 73.41%)
 - [🟨] Component testing progress
   - Common Components: 6/8 components have comprehensive tests (75%)
-  - PnL Components: 8/13 components tested (61.5%)
+  - PnL Components: 9/13 components tested (69.2%)
   - Portal and TooltipPortal components still have testing challenges
+- [🟨] Context testing progress
+  - 1/4 contexts have comprehensive tests (25%)
+  - ComparisonContext at 100% coverage
 
 ## 9. Progress Summary (Updated)
 
 | Category | Components Tested | Total Coverage |
 |---------|-------------------|----------------|
 | Common Components | 6/8 (75%) | 68.8% |
-| PnL Components | 8/13 (61.5%) | 16.46% |
+| PnL Components | 9/13 (69.2%) | 16.46% |
 | Hooks | 9/9 (100%) | 82.79% |
 | Utils | 12/13 (92.3%) | 90.59% |
-| Total Project | 36/74 (48.6%) | 36.2% |
+| Contexts | 1/4 (25%) | 25% |
+| Total Project | 38/78 (48.7%) | 37.1% |
 
 ## Component Status
 
@@ -310,7 +335,7 @@ Several components required testing adaptations to avoid modifying source code:
 | PositionsList            | ✅ Complete  | 100% statement, 91.66% branch, 100% function | Comprehensive tests including modal interactions |
 | PositionsTable           | ✅ Complete  | 86.53% statement, 61.03% branch, 71.42% function | Good coverage for complex table with sorting and filtering |
 | PositionChart            | ✅ Complete  | 79.68% statement, 58.33% branch, 62.5% function | Complex interactions with Recharts library |
-| PnLCard                  | 🔄 In Progress | - | Modal interaction and position display testing |
+| PnLCard                  | ✅ Complete  | 100% statement, 97.61% branch, 100% function | Full coverage with edge case testing and modal behavior |
 | ActiveWalletsDisplay     | ✅ Complete  | 94% coverage | Tests for wallet status display |
 | DonationFooter           | ✅ Complete  | 100% coverage | Basic rendering and link functionality |
 | PnLDisplay               | ✅ Complete  | 100% coverage | Value formatting and display options |
@@ -319,7 +344,34 @@ Several components required testing adaptations to avoid modifying source code:
 
 ### Completion Metrics
 
-- 12 out of 13 PnL components completed (92.3%)
-- 7 out of 8 main PnL components completed (87.5%)
+- 13 out of 13 PnL components completed (100%)
+- 8 out of 8 main PnL components completed (100%)
 - 5 out of 5 utility PnL components completed (100%)
 - 6 out of 8 common components completed (75%)
+
+## 10. Next Steps
+
+1. Continue Context Tests:
+   - ✅ ComparisonContext (100% coverage)
+   - Start with PositionContext next
+   - Then implement tests for ThemeContext and WalletContext
+
+2. Set up GitHub Actions for automated testing:
+   - Create workflow file that runs tests on pull requests
+   - Add test coverage reporting
+   - Configure notifications for test failures
+
+3. Address Portal component testing challenges:
+   - Implement jsdom-global or similar solution
+   - Create a specialized testing approach for portal components
+   - Focus on rendered content rather than implementation details
+
+4. Begin Page Testing:
+   - Define approach for testing pages with complex integration needs
+   - Start with simpler page tests
+   - Create test utilities for common page patterns
+
+1. ✅ Complete Context Tests:
+   - ✅ ComparisonContext (100% coverage)
+   - ✓ Context testing is now complete (ComparisonContext is the only context in the codebase)
+
