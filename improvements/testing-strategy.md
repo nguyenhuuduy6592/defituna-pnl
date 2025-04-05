@@ -77,10 +77,22 @@ Current Progress: 95%+ overall, with individual files:
   - ✅ usePoolData.js (95%+ coverage)
   - ✅ usePoolsData.js (95%+ coverage)
 
-### 2.3 Components (Medium-High Priority) ⬜
+### 2.3 Components (Medium-High Priority) 🟨
 - Target: 90% coverage
-- Current: 0% coverage
-- Pending implementation
+- Current Progress:
+  - Common Components:
+    - ✅ LoadingOverlay (100% coverage)
+    - ✅ TimeframeSelector (100% coverage)
+    - ⬜ Tooltip
+    - ⬜ TooltipPortal
+    - ⬜ Portal
+    - ⬜ InfoIcon
+    - ⬜ EnhancedTooltip
+    - ⬜ DisclaimerModal
+  - PnL Components: Not started
+  - Pool Components: Not started
+  - Education Components: Not started
+  - History Components: Not started
 
 ### 2.4 Contexts (Medium Priority) ⬜
 - Target: 85% coverage
@@ -103,7 +115,14 @@ Current Progress: 95%+ overall, with individual files:
 ### Phase 2: Core Functionality ✅
 - [x] Complete utils testing (95%+ coverage achieved)
 - [x] Implement hooks tests (95%+ coverage achieved)
-- [ ] Add component tests for critical UI elements
+- [x] Set up component testing infrastructure
+- [x] Create test templates for components
+- [🟨] Add component tests for critical UI elements (In Progress)
+  - [x] Common components started
+  - [ ] PnL components
+  - [ ] Pool components
+  - [ ] History components
+  - [ ] Education components
 - [ ] Set up snapshot testing
 - [ ] Begin context testing
 
@@ -121,32 +140,34 @@ Current Progress: 95%+ overall, with individual files:
 - Functions: 90%+ (Target: >90%) ✅
 - Lines: 85%+ (Target: >85%) ✅
 
-### Highlights
-- Successfully achieved 95%+ coverage across all utils
-- Near complete coverage for all implemented hooks
-- 500+ passing tests across utility and hook files
-- All critical functions well tested with edge cases covered
+### Component Coverage Progress
+- Common Components: ~25% (2/8 components)
+- PnL Components: 0%
+- Pool Components: 0%
+- History Components: 0%
+- Education Components: 0%
 
 ## 5. Next Steps (Prioritized)
 
 1. Component Testing:
-   - Set up component testing infrastructure
-   - Create test templates for components
-   - Begin with critical UI components
+   - Continue with common components (Next: Tooltip & Portal components)
+   - Create test templates for more complex components
+   - Begin testing PnL components
 
 2. Infrastructure:
    - Set up GitHub Actions for automated testing
    - Implement pre-commit hooks for test runs
 
 3. Documentation:
-   - Document testing patterns from successful utils and hooks
-   - Create templates for new test files
+   - Document component testing patterns
+   - Create templates for new component test files
 
 ## 6. Known Issues
 
-- Component tests not yet implemented
+- Most component tests not yet implemented
 - CI/CD pipeline pending setup
 - Integration and E2E tests pending
+- Need to add snapshot testing for components
 
 ## 7. Success Metrics Update
 
@@ -155,5 +176,6 @@ Current Progress: 95%+ overall, with individual files:
 - [x] All hooks fully tested
 - [x] Testing patterns established
 - [x] Coverage targets met for implemented tests
+- [x] Component testing infrastructure set up
 - [ ] CI/CD pipeline running
 - [ ] Documentation complete 
