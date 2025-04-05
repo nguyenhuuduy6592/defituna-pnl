@@ -108,6 +108,9 @@ const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => 
 
 TableHeader.displayName = 'TableHeader';
 
+// Export for testing
+export { TableHeader };
+
 /**
  * The pair cell with inversion support
  */
@@ -144,6 +147,9 @@ const PairCell = memo(({ pair, isInverted, leverage, onPairInversion }) => {
 
 PairCell.displayName = 'PairCell';
 
+// Export for testing
+export { PairCell };
+
 /**
  * The wallet address cell with copy functionality
  */
@@ -176,6 +182,9 @@ const WalletCell = memo(({ walletAddress }) => {
 });
 
 WalletCell.displayName = 'WalletCell';
+
+// Export for testing
+export { WalletCell };
 
 /**
  * Action buttons cell
@@ -214,6 +223,9 @@ const ActionsCell = memo(({ position, historyEnabled, onShare, onShowChart }) =>
 });
 
 ActionsCell.displayName = 'ActionsCell';
+
+// Export for testing
+export { ActionsCell };
 
 /**
  * A table component that displays position data with sorting and interactive features
