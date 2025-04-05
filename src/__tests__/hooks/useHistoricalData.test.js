@@ -2,140 +2,257 @@ import { renderHook, act } from '@testing-library/react';
 import { useHistoricalData } from '../../hooks/useHistoricalData';
 import { openDB } from 'idb';
 
-// --- Mock idb --- 
-// In-memory simulation of the IndexedDB structure needed by the hook
-let mockDbStore = {}; // Stores data: { [compositeKey]: record }
-let mockDbIndexes = { // Simulates index lookups
-  timestamp: {},
-  pair: {},
-  walletAddress: {},
-};
+// Mock the openDB function from idb
+jest.mock('idb', () => ({
+  openDB: jest.fn()
+}));
 
+// Create mock for IndexedDB functionality
 const mockCursor = {
-  continue: jest.fn(),
-  delete: jest.fn(),
   value: null,
-};
-
-const mockIndex = {
-  openCursor: jest.fn(() => Promise.resolve(mockCursor)),
-  getAll: jest.fn((range) => {
-    // Simulate filtering by timestamp range (rudimentary)
-    const results = Object.values(mockDbStore).filter(record => {
-       if (!range) return true;
-       const lowerBound = range.lower ? (range.lowerOpen ? record.timestamp > range.lower : record.timestamp >= range.lower) : true;
-       const upperBound = range.upper ? (range.upperOpen ? record.timestamp < range.upper : record.timestamp <= range.upper) : true;
-       return lowerBound && upperBound;
-    });
-    return Promise.resolve(results);
-  }),
+  key: null,
+  continue: jest.fn(),
+  delete: jest.fn().mockResolvedValue(undefined)
 };
 
 const mockStore = {
-  add: jest.fn((record) => {
-    const key = `${record.id}-${record.timestamp}`; 
-    mockDbStore[key] = record;
-    // Update mock indexes (simplified)
-    mockDbIndexes.timestamp[record.timestamp] = record;
-    mockDbIndexes.pair[record.pair] = record; 
-    mockDbIndexes.walletAddress[record.walletAddress] = record;
-    return Promise.resolve();
-  }),
-  index: jest.fn((indexName) => {
-     if (indexName === 'timestamp') return mockIndex;
-     // Add other indexes if needed by tests
-     throw new Error(`Mock index '${indexName}' not implemented`);
-  }),
-  // Add other store methods like get, delete if needed
+  add: jest.fn().mockResolvedValue(1),
+  getAll: jest.fn().mockResolvedValue([]),
+  openCursor: jest.fn().mockResolvedValue(mockCursor),
+  index: jest.fn().mockReturnValue({
+    getAll: jest.fn().mockResolvedValue([]),
+    openCursor: jest.fn().mockResolvedValue(mockCursor)
+  })
 };
 
-const mockTransaction = {
-  objectStore: jest.fn(() => mockStore),
-  done: Promise.resolve(), // Simulate transaction completion
+const mockTx = {
+  done: Promise.resolve(),
+  objectStore: jest.fn().mockReturnValue(mockStore),
+  complete: Promise.resolve()
 };
 
-const mockDb = {
-  transaction: jest.fn(() => mockTransaction),
+const mockDB = {
+  transaction: jest.fn().mockReturnValue(mockTx),
   close: jest.fn(),
-  // Add other db properties/methods if needed
+  objectStoreNames: {
+    contains: jest.fn().mockReturnValue(true)
+  },
+  createObjectStore: jest.fn().mockReturnValue({
+    createIndex: jest.fn()
+  })
 };
-
-jest.mock('idb', () => ({
-  openDB: jest.fn(),
-})); // Mock the entire module
-// -- End Mock idb --
 
 // Mock localStorage
-let localStorageMock = {};
+const localStorageMock = (() => {
+  let store = {};
+  return {
+    getItem: jest.fn(key => store[key]),
+    setItem: jest.fn((key, value) => {
+      store[key] = value;
+    }),
+    clear: jest.fn(() => {
+      store = {};
+    })
+  };
+})();
 
-beforeAll(() => {
-  global.Storage.prototype.setItem = jest.fn((key, value) => {
-    localStorageMock[key] = value;
-  });
-  global.Storage.prototype.getItem = jest.fn((key) => localStorageMock[key] || null);
+// Replace localStorage with our mock
+Object.defineProperty(window, 'localStorage', {
+  value: localStorageMock,
+  writable: true
 });
 
+// Mock global IDBKeyRange
+global.IDBKeyRange = {
+  lowerBound: jest.fn().mockReturnValue({}),
+  upperBound: jest.fn().mockReturnValue({})
+};
+
+// Setup
 beforeEach(() => {
-  // Reset mocks before each test
   jest.clearAllMocks();
-  localStorageMock = {};
-  mockDbStore = {};
-  mockDbIndexes = { timestamp: {}, pair: {}, walletAddress: {} };
+  localStorageMock.clear();
+  jest.useFakeTimers();
   
-  // Default mock implementation for openDB (success)
-  openDB.mockResolvedValue(mockDb);
-  
-  // Reset mock function states within the DB mock if needed
-  mockDb.transaction.mockClear();
-  mockTransaction.objectStore.mockClear();
-  mockStore.add.mockClear();
-  mockStore.index.mockClear();
-  mockIndex.getAll.mockClear();
-  mockIndex.openCursor.mockClear();
+  // Reset mock values and functions
+  openDB.mockResolvedValue(mockDB);
+  mockCursor.value = null;
   mockCursor.continue.mockClear();
   mockCursor.delete.mockClear();
-
+  
+  // Spy on console.error to prevent cluttering test output
   jest.spyOn(console, 'error').mockImplementation(() => {});
-  jest.useFakeTimers();
-});
-
-afterEach(() => {
-  console.error.mockRestore();
-  jest.useRealTimers();
 });
 
 describe('useHistoricalData Hook', () => {
+  test('should initialize as disabled by default', () => {
+    const { result } = renderHook(() => useHistoricalData());
+    
+    expect(result.current.enabled).toBe(false);
+    expect(result.current.error).toBeNull();
+    expect(openDB).not.toHaveBeenCalled();
+  });
   
-  describe('Initialization', () => {
-    it('should initialize as disabled by default', () => {
-      const { result } = renderHook(() => useHistoricalData());
-      expect(result.current.enabled).toBe(false);
-      expect(result.current.error).toBeNull();
-      expect(localStorage.getItem).toHaveBeenCalledWith('historicalDataEnabled');
-      expect(openDB).not.toHaveBeenCalled(); // DB not opened if disabled by default
+  test('should initialize as enabled if localStorage has it enabled', async () => {
+    // Set up localStorage to indicate history is enabled
+    localStorageMock.setItem('historicalDataEnabled', 'true');
+    
+    const { result } = renderHook(() => useHistoricalData());
+    
+    // Wait for async effects to complete
+    await act(async () => {
+      await Promise.resolve();
     });
     
-    // Add tests for loading from localStorage, DB init success/fail
+    expect(result.current.enabled).toBe(true);
+    expect(openDB).toHaveBeenCalled();
   });
-
-  describe('Enabling / Disabling', () => {
-    // Add tests for toggleHistoryEnabled
+  
+  test('should handle initialization errors', async () => {
+    // Force the openDB function to fail
+    openDB.mockRejectedValueOnce(new Error('DB initialization error'));
+    localStorageMock.setItem('historicalDataEnabled', 'true');
+    
+    const { result } = renderHook(() => useHistoricalData());
+    
+    // Wait for async effects to complete
+    await act(async () => {
+      await Promise.resolve();
+    });
+    
+    expect(result.current.error).toBeTruthy();
+    expect(console.error).toHaveBeenCalled();
   });
-
-  describe('Saving Data (savePositionSnapshot)', () => {
-    // Add tests for saving positions
+  
+  test('should toggle history enabled state', async () => {
+    const { result } = renderHook(() => useHistoricalData());
+    
+    // Initially disabled
+    expect(result.current.enabled).toBe(false);
+    
+    // Toggle to enabled
+    await act(async () => {
+      await result.current.toggleHistoryEnabled(true);
+    });
+    
+    expect(result.current.enabled).toBe(true);
+    expect(openDB).toHaveBeenCalled();
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('historicalDataEnabled', 'true');
+    
+    // Toggle to disabled
+    await act(async () => {
+      await result.current.toggleHistoryEnabled(false);
+    });
+    
+    expect(result.current.enabled).toBe(false);
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('historicalDataEnabled', 'false');
   });
-
-  describe('Retrieving Data (getPositionHistory)', () => {
-    // Add tests for getting history
+  
+  test('should save position snapshots when enabled', async () => {
+    const { result } = renderHook(() => useHistoricalData());
+    
+    // Enable history
+    await act(async () => {
+      await result.current.toggleHistoryEnabled(true);
+    });
+    
+    const testPositions = [
+      { 
+        id: 'pos1', 
+        positionAddress: '0xabc123',
+        pair: 'ETH-USDC',
+        pnl: 100
+      },
+      { 
+        id: 'pos2', 
+        positionAddress: '0xdef456',
+        pair: 'BTC-USDC',
+        pnl: 200
+      }
+    ];
+    
+    // Save positions
+    await act(async () => {
+      await result.current.savePositionSnapshot(testPositions);
+    });
+    
+    // Check that transaction and store methods were called correctly
+    expect(mockDB.transaction).toHaveBeenCalled();
+    expect(mockStore.add).toHaveBeenCalledTimes(2);
   });
-
-  describe('Cleanup Logic', () => {
-    // Add tests for cleanupOldData and periodic cleanup
+  
+  test('should retrieve position history', async () => {
+    // Set up mock data for retrieval
+    const mockHistoryData = [
+      { id: 'pos1', timestamp: Date.now() - 1000, pnl: 100 },
+      { id: 'pos1', timestamp: Date.now() - 2000, pnl: 90 },
+      { id: 'pos2', timestamp: Date.now() - 1500, pnl: 50 }
+    ];
+    
+    mockStore.index().getAll.mockResolvedValueOnce(mockHistoryData);
+    
+    const { result } = renderHook(() => useHistoricalData());
+    
+    // Enable history
+    await act(async () => {
+      await result.current.toggleHistoryEnabled(true);
+    });
+    
+    // Get history for pos1
+    let history;
+    await act(async () => {
+      history = await result.current.getPositionHistory('pos1');
+    });
+    
+    // Should filter and return only pos1 history
+    expect(history.length).toBe(2);
+    expect(history.every(item => item.id === 'pos1')).toBe(true);
   });
-
-  describe('Error Handling', () => {
-    // Add tests for various error scenarios
+  
+  test('should clean up old data', async () => {
+    // Set up a mock cursor that returns one old record
+    mockCursor.value = { timestamp: Date.now() - (40 * 24 * 60 * 60 * 1000) }; // 40 days old
+    
+    // Set up cursor to return null after first iteration
+    mockCursor.continue.mockImplementationOnce(() => {
+      mockCursor.value = null;
+      return Promise.resolve(null);
+    });
+    
+    const { result } = renderHook(() => useHistoricalData());
+    
+    // Enable history to trigger initial cleanup
+    await act(async () => {
+      await result.current.toggleHistoryEnabled(true);
+    });
+    
+    // Fast-forward timer to trigger scheduled cleanup
+    act(() => {
+      jest.advanceTimersByTime(24 * 60 * 60 * 1000); // 24 hours
+    });
+    
+    // Wait for any pending promises
+    await act(async () => {
+      await Promise.resolve();
+    });
+    
+    // Should have deleted the old record
+    expect(mockCursor.delete).toHaveBeenCalled();
   });
-
+  
+  test('should handle cleanup errors', async () => {
+    // Make the cursor throw an error
+    mockStore.index().openCursor.mockRejectedValueOnce(new Error('Cursor error'));
+    
+    const { result } = renderHook(() => useHistoricalData());
+    
+    // Enable history to trigger cleanup attempt
+    await act(async () => {
+      await result.current.toggleHistoryEnabled(true);
+    });
+    
+    // Should log the error but not crash
+    expect(console.error).toHaveBeenCalled();
+    expect(result.current.error).toBeTruthy();
+  });
 }); 
