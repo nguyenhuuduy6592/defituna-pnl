@@ -76,7 +76,7 @@ describe('Notification Utilities', () => {
 
     beforeEach(() => {
       jest.resetModules(); // Reset module to ensure fresh state if needed
-      notifications = require('../notifications');
+      notifications = require('../../utils/notifications');
     });
 
     it('should create and append notification element with correct styles', () => {
@@ -143,7 +143,7 @@ describe('Notification Utilities', () => {
 
     beforeEach(() => {
       jest.resetModules(); // Reset module to get fresh instances
-      notifications = require('../notifications');
+      notifications = require('../../utils/notifications');
     });
 
     it('should use navigator.clipboard.writeText in secure context', async () => {

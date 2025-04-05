@@ -3,7 +3,7 @@ import { useDebounceApi } from '../../hooks/useDebounceApi';
 import { debouncePromise } from '../../utils/debounce';
 
 // Mock the debouncePromise utility
-jest.mock('../utils/debounce', () => ({
+jest.mock('../../utils/debounce', () => ({
   // The mock returns a function that immediately invokes the callback it receives.
   // This bypasses the actual timer/debouncing logic but allows us to test
   // the state management and race condition logic within useDebounceApi.
@@ -182,7 +182,7 @@ describe('useDebounceApi Hook', () => {
 
     it('should prevent updates from calls initiated before reset', async () => {
       // Use real debounce for this test
-      debouncePromise.mockImplementationOnce(jest.requireActual('../utils/debounce').debouncePromise);
+      debouncePromise.mockImplementationOnce(jest.requireActual('../../utils/debounce').debouncePromise);
       jest.useFakeTimers();
       
       const apiResponse = { data: 'success' };
@@ -223,7 +223,7 @@ describe('useDebounceApi Hook', () => {
   describe('Cleanup', () => {
     it('should prevent state updates after unmount', async () => {
        // Use real debounce for this test to simulate async completion
-      debouncePromise.mockImplementationOnce(jest.requireActual('../utils/debounce').debouncePromise);
+      debouncePromise.mockImplementationOnce(jest.requireActual('../../utils/debounce').debouncePromise);
       jest.useFakeTimers();
       
       const apiResponse = { data: 'success' };

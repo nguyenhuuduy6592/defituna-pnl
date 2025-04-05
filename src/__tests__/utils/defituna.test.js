@@ -5,11 +5,11 @@ import {
   fetchTokenData,
   fetchAllPools,
   processPositionsData
-} from '../defituna';
-import { processTunaPosition } from '../formulas';
+} from '../../utils/defituna';
+import { processTunaPosition } from '../../utils/formulas';
 
 // Mock the formulas module
-jest.mock('../formulas', () => ({
+jest.mock('../../utils/formulas', () => ({
   processTunaPosition: jest.fn(),
 }));
 
@@ -36,7 +36,7 @@ describe('DeFiTuna Utilities', () => {
     }
 
     // processTunaPosition mock needs clearing if used across tests without re-mocking
-    const formulasMock = require('../formulas'); // Get the mocked module
+    const formulasMock = require('../../utils/formulas'); // Get the mocked module
     if (formulasMock.processTunaPosition && formulasMock.processTunaPosition.mockClear) {
       formulasMock.processTunaPosition.mockClear();
     }
@@ -55,7 +55,7 @@ describe('DeFiTuna Utilities', () => {
     const mockApiResponse = { data: [{ id: 1 }, { id: 2 }] };
 
     it('should fetch positions for a given wallet', async () => {
-      const { fetchPositions } = require('../defituna');
+      const { fetchPositions } = require('../../utils/defituna');
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
 
       const positions = await fetchPositions(wallet);
@@ -66,7 +66,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if wallet is not provided', async () => {
-      const { fetchPositions } = require('../defituna');
+      const { fetchPositions } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       // No fetch mock needed
       await expect(fetchPositions(null)).rejects.toThrow('Wallet address is required');
@@ -77,7 +77,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API fetch fails', async () => {
-      const { fetchPositions } = require('../defituna');
+      const { fetchPositions } = require('../../utils/defituna');
       const errorMessage = 'Network Error';
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       fetch.mockRejectedValueOnce(new Error(errorMessage));
@@ -92,7 +92,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API response is not ok', async () => {
-      const { fetchPositions } = require('../defituna');
+      const { fetchPositions } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       fetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: 'Not Found' });
       
@@ -105,7 +105,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API returns invalid data structure', async () => {
-      const { fetchPositions } = require('../defituna');
+      const { fetchPositions } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const invalidResponse = { not_data: [] };
       fetch.mockResolvedValueOnce({ ok: true, json: async () => invalidResponse });
@@ -120,7 +120,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API returns non-array data', async () => {
-      const { fetchPositions } = require('../defituna');
+      const { fetchPositions } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const invalidData = { id: 1 };
       const invalidResponse = { data: invalidData };
@@ -143,7 +143,7 @@ describe('DeFiTuna Utilities', () => {
     const cacheTTL = 30 * 1000;
 
     it('should fetch pool data for a given address when cache is empty', async () => {
-      const { fetchPoolData } = require('../defituna');
+      const { fetchPoolData } = require('../../utils/defituna');
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
 
       const poolData = await fetchPoolData(poolAddress);
@@ -154,7 +154,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should use cache if valid', async () => {
-      const { fetchPoolData } = require('../defituna');
+      const { fetchPoolData } = require('../../utils/defituna');
       // First call to populate cache
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
       await fetchPoolData(poolAddress);
@@ -168,7 +168,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should fetch new data if cache is expired', async () => {
-      const { fetchPoolData } = require('../defituna');
+      const { fetchPoolData } = require('../../utils/defituna');
       // First call to populate cache
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
       await fetchPoolData(poolAddress);
@@ -187,7 +187,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if pool address is not provided', async () => {
-      const { fetchPoolData } = require('../defituna');
+      const { fetchPoolData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       await expect(fetchPoolData(null)).rejects.toThrow('Pool address is required');
       expect(fetch).not.toHaveBeenCalled();
@@ -196,7 +196,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API fetch fails', async () => {
-      const { fetchPoolData } = require('../defituna');
+      const { fetchPoolData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const errorMessage = 'Network Error';
       fetch.mockRejectedValueOnce(new Error(errorMessage));
@@ -209,7 +209,7 @@ describe('DeFiTuna Utilities', () => {
     });
     
     it('should throw an error if API response is not ok', async () => {
-      const { fetchPoolData } = require('../defituna');
+      const { fetchPoolData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       fetch.mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Server Error' });
       
@@ -221,7 +221,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API response lacks data field', async () => {
-      const { fetchPoolData } = require('../defituna');
+      const { fetchPoolData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ not_the_data: {} }) });
       
@@ -234,7 +234,7 @@ describe('DeFiTuna Utilities', () => {
     });
     
     it('should throw an error if API response has null data field', async () => {
-      const { fetchPoolData } = require('../defituna');
+      const { fetchPoolData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ data: null }) });
       
@@ -252,7 +252,7 @@ describe('DeFiTuna Utilities', () => {
     const cacheTTL = 60 * 60 * 1000;
 
     it('should fetch market data when cache is empty', async () => {
-      const { fetchMarketData } = require('../defituna');
+      const { fetchMarketData } = require('../../utils/defituna');
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockMarketData });
 
       const marketData = await fetchMarketData();
@@ -263,7 +263,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should use cache if valid', async () => {
-      const { fetchMarketData } = require('../defituna');
+      const { fetchMarketData } = require('../../utils/defituna');
       // First call
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockMarketData });
       await fetchMarketData();
@@ -277,7 +277,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should fetch new data if cache is expired', async () => {
-      const { fetchMarketData } = require('../defituna');
+      const { fetchMarketData } = require('../../utils/defituna');
       // First call
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockMarketData });
       await fetchMarketData();
@@ -296,7 +296,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API fetch fails', async () => {
-      const { fetchMarketData } = require('../defituna');
+      const { fetchMarketData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const errorMessage = 'Network Error';
       fetch.mockRejectedValueOnce(new Error(errorMessage));
@@ -309,7 +309,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API response is not ok', async () => {
-      const { fetchMarketData } = require('../defituna');
+      const { fetchMarketData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       fetch.mockResolvedValueOnce({ ok: false, status: 403, statusText: 'Forbidden' });
       
@@ -338,7 +338,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should fetch token data for a given mint address when cache is empty', async () => {
-      const { fetchTokenData } = require('../defituna');
+      const { fetchTokenData } = require('../../utils/defituna');
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
 
       const tokenData = await fetchTokenData(mintAddress);
@@ -349,7 +349,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should use cache if valid', async () => {
-      const { fetchTokenData } = require('../defituna');
+      const { fetchTokenData } = require('../../utils/defituna');
       // First call
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
       await fetchTokenData(mintAddress);
@@ -363,7 +363,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should fetch new data if cache is expired', async () => {
-      const { fetchTokenData } = require('../defituna');
+      const { fetchTokenData } = require('../../utils/defituna');
       // First call
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
       await fetchTokenData(mintAddress);
@@ -382,7 +382,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should return default structure if mint address is not provided', async () => {
-      const { fetchTokenData } = require('../defituna');
+      const { fetchTokenData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       // No fetch mock needed
       const result = await fetchTokenData(null);
@@ -393,7 +393,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should return default structure and log error if API fetch fails', async () => {
-      const { fetchTokenData } = require('../defituna');
+      const { fetchTokenData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const errorMessage = 'Network Error';
       fetch.mockRejectedValueOnce(new Error(errorMessage));
@@ -407,7 +407,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should return default structure and log error if API response is not ok', async () => {
-      const { fetchTokenData } = require('../defituna');
+      const { fetchTokenData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       fetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: 'Not Found' });
       
@@ -425,7 +425,7 @@ describe('DeFiTuna Utilities', () => {
     const cacheTTL = 60 * 1000;
 
     it('should fetch all pools data when cache is empty (direct array)', async () => {
-      const { fetchAllPools } = require('../defituna');
+      const { fetchAllPools } = require('../../utils/defituna');
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockPoolsData });
 
       const poolsData = await fetchAllPools();
@@ -436,7 +436,7 @@ describe('DeFiTuna Utilities', () => {
     });
     
     it('should fetch all pools data when cache is empty (wrapped in data)', async () => {
-      const { fetchAllPools } = require('../defituna');
+      const { fetchAllPools } = require('../../utils/defituna');
       fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ data: mockPoolsData }) });
 
       const poolsData = await fetchAllPools();
@@ -447,7 +447,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should use cache if valid', async () => {
-      const { fetchAllPools } = require('../defituna');
+      const { fetchAllPools } = require('../../utils/defituna');
       // First call
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockPoolsData });
       await fetchAllPools();
@@ -461,7 +461,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should fetch new data if cache is expired', async () => {
-      const { fetchAllPools } = require('../defituna');
+      const { fetchAllPools } = require('../../utils/defituna');
       // First call
       fetch.mockResolvedValueOnce({ ok: true, json: async () => mockPoolsData });
       await fetchAllPools();
@@ -479,7 +479,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should return empty array and log error for unexpected response format', async () => {
-      const { fetchAllPools } = require('../defituna');
+      const { fetchAllPools } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const badResponse = { wrong_key: [] };
       fetch.mockResolvedValueOnce({ ok: true, json: async () => badResponse });
@@ -493,7 +493,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API fetch fails', async () => {
-      const { fetchAllPools } = require('../defituna');
+      const { fetchAllPools } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       const errorMessage = 'Network Error';
       fetch.mockRejectedValueOnce(new Error(errorMessage));
@@ -506,7 +506,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if API response is not ok', async () => {
-      const { fetchAllPools } = require('../defituna');
+      const { fetchAllPools } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
       fetch.mockResolvedValueOnce({ ok: false, status: 503, statusText: 'Service Unavailable' });
       
@@ -575,7 +575,7 @@ describe('DeFiTuna Utilities', () => {
     };
 
     it('should return an empty array for null, undefined, or empty input', async () => {
-      const { processPositionsData } = require('../defituna');
+      const { processPositionsData } = require('../../utils/defituna');
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       // No fetch mock needed
       
@@ -589,8 +589,8 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should fetch required data (market, unique pools, unique tokens)', async () => {
-      const { processPositionsData } = require('../defituna');
-      const { processTunaPosition } = require('../formulas');
+      const { processPositionsData } = require('../../utils/defituna');
+      const { processTunaPosition } = require('../../utils/formulas');
       // Setup fetch mock specifically for this test
       fetch.mockImplementation(async (url) => {
         const urlStr = url.toString();
@@ -622,8 +622,8 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should call processTunaPosition for each valid position with correct arguments', async () => {
-      const { processPositionsData } = require('../defituna');
-      const { processTunaPosition } = require('../formulas');
+      const { processPositionsData } = require('../../utils/defituna');
+      const { processTunaPosition } = require('../../utils/formulas');
       // Setup fetch mock (same as above test)
       fetch.mockImplementation(async (url) => {
          const urlStr = url.toString();
@@ -654,8 +654,8 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should format and encode the output correctly for valid positions', async () => {
-      const { processPositionsData } = require('../defituna');
-      const { processTunaPosition } = require('../formulas');
+      const { processPositionsData } = require('../../utils/defituna');
+      const { processTunaPosition } = require('../../utils/formulas');
       // Setup fetch mock for this test (only need poolA and its tokens)
        fetch.mockImplementation(async (url) => {
         const urlStr = url.toString();
@@ -681,8 +681,8 @@ describe('DeFiTuna Utilities', () => {
 
     it('should filter out positions with missing pool data', async () => {
       // Test Adjusted: Expect Promise.all to reject when fetchPoolData fails
-      const { processPositionsData } = require('../defituna');
-      const { processTunaPosition } = require('../formulas');
+      const { processPositionsData } = require('../../utils/defituna');
+      const { processTunaPosition } = require('../../utils/formulas');
       const consoleSpyError = jest.spyOn(console, 'error').mockImplementation(() => {});
       const consoleSpyWarn = jest.spyOn(console, 'warn').mockImplementation(() => {});
       fetch.mockImplementation(async (url) => {
@@ -710,8 +710,8 @@ describe('DeFiTuna Utilities', () => {
 
     it('should filter out positions with missing token data', async () => {
       // Test Adjusted: Expect position NOT to be filtered, processTunaPosition called with default token
-      const { processPositionsData } = require('../defituna');
-      const { processTunaPosition } = require('../formulas');
+      const { processPositionsData } = require('../../utils/defituna');
+      const { processTunaPosition } = require('../../utils/formulas');
       const consoleSpyError = jest.spyOn(console, 'error').mockImplementation(() => {});
       const consoleSpyWarn = jest.spyOn(console, 'warn').mockImplementation(() => {});
        fetch.mockImplementation(async (url) => {
@@ -757,7 +757,7 @@ describe('DeFiTuna Utilities', () => {
     });
 
     it('should throw an error if market data fetch fails', async () => {
-      const { processPositionsData } = require('../defituna');
+      const { processPositionsData } = require('../../utils/defituna');
       // Setup fetch mock for this specific failure
       fetch.mockImplementation(async (url) => {
         if (url.toString().includes('/markets')) { 
@@ -776,8 +776,8 @@ describe('DeFiTuna Utilities', () => {
     
     it('should handle errors during processTunaPosition gracefully (filter position)', async () => {
       // Test Adjusted: Expect processPositionsData to reject because the error in .map isn't caught per iteration
-      const { processPositionsData } = require('../defituna');
-      const { processTunaPosition } = require('../formulas');
+      const { processPositionsData } = require('../../utils/defituna');
+      const { processTunaPosition } = require('../../utils/formulas');
       // Setup fetch mock for valid data fetching
       fetch.mockImplementation(async (url) => {
          const urlStr = url.toString();
