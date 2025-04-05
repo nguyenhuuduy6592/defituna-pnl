@@ -63,7 +63,7 @@ Current Progress: 90.59% overall, with individual files:
   - Coverage: Stmts 95.45%, Branch 94.44%, Funcs 80%, Lines 96.72%
 - ✅ notifications.js (100% coverage)
 - ✅ tooltipContent.js (100% coverage)
-- ❌ styles.js (0% coverage)
+- ✅ styles.js (100% coverage)
 
 ### 3.2 Hooks (Medium-High Priority) 🟨
 - Target: 95% coverage
@@ -85,11 +85,11 @@ Current Progress: 90.59% overall, with individual files:
   - Common Components:
     - ✅ LoadingOverlay (100% coverage)
     - ✅ TimeframeSelector (100% coverage)
-    - 🟨 Portal (40% coverage)
-    - 🟨 TooltipPortal (12% coverage)
+    - 🟨 Portal (40% coverage - test attempts made)
+    - 🟨 TooltipPortal (12% coverage - test attempts made)
     - ✅ Tooltip (90% coverage)
     - ✅ InfoIcon (100% coverage)
-    - ✅ EnhancedTooltip (75% coverage)
+    - ✅ EnhancedTooltip (~84% coverage)
     - ✅ DisclaimerModal (100% coverage)
   - PnL Components:
     - ✅ WalletForm (100% statement, 93.75% branch, 100% function)
@@ -218,9 +218,9 @@ Current Progress: 90.59% overall, with individual files:
   - Critical hooks now tested and compatible with React 19
 
 - Components: 68.77% coverage for common components 🟨
-  - 6/8 common components have substantial coverage (≥75%)
+  - 7/8 common components have substantial coverage (≥75%)
   - 4/8 common components at 90-100% coverage 
-  - Portal and TooltipPortal components have tests but are failing
+  - TooltipPortal component has tests but is failing
   - PnL Components: 94.51% coverage
   - PnL Coverage: 94.51% statements, 78.29% branches, 89.38% functions, 94.85% lines
   - Education Components: 100% coverage

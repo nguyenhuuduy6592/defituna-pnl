@@ -42,8 +42,7 @@ afterAll(() => {
 describe('TooltipPortal Component', () => {
   // We'll only use skipped tests for this component due to React 19 JSDOM limitations
   
-  it.skip('renders tooltip content when show is true', () => {
-    // This test is skipped due to createPortal issues with React 19 and JSDOM
+  it('renders tooltip content when show is true', () => {
     const mockRect = {
       top: 100,
       left: 200,
@@ -67,8 +66,7 @@ describe('TooltipPortal Component', () => {
     expect(screen.getByText('Tooltip content')).toBeInTheDocument();
   });
   
-  it.skip('does not render tooltip content when show is false', () => {
-    // This test is skipped due to createPortal issues with React 19 and JSDOM
+  it('does not render tooltip content when show is false', () => {
     const mockRect = {
       top: 100,
       left: 200,
@@ -92,7 +90,7 @@ describe('TooltipPortal Component', () => {
     expect(screen.queryByText('Tooltip content')).not.toBeInTheDocument();
   });
   
-  it.skip('tests position calculation', () => {
+  it('tests position calculation', () => {
     // This test is skipped due to implementation difficulties
     // Testing implementation details of hooks directly is not recommended
     // and would require significant mocking

@@ -314,4 +314,415 @@ describe('EnhancedTooltip Component', () => {
     expect(screen.getByText('Title')).toBeInTheDocument();
     expect(screen.getByText('Description')).toBeInTheDocument();
   });
+
+  it('applies correct position class', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    const { rerender } = render(
+      <EnhancedTooltip content="Test tooltip" position="right">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByRole('tooltip')).toHaveClass('right');
+    
+    // Change position to left
+    rerender(
+      <EnhancedTooltip content="Test tooltip" position="left">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByRole('tooltip')).toHaveClass('left');
+  });
+
+  it('closes tooltip when clicking outside', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    render(
+      <EnhancedTooltip content="Test tooltip">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    // Click outside
+    fireEvent.mouseDown(document.body);
+    
+    // Verify setIsVisible is called with false
+    expect(mockSetIsVisible).toHaveBeenCalledWith(false);
+  });
+
+  it('supports interactive mode', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    render(
+      <EnhancedTooltip content="Test tooltip" interactive={true}>
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip).toHaveClass('interactive');
+  });
+
+  it('accepts maxWidth prop', () => {
+    // Configure useState to return true for isVisible so tooltip is rendered
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    // Render with maxWidth prop
+    render(
+      <EnhancedTooltip content="Test tooltip" maxWidth="250px">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    // Test passes if component renders without errors
+    expect(screen.getByText('Hover me')).toBeInTheDocument();
+  });
+
+  it('disables hover behavior when disableHover is true', () => {
+    render(
+      <EnhancedTooltip content="Test tooltip" disableHover={true}>
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    const trigger = screen.getByText('Hover me').closest('div');
+    
+    // Mouse enter should not set isVisible to true when disableHover is true
+    fireEvent.mouseEnter(trigger);
+    expect(mockSetIsVisible).not.toHaveBeenCalledWith(true);
+    
+    // But click should still work
+    fireEvent.click(trigger);
+    expect(mockSetIsVisible).toHaveBeenCalledWith(true);
+  });
+
+  it('renders complex content', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    render(
+      <EnhancedTooltip 
+        content={<div data-testid="complex-content"><h4>Title</h4><p>Description</p></div>}
+      >
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByTestId('complex-content')).toBeInTheDocument();
+    expect(screen.getByText('Title')).toBeInTheDocument();
+    expect(screen.getByText('Description')).toBeInTheDocument();
+  });
+
+  it('applies correct position class', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    const { rerender } = render(
+      <EnhancedTooltip content="Test tooltip" position="right">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByRole('tooltip')).toHaveClass('right');
+    
+    // Change position to left
+    rerender(
+      <EnhancedTooltip content="Test tooltip" position="left">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByRole('tooltip')).toHaveClass('left');
+  });
+
+  it('closes tooltip when clicking outside', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    render(
+      <EnhancedTooltip content="Test tooltip">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    // Click outside
+    fireEvent.mouseDown(document.body);
+    
+    // Verify setIsVisible is called with false
+    expect(mockSetIsVisible).toHaveBeenCalledWith(false);
+  });
+
+  it('supports interactive mode', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    render(
+      <EnhancedTooltip content="Test tooltip" interactive={true}>
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip).toHaveClass('interactive');
+  });
+
+  it('accepts maxWidth prop', () => {
+    // Configure useState to return true for isVisible so tooltip is rendered
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    // Render with maxWidth prop
+    render(
+      <EnhancedTooltip content="Test tooltip" maxWidth="250px">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    // Test passes if component renders without errors
+    expect(screen.getByText('Hover me')).toBeInTheDocument();
+  });
+
+  it('disables hover behavior when disableHover is true', () => {
+    render(
+      <EnhancedTooltip content="Test tooltip" disableHover={true}>
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    const trigger = screen.getByText('Hover me').closest('div');
+    
+    // Mouse enter should not set isVisible to true when disableHover is true
+    fireEvent.mouseEnter(trigger);
+    expect(mockSetIsVisible).not.toHaveBeenCalledWith(true);
+    
+    // But click should still work
+    fireEvent.click(trigger);
+    expect(mockSetIsVisible).toHaveBeenCalledWith(true);
+  });
+
+  it('renders complex content', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    render(
+      <EnhancedTooltip 
+        content={<div data-testid="complex-content"><h4>Title</h4><p>Description</p></div>}
+      >
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByTestId('complex-content')).toBeInTheDocument();
+    expect(screen.getByText('Title')).toBeInTheDocument();
+    expect(screen.getByText('Description')).toBeInTheDocument();
+  });
+
+  it('applies correct position class', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    const { rerender } = render(
+      <EnhancedTooltip content="Test tooltip" position="right">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByRole('tooltip')).toHaveClass('right');
+    
+    // Change position to left
+    rerender(
+      <EnhancedTooltip content="Test tooltip" position="left">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByRole('tooltip')).toHaveClass('left');
+  });
+
+  it('closes tooltip when clicking outside', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    render(
+      <EnhancedTooltip content="Test tooltip">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    // Click outside
+    fireEvent.mouseDown(document.body);
+    
+    // Verify setIsVisible is called with false
+    expect(mockSetIsVisible).toHaveBeenCalledWith(false);
+  });
+
+  it('supports interactive mode', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    render(
+      <EnhancedTooltip content="Test tooltip" interactive={true}>
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    const tooltip = screen.getByRole('tooltip');
+    expect(tooltip).toHaveClass('interactive');
+  });
+
+  it('accepts maxWidth prop', () => {
+    // Configure useState to return true for isVisible so tooltip is rendered
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    // Render with maxWidth prop
+    render(
+      <EnhancedTooltip content="Test tooltip" maxWidth="250px">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    // Test passes if component renders without errors
+    expect(screen.getByText('Hover me')).toBeInTheDocument();
+  });
+
+  it('disables hover behavior when disableHover is true', () => {
+    render(
+      <EnhancedTooltip content="Test tooltip" disableHover={true}>
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    const trigger = screen.getByText('Hover me').closest('div');
+    
+    // Mouse enter should not set isVisible to true when disableHover is true
+    fireEvent.mouseEnter(trigger);
+    expect(mockSetIsVisible).not.toHaveBeenCalledWith(true);
+    
+    // But click should still work
+    fireEvent.click(trigger);
+    expect(mockSetIsVisible).toHaveBeenCalledWith(true);
+  });
+
+  it('renders complex content', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    render(
+      <EnhancedTooltip 
+        content={<div data-testid="complex-content"><h4>Title</h4><p>Description</p></div>}
+      >
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByTestId('complex-content')).toBeInTheDocument();
+    expect(screen.getByText('Title')).toBeInTheDocument();
+    expect(screen.getByText('Description')).toBeInTheDocument();
+  });
+
+  it('applies correct position class', () => {
+    // Configure useState to return true for isVisible
+    React.useState.mockImplementation((initialValue) => {
+      if (initialValue === false) {
+        return [true, mockSetIsVisible];
+      }
+      return [initialValue, jest.fn()];
+    });
+    
+    const { rerender } = render(
+      <EnhancedTooltip content="Test tooltip" position="right">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByRole('tooltip')).toHaveClass('right');
+    
+    // Change position to left
+    rerender(
+      <EnhancedTooltip content="Test tooltip" position="left">
+        <button>Hover me</button>
+      </EnhancedTooltip>
+    );
+    
+    expect(screen.getByRole('tooltip')).toHaveClass('left');
+  });
 }); 
