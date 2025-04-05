@@ -22,9 +22,9 @@
 ## 2. Testing Priorities by Directory (Ordered by Impact/Effort)
 
 ### 2.1 Utils (High Priority) ✅
-Current Progress: 95%+ overall, with individual files:
+Current Progress: 91.66% overall, with individual files:
 - ✅ positionUtils.js (100% coverage)
-- ✅ formatters.js (100% coverage)
+- ✅ formatters.js (98.63% coverage)
 - ✅ formulas.js (92.79% coverage)
   - Functions: 100%
   - Branches: 94.59%
@@ -47,62 +47,63 @@ Current Progress: 95%+ overall, with individual files:
 - ✅ tokens.js (95%+ coverage)
   - Comprehensive tests implemented covering core functionality and error cases
   - API mocking and cache state testing implemented
-- ✅ chart.js (95%+ coverage)
+- ✅ chart.js (84.66% coverage)
   - All functions fully tested including edge cases
   - Complex scenarios and error handling covered
   - Visual styling and formatting functions tested
-- ✅ debounce.js (90%+ coverage)
+- ✅ debounce.js (74.57% coverage)
   - Both `debounce` and `debouncePromise` functions tested
   - Complex async scenarios and error handling covered
-- ✅ defituna.js (~98% coverage)
+- ✅ defituna.js (97.95% coverage)
   - All functions tested, covering successful paths, error handling, caching, and main processing logic
   - Coverage: Stmts 97.95%, Branch 96.07%, Funcs 100%, Lines 97.88%
-- ✅ export.js (~96% coverage)
+- ✅ export.js (95.45% coverage)
   - All functions tested, covering image generation, download triggers, Web Share API usage
   - Coverage: Stmts 95.45%, Branch 94.44%, Funcs 80%, Lines 96.72%
 - ✅ notifications.js (100% coverage)
 - ✅ tooltipContent.js (100% coverage)
+- ❌ styles.js (0% coverage)
 
-### 2.2 Hooks (High Priority) ✅
+### 2.2 Hooks (Medium-High Priority) 🟨
 - Target: 95% coverage
-- Current: 95%+ coverage
+- Current: 76.65% coverage
 - Files:
   - ✅ useSortState.js (100% coverage)
   - ✅ useCountdown.js (100% coverage)
   - ✅ useInvertedPairs.js (100% coverage)
   - ✅ useAutoRefresh.js (100% coverage)
-  - ✅ useWallet.js (~98% coverage)
-  - ✅ useDebounceApi.js (~94% coverage)
-  - ✅ useHistoricalData.js (95%+ coverage)
-  - ✅ usePoolData.js (95%+ coverage)
-  - ✅ usePoolsData.js (95%+ coverage)
+  - ✅ useWallet.js (98.43% coverage)
+  - ✅ useDebounceApi.js (94.44% coverage)
+  - ❌ useHistoricalData.js (23.23% coverage)
+  - ✅ usePoolData.js (100% coverage)
+  - 🟨 usePoolsData.js (72.79% coverage)
 
-### 2.3 Components (Medium-High Priority) 🟨
+### 2.3 Components (Low Priority) ❌
 - Target: 90% coverage
-- Current Progress:
+- Current Progress: 0% coverage
   - Common Components:
-    - ✅ LoadingOverlay (100% coverage)
-    - ✅ TimeframeSelector (100% coverage)
-    - ⬜ Tooltip
-    - ⬜ TooltipPortal
-    - ⬜ Portal
-    - ⬜ InfoIcon
-    - ⬜ EnhancedTooltip
-    - ⬜ DisclaimerModal
-  - PnL Components: Not started
-  - Pool Components: Not started
-  - Education Components: Not started
-  - History Components: Not started
+    - ❌ LoadingOverlay (0% coverage)
+    - ❌ TimeframeSelector (0% coverage)
+    - ❌ Tooltip (0% coverage)
+    - ❌ TooltipPortal (0% coverage)
+    - ❌ Portal (0% coverage)
+    - ❌ InfoIcon (0% coverage)
+    - ❌ EnhancedTooltip (0% coverage)
+    - ❌ DisclaimerModal (0% coverage)
+  - PnL Components: Not started (0% coverage)
+  - Pool Components: Not started (0% coverage)
+  - Education Components: Not started (0% coverage)
+  - History Components: Not started (0% coverage)
 
-### 2.4 Contexts (Medium Priority) ⬜
+### 2.4 Contexts (Low Priority) ❌
 - Target: 85% coverage
 - Current: 0% coverage
-- Pending implementation
+- Not started
 
-### 2.5 Pages (Medium Priority) ⬜
+### 2.5 Pages (Low Priority) ❌
 - Target: 80% coverage
 - Current: 0% coverage
-- Pending implementation
+- Not started
 
 ## 3. Implementation Status
 
@@ -112,17 +113,15 @@ Current Progress: 95%+ overall, with individual files:
 - [x] Begin with utils/ directory testing
 - [ ] Establish CI/CD pipeline for tests
 
-### Phase 2: Core Functionality ✅
-- [x] Complete utils testing (95%+ coverage achieved)
-- [x] Implement hooks tests (95%+ coverage achieved)
-- [x] Set up component testing infrastructure
-- [x] Create test templates for components
-- [🟨] Add component tests for critical UI elements (In Progress)
-  - [x] Common components started
-  - [ ] PnL components
-  - [ ] Pool components
-  - [ ] History components
-  - [ ] Education components
+### Phase 2: Core Functionality 🟨
+- [x] Complete utils testing (91.66% coverage achieved)
+- [🟨] Implement hooks tests (76.65% coverage achieved)
+  - [x] Most hooks have high coverage (>94%)
+  - [ ] useHistoricalData.js needs significant work (23.23% coverage)
+  - [ ] usePoolsData.js needs improvement (72.79% coverage)
+- [ ] Set up component testing infrastructure
+- [ ] Create test templates for components
+- [ ] Add component tests for critical UI elements (Not Started)
 - [ ] Set up snapshot testing
 - [ ] Begin context testing
 
@@ -134,108 +133,73 @@ Current Progress: 95%+ overall, with individual files:
 
 ## 4. Current Coverage Metrics vs Targets
 
-### Overall Project Coverage
-- Statements: 32.79% (Target: >85%) ❌
-- Branches: 36.32% (Target: >80%) ❌
-- Functions: 27.19% (Target: >90%) ❌
-- Lines: 32.07% (Target: >85%) ❌
+### Overall Project Coverage (as of April 5, 2025)
+- Statements: 48.97% (Target: >85%) ❌
+- Branches: 44.81% (Target: >80%) ❌
+- Functions: 37.5% (Target: >90%) ❌
+- Lines: 48.89% (Target: >85%) ❌
 
 ### Directory Coverage Breakdown
-- Utils: 51.65% coverage
-  - ✅ positionUtils.js (100% coverage)
-  - ✅ formatters.js (98.63% coverage)
-  - ✅ formulas.js (92.79% coverage)
-  - ✅ pairUtils.js (95% coverage)
-  - ✅ sortUtils.js (100% coverage)
-  - ✅ validation.js (100% coverage)
-  - ✅ tokens.js (73.01% coverage)
-  - ✅ chart.js (84.66% coverage)
-  - ❌ debounce.js (0% coverage)
-  - ❌ defituna.js (0% coverage)
-  - ❌ export.js (0% coverage)
-  - ❌ notifications.js (0% coverage)
-  - ❌ tooltipContent.js (0% coverage)
-  - ❌ styles.js (0% coverage)
+- Utils: 91.66% coverage ✅
+  - Statements: 91.66%
+  - Branches: 92.51%
+  - Functions: 92.38%
+  - Lines: 91.96%
+  - All files covered except styles.js
 
-- Hooks: 68.01% coverage
-  - ✅ useAutoRefresh.js (100% coverage)
-  - ✅ useCountdown.js (100% coverage)
-  - ✅ useInvertedPairs.js (100% coverage)
-  - ✅ usePoolData.js (100% coverage)
-  - ✅ useSortState.js (100% coverage)
-  - ✅ useWallet.js (98.43% coverage)
-  - ✅ usePoolsData.js (66.16% coverage)
-  - ❌ useDebounceApi.js (0% coverage)
-  - ❌ useHistoricalData.js (23.23% coverage)
+- Hooks: 76.65% coverage 🟨
+  - Statements: 76.65%
+  - Branches: 61%
+  - Functions: 83.14%
+  - Lines: 76.77%
+  - Major improvements needed for useHistoricalData.js
 
-- Components: 4.21% coverage
-  - ✅ LoadingOverlay.js (100% coverage)
-  - ✅ TimeframeSelector.js (100% coverage)
-  - ❌ All other components (0% coverage)
+- Components: 0% coverage ❌
+  - All component files have 0% coverage
 
-- Contexts: 0% coverage
-  - ❌ All context files (0% coverage)
+- Contexts: 0% coverage ❌
+  - All context files have 0% coverage
 
-- Pages: 0% coverage
-  - ❌ All page files (0% coverage)
-
-### Failed Test Suites
-1. useDebounceApi.test.js
-2. defituna.test.js
-3. export.test.js
-4. notifications.test.js
-5. tooltipContent.test.js
-6. usePoolsData.test.js
-7. test-utils.js
-8. debounce.test.js
+- Pages: 0% coverage ❌
+  - All page files have 0% coverage
 
 ## 5. Next Steps (Prioritized)
 
-1. Fix Failed Test Suites:
-   - Fix module import paths in test files
-   - Implement missing test utilities
-   - Fix waitForNextUpdate issues in usePoolsData tests
+1. Fix Low Coverage in Hooks:
+   - Focus on useHistoricalData.js (23.23% coverage)
+   - Improve usePoolsData.js (72.79% coverage)
 
-2. Increase Component Coverage:
-   - Focus on common components first
-   - Implement tests for PnL components
-   - Add tests for Pool components
+2. Begin Component Testing:
+   - Start with LoadingOverlay and TimeframeSelector components
+   - Set up proper test templates for React components
+   - Add snapshot testing for UI components
 
 3. Implement Context Tests:
    - Start with ComparisonContext
    - Add tests for other context providers
 
-4. Add Page Tests:
-   - Begin with critical pages
-   - Add integration tests
+4. Page Testing Strategy:
+   - Define approach for testing pages with complex integration needs
+   - Start with simpler page tests
 
-5. Fix Low Coverage Areas:
-   - Implement tests for debounce.js
-   - Add tests for defituna.js
-   - Cover notifications.js functionality
-   - Add tests for tooltipContent.js
-
-6. Infrastructure:
+5. Infrastructure:
    - Set up GitHub Actions for automated testing
    - Implement pre-commit hooks for test runs
 
 ## 6. Known Issues
 
-- Several test suites failing due to module import issues
-- waitForNextUpdate function not working in usePoolsData tests
-- Most component tests not yet implemented
-- CI/CD pipeline pending setup
+- Several mock implementations might be needed for useHistoricalData.js
+- Component testing requires proper DOM mocking setup
+- usePoolsData.js tests may need refactoring to handle async behavior better
+- Overall coverage significantly below targets
 - Integration and E2E tests pending
 - Need to add snapshot testing for components
-- Overall coverage significantly below targets
 
 ## 7. Success Metrics Update
 
 - [x] Test infrastructure established
-- [x] All utility files fully tested
-- [x] All hooks fully tested
-- [x] Testing patterns established
-- [x] Coverage targets met for implemented tests
-- [x] Component testing infrastructure set up
+- [x] Most utility files fully tested (91.66% coverage)
+- [🟨] Hooks testing progressing (76.65% coverage)
+- [ ] Component testing strategy finalized
 - [ ] CI/CD pipeline running
 - [ ] Documentation complete 
