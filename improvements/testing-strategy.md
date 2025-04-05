@@ -157,6 +157,33 @@ Current Progress: 90.59% overall, with individual files:
       - Keyboard events
       - Accessibility attributes
       - CSS classes
+    - ✅ WalletForm (100% coverage)
+      - Tests cover rendering with and without active wallets
+      - Form submission with validation
+      - Input handling and state management
+      - Dropdown visibility control
+      - Keyboard accessibility
+      - Integration with sub-components
+      - Note: Testing approach adapted to avoid source code modifications
+    - ✅ SavedWalletsDropdown (96% coverage)
+      - Tests cover rendering with saved wallets
+      - Highlighting active wallets
+      - Wallet selection via click and keyboard
+      - Toggling wallet active status
+      - Removing wallets and clearing all wallets
+      - Event propagation prevention
+    - ✅ PriceBar (100% coverage)
+      - Tests cover rendering with all valid price points
+      - Tooltip functionality with mouse interactions
+      - Filtering invalid price points
+      - Correct positioning of price markers
+      - Custom value formatting
+    - ✅ ClusterBar (100% statement/line coverage, 60% branch coverage)
+      - Tests cover rendering with correct segment proportions
+      - Tooltip functionality with mouse interactions
+      - Handling of zero, negative and missing values
+      - Custom value formatting
+      - Note: Some branch paths related to null checks are difficult to test
     - ❌ Other PnL components (0% coverage)
   - Pool Components: Not started (0% coverage)
   - Education Components: Not started (0% coverage)
@@ -203,6 +230,10 @@ Current Progress: 90.59% overall, with individual files:
   - [x] DonationFooter (100% coverage)
   - [x] AutoRefresh (100% coverage)
   - [x] ActiveWalletsDisplay (94% coverage)
+  - [x] WalletForm (100% coverage)
+  - [x] SavedWalletsDropdown (96% coverage)
+  - [x] PriceBar (100% coverage)
+  - [x] ClusterBar (100% statement/line coverage, 60% branch coverage)
   - [ ] Continue with remaining PnL components
 - [ ] Set up snapshot testing
 - [ ] Begin context testing
@@ -240,7 +271,7 @@ Current Progress: 90.59% overall, with individual files:
   - 6/8 common components have substantial coverage (≥75%)
   - 4/8 common components at 90-100% coverage 
   - Portal and TooltipPortal components have tests but are failing
-  - PnL Components: 5/13 (38.5%) at high coverage
+  - PnL Components: 8/13 (61.5%) at high coverage
   - PnL Coverage: 16.46% statements, 10.08% branches, 10.61% functions, 15.81% lines
   - Other components at 0% coverage
 
@@ -275,6 +306,10 @@ Current Progress: 90.59% overall, with individual files:
    - ✅ DonationFooter (100% coverage)
    - ✅ AutoRefresh (100% coverage)
    - ✅ ActiveWalletsDisplay (94% coverage)
+   - ✅ WalletForm (100% coverage)
+   - ✅ SavedWalletsDropdown (96% coverage)
+   - ✅ PriceBar (100% coverage)
+   - ✅ ClusterBar (100% statement/line coverage, 60% branch coverage)
    - Next components to test:
      - Continue with PnL components, focusing on simpler ones like WalletForm
    - Add snapshot testing for UI components
@@ -308,6 +343,13 @@ Current Progress: 90.59% overall, with individual files:
   - Consider using jsdom-global or a more specific Portal testing approach
   - TooltipPortal component faces similar challenges
 
+### Testing Adaptations Required
+Several components required testing adaptations to avoid modifying source code:
+- **WalletForm Component**:
+  - Form element lacks `role="form"` attribute, so tests needed to use `container.querySelector('form')` instead of `screen.getByRole('form')`
+  - This approach follows our "Separate Testing from Refactoring" principle but would benefit from future accessibility improvements
+  - **Potential Enhancement:** Add `role="form"` attribute to the form element for better accessibility and easier testing
+
 ## 8. Success Metrics Update
 
 - [x] Test infrastructure established
@@ -319,7 +361,7 @@ Current Progress: 90.59% overall, with individual files:
   - Need to improve branch coverage (currently at 73.41%)
 - [🟨] Component testing progress
   - Common Components: 6/8 components have comprehensive tests (75%)
-  - PnL Components: 5/13 components tested (38.5%)
+  - PnL Components: 8/13 components tested (61.5%)
   - Portal and TooltipPortal components still have testing challenges
 
 ## 9. Progress Summary (Updated)
@@ -327,10 +369,10 @@ Current Progress: 90.59% overall, with individual files:
 | Category | Components Tested | Total Coverage |
 |---------|-------------------|----------------|
 | Common Components | 6/8 (75%) | 68.8% |
-| PnL Components | 5/13 (38.5%) | 16.46% |
+| PnL Components | 8/13 (61.5%) | 16.46% |
 | Hooks | 9/9 (100%) | 82.79% |
 | Utils | 12/13 (92.3%) | 90.59% |
-| Total Project | 32/74 (43.2%) | 36.2% |
+| Total Project | 37/74 (50.0%) | 36.2% |
 
 ### Components
 
@@ -349,6 +391,10 @@ Current Progress: 90.59% overall, with individual files:
 | DonationFooter | ✅ Tested | 100% |
 | AutoRefresh | ✅ Tested | 100% |
 | ActiveWalletsDisplay | ✅ Tested | 94% |
+| WalletForm | ✅ Tested | 100% |
+| SavedWalletsDropdown | ✅ Tested | 96% |
+| PriceBar | ✅ Tested | 100% |
+| ClusterBar | ✅ Tested | 100% statement/line, 60% branch |
 
 ## 10. Next Actions
 
@@ -366,7 +412,13 @@ Current Progress: 90.59% overall, with individual files:
 11. ✅ Test DonationFooter component
 12. ✅ Test AutoRefresh component
 13. ✅ Test ActiveWalletsDisplay component
-14. Test WalletForm component
+14. ✅ Test WalletForm component
+15. ✅ Test SavedWalletsDropdown component
+16. ✅ Test PriceBar component
+17. ✅ Test ClusterBar component
+18. Test PositionsList component next
+19. Document accessibility enhancements for WalletForm component as a separate task:
+    - Add `role="form"` to the form element for better accessibility and simpler testing
 
 ### Medium Priority
 1. ✅ Test hooks (useAutoRefresh, useCountdown, useDebounceApi)
