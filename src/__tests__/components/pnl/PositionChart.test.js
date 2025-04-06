@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import { PositionChart } from '../../../components/pnl/PositionChart';
 import { prepareChartData, groupChartData, TIME_PERIODS } from '../../../utils';
 import { exportChartAsImage, shareCard } from '../../../utils/export';
@@ -7,7 +7,15 @@ import { exportChartAsImage, shareCard } from '../../../utils/export';
 // Mock dependencies
 jest.mock('recharts', () => ({
   LineChart: ({ children }) => <div data-testid="line-chart">{children}</div>,
-  Line: ({ name, dataKey }) => <div data-testid={`line-${dataKey}`} data-name={name}>{name}</div>,
+  Line: ({ name, dataKey, connectNulls }) => (
+    <div 
+      data-testid={`line-${dataKey}`} 
+      data-name={name} 
+      data-connect-nulls={connectNulls}
+    >
+      {name}
+    </div>
+  ),
   XAxis: () => <div data-testid="x-axis"></div>,
   YAxis: () => <div data-testid="y-axis"></div>,
   CartesianGrid: () => <div data-testid="cartesian-grid"></div>,
@@ -150,14 +158,28 @@ describe('PositionChart', () => {
     expect(prepareChartData).toHaveBeenCalledWith(mockHistoryData);
     expect(groupChartData).toHaveBeenCalled();
     
-    // Check chart components are rendered
-    expect(screen.queryAllByTestId('responsive-container')[0]).toBeInTheDocument();
-    expect(screen.queryAllByTestId('line-chart')[0]).toBeInTheDocument();
-    expect(screen.queryAllByTestId('line-pnl')[0]).toBeInTheDocument();
-    expect(screen.queryAllByTestId('line-totalYield')[0]).toBeInTheDocument();
+    // Get the main chart container (the one not inside exportWrapper)
+    const mainChartContainer = screen.getByTestId('portal-container').querySelector(':scope > .chartOverlay > .chartContainer');
+    expect(mainChartContainer).toBeInTheDocument();
 
-    // Check for other chart elements
-    expect(screen.queryAllByTestId('reference-line')[0]).toBeInTheDocument();
+    // Find the visible chart content div directly within the main container
+    const visibleChartContent = mainChartContainer.querySelector(':scope > .chartContent');
+    expect(visibleChartContent).toBeInTheDocument(); // Make sure we found it
+
+    // Use 'within' to scope the search to the visible chart content div
+    const visibleChart = within(visibleChartContent);
+
+    // Check chart components are rendered within the visible chart
+    expect(visibleChart.getByTestId('line-chart')).toBeInTheDocument();
+    expect(visibleChart.getByTestId('line-pnl')).toBeInTheDocument();
+    expect(visibleChart.getByTestId('line-totalYield')).toBeInTheDocument();
+
+    // Assert that connectNulls is true for both lines within the visible chart
+    expect(visibleChart.getByTestId('line-pnl')).toHaveAttribute('data-connect-nulls', 'true');
+    expect(visibleChart.getByTestId('line-totalYield')).toHaveAttribute('data-connect-nulls', 'true');
+
+    // Check for other chart elements within the visible chart
+    expect(visibleChart.getByTestId('reference-line')).toBeInTheDocument();
   });
 
   it('renders the NoChartData component when position history is empty', () => {

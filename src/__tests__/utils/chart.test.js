@@ -141,24 +141,46 @@ describe('Chart Utils', () => {
       expect(groupChartData({})).toEqual([]);
     });
 
-    it('should group data by 5 minutes (default) using the last entry in interval', () => {
-      const result = groupChartData(sampleData);
-      const expectedTimestamps = [
-        new Date('2023-01-01T10:00:00Z').getTime(), // Group for 10:00-10:04
-        new Date('2023-01-01T10:05:00Z').getTime(), // Group for 10:05-10:09
-        new Date('2023-01-01T10:10:00Z').getTime(), // Group for 10:10-10:14
-        new Date('2023-01-01T10:35:00Z').getTime(), // Group for 10:35-10:39 <-- Adjusted from 10:30
-        new Date('2023-01-01T11:05:00Z').getTime(), // Group for 11:05-11:09
-      ].sort();
+    it('should group data by 5 minutes (default) filling gaps with null', () => {
+      const result = groupChartData(sampleData); // Uses default 5min period
 
-      expect(result.length).toBe(5);
+      // Expected intervals from 10:00 (contains 10:01) to 11:05
+      // 10:00, 10:05, 10:10, 10:15, 10:20, 10:25, 10:30, 10:35, 10:40, 10:45, 10:50, 10:55, 11:00, 11:05
+      // Total: 14 intervals
+      expect(result.length).toBe(14);
+
+      // Check the timestamps of all generated intervals
+      const expectedTimestamps = [
+        new Date('2023-01-01T10:00:00Z').getTime(),
+        new Date('2023-01-01T10:05:00Z').getTime(),
+        new Date('2023-01-01T10:10:00Z').getTime(),
+        new Date('2023-01-01T10:15:00Z').getTime(),
+        new Date('2023-01-01T10:20:00Z').getTime(),
+        new Date('2023-01-01T10:25:00Z').getTime(),
+        new Date('2023-01-01T10:30:00Z').getTime(),
+        new Date('2023-01-01T10:35:00Z').getTime(),
+        new Date('2023-01-01T10:40:00Z').getTime(),
+        new Date('2023-01-01T10:45:00Z').getTime(),
+        new Date('2023-01-01T10:50:00Z').getTime(),
+        new Date('2023-01-01T10:55:00Z').getTime(),
+        new Date('2023-01-01T11:00:00Z').getTime(),
+        new Date('2023-01-01T11:05:00Z').getTime(),
+      ].sort();
       expect(result.map(item => item.timestamp).sort()).toEqual(expectedTimestamps);
-      // Check the last entry was kept for each group
-      expect(result.find(r => r.timestamp === expectedTimestamps[0]).pnl).toBe(12);
-      expect(result.find(r => r.timestamp === expectedTimestamps[1]).pnl).toBe(16);
-      expect(result.find(r => r.timestamp === expectedTimestamps[2]).pnl).toBe(18);
-      expect(result.find(r => r.timestamp === expectedTimestamps[3]).pnl).toBe(20);
-      expect(result.find(r => r.timestamp === expectedTimestamps[4]).pnl).toBe(25);
+
+      // Check values for intervals that should contain data
+      expect(result.find(r => r.timestamp === expectedTimestamps[0]).pnl).toBe(12); // Last entry in 10:00-10:04 interval
+      expect(result.find(r => r.timestamp === expectedTimestamps[1]).pnl).toBe(16); // Last entry in 10:05-10:09 interval
+      expect(result.find(r => r.timestamp === expectedTimestamps[2]).pnl).toBe(18); // Last entry in 10:10-10:14 interval
+      expect(result.find(r => r.timestamp === expectedTimestamps[7]).pnl).toBe(20); // Last entry in 10:35-10:39 interval (index 7 is 10:35)
+      expect(result.find(r => r.timestamp === expectedTimestamps[13]).pnl).toBe(25); // Last entry in 11:05-11:09 interval (index 13 is 11:05)
+
+      // Check values for intervals that should be null gaps
+      expect(result.find(r => r.timestamp === expectedTimestamps[3]).pnl).toBeNull(); // 10:15 interval
+      expect(result.find(r => r.timestamp === expectedTimestamps[4]).pnl).toBeNull(); // 10:20 interval
+      expect(result.find(r => r.timestamp === expectedTimestamps[5]).pnl).toBeNull(); // 10:25 interval
+      expect(result.find(r => r.timestamp === expectedTimestamps[6]).pnl).toBeNull(); // 10:30 interval (10:35 data point is in *next* interval)
+      // ... check other null gaps as needed
     });
 
     it('should group data by 1 hour using the last entry in interval', () => {
@@ -174,19 +196,30 @@ describe('Chart Utils', () => {
       expect(result.find(r => r.timestamp === expectedTimestamps[1]).pnl).toBe(25); // Last entry at 11:05
     });
 
-    it('should handle different time periods correctly (e.g., 15min)', () => {
+    it('should handle different time periods correctly (e.g., 15min) filling gaps with null', () => {
       const result = groupChartData(sampleData, '15min');
+
+      // Expected intervals from 10:00 (contains 10:01) to 11:00 (contains 11:05)
+      // 10:00, 10:15, 10:30, 10:45, 11:00
+      // Total: 5 intervals
+      expect(result.length).toBe(5);
+
       const expectedTimestamps = [
         new Date('2023-01-01T10:00:00Z').getTime(), // 10:00-10:14
+        new Date('2023-01-01T10:15:00Z').getTime(), // 10:15-10:29 (Null)
         new Date('2023-01-01T10:30:00Z').getTime(), // 10:30-10:44
+        new Date('2023-01-01T10:45:00Z').getTime(), // 10:45-10:59 (Null)
         new Date('2023-01-01T11:00:00Z').getTime(), // 11:00-11:14
       ].sort();
 
-      expect(result.length).toBe(3);
       expect(result.map(item => item.timestamp).sort()).toEqual(expectedTimestamps);
-      expect(result.find(r => r.timestamp === expectedTimestamps[0]).pnl).toBe(18); // Last entry at 10:11
-      expect(result.find(r => r.timestamp === expectedTimestamps[1]).pnl).toBe(20); // Last entry at 10:35
-      expect(result.find(r => r.timestamp === expectedTimestamps[2]).pnl).toBe(25); // Last entry at 11:05
+
+      // Check values for each interval
+      expect(result.find(r => r.timestamp === expectedTimestamps[0]).pnl).toBe(18); // Last entry at 10:11 (in 10:00 interval)
+      expect(result.find(r => r.timestamp === expectedTimestamps[1]).pnl).toBeNull(); // 10:15 interval is null
+      expect(result.find(r => r.timestamp === expectedTimestamps[2]).pnl).toBe(20); // Last entry at 10:35 (in 10:30 interval)
+      expect(result.find(r => r.timestamp === expectedTimestamps[3]).pnl).toBeNull(); // 10:45 interval is null
+      expect(result.find(r => r.timestamp === expectedTimestamps[4]).pnl).toBe(25); // Last entry at 11:05 (in 11:00 interval)
     });
 
     it('should handle entries with invalid timestamps gracefully', () => {
@@ -196,11 +229,17 @@ describe('Chart Utils', () => {
         { timestamp: null, pnl: 35 },
         { pnl: 40 }, // Missing timestamp
       ];
+      // Process data with invalid entries
       const result = groupChartData(dataWithInvalid);
-      // Expect invalid entries to be filtered out, result should be same as sampleData
+
+      // Process clean data to get the expected result (with null gaps)
       const expectedResult = groupChartData(sampleData);
+
+      // Compare the results - should be identical after invalid entries are filtered before grouping
       expect(result).toEqual(expectedResult);
-      expect(result.length).toBe(5); // Ensure no extra entries were added
+
+      // Verify the length matches the expected length for clean data (14 for 5min interval)
+      expect(result.length).toBe(14);
     });
 
     it('should use 5min default if period is unrecognized', () => {

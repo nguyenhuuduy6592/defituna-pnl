@@ -181,6 +181,7 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
             dot={false} 
             activeDot={{ r: 6 }}
             name="PnL ($)"
+            connectNulls={true}
           />
         )}
         {activeMetrics.totalYield && (
@@ -192,6 +193,7 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
             dot={false}
             activeDot={{ r: 6 }}
             name="Yield + Compound ($)"
+            connectNulls={true}
           />
         )}
       </LineChart>
@@ -231,20 +233,28 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
       const preparedData = prepareChartData(positionHistory);
       const groupedData = groupChartData(preparedData, activePeriod);
       
-      // Enhanced validation and add totalYield calculation
+      // Keep valid items OR items explicitly added as null gaps
       const validData = groupedData.filter(item => 
         item &&
         typeof item.timestamp === 'number' && 
         !isNaN(item.timestamp) &&
-        (Math.abs(item.pnl) > 1e-9 || Math.abs(item.yield) > 1e-9 || Math.abs(item.compounded) > 1e-9)
+        // Keep if it's a null gap (pnl is null) OR if original values are non-trivial
+        (item.pnl === null || Math.abs(item.pnl) > 1e-9 || Math.abs(item.yield) > 1e-9 || Math.abs(item.compounded) > 1e-9)
       ).map(item => ({
         ...item,
-        totalYield: (item.yield || 0) + (item.compounded || 0)
+        // Calculate totalYield, preserving null if yield or compounded is null
+        totalYield: (item.yield === null || item.compounded === null) 
+                      ? null 
+                      : (item.yield || 0) + (item.compounded || 0)
       }));
+      
+      // Remove logs added for debugging
+      // console.log("[PositionChart useEffect] Final chartData length:", validData.length);
+      // console.log("[PositionChart useEffect] Final chartData sample (incl. nulls?):", validData.slice(0, 20));
       
       setChartData(validData);
     } catch (error) {
-      console.error('Error processing chart data:', error);
+      console.error('Error processing chart data in useEffect:', error);
       setChartData([]);
     }
   }, [positionHistory, activePeriod]);

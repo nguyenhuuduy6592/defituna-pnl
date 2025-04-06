@@ -64,11 +64,17 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
   }
 
   const groups = new Map();
-  
+  let minTimestamp = Infinity;
+  let maxTimestamp = -Infinity;
+
+  // First pass: Group existing data and find min/max timestamps
   data.forEach(entry => {
     if (!entry || typeof entry.timestamp !== 'number' || isNaN(entry.timestamp)) {
       return; // Skip invalid entries
     }
+
+    minTimestamp = Math.min(minTimestamp, entry.timestamp);
+    maxTimestamp = Math.max(maxTimestamp, entry.timestamp);
 
     const date = new Date(entry.timestamp);
     if (isNaN(date.getTime())) {
@@ -77,14 +83,14 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
 
     let keyTimestamp;
     try {
-      // Create a mutable copy for manipulation
       const intervalDate = new Date(date.getTime()); 
       intervalDate.setSeconds(0, 0); // Normalize seconds/ms
 
       // Determine the start of the interval based on the period
       switch(period) {
         case TIME_PERIODS.MINUTE_1.value:
-          break; // Key is the start of the minute
+          // Key is the start of the minute
+          break; 
         case TIME_PERIODS.MINUTE_5.value:
           intervalDate.setMinutes(Math.floor(intervalDate.getMinutes() / 5) * 5);
           break;
@@ -106,7 +112,6 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
           break;
         case TIME_PERIODS.WEEK_1.value:
           intervalDate.setHours(0, 0, 0, 0);
-          // Adjust to the start of the week (e.g., Sunday or Monday depending on locale)
           intervalDate.setDate(intervalDate.getDate() - intervalDate.getDay()); 
           break;
         case TIME_PERIODS.MONTH_1.value:
@@ -114,12 +119,10 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
           intervalDate.setDate(1);
           break;
         default:
-          // Default to 5 minutes if period is unrecognized
           intervalDate.setMinutes(Math.floor(intervalDate.getMinutes() / 5) * 5);
       }
       keyTimestamp = intervalDate.getTime();
     } catch (error) {
-      console.error('Error calculating interval key:', error, entry.timestamp);
       return; // Skip if key calculation fails
     }
     
@@ -128,8 +131,89 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
 
   });
 
-  // Convert map values back to an array and sort by timestamp
-  return Array.from(groups.values()).sort((a, b) => a.timestamp - b.timestamp);
+  if (minTimestamp === Infinity || maxTimestamp === -Infinity) {
+    return []; // No valid data found
+  }
+
+  // Determine the time step based on the period
+  let stepMs;
+  switch(period) {
+    case TIME_PERIODS.MINUTE_1.value: stepMs = 60 * 1000; break;
+    case TIME_PERIODS.MINUTE_5.value: stepMs = 5 * 60 * 1000; break;
+    case TIME_PERIODS.MINUTE_15.value: stepMs = 15 * 60 * 1000; break;
+    case TIME_PERIODS.MINUTE_30.value: stepMs = 30 * 60 * 1000; break;
+    case TIME_PERIODS.HOUR_1.value: stepMs = 60 * 60 * 1000; break;
+    case TIME_PERIODS.HOUR_4.value: stepMs = 4 * 60 * 60 * 1000; break;
+    case TIME_PERIODS.DAY_1.value: stepMs = 24 * 60 * 60 * 1000; break;
+    // Weekly/Monthly steps are tricky due to variable days/months, handle carefully
+    // For simplicity here, we'll use average days. Refine if precise calendar alignment needed.
+    case TIME_PERIODS.WEEK_1.value: stepMs = 7 * 24 * 60 * 60 * 1000; break;
+    case TIME_PERIODS.MONTH_1.value: stepMs = 30 * 24 * 60 * 60 * 1000; break; // Approximate
+    default: stepMs = 5 * 60 * 1000; // Default to 5 minutes
+  }
+  
+  // Ensure we start from the first interval containing minTimestamp
+  const firstIntervalDate = new Date(minTimestamp);
+  firstIntervalDate.setSeconds(0, 0);
+  switch(period) {
+    case TIME_PERIODS.MINUTE_1.value: break; 
+    case TIME_PERIODS.MINUTE_5.value: firstIntervalDate.setMinutes(Math.floor(firstIntervalDate.getMinutes() / 5) * 5); break;
+    case TIME_PERIODS.MINUTE_15.value: firstIntervalDate.setMinutes(Math.floor(firstIntervalDate.getMinutes() / 15) * 15); break;
+    case TIME_PERIODS.MINUTE_30.value: firstIntervalDate.setMinutes(Math.floor(firstIntervalDate.getMinutes() / 30) * 30); break;
+    case TIME_PERIODS.HOUR_1.value: firstIntervalDate.setMinutes(0); break;
+    case TIME_PERIODS.HOUR_4.value: firstIntervalDate.setMinutes(0); firstIntervalDate.setHours(Math.floor(firstIntervalDate.getHours() / 4) * 4); break;
+    case TIME_PERIODS.DAY_1.value: firstIntervalDate.setHours(0, 0, 0, 0); break;
+    case TIME_PERIODS.WEEK_1.value: firstIntervalDate.setHours(0, 0, 0, 0); firstIntervalDate.setDate(firstIntervalDate.getDate() - firstIntervalDate.getDay()); break;
+    case TIME_PERIODS.MONTH_1.value: firstIntervalDate.setHours(0, 0, 0, 0); firstIntervalDate.setDate(1); break;
+    default: firstIntervalDate.setMinutes(Math.floor(firstIntervalDate.getMinutes() / 5) * 5);
+  }
+  let currentTimestamp = firstIntervalDate.getTime();
+
+  const resultData = [];
+  let iterations = 0; // Safety counter
+  const maxIterations = (maxTimestamp - currentTimestamp) / (stepMs > 0 ? stepMs : 60000) + data.length + 100; // Generous limit
+  
+  // Second pass: Iterate through all expected intervals and fill gaps with null
+  while (currentTimestamp <= maxTimestamp && iterations < maxIterations) {
+    iterations++;
+    if (groups.has(currentTimestamp)) {
+      resultData.push(groups.get(currentTimestamp));
+    } else {
+      resultData.push({
+        timestamp: currentTimestamp,
+        pnl: null,
+        yield: null, 
+        compounded: null,
+        totalYield: null
+      });
+    }
+
+    // Move to the next interval timestamp
+    // For Month/Week, this simple addition might drift. Consider calendar-aware increment if needed.
+    if (period === TIME_PERIODS.MONTH_1.value) {
+        const nextDate = new Date(currentTimestamp);
+        nextDate.setMonth(nextDate.getMonth() + 1);
+        currentTimestamp = nextDate.getTime();
+    } else if (period === TIME_PERIODS.WEEK_1.value) {
+        const nextDate = new Date(currentTimestamp);
+        nextDate.setDate(nextDate.getDate() + 7);
+        currentTimestamp = nextDate.getTime();
+    } else {
+        currentTimestamp += stepMs;
+    }
+    
+    // Remove the previous safety break, using iterations counter instead
+    // if (resultData.length > data.length * 2 && data.length > 0) { ... }
+    if(stepMs <= 0) {
+      break;
+    }
+  }
+  
+  if (iterations >= maxIterations) {
+      console.warn("[groupChartData] Iteration limit reached, loop terminated prematurely.");
+  }
+
+  return resultData;
 }
 
 /**
