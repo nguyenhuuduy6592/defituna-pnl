@@ -162,12 +162,17 @@ export default () => {
           await savePositionSnapshot(combined.positions);
         }
         
-        // Handle wallet form submission
+        // Handle wallet form submission logic (adding wallet, clearing input)
         if (isSubmission && wallet) {
           addWallet(wallet);
           setWallet('');
-          startFetchCooldown(30);
         }
+
+        // Start cooldown if this was triggered by a form submission
+        if (isSubmission) {
+          startFetchCooldown(30); 
+        }
+
       } else if (fetchErrors.length === 0) {
         setErrorMessage('No position data found for the provided wallet(s).');
       }
