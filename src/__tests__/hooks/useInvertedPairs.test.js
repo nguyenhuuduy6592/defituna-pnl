@@ -42,26 +42,6 @@ describe('useInvertedPairs Hook', () => {
     expect(setItemSpy).toHaveBeenCalledWith('invertedPairs', JSON.stringify(initialPairs));
   });
 
-  // Skipped because the original hook doesn't handle JSON.parse errors gracefully.
-  // It throws an error instead of initializing with an empty set.
-  // Refactoring Suggestion added to testing-strategy.md.
-  it.skip('should handle invalid JSON in localStorage gracefully (initialize empty)', () => {
-    localStorage.setItem('invertedPairs', '{invalid json');
-    getItemSpy.mockReturnValueOnce('{invalid json');
-
-    // Suppress console error from JSON.parse failure during the test
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    
-    const { result } = renderHook(() => useInvertedPairs());
-    
-    expect(result.current.invertedPairs).toEqual(new Set());
-    expect(getItemSpy).toHaveBeenCalledWith('invertedPairs');
-     // Should still try to save the default empty state
-    expect(setItemSpy).toHaveBeenCalledWith('invertedPairs', '[]');
-
-    consoleErrorSpy.mockRestore(); 
-  });
-
   describe('handlePairInversion', () => {
     it('should add a pair to the set and update localStorage', () => {
       const { result } = renderHook(() => useInvertedPairs());

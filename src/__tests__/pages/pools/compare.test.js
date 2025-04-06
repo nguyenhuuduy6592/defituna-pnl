@@ -1,300 +1,187 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ComparePoolsPage from '../../../pages/pools/compare';
+import PoolComparisonPage from '../../../pages/pools/compare';
 import { useComparison } from '../../../contexts/ComparisonContext';
-import { usePoolData } from '../../../hooks/usePoolData';
+import * as formatters from '../../../utils/formatters'; // Import all formatters
 
-// Mock Next.js Link component
+// Mock Next.js components
+jest.mock('next/head', () => {
+  return {
+    __esModule: true,
+    default: ({ children }) => <>{children}</>,
+  };
+});
 jest.mock('next/link', () => {
-  return ({ children, href }) => (
-    <a href={href} data-testid="next-link">
-      {children}
-    </a>
-  );
+  return {
+    __esModule: true,
+    default: ({ children, href, className }) => <a href={href} className={className} data-testid={`link-to-${href}`}>{children}</a>,
+  };
 });
 
-// Mock the hooks
+// Mock context hook
 jest.mock('../../../contexts/ComparisonContext');
-jest.mock('../../../hooks/usePoolData');
 
-// Mock components
-jest.mock('../../../components/common/LoadingOverlay', () => ({
-  __esModule: true,
-  default: ({ isLoading }) => (
-    isLoading ? <div data-testid="loading-indicator">Loading...</div> : null
-  ),
-}));
+// Mock PoolMetrics component
+jest.mock('../../../components/pools/PoolMetrics', () => {
+  return {
+    __esModule: true,
+    default: ({ poolAddress, timeframe }) => (
+      <div data-testid={`pool-metrics-${poolAddress}-${timeframe}`}>Metrics for {poolAddress} ({timeframe})</div>
+    ),
+  };
+});
 
-jest.mock('../../../components/pools/PoolComparisonTable', () => ({
-  __esModule: true,
-  default: ({ pools }) => (
-    <div data-testid="pool-comparison-table">
-      <div>Comparing {pools.length} pools</div>
-      {pools.map(pool => (
-        <div key={pool.address} data-testid={`pool-row-${pool.address}`}>
-          {pool.tokenA.symbol}/{pool.tokenB.symbol}
-        </div>
-      ))}
-    </div>
-  ),
-}));
+// Helper function to create mock pool data
+// Note: fee_rate in API is basis points (e.g., 5 = 0.05%)
+const createMockPool = (id, symbolA, symbolB, tvl, vol24, fee24, yield24, feeRate = 5) => ({
+  address: id,
+  tokenA: { symbol: symbolA },
+  tokenB: { symbol: symbolB },
+  tvl_usdc: tvl,
+  stats: { 
+    '24h': { volume: vol24, fees: fee24, yield_over_tvl: yield24 },
+    '7d': { volume: vol24 * 6, fees: fee24 * 6, yield_over_tvl: yield24 * 0.9 }, // Mock different data
+    '30d': { volume: vol24 * 25, fees: fee24 * 25, yield_over_tvl: yield24 * 0.8 },
+   },
+  fee_rate: feeRate, // Use basis points directly
+  protocol_fee_rate: 0, // Assume 0 for simplicity
+});
 
-jest.mock('../../../components/pools/PoolDropdown', () => ({
-  __esModule: true,
-  default: ({ pools, selectedPools, onSelectPool }) => (
-    <div data-testid="pool-dropdown">
-      <select 
-        data-testid="pool-select"
-        onChange={(e) => onSelectPool(e.target.value)}
-      >
-        <option value="">Select a pool</option>
-        {pools
-          .filter(p => !selectedPools.includes(p.address))
-          .map(pool => (
-            <option key={pool.address} value={pool.address}>
-              {pool.tokenA.symbol}/{pool.tokenB.symbol}
-            </option>
-          ))}
-      </select>
-    </div>
-  ),
-}));
 
-jest.mock('../../../components/common/TimeframeSelector', () => ({
-  __esModule: true,
-  default: ({ timeframes, selected, onChange }) => (
-    <div data-testid="timeframe-selector">
-      {timeframes.map(timeframe => (
-        <button 
-          key={timeframe} 
-          data-testid={`timeframe-${timeframe}`}
-          className={selected === timeframe ? 'active' : ''}
-          onClick={() => onChange(timeframe)}
-        >
-          {timeframe}
-        </button>
-      ))}
-    </div>
-  ),
-}));
+describe('PoolComparisonPage (/pools/compare)', () => {
+  const mockRemovePool = jest.fn();
+  const mockClearComparison = jest.fn();
+  const mockPool1 = createMockPool('pool1', 'SOL', 'USDC', 1000000, 50000, 50, 0.0005, 5); // 0.05% fee rate
+  const mockPool2 = createMockPool('pool2', 'ETH', 'USDT', 2000000, 100000, 100, 0.0004, 10); // 0.10% fee rate
 
-describe('Compare Pools Page', () => {
-  const mockPools = [
-    {
-      address: 'pool1',
-      tokenA: { symbol: 'ETH', logoURI: '/eth.png' },
-      tokenB: { symbol: 'USDC', logoURI: '/usdc.png' },
-      tvl_usdc: 1000000,
-      fee_rate: 500,
-      provider: 'orca',
-      stats: {
-        '24h': {
-          volume: 500000,
-          fees: 250,
-          yield_over_tvl: 0.05
-        },
-        '7d': {
-          volume: 3500000,
-          fees: 1750,
-          yield_over_tvl: 0.07
-        }
-      }
-    },
-    {
-      address: 'pool2',
-      tokenA: { symbol: 'SOL', logoURI: '/sol.png' },
-      tokenB: { symbol: 'USDT', logoURI: '/usdt.png' },
-      tvl_usdc: 500000,
-      fee_rate: 300,
-      provider: 'raydium',
-      stats: {
-        '24h': {
-          volume: 250000,
-          fees: 75,
-          yield_over_tvl: 0.03
-        },
-        '7d': {
-          volume: 1750000,
-          fees: 525,
-          yield_over_tvl: 0.04
-        }
-      }
-    }
-  ];
-  
-  const mockRemovePoolFromComparison = jest.fn();
-  
   beforeEach(() => {
     jest.clearAllMocks();
-    
-    // Mock useComparison hook
+    // Default mock state with pools
     useComparison.mockReturnValue({
-      comparisonPools: mockPools,
-      removePoolFromComparison: mockRemovePoolFromComparison,
-      clearComparison: jest.fn()
-    });
-    
-    // Mock usePoolData hook
-    usePoolData.mockImplementation((poolId) => {
-      const pool = mockPools.find(p => p.address === poolId);
-      return {
-        loading: false,
-        error: null,
-        data: pool || null,
-        feeAPR: 10.5,
-        volumeTVLRatio: 0.5,
-        volatility: 'Medium'
-      };
+      comparisonPools: [mockPool1, mockPool2],
+      removePoolFromComparison: mockRemovePool,
+      clearComparison: mockClearComparison,
     });
   });
-  
-  it('renders the page title and description', () => {
-    render(<ComparePoolsPage />);
-    
-    expect(screen.getByText('Compare Pools')).toBeInTheDocument();
-    expect(
-      screen.getByText(/Compare key metrics across selected pools/i)
-    ).toBeInTheDocument();
+
+  it('renders the page title and heading', () => {
+    render(<PoolComparisonPage />);
+    // Title is set in <Head> which is mocked, so we can't directly assert document.title
+    expect(screen.getByRole('heading', { name: /Pool Comparison/i })).toBeInTheDocument();
   });
-  
-  it('renders the timeframe selector', () => {
-    render(<ComparePoolsPage />);
-    
-    expect(screen.getByTestId('timeframe-selector')).toBeInTheDocument();
+
+  it('renders navigation links', () => {
+    render(<PoolComparisonPage />);
+    expect(screen.getByTestId('link-to-/pools')).toHaveTextContent('← Back to Pools');
+    expect(screen.getByTestId('link-to-/')).toHaveTextContent('Home');
   });
-  
-  it('renders all pools in comparison', () => {
-    render(<ComparePoolsPage />);
-    
-    expect(screen.getByText('ETH/USDC')).toBeInTheDocument();
-    expect(screen.getByText('SOL/USDT')).toBeInTheDocument();
+
+  it('renders the empty state when no pools are selected', () => {
+    useComparison.mockReturnValueOnce({ comparisonPools: [], removePoolFromComparison: mockRemovePool, clearComparison: mockClearComparison });
+    render(<PoolComparisonPage />);
+    expect(screen.getByText(/No pools selected for comparison/i)).toBeInTheDocument();
+    expect(screen.getByText(/pools page/i).closest('a')).toHaveAttribute('href', '/pools');
+    expect(screen.getByRole('button', { name: /Clear All/i })).toBeDisabled(); // Clear button disabled
   });
-  
-  it('renders comparison table with metrics', () => {
-    render(<ComparePoolsPage />);
-    
-    // Check for table headers
-    expect(screen.getByText('Pool')).toBeInTheDocument();
-    expect(screen.getByText('TVL')).toBeInTheDocument();
-    expect(screen.getByText('Volume')).toBeInTheDocument();
-    expect(screen.getByText('Fee')).toBeInTheDocument();
-    expect(screen.getByText('Fee APR')).toBeInTheDocument();
-    expect(screen.getByText('Vol/TVL')).toBeInTheDocument();
-    expect(screen.getByText('Provider')).toBeInTheDocument();
+
+  it("renders the timeframe selector with default selection ('24h')", () => {
+    render(<PoolComparisonPage />);
+    const button24h = screen.getByRole('button', { name: '24h' });
+    const button7d = screen.getByRole('button', { name: '7d' });
+    const button30d = screen.getByRole('button', { name: '30d' });
+    expect(button24h).toHaveClass('active');
+    expect(button7d).not.toHaveClass('active');
+    expect(button30d).not.toHaveClass('active');
   });
-  
-  it('calls removePoolFromComparison when remove button is clicked', () => {
-    render(<ComparePoolsPage />);
-    
-    // Find remove buttons
-    const removeButtons = screen.getAllByText('Remove');
-    
-    // Click the first remove button
-    fireEvent.click(removeButtons[0]);
-    
-    expect(mockRemovePoolFromComparison).toHaveBeenCalledWith('pool1');
+
+  it('changes the displayed metrics when timeframe is changed', () => {
+    // Using a simple check by looking for the timeframe in the metric label
+    render(<PoolComparisonPage />);
+    expect(screen.getByText(/Volume \(24h\)/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Volume \(7d\)/i)).not.toBeInTheDocument();
+
+    const button7d = screen.getByRole('button', { name: '7d' });
+    fireEvent.click(button7d);
+
+    expect(button7d).toHaveClass('active');
+    expect(screen.queryByText(/Volume \(24h\)/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Volume \(7d\)/i)).toBeInTheDocument(); 
   });
-  
-  it('shows empty state when no pools are in comparison', () => {
-    useComparison.mockReturnValueOnce({
-      comparisonPools: [],
-      removePoolFromComparison: mockRemovePoolFromComparison,
-      clearComparison: jest.fn()
-    });
-    
-    render(<ComparePoolsPage />);
-    
-    expect(screen.getByText('No pools selected for comparison')).toBeInTheDocument();
-    expect(screen.getByText('Go to Pools')).toBeInTheDocument();
+
+  it('renders the comparison grid with pool headers when pools exist', () => {
+    render(<PoolComparisonPage />);
+    expect(screen.getByText('SOL/USDC')).toBeInTheDocument();
+    expect(screen.getByText('ETH/USDT')).toBeInTheDocument();
+    expect(screen.getByLabelText(`Remove SOL/USDC from comparison`)).toBeInTheDocument();
+    expect(screen.getByLabelText(`Remove ETH/USDT from comparison`)).toBeInTheDocument();
   });
-  
-  it('renders "Clear All" button when pools are in comparison', () => {
-    render(<ComparePoolsPage />);
-    
-    const clearButton = screen.getByText('Clear All');
-    expect(clearButton).toBeInTheDocument();
+
+  it('calls removePoolFromComparison when a remove button is clicked', () => {
+    render(<PoolComparisonPage />);
+    const removeButtonPool1 = screen.getByLabelText(`Remove SOL/USDC from comparison`);
+    fireEvent.click(removeButtonPool1);
+    expect(mockRemovePool).toHaveBeenCalledWith('pool1');
+    expect(mockRemovePool).toHaveBeenCalledTimes(1);
   });
-  
-  it('calls clearComparison when "Clear All" button is clicked', () => {
-    const mockClearComparison = jest.fn();
-    useComparison.mockReturnValueOnce({
-      comparisonPools: mockPools,
-      removePoolFromComparison: mockRemovePoolFromComparison,
-      clearComparison: mockClearComparison
-    });
-    
-    render(<ComparePoolsPage />);
-    
-    const clearButton = screen.getByText('Clear All');
+
+  it('calls clearComparison when the Clear All button is clicked', () => {
+    render(<PoolComparisonPage />);
+    const clearButton = screen.getByRole('button', { name: /Clear All/i });
+    expect(clearButton).toBeEnabled();
     fireEvent.click(clearButton);
-    
-    expect(mockClearComparison).toHaveBeenCalled();
+    expect(mockClearComparison).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders basic metrics labels', () => {
+    render(<PoolComparisonPage />);
+    expect(screen.getByText('TVL')).toBeInTheDocument();
+    expect(screen.getByText(/Volume \(24h\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Fees \(24h\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/Yield \(24h\)/i)).toBeInTheDocument();
+    expect(screen.getByText('Fee Rate')).toBeInTheDocument();
   });
   
-  it('includes a link back to all pools', () => {
-    render(<ComparePoolsPage />);
+  it('renders basic metrics values correctly formatted', () => {
+    render(<PoolComparisonPage />);
     
-    const backLink = screen.getByText('Back to All Pools');
-    expect(backLink).toBeInTheDocument();
-    expect(backLink).toHaveAttribute('href', '/pools');
-  });
-  
-  it('renders provider information for each pool', () => {
-    render(<ComparePoolsPage />);
+    // Find the row containing the 'Fee Rate' label
+    const feeRateLabel = screen.getByText('Fee Rate');
+    const feeRateRow = feeRateLabel.closest('.comparisonRow'); // Find the parent row
+    expect(feeRateRow).toBeInTheDocument(); // Ensure the row was found
+
+    // Within that row, find all pool columns using querySelectorAll as role/name wasn't found
+    const poolColumns = feeRateRow.querySelectorAll('.poolColumn'); // Use querySelectorAll based on class
+    expect(poolColumns.length).toBeGreaterThanOrEqual(2); // Ensure we have columns for our pools
+
+    // Spot check pool1's 24h Volume (using getAllByText as volume might appear elsewhere)
+    expect(screen.getAllByText(formatters.formatFee(mockPool1.stats['24h'].volume || 0, true))[0]).toBeInTheDocument();
+    // Spot check pool2's TVL
+    expect(screen.getByText(formatters.formatFee(mockPool2.tvl_usdc, true))).toBeInTheDocument();
     
-    expect(screen.getByText('orca')).toBeInTheDocument();
-    expect(screen.getByText('raydium')).toBeInTheDocument();
+    // Spot check pool1's Fee Rate (formatted) within its specific column
+    const pool1FeeRateValue = within(poolColumns[0]).getByText(formatters.formatPercentage(mockPool1.fee_rate / 10000));
+    expect(pool1FeeRateValue).toBeInTheDocument(); 
+
+    // Spot check pool2's Fee Rate (formatted) within its specific column
+    const pool2FeeRateValue = within(poolColumns[1]).getByText(formatters.formatPercentage(mockPool2.fee_rate / 10000));
+    expect(pool2FeeRateValue).toBeInTheDocument();
   });
 
-  it('renders the pool comparison page', async () => {
-    await act(async () => {
-      render(<ComparePoolsPage />);
-    });
+  it('renders PoolMetrics component for each pool with correct props', () => {
+    render(<PoolComparisonPage />);
+    expect(screen.getByTestId('pool-metrics-pool1-24h')).toBeInTheDocument();
+    expect(screen.getByTestId('pool-metrics-pool2-24h')).toBeInTheDocument();
 
-    expect(screen.getByText('Compare Pools')).toBeInTheDocument();
-    expect(screen.getByTestId('pool-comparison-table')).toBeInTheDocument();
-    expect(screen.getByText('Comparing 2 pools')).toBeInTheDocument();
-    expect(screen.getByTestId('pool-row-pool1')).toBeInTheDocument();
-    expect(screen.getByTestId('pool-row-pool2')).toBeInTheDocument();
+    // Change timeframe and check again
+    fireEvent.click(screen.getByRole('button', { name: '7d' }));
+    expect(screen.getByTestId('pool-metrics-pool1-7d')).toBeInTheDocument();
+    expect(screen.getByTestId('pool-metrics-pool2-7d')).toBeInTheDocument();
   });
 
-  it('allows changing timeframe', async () => {
-    await act(async () => {
-      render(<ComparePoolsPage />);
-    });
-    
-    // Change to 7d timeframe
-    const timeframe7d = screen.getByTestId('timeframe-7d');
-    
-    await act(async () => {
-      fireEvent.click(timeframe7d);
-    });
-    
-    // This test would need to verify state changes or effects of timeframe change
-    // For this mock setup, we can just verify the click event works
-    expect(timeframe7d).toHaveClass('active');
-  });
-
-  it.skip('allows adding a new pool to compare', async () => {
-    // This would require a more complex mock setup
-    // We need to add a third pool to the mockPools and simulate selection
-  });
-
-  it.skip('allows removing a pool from comparison', async () => {
-    // This would require a more complex mock setup
-  });
-
-  it.skip('redirects to pools page if no pools selected', async () => {
-    // This would require a more complex mock setup
-  });
-
-  it.skip('shows loading indicator when pool data is loading', async () => {
-    // This would require a more complex mock setup
-  });
-
-  it.skip('shows error message when loading pools fails', async () => {
-    // This would require a more complex mock setup
+  it('renders View Pool Details link for each pool', () => {
+    render(<PoolComparisonPage />);
+    expect(screen.getByTestId('link-to-/pools/pool1')).toHaveTextContent('View Pool Details');
+    expect(screen.getByTestId('link-to-/pools/pool2')).toHaveTextContent('View Pool Details');
   });
 }); 

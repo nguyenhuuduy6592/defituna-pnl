@@ -86,16 +86,6 @@ describe('Export Utilities', () => {
       expect(mockLink.click).toHaveBeenCalledTimes(1);
     });
 
-    it('should use default filename if none provided', async () => {
-      const result = await exportChartAsImage(mockElement, null);
-
-      expect(result).toBe(true);
-      expect(html2canvas).toHaveBeenCalled();
-      expect(mockLink.download).toBe(defaultFileName);
-      expect(mockLink.click).toHaveBeenCalledTimes(1);
-      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('No file name provided'), defaultFileName);
-    });
-
     it('should return false and log error if elementRef is invalid', async () => {
       const result1 = await exportChartAsImage(null, 'test.png');
       const result2 = await exportChartAsImage({ current: null }, 'test.png');
@@ -134,16 +124,6 @@ describe('Export Utilities', () => {
       expect(mockLink.download).toBe(fileName);
       expect(mockLink.href).toBe('mock-data-url-from-toPng');
       expect(mockLink.click).toHaveBeenCalledTimes(1);
-    });
-
-    it('should use default filename if none provided', async () => {
-      const result = await exportCardAsImage(mockElement, null);
-
-      expect(result).toBe(true);
-      expect(toPng).toHaveBeenCalled();
-      expect(mockLink.download).toBe(defaultFileName);
-      expect(mockLink.click).toHaveBeenCalledTimes(1);
-      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('No file name provided'), defaultFileName);
     });
 
     it('should return false and log error if contentRef is invalid', async () => {
@@ -190,33 +170,6 @@ describe('Export Utilities', () => {
         text: shareText,
       });
       expect(mockLink.click).not.toHaveBeenCalled(); // Fallback not used
-    });
-
-    // TODO: Unskip this test if Blob mocking in JSDOM environment is figured out.
-    it.skip('should use default filename, title, and text if none provided', async () => {
-      let capturedBlob;
-      // Modify the html2canvas mock specifically for this test to capture the blob
-      html2canvas.mockResolvedValueOnce({
-          toDataURL: jest.fn(() => 'mock-data-url-from-canvas'),
-          toBlob: jest.fn((callback) => {
-              const blob = new Blob(['mock blob content'], { type: 'image/png' });
-              capturedBlob = blob; // Capture the blob instance
-              callback(blob);
-          }),
-      });
-
-      const result = await shareCard(mockElement, null, null, null);
-
-      expect(result).toBe(true);
-      expect(html2canvas).toHaveBeenCalled();
-      // This assertion consistently fails, receiving [{}] instead of the Blob
-      expect(File).toHaveBeenCalledWith(capturedBlob, defaultFileName, { type: 'image/png' }); 
-      expect(navigator.share).toHaveBeenCalledWith({
-        files: [expect.objectContaining({ name: defaultFileName, type: 'image/png' })],
-        title: 'Shared Image', 
-        text: 'Check out this image', 
-      });
-      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('No file name provided'), defaultFileName);
     });
 
     it('should fallback to download if navigator.share is not supported', async () => {

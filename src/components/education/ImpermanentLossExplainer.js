@@ -24,7 +24,7 @@ const ImpermanentLossExplainer = () => {
             to when you deposited them in the liquidity pool. The more volatile the 
             trading pair, the higher the risk of impermanent loss.
           </p>
-          <p>
+          <div className={styles.infoParagraph}> 
             <InfoIcon 
               content={getImpermanentLossTooltip()} 
               position="right" 
@@ -33,7 +33,7 @@ const ImpermanentLossExplainer = () => {
             <span className={styles.infoText}>
               Click the info icon for more details
             </span>
-          </p>
+          </div>
         </div>
         
         <div className={styles.visual}>
