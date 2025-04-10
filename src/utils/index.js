@@ -10,4 +10,5 @@ export * from './pairUtils';
 export * from './constants';
 export * from './chart';
 export * from './export';
-export * from './styles'; 
+export * from './styles';
+export * from './indexedDB'; 
