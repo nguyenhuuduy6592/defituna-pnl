@@ -14,9 +14,7 @@ import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
 import { 
-  addWalletAddressToPositions, 
-  decodePositions, 
-  decodeValue 
+  fetchWalletPnL
 } from '../utils';
 import styles from './index.module.scss';
 import Link from 'next/link';
@@ -58,48 +56,8 @@ export default () => {
     }
   }, []);
 
-  // Base function for fetching PnL data for a single wallet
-  const _fetchWalletPnL = useCallback(async (walletAddress) => {
-    if (!walletAddress) return null;
-    try {
-      const res = await fetch('/api/fetch-pnl', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress })
-      });
-      if (!res.ok) {
-        const errorData = await res.json();
-        console.error(`Error fetching for ${walletAddress}:`, errorData);
-        throw new Error(errorData.error || `Failed to fetch data for ${walletAddress}`);
-      }
-      
-      const data = await res.json();
-      
-      // Decode the total PnL value (using same USD_MULTIPLIER = 100)
-      if (data.t_pnl !== undefined) {
-        data.totalPnL = decodeValue(data.t_pnl, 100);
-        delete data.t_pnl; // Remove the encoded field
-      }
-      
-      // First decode the numeric encoded values in positions
-      if (data && data.positions) {
-        data.positions = decodePositions(data.positions);
-      }
-      
-      // Then add the wallet address to each position (was removed from server response)
-      if (data && data.positions) {
-        data.positions = addWalletAddressToPositions(data.positions, walletAddress);
-      }
-      
-      return data;
-    } catch (err) {
-      console.error(`Caught error fetching for ${walletAddress}:`, err);
-      return { error: err.message || 'Unknown error fetching wallet data' }; 
-    }
-  }, []);
-
   // Debounced version for auto-refresh - extract the execute function
-  const { execute: debouncedExecuteFetchWalletPnL } = useDebounceApi(_fetchWalletPnL, 500);
+  const { execute: debouncedExecuteFetchWalletPnL } = useDebounceApi(fetchWalletPnL, 500);
 
   // Aggregate PnL data from multiple wallets, filtering out errors
   const aggregatePnLData = useCallback((walletsData) => {
@@ -130,7 +88,7 @@ export default () => {
 
     try {
       // Select the appropriate fetch function
-      const fetchFunc = isSubmission ? _fetchWalletPnL : debouncedExecuteFetchWalletPnL;
+      const fetchFunc = isSubmission ? fetchWalletPnL : debouncedExecuteFetchWalletPnL;
 
       const results = await Promise.all(
         walletsToFetch.map(address => fetchFunc(address))
@@ -190,7 +148,7 @@ export default () => {
     startFetchCooldown, 
     historyEnabled, 
     savePositionSnapshot, 
-    _fetchWalletPnL, 
+    fetchWalletPnL, 
     wallet, 
     addWallet, 
     setWallet, 

@@ -11,4 +11,5 @@ export * from './constants';
 export * from './chart';
 export * from './export';
 export * from './styles';
-export * from './indexedDB'; 
+export * from './indexedDB';
+export * from './pnlUtils'; 
