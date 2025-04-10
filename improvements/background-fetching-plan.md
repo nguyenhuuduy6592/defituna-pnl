@@ -1,4 +1,4 @@
-# Background Data Fetching Implementation Plan (v2.1)
+# Background Data Fetching Implementation Plan (v2.3)
 
 ## Overview
 This document outlines the plan to implement background data fetching for the DeFiTuna application using a Service Worker. The goal is to enable real-time updates of position data even when the browser tab is inactive, enhancing user experience and data reliability, addressing browser compatibility, testing, and error handling, focusing on minimal schema changes while ensuring reliability.
@@ -10,7 +10,6 @@ This document outlines the plan to implement background data fetching for the De
 - **Action:** Enhance service worker for background sync
 - **Implementation Details:**
   - Add `install`/`activate` listeners for cache setup
-  - Implement `periodicsync` event handler for background fetches
   - Create `fetchPositions()` function to:
     - Call API endpoints (reuse existing fetch logic)
     - Validate response data
@@ -20,10 +19,9 @@ This document outlines the plan to implement background data fetching for the De
         - **404 Not Found:** Log the error and notify the user that the data could not be retrieved.
         - **500 Internal Server Error:** Log the error and implement a retry mechanism with exponential backoff.
         - **Network Errors:** Log the error and attempt to fetch from the cache if available.
-- **Browser Support:**
-  - Check for `periodicSync` support: `'periodicSync' in registration`
-  - **Fallback:** If unsupported, use `setInterval` (every 5 min) to fetch data.
-    - **Implementation:** Ensure that the fallback fetches the latest data without overwhelming the API.
+  - **Timer Logic:** 
+    - Use `setInterval` to fetch data based on the refresh interval set in `AutoRefresh.js`, allowing background fetching even when the tab is closed.
+    - Ensure that the timer fetches the latest data without overwhelming the API.
 - **Status:** Not Started
 
 ### 2. Service Worker Registration
@@ -51,9 +49,9 @@ This document outlines the plan to implement background data fetching for the De
 - **Action:** Integrate with Service Worker
 - **Implementation Details:**
   - **New Logic:**
-    - Register periodic sync on mount
+    - Register the timer on mount to fetch data at the specified interval and if auto refresh is enabled.
     - Sync interval = current refresh interval
-    - Add `useEffect` cleanup to unregister
+    - Add `useEffect` cleanup to clear the timer when the component unmounts.
   - **Error Handling:**
     - Service Worker: Logs technical details for debugging.
     - UI: Shows user-friendly alerts for sync failures or issues.
@@ -72,7 +70,7 @@ This document outlines the plan to implement background data fetching for the De
 - **Test Areas:**
   1. **Service Worker:**
      - Mock `navigator.serviceWorker` in Jest
-     - Test `periodicsync` event responses
+     - Test timer-based fetch logic
      - Verify offline fallback behavior
   2. **IndexedDB:**
      - Verify existing logic tests work
