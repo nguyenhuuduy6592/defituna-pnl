@@ -7,7 +7,7 @@ export default function App({ Component, pageProps }) {
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       window.addEventListener('load', () => {
         navigator.serviceWorker
-          .register('/sw.js')
+          .register('/service-worker.js')
           .then(registration => {
             console.log('Service Worker registered:', registration)
           })

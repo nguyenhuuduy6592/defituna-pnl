@@ -12,7 +12,7 @@ const nextConfig = {
   },
   headers: async () => [
     {
-      source: '/sw.js',
+      source: '/service-worker.js',
       headers: [
         {
           key: 'Cache-Control',

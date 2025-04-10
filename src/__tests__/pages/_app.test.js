@@ -71,7 +71,7 @@ describe('App Component (_app.js)', () => {
        map.load();
     });
 
-    expect(navigator.serviceWorker.register).toHaveBeenCalledWith('/sw.js');
+    expect(navigator.serviceWorker.register).toHaveBeenCalledWith('/service-worker.js');
     // We expect the console log upon successful registration (async)
     // Need to await the promise resolution
     return Promise.resolve().then(() => {
