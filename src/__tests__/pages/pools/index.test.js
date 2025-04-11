@@ -202,7 +202,7 @@ describe('Pools Page', () => {
   it('includes a link back to the PnL viewer', () => {
     render(<PoolsPage />);
     
-    const homeLink = screen.getByText('Back to PnL Viewer');
+    const homeLink = screen.getByText('← Back to PnL Viewer');
     expect(homeLink).toBeInTheDocument();
     expect(homeLink).toHaveAttribute('href', '/');
   });

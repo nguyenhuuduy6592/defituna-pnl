@@ -1,0 +1,42 @@
+.versionContainer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+  text-align: center;
+  padding: 0.5rem 0.5rem 0.75rem 0.5rem;
+  z-index: 1000;
+}
+
+.versionText {
+  font-size: 0.8em;
+  color: #888;
+  display: inline-block;
+}
+
+.releaseNotesLink {
+  font-size: 0.7em;
+  margin-left: 0.5rem;
+  color: #666;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+    color: #444;
+  }
+}
+
+.backLink {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  color: #333;
+  text-decoration: none;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #e0e0e0;
+  }
+}

@@ -1,11 +1,21 @@
 import React from 'react';
-import { render, act } from '@testing-library/react';
-import App from '../../pages/_app'; 
-import { ComparisonProvider } from '../../contexts/ComparisonContext';
+import { render, act, screen } from '@testing-library/react';
+import App from '../../pages/_app';
+import AppVersionDisplay from '../../components/AppVersionDisplay';
 
 // Mock the ComparisonProvider as its internal logic isn't the focus here
 jest.mock('../../contexts/ComparisonContext', () => ({
   ComparisonProvider: ({ children }) => <div data-testid="mock-comparison-provider">{children}</div>,
+}));
+
+// Mock AppVersionDisplay
+jest.mock('../../components/AppVersionDisplay', () => {
+  return jest.fn(() => <div data-testid="mock-version-display">Version Display</div>);
+});
+
+// Mock styles
+jest.mock('@/styles/AppVersion.module.scss', () => ({
+  versionContainer: 'versionContainer'
 }));
 
 // Mock navigator.serviceWorker
@@ -121,5 +131,11 @@ describe('App Component (_app.js)', () => {
     });
 
     expect(console.error).toHaveBeenCalledWith('Service Worker registration failed:', registrationError);
+  });
+  
+  it('renders AppVersionDisplay component', () => {
+    render(<App Component={MockComponent} pageProps={mockPageProps} />);
+    expect(screen.getByTestId('mock-version-display')).toBeInTheDocument();
+    expect(AppVersionDisplay).toHaveBeenCalled();
   });
 }); 

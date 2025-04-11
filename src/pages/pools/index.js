@@ -52,7 +52,7 @@ export default function PoolsPage() {
               </Link>
             )}
             <Link href="/" className={styles.homeLink}>
-              Back to PnL Viewer
+            ← Back to PnL Viewer
             </Link>
           </div>
         </div>
