@@ -4,6 +4,8 @@
  * Constants are grouped by functionality.
  */
 
+export const appTitle = 'Defituna PnL Viewer';
+
 /**
  * Time period options for data fetching and display
  * @type {Object}

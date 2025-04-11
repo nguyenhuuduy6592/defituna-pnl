@@ -5,12 +5,13 @@ import fs from 'fs';
 import path from 'path';
 import ReactMarkdown from 'react-markdown';
 import styles from '@/styles/ReleaseNotes.module.scss';
+import { appTitle } from '../utils';
 
 function ReleaseNotesPage({ notes }) {
   return (
     <div className={styles.container}>
       <Head>
-        <title>DeFiTuna PnL Viewer - Release Notes</title>
+        <title>Release Notes - {appTitle}</title>
         <meta name="description" content="View version history and latest updates for DeFiTuna PnL Viewer" />
       </Head>
 

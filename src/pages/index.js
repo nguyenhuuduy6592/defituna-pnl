@@ -13,11 +13,10 @@ import {
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
-import { 
-  fetchWalletPnL
-} from '../utils';
+import { fetchWalletPnL, appTitle } from '../utils';
 import styles from './index.module.scss';
 import Link from 'next/link';
+import Head from 'next/head';
 
 export default () => {
   const [loading, setLoading] = useState(false);
@@ -225,12 +224,13 @@ export default () => {
     localStorage.setItem('disclaimerShown', 'true');
   };
 
-  const title = 'Defituna PnL Viewer';
   return (
     <div className="container">
-      <title>{title}</title>
+      <Head>
+        <title>{appTitle}</title>
+      </Head>
       <div className={styles.titleContainer}>
-        <h1>{title}</h1>
+        <h1>{appTitle}</h1>
         <Tooltip content={`• View Defituna positions and PnL
 • No transactions needed - just enter wallet address
 • Support for multiple wallets

@@ -6,6 +6,7 @@ import PoolCard from '../../components/pools/PoolCard';
 import PoolFilters from '../../components/pools/PoolFilters';
 import { useComparison } from '../../contexts/ComparisonContext';
 import styles from '../../styles/Pools.module.scss';
+import { appTitle } from '../../utils/constants';
 
 export default function PoolsPage() {
   // State for selected timeframe (24h, 7d, 30d)
@@ -38,7 +39,7 @@ export default function PoolsPage() {
   return (
     <div className={styles.container}>
       <Head>
-        <title>DeFiTuna - All Pools</title>
+        <title>All Pools - {appTitle}</title>
         <meta name="description" content="Explore all available pools on DeFiTuna" />
       </Head>
       
