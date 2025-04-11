@@ -33,10 +33,12 @@ const nextConfig = {
 };
 
 export default withPWA({
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
-  register: true,
+  dest: 'public', // RESTORED: Ensure SW is output to public directory
+  // disable: process.env.NODE_ENV === 'development', // Keep REMOVED
+  swSrc: 'src/service-worker/index.js',
+  // swDest: 'public/service-worker.js', // Keep REMOVED (dest handles this)
+  register: true, // Keep registration enabled
   skipWaiting: true,
-  runtimeCaching: [],
+  // runtimeCaching: [], // Keep REMOVED
   buildExcludes: [/middleware-manifest\.json$/],
 })(nextConfig);

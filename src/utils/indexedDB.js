@@ -65,14 +65,16 @@ export const savePositionSnapshot = async (db, positions, timestamp = Date.now()
     const tx = db.transaction(STORE_NAMES.POSITIONS, 'readwrite');
     const store = tx.objectStore(STORE_NAMES.POSITIONS);
 
-    // Save each position in the transaction
     await Promise.all(positions.map(position => {
-      if (!position || !position.pair || !position.positionAddress) {
-        return Promise.resolve(); // Skip invalid positions
+      // Enhanced Validation: Check if position is an object and has necessary keys
+      if (!position || typeof position !== 'object' || !position.pair || !position.positionAddress) {
+        console.warn('[savePositionSnapshot] Skipping invalid position for saving:', position);
+        return Promise.resolve(); 
       }
       
       const id = `${position.pair}-${position.positionAddress}`;
-      return store.add({
+      // Use put instead of add to handle potential duplicate entries from rapid syncs gracefully (overwrite)
+      return store.put({
         ...position,
         id,
         timestamp
@@ -83,6 +85,8 @@ export const savePositionSnapshot = async (db, positions, timestamp = Date.now()
     return true;
   } catch (error) {
     console.error('Failed to save position snapshot:', error);
+    // Log constraint errors specifically if needed, though put avoids most of these
+    // if (error.name === 'ConstraintError') { ... }
     return false;
   }
 };
@@ -119,9 +123,38 @@ export const getPositionHistory = async (db, positionId, timeRange) => {
  * Clean up historical data older than the specified retention period
  * 
  * @param {IDBDatabase} db - Database instance
- * @param {number} retentionDays - Number of days to retain data for
+ * @param {number} retentionDays - Number of days to retain data for (defaults to DEFAULT_RETENTION_DAYS)
  * @returns {Promise<boolean>} Success status
  */
+export const cleanupData = async (db, retentionDays = DEFAULT_RETENTION_DAYS) => {
+  if (!db) return false;
+
+  try {
+    const cutoffTimestamp = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
+    const tx = db.transaction(STORE_NAMES.POSITIONS, 'readwrite');
+    const store = tx.objectStore(STORE_NAMES.POSITIONS);
+    const index = store.index('timestamp');
+    let cursor = await index.openCursor(IDBKeyRange.upperBound(cutoffTimestamp));
+    let deleteCount = 0;
+
+    while (cursor) {
+      // console.log('[cleanupData] Deleting old record with timestamp:', cursor.value.timestamp);
+      await cursor.delete();
+      deleteCount++;
+      cursor = await cursor.continue();
+    }
+
+    await tx.done;
+    if (deleteCount > 0) {
+        console.log(`[cleanupData] Successfully deleted ${deleteCount} old position records.`);
+    }
+    return true;
+  } catch (error) {
+    console.error('Failed to clean up old data:', error);
+    return false;
+  }
+};
+
 /**
  * Save data to a specific store
  * 

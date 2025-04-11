@@ -26,6 +26,9 @@ export const HistoryToggle = ({ enabled, onToggle, setAutoRefresh }) => {
     
     if (pendingAction) {
       setAutoRefresh(true); // Enable auto-refresh when enabling history
+    } else {
+      // Optionally, you might want to disable auto-refresh when disabling history?
+      // setAutoRefresh(false);
     }
     
     onToggle(pendingAction);

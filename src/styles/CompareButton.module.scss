@@ -1,49 +1,49 @@
-@import '@styles/variables.module.scss';
+@import 'variables.module.scss';
+
+.compareButtonContainer {
+  position: relative; 
+  display: inline-block; 
+}
 
 .compareButton {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: spacing(xs);
-  padding: spacing(sm) spacing(md);
-  border-radius: spacing(md);
-  border: 2px solid color(primary);
-  background-color: bg-color(white);
-  color: color(primary);
-  font-size: font-size(sm);
-  font-weight: 600;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--border-color-light);
+  border-radius: var(--border-radius);
+  background-color: var(--background-secondary);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 10;
-  position: relative;
-  min-width: 120px;
-  height: 36px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
 
-  &:hover {
-    background-color: color(primary-light);
-    color: color(primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  &:hover:not(:disabled) {
+    background-color: var(--background-tertiary);
+    border-color: var(--accent-color-primary);
   }
 
-  &.active {
-    background-color: color(primary);
-    color: white;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  svg {
+    margin-right: var(--spacing-xs);
+    fill: currentColor;
+  }
+
+  &.selected {
+    background-color: var(--accent-color-primary);
+    border-color: var(--accent-color-primary);
+    color: var(--text-on-accent);
 
     &:hover {
-      background-color: color(primary-dark);
+      background-color: var(--accent-color-secondary);
     }
-  }
 
-  .icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: font-size(md);
-  }
-  
-  .text {
-    font-weight: 500;
+    svg {
+      fill: var(--text-on-accent);
+    }
   }
 } 

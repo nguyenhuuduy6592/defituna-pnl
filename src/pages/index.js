@@ -15,6 +15,7 @@ import { WalletForm } from '@/components/pnl/WalletForm';
 import { AutoRefresh } from '@/components/pnl/AutoRefresh';
 import { PnLDisplay } from '@/components/pnl/PnLDisplay';
 import { fetchWalletPnL, appTitle } from '@/utils';
+import { postMessageToSW } from '@/utils/serviceWorkerUtils';
 import styles from '@/styles/index.module.scss';
 import Link from 'next/link';
 import Head from 'next/head';
@@ -46,6 +47,7 @@ export default () => {
     savePositionSnapshot,
     getPositionHistory
   } = useHistoricalData();
+
   // Check if this is the first visit
   useEffect(() => {
     const checkDisclaimerShown = async () => {
@@ -174,9 +176,7 @@ export default () => {
     refreshInterval,
     setRefreshInterval,
     refreshCountdown
-  } = useAutoRefresh(
-    useCallback(() => fetchPnLData(activeWallets), [fetchPnLData, activeWallets])
-  );
+  } = useAutoRefresh();
 
   // Auto fetch data if there are active wallets on page load
   useEffect(() => {
@@ -216,6 +216,11 @@ export default () => {
       loadAllHistory();
     }
   }, [historyEnabled, aggregatedData, getPositionHistory]);
+
+  // Effect to send wallet updates to Service Worker
+  useEffect(() => {
+    postMessageToSW({ type: 'SET_WALLETS', wallets: activeWallets });
+  }, [activeWallets]);
 
   const handleSubmit = async e => {
     e.preventDefault();

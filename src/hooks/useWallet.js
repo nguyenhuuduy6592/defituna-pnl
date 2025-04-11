@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB';
 
 /**
@@ -21,6 +21,7 @@ export const useWallet = () => {
   const [wallet, setWallet] = useState('');
   const [activeWallets, setActiveWallets] = useState([]);
   const [savedWallets, setSavedWallets] = useState([]);
+  const initialLoadComplete = useRef(false); // Flag for initial load
 
   /**
    * Load saved wallets and active wallets from IndexedDB on initialization
@@ -35,24 +36,33 @@ export const useWallet = () => {
 
         // Load saved wallets
         const savedWalletsData = await getData(db, STORE_NAMES.WALLETS, 'wallets');
-        setSavedWallets(savedWalletsData?.value || []);
+        const loadedSavedWallets = savedWalletsData?.value || [];
+        setSavedWallets(loadedSavedWallets);
 
         // Load active wallets
         const activeWalletsData = await getData(db, STORE_NAMES.WALLETS, 'activeWallets');
+        const loadedActiveWallets = activeWalletsData?.value;
+        
+        // Load lastWallet for backward compatibility
         const lastWalletData = await getData(db, STORE_NAMES.WALLETS, 'lastWallet');
+        const loadedLastWallet = lastWalletData?.value;
 
-        if (activeWalletsData?.value?.length > 0) {
-          setActiveWallets(activeWalletsData.value);
-        } else if (lastWalletData?.value) {
+        if (Array.isArray(loadedActiveWallets) && loadedActiveWallets.length > 0) {
+          setActiveWallets(loadedActiveWallets);
+        } else if (loadedLastWallet) {
           // For backward compatibility
-          setActiveWallets([lastWalletData.value]);
+          setActiveWallets([loadedLastWallet]);
+        } else {
+           setActiveWallets([]); // Ensure it's set to empty if nothing loaded
         }
       } catch (error) {
-        console.error('Error loading wallet data from IndexedDB:', error);
+        console.error('Error loading wallet data from IndexedDB:', error); // Keep error log
         // Reset to defaults on error
         setSavedWallets([]);
         setActiveWallets([]);
         setWallet('');
+      } finally {
+        initialLoadComplete.current = true; // Mark load as complete
       }
     };
 
@@ -60,9 +70,14 @@ export const useWallet = () => {
   }, []); // Only run once on mount
 
   /**
-   * Save settings to IndexedDB whenever they change
+   * Save settings to IndexedDB whenever they change, AFTER initial load
    */
   useEffect(() => {
+    // Prevent saving until initial load is done
+    if (!initialLoadComplete.current) {
+      return;
+    }
+
     const saveWalletData = async () => {
       try {
         const db = await initializeDB();
@@ -79,12 +94,12 @@ export const useWallet = () => {
             : saveData(db, STORE_NAMES.WALLETS, { key: 'lastWallet', value: null })
         ]);
       } catch (error) {
-        console.error('Error saving wallet data to IndexedDB:', error);
+        console.error('Error saving wallet data to IndexedDB:', error); // Keep error log
       }
     };
 
     saveWalletData();
-  }, [savedWallets, activeWallets, wallet]);
+  }, [savedWallets, activeWallets, wallet]); // Dependencies remain the same
 
   /**
    * Updates the current wallet input value

@@ -3,6 +3,7 @@ import {
   initializeDB as initDB,
   savePositionSnapshot as saveSnapshot,
   getPositionHistory as getHistory,
+  cleanupData,
   DEFAULT_RETENTION_DAYS,
   saveData,
   getData,
