@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import AppVersionDisplay from '../AppVersionDisplay';
+import AppVersionDisplay from '../components/AppVersionDisplay';
 
 // Mock the styles to avoid issues with CSS modules in tests
 jest.mock('@/styles/AppVersion.module.scss', () => ({
