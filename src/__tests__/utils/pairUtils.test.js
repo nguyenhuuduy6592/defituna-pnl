@@ -2,7 +2,7 @@ import {
   invertPairString,
   invertPrice,
   getAdjustedPosition
-} from '../../utils/pairUtils';
+} from '@/utils/pairUtils';
 
 describe('invertPairString', () => {
   it('handles invalid inputs', () => {

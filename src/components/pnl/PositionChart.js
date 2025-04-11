@@ -10,13 +10,13 @@ import {
   ResponsiveContainer,
   ReferenceLine
 } from 'recharts';
-import { Portal } from '../common/Portal';
-import { Tooltip } from '../common/Tooltip';
+import { Portal } from '@/components/common/Portal';
+import { Tooltip } from '@/components/common/Tooltip';
 import { BsInfoCircle } from 'react-icons/bs';
 import { HiDownload, HiShare } from 'react-icons/hi';
-import { prepareChartData, groupChartData, formatXAxisLabel, CustomChartTooltip, formatNumber, TIME_PERIODS } from '../../utils';
-import { exportChartAsImage, shareCard } from '../../utils/export';
-import styles from './PositionChart.module.scss';
+import { prepareChartData, groupChartData, formatXAxisLabel, CustomChartTooltip, formatNumber, TIME_PERIODS } from '@/utils';
+import { exportChartAsImage, shareCard } from '@/utils/export';
+import styles from '@/styles/PositionChart.module.scss';
 
 // --- Constants ---
 const Y_AXIS_DOMAIN_PADDING_FACTOR = 0.1;

@@ -8,7 +8,7 @@ import {
   getFeeRateTooltip,
   getImpermanentLossTooltip,
   getPriceImpactTooltip,
-} from '../../utils/tooltipContent';
+} from '@/utils/tooltipContent';
 
 describe('Tooltip Content Utilities', () => {
   describe('getFeeAPRTooltip', () => {

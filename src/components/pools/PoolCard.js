@@ -1,10 +1,10 @@
 import React from 'react';
 import Link from 'next/link';
-import styles from '../../styles/PoolCard.module.scss';
-import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
-import { usePoolData } from '../../hooks/usePoolData';
-import CompareButton from './CompareButton';
-import InfoIcon from '../common/InfoIcon';
+import styles from '@/styles/PoolCard.module.scss';
+import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '@/utils/formatters';
+import { usePoolData } from '@/hooks/usePoolData';
+import CompareButton from '@/components/pools/CompareButton';
+import InfoIcon from '@/components/common/InfoIcon';
 import { 
   getFeeAPRTooltip, 
   getVolumeTVLTooltip, 
@@ -12,7 +12,7 @@ import {
   getVolumeTooltip,
   getYieldTooltip,
   getFeeRateTooltip 
-} from '../../utils/tooltipContent';
+} from '@/utils/tooltipContent';
 
 /**
  * Pool Card Component

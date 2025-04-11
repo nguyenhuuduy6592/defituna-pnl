@@ -1,4 +1,4 @@
-import { getValueClass } from '../../utils/styles';
+import { getValueClass } from '@/utils/styles';
 
 describe('Styles Utility', () => {
   describe('getValueClass', () => {

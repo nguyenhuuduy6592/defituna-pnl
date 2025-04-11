@@ -4,7 +4,7 @@ import {
   computeLiquidationPrices,
   tickToPrice,
   createEmptyPositionTemplate
-} from '../../utils/formulas';
+} from '@/utils/formulas';
 
 // Import non-exported functions for testing
 const formulas = require('../../utils/formulas');

@@ -1,7 +1,7 @@
 import 'jest-environment-jsdom'; // Explicitly import jsdom environment
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Document, { Html, Head, Main, NextScript } from '../../pages/_document';
+import Document, { Html, Head, Main, NextScript } from '@/pages/_document';
 import { renderToStaticMarkup } from 'react-dom/server';
 
 // Mock Next.js internal components used by Document

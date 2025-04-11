@@ -5,11 +5,11 @@ import {
   fetchTokenData,
   fetchAllPools,
   processPositionsData
-} from '../../utils/defituna';
-import { processTunaPosition } from '../../utils/formulas';
+} from '@/utils/defituna';
+import { processTunaPosition } from '@/utils/formulas';
 
 // Mock the formulas module
-jest.mock('../../utils/formulas', () => ({
+jest.mock('@/utils/formulas', () => ({
   processTunaPosition: jest.fn(),
 }));
 

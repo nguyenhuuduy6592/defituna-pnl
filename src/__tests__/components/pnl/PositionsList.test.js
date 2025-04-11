@@ -1,14 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { PositionsList } from '../../../components/pnl/PositionsList';
+import { PositionsList } from '@/components/pnl/PositionsList';
 import { 
   useHistoricalData, 
   useSortState, 
   useInvertedPairs 
-} from '../../../hooks';
+} from '@/hooks';
 
 // Mock dependencies
-jest.mock('../../../components/pnl/PnLCard', () => ({
+jest.mock('@/components/pnl/PnLCard', () => ({
   PnLCard: ({ position, onClose }) => (
     <div data-testid="pnl-card" onClick={onClose}>
       <div data-testid="pnl-card-pair">{position.pairDisplay}</div>
@@ -17,7 +17,7 @@ jest.mock('../../../components/pnl/PnLCard', () => ({
   )
 }));
 
-jest.mock('../../../components/pnl/PositionChart', () => ({
+jest.mock('@/components/pnl/PositionChart', () => ({
   PositionChart: ({ position, positionHistory, onClose }) => (
     <div data-testid="position-chart" onClick={onClose}>
       <div data-testid="chart-pair">{position.pair}</div>
@@ -26,7 +26,7 @@ jest.mock('../../../components/pnl/PositionChart', () => ({
   )
 }));
 
-jest.mock('../../../components/pnl/PositionsTable', () => ({
+jest.mock('@/components/pnl/PositionsTable', () => ({
   PositionsTable: ({ 
     positions, 
     showWallet, 
@@ -78,7 +78,7 @@ jest.mock('../../../components/pnl/PositionsTable', () => ({
   )
 }));
 
-jest.mock('../../../hooks', () => ({
+jest.mock('@/hooks', () => ({
   useHistoricalData: jest.fn(),
   useSortState: jest.fn(),
   useInvertedPairs: jest.fn()

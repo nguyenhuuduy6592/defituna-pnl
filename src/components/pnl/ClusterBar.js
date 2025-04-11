@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo, useCallback } from 'react';
-import styles from './ClusterBar.module.scss';
-import { TooltipPortal } from '../common/TooltipPortal';
+import styles from '@/styles/ClusterBar.module.scss';
+import { TooltipPortal } from '@/components/common/TooltipPortal';
 
 /**
  * Renders a bar segment with a specific width

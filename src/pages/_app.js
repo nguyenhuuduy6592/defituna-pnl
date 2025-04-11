@@ -1,10 +1,11 @@
 import '@/styles/globals.scss'
 import { useEffect } from 'react'
-import { ComparisonProvider } from '../contexts/ComparisonContext'
-import AppVersionDisplay from '../components/AppVersionDisplay'
+import { ComparisonProvider } from '@/contexts/ComparisonContext'
+import AppVersionDisplay from '@/components/AppVersionDisplay'
 import styles from '@/styles/AppVersion.module.scss';
 
 export default function App({ Component, pageProps }) {
+  // Register service worker
   useEffect(() => {
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
       window.addEventListener('load', () => {

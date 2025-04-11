@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from './InfoIcon.module.scss';
-import EnhancedTooltip from './EnhancedTooltip';
+import styles from '@/styles/InfoIcon.module.scss';
+import EnhancedTooltip from '@/components/common/EnhancedTooltip';
 
 /**
  * InfoIcon component that displays a tooltip when hovered or clicked

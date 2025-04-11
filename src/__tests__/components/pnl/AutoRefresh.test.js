@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { AutoRefresh } from '../../../components/pnl/AutoRefresh';
+import { AutoRefresh } from '@/components/pnl/AutoRefresh';
 
 // Mock the HistoryToggle component
-jest.mock('../../../components/history/HistoryToggle', () => ({
+jest.mock('@/components/history/HistoryToggle', () => ({
   HistoryToggle: ({ enabled, onToggle, setAutoRefresh }) => (
     <div 
       data-testid="history-toggle-mock" 
@@ -17,7 +17,7 @@ jest.mock('../../../components/history/HistoryToggle', () => ({
 }));
 
 // Mock styles
-jest.mock('../../../components/pnl/AutoRefresh.module.scss', () => ({
+jest.mock('@/styles/AutoRefresh.module.scss', () => ({
   refreshControls: 'refreshControls-mock',
   refreshToggles: 'refreshToggles-mock',
   refreshToggle: 'refreshToggle-mock',

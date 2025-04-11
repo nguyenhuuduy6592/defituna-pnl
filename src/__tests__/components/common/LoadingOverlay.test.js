@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { LoadingOverlay } from '../../../components/common/LoadingOverlay';
+import { LoadingOverlay } from '@/components/common/LoadingOverlay';
 
 // Mock the LoadingOverlay styles
-jest.mock('../../../components/common/LoadingOverlay.module.scss', () => ({
+jest.mock('@/components/common/LoadingOverlay.module.scss', () => ({
   loadingContainer: 'loadingContainer',
   loadingOverlay: 'loadingOverlay',
   loadingOverlayHidden: 'loadingOverlayHidden'

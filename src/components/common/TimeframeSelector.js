@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../../styles/TimeframeSelector.module.scss';
+import styles from '@/styles/TimeframeSelector.module.scss';
 
 /**
  * TimeframeSelector component for selecting time periods

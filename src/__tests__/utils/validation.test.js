@@ -1,4 +1,4 @@
-import { isValidWalletAddress } from '../../utils/validation';
+import { isValidWalletAddress } from '@/utils/validation';
 
 describe('validation utilities', () => {
   describe('isValidWalletAddress', () => {

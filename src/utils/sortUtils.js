@@ -1,4 +1,4 @@
-import { calculateStatus } from './positionUtils';
+import { calculateStatus } from '@/utils/positionUtils';
 
 export const SORT_FIELD_CONFIG = {
   pnl: position => position?.pnl?.usd || 0,

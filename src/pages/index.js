@@ -1,20 +1,21 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { BsInfoCircle } from 'react-icons/bs';
 import { FiAlertTriangle } from 'react-icons/fi';
-import { Tooltip } from '../components/common/Tooltip';
-import { DisclaimerModal } from '../components/common/DisclaimerModal';
+import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB';
+import { Tooltip } from '@/components/common/Tooltip';
+import { DisclaimerModal } from '@/components/common/DisclaimerModal';
 import { 
   useWallet, 
   useAutoRefresh, 
   useCountdown, 
   useHistoricalData, 
   useDebounceApi 
-} from '../hooks';
-import { WalletForm } from '../components/pnl/WalletForm';
-import { AutoRefresh } from '../components/pnl/AutoRefresh';
-import { PnLDisplay } from '../components/pnl/PnLDisplay';
-import { fetchWalletPnL, appTitle } from '../utils';
-import styles from './index.module.scss';
+} from '@/hooks';
+import { WalletForm } from '@/components/pnl/WalletForm';
+import { AutoRefresh } from '@/components/pnl/AutoRefresh';
+import { PnLDisplay } from '@/components/pnl/PnLDisplay';
+import { fetchWalletPnL, appTitle } from '@/utils';
+import styles from '@/styles/index.module.scss';
 import Link from 'next/link';
 import Head from 'next/head';
 
@@ -45,14 +46,27 @@ export default () => {
     savePositionSnapshot,
     getPositionHistory
   } = useHistoricalData();
-
   // Check if this is the first visit
   useEffect(() => {
-    const disclaimerShown = localStorage.getItem('disclaimerShown');
-    if (!disclaimerShown) {
-      setDisclaimerOpen(true);
-      localStorage.setItem('disclaimerShown', 'true');
-    }
+    const checkDisclaimerShown = async () => {
+      try {
+        const db = await initializeDB();
+        if (!db) return;
+
+        const disclaimerData = await getData(db, STORE_NAMES.SETTINGS, 'disclaimerShown');
+        if (!disclaimerData?.value) {
+          setDisclaimerOpen(true);
+          await saveData(db, STORE_NAMES.SETTINGS, {
+            key: 'disclaimerShown',
+            value: true
+          });
+        }
+      } catch (error) {
+        console.error('Error checking disclaimer status:', error);
+      }
+    };
+
+    checkDisclaimerShown();
   }, []);
 
   // Debounced version for auto-refresh - extract the execute function
@@ -218,10 +232,19 @@ export default () => {
     const newInterval = parseInt(e.target.value);
     setRefreshInterval(newInterval);
   };
-
-  const handleCloseDisclaimer = () => {
+  const handleCloseDisclaimer = async () => {
     setDisclaimerOpen(false);
-    localStorage.setItem('disclaimerShown', 'true');
+    try {
+      const db = await initializeDB();
+      if (db) {
+        await saveData(db, STORE_NAMES.SETTINGS, {
+          key: 'disclaimerShown',
+          value: true
+        });
+      }
+    } catch (error) {
+      console.error('Error saving disclaimer status:', error);
+    }
   };
 
   return (

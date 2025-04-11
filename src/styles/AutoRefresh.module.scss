@@ -1,5 +1,5 @@
 @use "sass:map";
-@use '../../styles/variables.module.scss';
+@use '@/styles/variables.module.scss';
 
 .refreshControls {
   margin: variables.spacing(md) 0;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { Portal } from '../../../components/common/Portal';
+import { Portal } from '@/components/common/Portal';
 
 // Mock createPortal to make it testable
 jest.mock('react-dom', () => ({

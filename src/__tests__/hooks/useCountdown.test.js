@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
-import { useCountdown } from '../../hooks/useCountdown';
+import { useCountdown } from '@/hooks/useCountdown';
 
 // Mock console.warn
 let consoleWarnSpy;

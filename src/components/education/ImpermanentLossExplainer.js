@@ -1,7 +1,7 @@
 import React from 'react';
-import styles from './ImpermanentLossExplainer.module.scss';
-import { getImpermanentLossTooltip } from '../../utils/tooltipContent';
-import InfoIcon from '../common/InfoIcon';
+import styles from '@/styles/ImpermanentLossExplainer.module.scss';
+import { getImpermanentLossTooltip } from '@/utils/tooltipContent';
+import InfoIcon from '@/components/common/InfoIcon';
 
 /**
  * A component that explains impermanent loss with interactive elements

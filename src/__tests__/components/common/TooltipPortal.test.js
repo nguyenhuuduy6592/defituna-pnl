@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { TooltipPortal } from '../../../components/common/TooltipPortal';
+import { TooltipPortal } from '@/components/common/TooltipPortal';
 
 // Mock createPortal to make it testable
 jest.mock('react-dom', () => ({
@@ -13,7 +13,7 @@ jest.mock('react-dom', () => ({
 }));
 
 // Mock the TooltipPortal styles
-jest.mock('../../../components/common/TooltipPortal.module.scss', () => ({
+jest.mock('@/components/common/TooltipPortal.module.scss', () => ({
   tooltipContainer: 'tooltipContainer',
   tooltip: 'tooltip',
   top: 'top',

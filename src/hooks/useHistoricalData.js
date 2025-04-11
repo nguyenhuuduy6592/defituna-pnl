@@ -3,9 +3,11 @@ import {
   initializeDB as initDB,
   savePositionSnapshot as saveSnapshot,
   getPositionHistory as getHistory,
-  cleanupOldData as cleanupData,
-  DEFAULT_RETENTION_DAYS
-} from '../utils/indexedDB';
+  DEFAULT_RETENTION_DAYS,
+  saveData,
+  getData,
+  STORE_NAMES
+} from '@/utils/indexedDB';
 
 /**
  * Hook for managing historical position data using IndexedDB
@@ -68,7 +70,10 @@ export const useHistoricalData = () => {
         if (!db) return;
       }
       setEnabled(newEnabled);
-      localStorage.setItem('historicalDataEnabled', String(newEnabled));
+      await saveData(dbInstance, STORE_NAMES.SETTINGS, {
+        key: 'historicalDataEnabled',
+        value: newEnabled
+      });
       setError(null);
     } catch (error) {
       handleError(error, 'Failed to toggle history collection feature');
@@ -76,14 +81,21 @@ export const useHistoricalData = () => {
   }, [dbInstance, initializeDB]);
 
   useEffect(() => {
-    const savedEnabled = localStorage.getItem('historicalDataEnabled') === 'true';
-    if (savedEnabled) {
-      initializeDB()
-        .then(db => {
-          if (db) setEnabled(true);
-        })
-        .catch(error => handleError(error, 'Failed to initialize historical data features'));
-    }
+    const loadSettings = async () => {
+      try {
+        const db = await initializeDB();
+        if (!db) return;
+
+        const savedData = await getData(db, STORE_NAMES.SETTINGS, 'historicalDataEnabled');
+        if (savedData?.value === true) {
+          setEnabled(true);
+        }
+      } catch (error) {
+        handleError(error, 'Failed to initialize historical data features');
+      }
+    };
+
+    loadSettings();
   }, [initializeDB]);
 
   useEffect(() => {

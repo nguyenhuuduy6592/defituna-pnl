@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './EnhancedTooltip.module.scss';
+import styles from '@/styles/EnhancedTooltip.module.scss';
 
 /**
  * Enhanced tooltip component with support for rich formatting and sections

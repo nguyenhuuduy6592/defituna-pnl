@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { HistoryToggle } from '../../../components/history/HistoryToggle';
+import { HistoryToggle } from '@/components/history/HistoryToggle';
 
 // Mock the HistoryConfirmationModal component
-jest.mock('../../../components/history/HistoryConfirmationModal', () => ({
+jest.mock('@/components/history/HistoryConfirmationModal', () => ({
   HistoryConfirmationModal: ({ onConfirm, onCancel, isEnabling }) => (
     <div data-testid="confirmation-modal" data-is-enabling={isEnabling}>
       <button data-testid="confirm-button" onClick={onConfirm}>Confirm</button>

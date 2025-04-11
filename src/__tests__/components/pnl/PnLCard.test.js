@@ -1,25 +1,25 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { PnLCard } from '../../../components/pnl/PnLCard';
-import { exportCardAsImage, shareCard } from '../../../utils/export';
-import { getValueClass } from '../../../utils/styles';
-import { getStateClass } from '../../../utils/positionUtils';
+import { PnLCard } from '@/components/pnl/PnLCard';
+import { exportCardAsImage, shareCard } from '@/utils/export';
+import { getValueClass } from '@/utils/styles';
+import { getStateClass } from '@/utils/positionUtils';
 
 // Mock dependencies
-jest.mock('../../../components/common/Portal', () => ({
+jest.mock('@/components/common/Portal', () => ({
   Portal: ({ children }) => <div data-testid="portal-container">{children}</div>
 }));
 
-jest.mock('../../../utils/export', () => ({
+jest.mock('@/utils/export', () => ({
   exportCardAsImage: jest.fn(),
   shareCard: jest.fn()
 }));
 
-jest.mock('../../../utils/styles', () => ({
+jest.mock('@/utils/styles', () => ({
   getValueClass: jest.fn().mockReturnValue('positive')
 }));
 
-jest.mock('../../../utils/positionUtils', () => ({
+jest.mock('@/utils/positionUtils', () => ({
   getStateClass: jest.fn().mockReturnValue('active')
 }));
 

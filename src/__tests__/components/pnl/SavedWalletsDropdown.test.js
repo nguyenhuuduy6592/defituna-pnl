@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { SavedWalletsDropdown } from '../../../components/pnl/SavedWalletsDropdown';
-import { formatWalletAddress } from '../../../utils';
+import { SavedWalletsDropdown } from '@/components/pnl/SavedWalletsDropdown';
+import { formatWalletAddress } from '@/utils';
 
 // Mock dependencies
-jest.mock('../../../utils', () => ({
+jest.mock('@/utils', () => ({
   formatWalletAddress: jest.fn(address => `${address.slice(0, 6)}...${address.slice(-4)}`)
 }));
 

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import styles from './TooltipPortal.module.scss';
+import styles from '@/styles/TooltipPortal.module.scss';
 
 /**
  * Tooltip component that renders content in a portal with positioning relative to a target element

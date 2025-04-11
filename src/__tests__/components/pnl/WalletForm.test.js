@@ -1,27 +1,27 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { WalletForm } from '../../../components/pnl/WalletForm';
-import { copyToClipboard, showNotification } from '../../../utils/notifications';
-import { isValidWalletAddress } from '../../../utils/validation';
+import { WalletForm } from '@/components/pnl/WalletForm';
+import { copyToClipboard, showNotification } from '@/utils/notifications';
+import { isValidWalletAddress } from '@/utils/validation';
 
 // Mock dependencies
-jest.mock('../../../utils/notifications', () => ({
+jest.mock('@/utils/notifications', () => ({
   copyToClipboard: jest.fn(),
   showNotification: jest.fn()
 }));
 
-jest.mock('../../../utils/validation', () => ({
+jest.mock('@/utils/validation', () => ({
   isValidWalletAddress: jest.fn()
 }));
 
 // Mock formatWalletAddress since it's used in the component
-jest.mock('../../../utils', () => ({
+jest.mock('@/utils', () => ({
   formatWalletAddress: jest.fn(address => `${address.slice(0, 6)}...${address.slice(-4)}`)
 }));
 
 // Mock the sub-components
-jest.mock('../../../components/pnl/SavedWalletsDropdown', () => {
+jest.mock('@/components/pnl/SavedWalletsDropdown', () => {
   const MockSavedWalletsDropdown = ({ uniqueSavedWallets, activeWallets, onWalletChange, toggleWalletActive, onRemoveWallet }) => (
     <div data-testid="saved-wallets-dropdown">
       {uniqueSavedWallets.map(wallet => (
@@ -51,7 +51,7 @@ jest.mock('../../../components/pnl/SavedWalletsDropdown', () => {
   return MockSavedWalletsDropdown;
 });
 
-jest.mock('../../../components/pnl/ActiveWalletsDisplay', () => {
+jest.mock('@/components/pnl/ActiveWalletsDisplay', () => {
   const MockActiveWalletsDisplay = ({ activeWallets, toggleWalletActive, handleChipKeyDown }) => (
     activeWallets && activeWallets.length > 0 ? (
       <div data-testid="active-wallets-display">

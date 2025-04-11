@@ -7,7 +7,7 @@ import {
   addWalletAddressToPositions,
   decodePosition,
   decodePositions
-} from '../../utils/positionUtils';
+} from '@/utils/positionUtils';
 
 describe('decodeValue', () => {
   it('handles null and undefined inputs', () => {

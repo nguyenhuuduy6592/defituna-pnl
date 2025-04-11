@@ -1,9 +1,9 @@
 // Utility functions for processing historical position data for charts
 
 import React from 'react'; // Needed for JSX in CustomChartTooltip
-import { TIME_PERIODS } from './constants';
-import { formatNumber } from './formatters';
-import styles from '../components/pnl/PositionChart.module.scss'; // Need styles for tooltip
+import { TIME_PERIODS } from '@/utils/constants';
+import { formatNumber } from '@/utils/formatters';
+import styles from '@/styles/PositionChart.module.scss'; // Need styles for tooltip
 
 /**
  * Prepares historical position data for charting

@@ -1,5 +1,5 @@
 @use "sass:map";
-@use '../../styles/variables.module.scss';
+@use '@/styles/variables.module.scss';
 
 .chartOverlay {
   position: fixed;

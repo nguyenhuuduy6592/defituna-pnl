@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import { PositionsList } from './PositionsList';
-import { DonationFooter } from './DonationFooter';
-import { TotalPnLDisplay } from './TotalPnLDisplay';
-import styles from './PnLDisplay.module.scss';
-import { LoadingOverlay } from '../common/LoadingOverlay';
-import { usePositionAges } from './hooks/usePositionAges';
+import { PositionsList } from '@/components/pnl/PositionsList';
+import { DonationFooter } from '@/components/pnl/DonationFooter';
+import { TotalPnLDisplay } from '@/components/pnl/TotalPnLDisplay';
+import styles from '@/styles/PnLDisplay.module.scss';
+import { LoadingOverlay } from '@/components/common/LoadingOverlay';
+import { usePositionAges } from '@/components/pnl/hooks/usePositionAges';
 
 // Default structure when data is not yet available
 const defaultData = {

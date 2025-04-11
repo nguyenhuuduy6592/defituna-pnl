@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { PnLDisplay } from '../../../components/pnl/PnLDisplay';
+import { PnLDisplay } from '@/components/pnl/PnLDisplay';
 
 // Mock the child components to isolate testing to just the PnLDisplay component
-jest.mock('../../../components/pnl/PositionsList', () => ({
+jest.mock('@/components/pnl/PositionsList', () => ({
   PositionsList: ({ positions, showWallet, historyEnabled }) => (
     <div data-testid="positions-list" data-positions={JSON.stringify(positions)} data-showwallet={showWallet.toString()} data-historyenabled={historyEnabled.toString()}>
       Positions List Mock
@@ -12,7 +12,7 @@ jest.mock('../../../components/pnl/PositionsList', () => ({
   )
 }));
 
-jest.mock('../../../components/pnl/DonationFooter', () => ({
+jest.mock('@/components/pnl/DonationFooter', () => ({
   DonationFooter: ({ visible }) => (
     <div data-testid="donation-footer" data-visible={visible.toString()}>
       Donation Footer Mock
@@ -20,7 +20,7 @@ jest.mock('../../../components/pnl/DonationFooter', () => ({
   )
 }));
 
-jest.mock('../../../components/pnl/TotalPnLDisplay', () => ({
+jest.mock('@/components/pnl/TotalPnLDisplay', () => ({
   TotalPnLDisplay: ({ label, totalValue }) => (
     <div data-testid={`total-pnl-${label.replace(/\s+/g, '-').toLowerCase()}`} data-label={label} data-totalvalue={totalValue}>
       {label}: {totalValue}
@@ -28,7 +28,7 @@ jest.mock('../../../components/pnl/TotalPnLDisplay', () => ({
   )
 }));
 
-jest.mock('../../../components/common/LoadingOverlay', () => ({
+jest.mock('@/components/common/LoadingOverlay', () => ({
   LoadingOverlay: ({ loading, children }) => (
     <div data-testid="loading-overlay" data-loading={loading.toString()}>
       {children}
@@ -36,12 +36,12 @@ jest.mock('../../../components/common/LoadingOverlay', () => ({
   )
 }));
 
-jest.mock('../../../components/pnl/hooks/usePositionAges', () => ({
+jest.mock('@/components/pnl/hooks/usePositionAges', () => ({
   usePositionAges: (positions) => positions.map(pos => ({ ...pos, age: '30 days' }))
 }));
 
 // Mock styles
-jest.mock('../../../components/pnl/PnLDisplay.module.scss', () => ({
+jest.mock('@/components/pnl/PnLDisplay.module.scss', () => ({
   pnlContainer: 'pnlContainer-mock',
   cardRow: 'cardRow-mock'
 }));

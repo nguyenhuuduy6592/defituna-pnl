@@ -1,27 +1,8 @@
 import React from 'react';
 import { render, screen, act, renderHook } from '@testing-library/react';
-import { ComparisonProvider, useComparison } from '../../contexts/ComparisonContext';
-
-// Mock localStorage
-const localStorageMock = (() => {
-  let store = {};
-  return {
-    getItem: jest.fn((key) => store[key] || null),
-    setItem: jest.fn((key, value) => {
-      store[key] = value.toString();
-    }),
-    clear: jest.fn(() => {
-      store = {};
-    }),
-    removeItem: jest.fn((key) => {
-      delete store[key];
-    }),
-    getAll: () => store,
-  };
-})();
-
-// Replace the global localStorage with our mock
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+import { ComparisonProvider, useComparison } from '@/contexts/ComparisonContext';
+// Import the actual functions - they are mocked by jest.setup.js
+import { getData, saveData } from '@/utils/indexedDB'; 
 
 // Test component that uses the context
 const TestComponent = () => {
@@ -89,33 +70,31 @@ const TestComponent = () => {
 };
 
 describe('ComparisonContext', () => {
-  beforeEach(() => {
-    // Clear all mocks before each test
-    jest.clearAllMocks();
-    localStorage.clear();
-  });
-
-  it('provides initial empty comparison pools state', () => {
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
+  it('provides initial empty comparison pools state', async () => {
+    await act(async () => {
+      render(
+        <ComparisonProvider>
+          <TestComponent />
+        </ComparisonProvider>
+      );
+    });
     
     // Should start with zero pools
     expect(screen.getByTestId('pools-count')).toHaveTextContent('0');
     expect(screen.getByTestId('pool1-in-comparison')).toHaveTextContent('No');
   });
 
-  it('adds pools to comparison', () => {
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
+  it('adds pools to comparison', async () => {
+    await act(async () => {
+      render(
+        <ComparisonProvider>
+          <TestComponent />
+        </ComparisonProvider>
+      );
+    });
     
     // Add first pool
-    act(() => {
+    await act(async () => {
       screen.getByTestId('add-pool1').click();
     });
     
@@ -125,7 +104,7 @@ describe('ComparisonContext', () => {
     expect(screen.getByTestId('pool-pool1')).toHaveTextContent('ETH/USDT');
     
     // Add second pool
-    act(() => {
+    await act(async () => {
       screen.getByTestId('add-pool2').click();
     });
     
@@ -134,15 +113,17 @@ describe('ComparisonContext', () => {
     expect(screen.getByTestId('pool-pool2')).toHaveTextContent('BTC/USDT');
   });
 
-  it('prevents adding duplicate pools', () => {
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
+  it('prevents adding duplicate pools', async () => {
+    await act(async () => {
+      render(
+        <ComparisonProvider>
+          <TestComponent />
+        </ComparisonProvider>
+      );
+    });
     
     // Add pool1 twice
-    act(() => {
+    await act(async () => {
       screen.getByTestId('add-pool1').click();
       screen.getByTestId('add-pool1').click();
     });
@@ -151,18 +132,20 @@ describe('ComparisonContext', () => {
     expect(screen.getByTestId('pools-count')).toHaveTextContent('1');
   });
 
-  it('enforces maximum number of comparison pools', () => {
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
+  it('enforces maximum number of comparison pools', async () => {
+    await act(async () => {
+      render(
+        <ComparisonProvider>
+          <TestComponent />
+        </ComparisonProvider>
+      );
+    });
     
     // Check max pools value is correct
     expect(screen.getByTestId('max-pools')).toHaveTextContent('3');
     
     // Add four pools
-    act(() => {
+    await act(async () => {
       screen.getByTestId('add-pool1').click();
       screen.getByTestId('add-pool2').click();
       screen.getByTestId('add-pool3').click();
@@ -180,15 +163,17 @@ describe('ComparisonContext', () => {
     expect(screen.getByTestId('pool1-in-comparison')).toHaveTextContent('No');
   });
 
-  it('removes pools from comparison', () => {
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
+  it('removes pools from comparison', async () => {
+    await act(async () => {
+      render(
+        <ComparisonProvider>
+          <TestComponent />
+        </ComparisonProvider>
+      );
+    });
     
     // Add two pools
-    act(() => {
+    await act(async () => {
       screen.getByTestId('add-pool1').click();
       screen.getByTestId('add-pool2').click();
     });
@@ -197,7 +182,7 @@ describe('ComparisonContext', () => {
     expect(screen.getByTestId('pools-count')).toHaveTextContent('2');
     
     // Remove first pool
-    act(() => {
+    await act(async () => {
       screen.getByTestId('remove-pool1').click();
     });
     
@@ -210,15 +195,17 @@ describe('ComparisonContext', () => {
     expect(screen.getByTestId('pool1-in-comparison')).toHaveTextContent('No');
   });
 
-  it('clears all pools from comparison', () => {
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
+  it('clears all pools from comparison', async () => {
+    await act(async () => {
+      render(
+        <ComparisonProvider>
+          <TestComponent />
+        </ComparisonProvider>
+      );
+    });
     
     // Add three pools
-    act(() => {
+    await act(async () => {
       screen.getByTestId('add-pool1').click();
       screen.getByTestId('add-pool2').click();
       screen.getByTestId('add-pool3').click();
@@ -228,7 +215,7 @@ describe('ComparisonContext', () => {
     expect(screen.getByTestId('pools-count')).toHaveTextContent('3');
     
     // Clear all pools
-    act(() => {
+    await act(async () => {
       screen.getByTestId('clear-pools').click();
     });
     
@@ -242,76 +229,53 @@ describe('ComparisonContext', () => {
     expect(screen.getByTestId('pool1-in-comparison')).toHaveTextContent('No');
   });
 
-  it('persists comparison pools to localStorage', () => {
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
-    
-    // Add two pools
-    act(() => {
-      screen.getByTestId('add-pool1').click();
-      screen.getByTestId('add-pool2').click();
-    });
-    
-    // localStorage.setItem should have been called
-    expect(localStorage.setItem).toHaveBeenCalledWith(
-      'comparisonPools',
-      expect.any(String)
-    );
-    
-    // Access the localStorage store directly
-    const storedValue = localStorage.getItem('comparisonPools');
-    expect(storedValue).toBeTruthy();
-    
-    // The value stored should be a serialized array with our two pools
-    const savedValue = JSON.parse(storedValue);
-    expect(savedValue).toHaveLength(2);
-    expect(savedValue[0].address).toBe('pool1');
-    expect(savedValue[1].address).toBe('pool2');
-  });
-
-  it('loads comparison pools from localStorage on mount', () => {
-    // Set initial localStorage value
+  it('loads comparison pools from IndexedDB on mount', async () => {
+    // Set initial IndexedDB value
     const initialPools = [
       { address: 'pool2', name: 'BTC/USDT' },
       { address: 'pool3', name: 'DOT/USDT' }
     ];
-    localStorage.getItem.mockReturnValueOnce(JSON.stringify(initialPools));
+    // Use the imported (mocked) getData function
+    getData.mockImplementationOnce((db, storeName, key) => {
+      if (key === 'comparisonPools') {
+        return Promise.resolve({ value: initialPools });
+      }
+      return Promise.resolve(null);
+    });
     
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
+    await act(async () => {
+      render(
+        <ComparisonProvider>
+          <TestComponent />
+        </ComparisonProvider>
+      );
+    });
     
     // Should have loaded two pools
     expect(screen.getByTestId('pools-count')).toHaveTextContent('2');
     expect(screen.getByTestId('pool-pool2')).toHaveTextContent('BTC/USDT');
     expect(screen.getByTestId('pool-pool3')).toHaveTextContent('DOT/USDT');
-    
-    // localStorage.getItem should have been called
-    expect(localStorage.getItem).toHaveBeenCalledWith('comparisonPools');
   });
 
-  it('handles localStorage errors gracefully', () => {
-    // Mock localStorage.getItem to throw an error
+  it('handles IndexedDB errors gracefully', async () => {
+    // Mock getData to throw an error
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    localStorage.getItem.mockImplementationOnce(() => {
-      throw new Error('localStorage is not available');
+    // Use the imported (mocked) getData function
+    getData.mockImplementationOnce(() => {
+      throw new Error('IndexedDB is not available');
     });
     
-    // Component should render without errors
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
+    await act(async () => {
+      render(
+        <ComparisonProvider>
+          <TestComponent />
+        </ComparisonProvider>
+      );
+    });
     
     // Should have logged the error
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error loading saved comparison pools:',
+      'Error loading comparison pools from IndexedDB:',
       expect.any(Error)
     );
     
@@ -322,27 +286,30 @@ describe('ComparisonContext', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  it('handles localStorage setItem errors gracefully', () => {
-    // Mock localStorage.setItem to throw an error
+  it('handles IndexedDB saveData errors gracefully', async () => {
+    // Mock saveData to throw an error
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-    localStorage.setItem.mockImplementationOnce(() => {
-      throw new Error('localStorage is not available');
+    // Use the imported (mocked) saveData function
+    saveData.mockImplementationOnce(() => {
+      throw new Error('IndexedDB is not available');
     });
     
-    render(
-      <ComparisonProvider>
-        <TestComponent />
-      </ComparisonProvider>
-    );
+    await act(async () => {
+      render(
+        <ComparisonProvider>
+          <TestComponent />
+        </ComparisonProvider>
+      );
+    });
     
-    // Add a pool to trigger localStorage.setItem
-    act(() => {
+    // Add a pool to trigger saveData
+    await act(async () => {
       screen.getByTestId('add-pool1').click();
     });
     
     // Should have logged the error
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Error saving comparison pools:',
+      'Error saving comparison pools to IndexedDB:',
       expect.any(Error)
     );
     

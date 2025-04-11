@@ -1,12 +1,12 @@
-import { fetchWalletPnL } from '../../utils/pnlUtils';
+import { fetchWalletPnL } from '@/utils/pnlUtils';
 import { 
   addWalletAddressToPositions, 
   decodePositions, 
   decodeValue 
-} from '../../utils/positionUtils';
+} from '@/utils/positionUtils';
 
 // Mock the dependencies from positionUtils
-jest.mock('../../utils/positionUtils', () => ({
+jest.mock('@/utils/positionUtils', () => ({
   addWalletAddressToPositions: jest.fn((positions, walletAddress) => 
     positions.map(p => ({ ...p, walletAddress }))
   ),

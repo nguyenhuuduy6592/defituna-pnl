@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
-import styles from './HistoryToggle.module.scss';
-import { HistoryConfirmationModal } from './HistoryConfirmationModal';
+import styles from '@/styles/HistoryToggle.module.scss';
+import { HistoryConfirmationModal } from '@/components/history/HistoryConfirmationModal';
 
 /**
  * Toggle switch for enabling/disabling position history storage

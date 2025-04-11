@@ -1,12 +1,3 @@
-// Mock the functions from the module itself if needed for spying
-// jest.mock('../notifications', () => {
-//   const originalModule = jest.requireActual('../notifications');
-//   return {
-//     ...originalModule,
-//     showNotification: jest.fn(), // Mock showNotification if we only want to check if it's called
-//   };
-// });
-
 // --- Mocks for Browser APIs ---
 
 // Mock DOM manipulation

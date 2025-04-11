@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { TotalPnLDisplay } from '../../../components/pnl/TotalPnLDisplay';
-import { formatValue, getValueClass } from '../../../utils';
+import { TotalPnLDisplay } from '@/components/pnl/TotalPnLDisplay';
+import { formatValue, getValueClass } from '@/utils';
 
 // Mock the utils functions
-jest.mock('../../../utils', () => ({
+jest.mock('@/utils', () => ({
   formatValue: jest.fn(value => value.toFixed(2)),
   getValueClass: jest.fn(value => {
     if (value > 0) return 'positive';
@@ -15,7 +15,7 @@ jest.mock('../../../utils', () => ({
 }));
 
 // Mock the styles module
-jest.mock('../../../components/pnl/TotalPnLDisplay.module.scss', () => ({
+jest.mock('@/components/pnl/TotalPnLDisplay.module.scss', () => ({
   pnlHeader: 'pnlHeader',
   pnlGrid: 'pnlGrid',
   pnlItem: 'pnlItem',

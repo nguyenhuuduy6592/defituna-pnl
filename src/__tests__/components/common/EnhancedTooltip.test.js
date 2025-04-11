@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import EnhancedTooltip from '../../../components/common/EnhancedTooltip';
+import EnhancedTooltip from '@/components/common/EnhancedTooltip';
 
 // Mock the createPortal function
 jest.mock('react-dom', () => {

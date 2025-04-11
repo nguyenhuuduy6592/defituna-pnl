@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import ReactMarkdown from 'react-markdown';
 import styles from '@/styles/ReleaseNotes.module.scss';
-import { appTitle } from '../utils';
+import { appTitle } from '@/utils';
 
 function ReleaseNotesPage({ notes }) {
   return (

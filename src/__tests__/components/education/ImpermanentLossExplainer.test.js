@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ImpermanentLossExplainer from '../../../components/education/ImpermanentLossExplainer';
+import ImpermanentLossExplainer from '@/components/education/ImpermanentLossExplainer';
 
 // Mock the InfoIcon component with a span to avoid DOM nesting errors
-jest.mock('../../../components/common/InfoIcon', () => {
+jest.mock('@/components/common/InfoIcon', () => {
   return function MockInfoIcon({ content, position, size }) {
     return (
       <span data-testid="info-icon" data-content={content} data-position={position} data-size={size}>

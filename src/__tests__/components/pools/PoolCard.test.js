@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import PoolCard from '../../../components/pools/PoolCard';
-import { usePoolData } from '../../../hooks/usePoolData';
+import PoolCard from '@/components/pools/PoolCard';
+import { usePoolData } from '@/hooks/usePoolData';
 
 // Mock the Next.js Link component
 jest.mock('next/link', () => {
@@ -16,19 +16,19 @@ jest.mock('next/link', () => {
 });
 
 // Mock the usePoolData hook
-jest.mock('../../../hooks/usePoolData', () => ({
+jest.mock('@/hooks/usePoolData', () => ({
   usePoolData: jest.fn()
 }));
 
 // Mock the CompareButton component
-jest.mock('../../../components/pools/CompareButton', () => {
+jest.mock('@/components/pools/CompareButton', () => {
   return function MockCompareButton({ pool }) {
     return <div data-testid="compare-button" data-pool-address={pool.address}>Compare Button</div>;
   };
 });
 
 // Mock the InfoIcon component
-jest.mock('../../../components/common/InfoIcon', () => {
+jest.mock('@/components/common/InfoIcon', () => {
   return function MockInfoIcon({ content, position }) {
     return <span data-testid="info-icon" data-content={content} data-position={position}>ℹ️</span>;
   };

@@ -1,5 +1,5 @@
 @use "sass:map";
-@use '../../styles/variables.module.scss' as variables;
+@use '@/styles/variables.module.scss' as variables;
 
 .donationFooter {
     margin-top: variables.spacing(lg);

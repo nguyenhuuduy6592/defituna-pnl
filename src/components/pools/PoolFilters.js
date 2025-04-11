@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../../styles/PoolFilters.module.scss';
-import TimeframeSelector from '../common/TimeframeSelector';
+import styles from '@/styles/PoolFilters.module.scss';
+import TimeframeSelector from '@/components/common/TimeframeSelector';
+import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB';
 
 const TIMEFRAMES = ['24h', '7d', '30d'];
 
@@ -51,24 +52,49 @@ export default function PoolFilters({
   // State for saved filters
   const [savedFilters, setSavedFilters] = useState([]);
 
-  // Load saved filters and current filters from localStorage on mount
+  // Load saved filters and current filters from IndexedDB on mount
   useEffect(() => {
-    // Load saved filters
-    const savedFiltersFromStorage = localStorage.getItem('poolSavedFilters');
-    if (savedFiltersFromStorage) {
-      setSavedFilters(JSON.parse(savedFiltersFromStorage));
-    }
-    
-    // Load current filters
-    const savedFilters = localStorage.getItem('poolFilters');
-    if (savedFilters) {
-      onFilterChange(JSON.parse(savedFilters));
-    }
-  }, []);
+    const loadFilters = async () => {
+      try {
+        const db = await initializeDB();
+        if (!db) return;
 
-  // Save filters to localStorage when they change
+        // Load saved filters
+        const savedFiltersData = await getData(db, STORE_NAMES.SETTINGS, 'poolSavedFilters');
+        if (savedFiltersData?.value) {
+          setSavedFilters(savedFiltersData.value);
+        }
+        
+        // Load current filters
+        const currentFiltersData = await getData(db, STORE_NAMES.SETTINGS, 'poolFilters');
+        if (currentFiltersData?.value) {
+          onFilterChange(currentFiltersData.value);
+        }
+      } catch (error) {
+        console.error('Error loading pool filters from IndexedDB:', error);
+      }
+    };
+
+    loadFilters();
+  }, [onFilterChange]);
+
+  // Save filters to IndexedDB when they change
   useEffect(() => {
-    localStorage.setItem('poolFilters', JSON.stringify(filters));
+    const saveFilters = async () => {
+      try {
+        const db = await initializeDB();
+        if (!db) return;
+
+        await saveData(db, STORE_NAMES.SETTINGS, {
+          key: 'poolFilters',
+          value: filters
+        });
+      } catch (error) {
+        console.error('Error saving pool filters to IndexedDB:', error);
+      }
+    };
+
+    saveFilters();
   }, [filters]);
 
   const handleSortChange = (e) => {
@@ -153,7 +179,7 @@ export default function PoolFilters({
   };
 
   // Save current filter
-  const handleSaveFilter = () => {
+  const handleSaveFilter = async () => {
     const label = getFilterLabel();
     
     // Check if this filter is already saved
@@ -165,17 +191,28 @@ export default function PoolFilters({
       f.filters.timeframe === filters.timeframe
     );
     
-    if (isDuplicate) return; // Don't save duplicates
+    if (isDuplicate) return;
     
     const newSavedFilter = {
-      id: Date.now(), // Use timestamp as unique ID
+      id: Date.now(),
       label,
       filters: { ...filters }
     };
     
     const updatedSavedFilters = [...savedFilters, newSavedFilter];
     setSavedFilters(updatedSavedFilters);
-    localStorage.setItem('poolSavedFilters', JSON.stringify(updatedSavedFilters));
+
+    try {
+      const db = await initializeDB();
+      if (!db) return;
+
+      await saveData(db, STORE_NAMES.SETTINGS, {
+        key: 'poolSavedFilters',
+        value: updatedSavedFilters
+      });
+    } catch (error) {
+      console.error('Error saving pool filters to IndexedDB:', error);
+    }
   };
 
   // Apply a saved filter
@@ -184,12 +221,23 @@ export default function PoolFilters({
   };
 
   // Delete a saved filter
-  const handleDeleteSavedFilter = (id, e) => {
-    e.stopPropagation(); // Prevent triggering apply filter
+  const handleDeleteSavedFilter = async (id, e) => {
+    e.stopPropagation();
     
     const updatedSavedFilters = savedFilters.filter(f => f.id !== id);
     setSavedFilters(updatedSavedFilters);
-    localStorage.setItem('poolSavedFilters', JSON.stringify(updatedSavedFilters));
+
+    try {
+      const db = await initializeDB();
+      if (!db) return;
+
+      await saveData(db, STORE_NAMES.SETTINGS, {
+        key: 'poolSavedFilters',
+        value: updatedSavedFilters
+      });
+    } catch (error) {
+      console.error('Error saving pool filters to IndexedDB:', error);
+    }
   };
 
   return (
@@ -291,4 +339,4 @@ export default function PoolFilters({
       </div>
     </div>
   );
-} 
+}

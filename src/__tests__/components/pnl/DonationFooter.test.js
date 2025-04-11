@@ -1,17 +1,17 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { DonationFooter } from '../../../components/pnl/DonationFooter';
-import { copyToClipboard, formatWalletAddress } from '../../../utils';
+import { DonationFooter } from '@/components/pnl/DonationFooter';
+import { copyToClipboard, formatWalletAddress } from '@/utils';
 
 // Mock the utility functions
-jest.mock('../../../utils', () => ({
+jest.mock('@/utils', () => ({
   copyToClipboard: jest.fn(),
   formatWalletAddress: jest.fn((address) => `formatted-${address}`)
 }));
 
 // Mock styles
-jest.mock('../../../components/pnl/DonationFooter.module.scss', () => ({
+jest.mock('@/components/pnl/DonationFooter.module.scss', () => ({
   donationFooter: 'donationFooter-mock',
   title: 'title-mock',
   address: 'address-mock',

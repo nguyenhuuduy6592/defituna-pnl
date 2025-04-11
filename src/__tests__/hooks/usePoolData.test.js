@@ -1,9 +1,9 @@
 import { renderHook } from '@testing-library/react';
-import { usePoolData } from '../../hooks/usePoolData';
-import usePoolsData from '../../hooks/usePoolsData';
+import { usePoolData } from '@/hooks/usePoolData';
+import usePoolsData from '@/hooks/usePoolsData';
 
 // Mock usePoolsData hook
-jest.mock('../../hooks/usePoolsData');
+jest.mock('@/hooks/usePoolsData');
 
 // Mock data
 const mockPool = {

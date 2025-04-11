@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import styles from './TotalPnLDisplay.module.scss';
-import { formatValue, getValueClass } from '../../utils';
+import styles from '@/styles/TotalPnLDisplay.module.scss';
+import { formatValue, getValueClass } from '@/utils';
 
 /**
  * Component for displaying total PnL information across multiple wallets

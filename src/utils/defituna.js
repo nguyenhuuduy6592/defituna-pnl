@@ -3,7 +3,7 @@
  * This module provides functions to fetch and process data from the DeFiTuna API.
  */
 
-import { processTunaPosition } from './formulas.js';
+import { processTunaPosition } from '@/utils/formulas.js';
 
 // --- Simple In-Memory Cache with Different TTLs --- 
 const POOL_CACHE_TTL = 30 * 1000;       // 30 seconds for pool data (contains dynamic ticks)

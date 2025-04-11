@@ -1,5 +1,5 @@
-import { fetchPositions, processPositionsData } from '../../utils/defituna';
-import { isValidWalletAddress } from '../../utils/validation';
+import { fetchPositions, processPositionsData } from '@/utils/defituna';
+import { isValidWalletAddress } from '@/utils/validation';
 
 // Use the same multiplier as in defituna.js
 const USD_MULTIPLIER = 100; // Convert dollars to cents (2 decimal places)

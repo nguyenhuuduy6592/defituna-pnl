@@ -1,9 +1,9 @@
 import { useRef, useMemo, useCallback, memo } from 'react';
-import styles from './WalletForm.module.scss';
-import { copyToClipboard, showNotification } from '../../utils/notifications';
-import { isValidWalletAddress } from '../../utils/validation';
-import SavedWalletsDropdown from './SavedWalletsDropdown';
-import ActiveWalletsDisplay from './ActiveWalletsDisplay';
+import styles from '@/styles/WalletForm.module.scss';
+import { copyToClipboard, showNotification } from '@/utils/notifications';
+import { isValidWalletAddress } from '@/utils/validation';
+import SavedWalletsDropdown from '@/components/pnl/SavedWalletsDropdown';
+import ActiveWalletsDisplay from '@/components/pnl/ActiveWalletsDisplay';
 
 /**
  * Submit button component that shows different states based on loading and countdown

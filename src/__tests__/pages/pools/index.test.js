@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import PoolsPage from '../../../pages/pools/index';
-import usePoolsData from '../../../hooks/usePoolsData';
-import { useComparison } from '../../../contexts/ComparisonContext';
+import PoolsPage from '@/pages/pools/index';
+import usePoolsData from '@/hooks/usePoolsData';
+import { useComparison } from '@/contexts/ComparisonContext';
 
 // Mock Next.js components
 jest.mock('next/head', () => {
@@ -22,11 +22,11 @@ jest.mock('next/link', () => {
 });
 
 // Mock hooks
-jest.mock('../../../hooks/usePoolsData');
-jest.mock('../../../contexts/ComparisonContext');
+jest.mock('@/hooks/usePoolsData');
+jest.mock('@/contexts/ComparisonContext');
 
 // Mock components
-jest.mock('../../../components/pools/PoolCard', () => {
+jest.mock('@/components/pools/PoolCard', () => {
   return function MockPoolCard({ pool, timeframe }) {
     return (
       <div 
@@ -40,7 +40,7 @@ jest.mock('../../../components/pools/PoolCard', () => {
   };
 });
 
-jest.mock('../../../components/pools/PoolFilters', () => {
+jest.mock('@/components/pools/PoolFilters', () => {
   return function MockPoolFilters({ filters, onFilterChange, filterOptions }) {
     return (
       <div data-testid="pool-filters">

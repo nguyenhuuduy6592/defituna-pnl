@@ -1,6 +1,6 @@
 import React, { useState, useRef, useMemo, useCallback } from 'react';
-import styles from './PriceBar.module.scss';
-import { TooltipPortal } from '../common/TooltipPortal';
+import styles from '@/styles/PriceBar.module.scss';
+import { TooltipPortal } from '@/components/common/TooltipPortal';
 
 /**
  * Renders a price point marker on the price bar

@@ -9,16 +9,16 @@ import {
   getGridStyling,
   getAxisStyling,
   CustomChartTooltip,
-} from '../../utils/chart';
-import { formatNumber } from '../../utils/formatters'; // Tooltip uses this
+} from '@/utils/chart';
+import { formatNumber } from '@/utils/formatters'; // Tooltip uses this
 
 // Mock the formatNumber function to isolate tooltip test
-jest.mock('../../utils/formatters', () => ({
+jest.mock('@/utils/formatters', () => ({
   formatNumber: jest.fn((value) => `formatted_${value}`),
 }));
 
 // Mock the CSS module import
-jest.mock('../components/pnl/PositionChart.module.scss', () => ({
+jest.mock('@/styles/PositionChart.module.scss', () => ({
   tooltip: 'mockTooltipClass',
   tooltipLabel: 'mockTooltipLabelClass',
 }));

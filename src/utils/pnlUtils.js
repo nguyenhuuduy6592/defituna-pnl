@@ -1,4 +1,4 @@
-import { addWalletAddressToPositions, decodePositions, decodeValue } from './positionUtils';
+import { addWalletAddressToPositions, decodePositions, decodeValue } from '@/utils/positionUtils';
 
 export const fetchWalletPnL = async (walletAddress) => {
   if (!walletAddress) return null;

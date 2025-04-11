@@ -1,6 +1,5 @@
-import React from 'react';
 import { renderHook, act } from '@testing-library/react';
-import { usePositionAges } from '../../../../components/pnl/hooks/usePositionAges';
+import { usePositionAges } from '@/components/pnl/hooks/usePositionAges';
 
 describe('usePositionAges Hook', () => {
   beforeEach(() => {

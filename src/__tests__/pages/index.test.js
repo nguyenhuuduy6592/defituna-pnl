@@ -1,10 +1,21 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import HomePage from '../../pages/index';
+import HomePage from '@/pages/index';
+import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB';
+
+// Mock IndexedDB utility functions
+jest.mock('@/utils/indexedDB', () => ({
+  initializeDB: jest.fn().mockResolvedValue({}),
+  getData: jest.fn(),
+  saveData: jest.fn().mockResolvedValue(true),
+  STORE_NAMES: {
+    SETTINGS: 'settings'
+  }
+}));
 
 // Mock hooks
-jest.mock('../../hooks', () => ({
+jest.mock('@/hooks', () => ({
   useWallet: jest.fn(() => ({
     wallet: '',
     setWallet: jest.fn(),
@@ -24,7 +35,8 @@ jest.mock('../../hooks', () => ({
     setAutoRefresh: jest.fn(),
     refreshInterval: 60,
     setRefreshInterval: jest.fn(),
-    refreshCountdown: 30
+    refreshCountdown: 30,
+    error: null
   })),
   useCountdown: jest.fn(() => ({
     countdown: 0,
@@ -42,7 +54,7 @@ jest.mock('../../hooks', () => ({
 }));
 
 // Mock components
-jest.mock('../../components/pnl/WalletForm', () => ({
+jest.mock('@/components/pnl/WalletForm', () => ({
   WalletForm: jest.fn(({ onSubmit }) => (
     <div data-testid="wallet-form">
       <input 
@@ -52,7 +64,6 @@ jest.mock('../../components/pnl/WalletForm', () => ({
       <button 
         data-testid="submit-button" 
         onClick={() => {
-          // Simulate a proper event object
           const fakeEvent = { preventDefault: jest.fn() };
           onSubmit('new-wallet', fakeEvent);
         }}
@@ -63,17 +74,14 @@ jest.mock('../../components/pnl/WalletForm', () => ({
   ))
 }));
 
-jest.mock('../../components/pnl/AutoRefresh', () => ({
-  AutoRefresh: jest.fn(({ autoRefresh, onToggle, refreshInterval, onIntervalChange, countdown }) => {
-    // Create mock toggle function if not provided
-    const handleToggle = onToggle || jest.fn();
-    
+jest.mock('@/components/pnl/AutoRefresh', () => ({
+  AutoRefresh: jest.fn(({ autoRefresh, setAutoRefresh, refreshInterval, onIntervalChange, autoRefreshCountdown, loading, historyEnabled, onHistoryToggle }) => {
     return (
       <div data-testid="auto-refresh">
         <input 
           type="checkbox" 
           checked={autoRefresh} 
-          onChange={() => handleToggle(!autoRefresh)}
+          onChange={() => setAutoRefresh(!autoRefresh)}
           data-testid="auto-refresh-toggle"
         />
         <select 
@@ -83,14 +91,23 @@ jest.mock('../../components/pnl/AutoRefresh', () => ({
         >
           <option value="30">30s</option>
           <option value="60">60s</option>
+          <option value="300">5m</option>
         </select>
-        <span data-testid="countdown">{countdown}</span>
+        <span data-testid="countdown">{autoRefreshCountdown}</span>
+        <div data-testid="history-toggle">
+          <input
+            type="checkbox"
+            checked={historyEnabled}
+            onChange={() => onHistoryToggle && onHistoryToggle(!historyEnabled)}
+          />
+        </div>
+        {loading && <span data-testid="loading-status">Refreshing data...</span>}
       </div>
     );
   })
 }));
 
-jest.mock('../../components/pnl/PnLDisplay', () => ({
+jest.mock('@/components/pnl/PnLDisplay', () => ({
   PnLDisplay: jest.fn(({ data }) => (
     <div data-testid="pnl-display">
       {data ? (
@@ -105,7 +122,7 @@ jest.mock('../../components/pnl/PnLDisplay', () => ({
   ))
 }));
 
-jest.mock('../../components/common/DisclaimerModal', () => ({
+jest.mock('@/components/common/DisclaimerModal', () => ({
   DisclaimerModal: jest.fn(({ isOpen, onClose }) => (
     isOpen ? (
       <div data-testid="disclaimer-modal">
@@ -116,7 +133,7 @@ jest.mock('../../components/common/DisclaimerModal', () => ({
 }));
 
 // Create a loading indicator component for tests
-jest.mock('../../components/common/LoadingOverlay', () => ({
+jest.mock('@/components/common/LoadingOverlay', () => ({
   LoadingOverlay: jest.fn(({ loading, children }) => (
     loading ? (
       <div data-testid="loading-indicator">Loading...</div>
@@ -126,27 +143,6 @@ jest.mock('../../components/common/LoadingOverlay', () => ({
 
 // Mock fetch for API calls
 global.fetch = jest.fn();
-
-// Mock localStorage
-const localStorageMock = (function() {
-  let store = {};
-  return {
-    getItem: jest.fn(key => store[key]),
-    setItem: jest.fn((key, value) => {
-      store[key] = value.toString();
-    }),
-    clear: jest.fn(() => {
-      store = {};
-    }),
-    removeItem: jest.fn(key => {
-      delete store[key];
-    }),
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock
-});
 
 describe('Home Page', () => {
   beforeEach(() => {
@@ -163,48 +159,99 @@ describe('Home Page', () => {
         ]
       })
     });
+
+    // Reset IndexedDB mock
+    getData.mockImplementation((db, storeName, key) => {
+      if (key === 'disclaimerShown') {
+        return Promise.resolve(null);
+      }
+      return Promise.resolve(null);
+    });
   });
 
-  it('renders the wallet form', () => {
-    render(<HomePage />);
+  it('renders the wallet form', async () => {
+    await act(async () => {
+      render(<HomePage />);
+    });
     expect(screen.getByTestId('wallet-form')).toBeInTheDocument();
   });
 
-  it('renders the auto-refresh component', () => {
-    render(<HomePage />);
+  it('renders the auto-refresh component', async () => {
+    await act(async () => {
+      render(<HomePage />);
+    });
     expect(screen.getByTestId('auto-refresh')).toBeInTheDocument();
   });
 
-  it('shows disclaimer modal on first visit', () => {
-    localStorage.getItem.mockReturnValueOnce(null); // Simulate first visit
+  it('shows disclaimer modal on first visit', async () => {
+    // Mock IndexedDB to return null for disclaimer (not shown before)
+    getData.mockImplementation((db, storeName, key) => {
+      if (key === 'disclaimerShown') {
+        return Promise.resolve(null);
+      }
+      return Promise.resolve(null);
+    });
+
+    await act(async () => {
+      render(<HomePage />);
+    });
     
-    render(<HomePage />);
-    
-    expect(screen.getByTestId('disclaimer-modal')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('disclaimer-modal')).toBeInTheDocument();
+    });
   });
 
-  it('does not show disclaimer on subsequent visits', () => {
-    localStorage.getItem.mockReturnValueOnce('true'); // Simulate returning visitor
+  it('does not show disclaimer on subsequent visits', async () => {
+    // Mock IndexedDB to return true for disclaimer (already shown)
+    getData.mockImplementation((db, storeName, key) => {
+      if (key === 'disclaimerShown') {
+        return Promise.resolve({ value: true });
+      }
+      return Promise.resolve(null);
+    });
+
+    await act(async () => {
+      render(<HomePage />);
+    });
     
-    render(<HomePage />);
-    
-    expect(screen.queryByTestId('disclaimer-modal')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByTestId('disclaimer-modal')).not.toBeInTheDocument();
+    });
   });
 
-  it('toggles auto-refresh when button is clicked', () => {
-    const { AutoRefresh } = require('../../components/pnl/AutoRefresh');
+  it('toggles auto-refresh when button is clicked', async () => {
+    const mockSetAutoRefresh = jest.fn();
+    const { useAutoRefresh } = require('@/hooks');
     
-    render(<HomePage />);
+    useAutoRefresh.mockImplementation(() => ({
+      autoRefresh: false,
+      setAutoRefresh: mockSetAutoRefresh,
+      refreshInterval: 60,
+      setRefreshInterval: jest.fn(),
+      refreshCountdown: 30,
+      error: null
+    }));
+    
+    await act(async () => {
+      render(<HomePage />);
+    });
     
     const autoRefreshToggle = screen.getByTestId('auto-refresh-toggle');
-    fireEvent.click(autoRefreshToggle);
     
-    expect(AutoRefresh).toHaveBeenCalled();
+    await act(async () => {
+      fireEvent.click(autoRefreshToggle);
+    });
+    
+    expect(mockSetAutoRefresh).toHaveBeenCalledWith(true);
   });
 
-  it('shows PnL display component', () => {
-    render(<HomePage />);
+  it('shows PnL display component', async () => {
+    await act(async () => {
+      render(<HomePage />);
+    });
     
-    expect(screen.getByTestId('pnl-display')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByTestId('pnl-display')).toBeInTheDocument();
+    });
   });
 });

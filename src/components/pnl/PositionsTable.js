@@ -1,6 +1,6 @@
-import { memo, useCallback, useMemo } from 'react';
-import { ClusterBar } from './ClusterBar';
-import { PriceBar } from './PriceBar';
+import { memo, useCallback } from 'react';
+import { ClusterBar } from '@/components/pnl/ClusterBar';
+import { PriceBar } from '@/components/pnl/PriceBar';
 import {
   formatNumber,
   formatDuration,
@@ -9,8 +9,8 @@ import {
   getStateClass,
   invertPairString,
   copyToClipboard
-} from '../../utils';
-import styles from './PositionsTable.module.scss';
+} from '@/utils';
+import styles from '@/styles/PositionsTable.module.scss';
 
 /**
  * Table header with sort functionality

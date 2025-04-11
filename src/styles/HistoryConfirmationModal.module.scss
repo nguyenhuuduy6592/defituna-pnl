@@ -1,6 +1,6 @@
 @use "sass:color";
 @use "sass:map";
-@use '../../styles/variables.module.scss';
+@use '@/styles/variables.module.scss';
 
 .overlay {
   position: fixed;

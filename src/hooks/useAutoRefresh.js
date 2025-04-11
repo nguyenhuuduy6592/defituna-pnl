@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB';
 
 // Constants
 const DEFAULT_INTERVAL = 30;
@@ -33,40 +34,62 @@ export const useAutoRefresh = (onRefresh, initialInterval = DEFAULT_INTERVAL) =>
   }, [onRefresh]);
 
   /**
-   * Load saved settings from localStorage on initial mount
+   * Load saved settings from IndexedDB on initial mount
    */
   useEffect(() => {
-    try {
-      // Load auto-refresh state
-      const savedAutoRefresh = localStorage.getItem(AUTO_REFRESH_KEY) === 'true';
-      setAutoRefresh(savedAutoRefresh);
-      
-      // Load refresh interval
-      const savedInterval = Number(localStorage.getItem(REFRESH_INTERVAL_KEY));
-      if (savedInterval && !isNaN(savedInterval) && savedInterval > 0) {
-        setRefreshInterval(savedInterval);
-        setRefreshCountdown(savedInterval);
+    const loadSettings = async () => {
+      try {
+        const db = await initializeDB();
+        if (!db) {
+          throw new Error('Failed to initialize IndexedDB');
+        }
+
+        // Load auto-refresh state
+        const autoRefreshData = await getData(db, STORE_NAMES.SETTINGS, AUTO_REFRESH_KEY);
+        setAutoRefresh(autoRefreshData?.value === true);
+
+        // Load refresh interval
+        const intervalData = await getData(db, STORE_NAMES.SETTINGS, REFRESH_INTERVAL_KEY);
+        const savedInterval = Number(intervalData?.value);
+        if (savedInterval && !isNaN(savedInterval) && savedInterval > 0) {
+          setRefreshInterval(savedInterval);
+          setRefreshCountdown(savedInterval);
+        }
+
+        setError(null);
+      } catch (error) {
+        console.error('Error loading auto-refresh settings:', error);
+        setError('Failed to load auto-refresh settings');
       }
-      
-      setError(null);
-    } catch (error) {
-      console.error('Error loading auto-refresh settings:', error);
-      setError('Failed to load auto-refresh settings');
-    }
+    };
+
+    loadSettings();
   }, []);
 
   /**
-   * Save settings to localStorage whenever they change
+   * Save settings to IndexedDB whenever they change
    */
   useEffect(() => {
-    try {
-      localStorage.setItem(AUTO_REFRESH_KEY, String(autoRefresh));
-      localStorage.setItem(REFRESH_INTERVAL_KEY, String(refreshInterval));
-      setError(null);
-    } catch (error) {
-      console.error('Error saving auto-refresh settings:', error);
-      setError('Failed to save auto-refresh settings');
-    }
+    const saveSettings = async () => {
+      try {
+        const db = await initializeDB();
+        if (!db) {
+          throw new Error('Failed to initialize IndexedDB');
+        }
+
+        await Promise.all([
+          saveData(db, STORE_NAMES.SETTINGS, { key: AUTO_REFRESH_KEY, value: autoRefresh }),
+          saveData(db, STORE_NAMES.SETTINGS, { key: REFRESH_INTERVAL_KEY, value: refreshInterval })
+        ]);
+
+        setError(null);
+      } catch (error) {
+        console.error('Error saving auto-refresh settings:', error);
+        setError('Failed to save auto-refresh settings');
+      }
+    };
+
+    saveSettings();
   }, [autoRefresh, refreshInterval]);
 
   /**
@@ -100,10 +123,15 @@ export const useAutoRefresh = (onRefresh, initialInterval = DEFAULT_INTERVAL) =>
     }
 
     const countdownTick = () => {
+      // Only countdown if the tab is visible
+      if (!isVisibleRef.current) {
+        return;
+      }
+      
       setRefreshCountdown((prev) => {
         if (prev <= 1) {
           try {
-            // Only refresh if tab is visible
+            // Check visibility again just before refresh, though redundant if countdown only happens when visible
             if (isVisibleRef.current && onRefreshRef.current) {
               onRefreshRef.current();
             }

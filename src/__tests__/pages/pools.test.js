@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
-import PoolsPage from '../../pages/pools';
-import { ComparisonProvider } from '../../contexts/ComparisonContext';
+import PoolsPage from '@/pages/pools';
+import { ComparisonProvider } from '@/contexts/ComparisonContext';
 
 // Mocks
 jest.mock('next/router', () => ({
@@ -22,7 +22,7 @@ jest.mock('next/link', () => {
 });
 
 // Mock components
-jest.mock('../../components/common/LoadingOverlay', () => ({
+jest.mock('@/components/common/LoadingOverlay', () => ({
   __esModule: true,
   default: ({ isLoading }) => (
     isLoading ? <div data-testid="loading-indicator">Loading...</div> : null
@@ -30,7 +30,7 @@ jest.mock('../../components/common/LoadingOverlay', () => ({
 }));
 
 // Mock usePoolsData
-jest.mock('../../hooks/usePoolsData', () => ({
+jest.mock('@/hooks/usePoolsData', () => ({
   __esModule: true,
   default: () => ({
     loading: false,
@@ -95,7 +95,7 @@ jest.mock('../../hooks/usePoolsData', () => ({
 }));
 
 // Update PoolCard mock to use the simple next/link mock
-jest.mock('../../components/pools/PoolCard', () => {
+jest.mock('@/components/pools/PoolCard', () => {
   const MockedLink = require('next/link'); // Get the mocked Link
   return {
     __esModule: true,

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import styles from './Tooltip.module.scss';
+import styles from '@/styles/Tooltip.module.scss';
 
 /**
  * Tooltip component that displays additional information on hover (desktop) or tap (mobile)

@@ -1,15 +1,15 @@
 import React from 'react';
 import { render, act, screen } from '@testing-library/react';
-import App from '../../pages/_app';
-import AppVersionDisplay from '../../components/AppVersionDisplay';
+import App from '@/pages/_app';
+import AppVersionDisplay from '@/components/AppVersionDisplay';
 
 // Mock the ComparisonProvider as its internal logic isn't the focus here
-jest.mock('../../contexts/ComparisonContext', () => ({
+jest.mock('@/contexts/ComparisonContext', () => ({
   ComparisonProvider: ({ children }) => <div data-testid="mock-comparison-provider">{children}</div>,
 }));
 
 // Mock AppVersionDisplay
-jest.mock('../../components/AppVersionDisplay', () => {
+jest.mock('@/components/AppVersionDisplay', () => {
   return jest.fn(() => <div data-testid="mock-version-display">Version Display</div>);
 });
 
@@ -38,7 +38,7 @@ describe('App Component (_app.js)', () => {
     // Clear mocks before each test
     jest.clearAllMocks();
     // Set to production to test service worker registration
-    process.env.NODE_ENV = 'production'; 
+    process.env.NODE_ENV = 'production';
   });
   
   afterEach(() => {

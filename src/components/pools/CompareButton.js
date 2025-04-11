@@ -1,7 +1,7 @@
 import React from 'react';
-import { BsBarChartLine, BsPlusCircle, BsDashCircle } from 'react-icons/bs';
-import { useComparison } from '../../contexts/ComparisonContext';
-import styles from './CompareButton.module.scss';
+import { BsPlusCircle, BsDashCircle } from 'react-icons/bs';
+import { useComparison } from '@/contexts/ComparisonContext';
+import styles from '@/styles/CompareButton.module.scss';
 
 /**
  * Button component for adding/removing pools to/from comparison

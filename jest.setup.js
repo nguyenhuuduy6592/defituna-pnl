@@ -31,7 +31,7 @@ jest.mock('next/router', () => ({
       },
       isFallback: false,
     }
-  },
+  }
 }))
 
 // Mock next/image
@@ -74,24 +74,76 @@ if (typeof MessageChannel === 'undefined') {
       close: () => {},
     };
   }
+  
   global.MessageChannel = MessageChannelMock;
 }
 
-// Mock IntersectionObserver if needed by components (uncomment if necessary)
-/*
-class IntersectionObserverMock {
-  observe = jest.fn();
-  unobserve = jest.fn();
-  disconnect = jest.fn();
-}
-Object.defineProperty(window, 'IntersectionObserver', {
-  writable: true,
-  configurable: true,
-  value: IntersectionObserverMock,
-});
-Object.defineProperty(global, 'IntersectionObserver', {
-  writable: true,
-  configurable: true,
-  value: IntersectionObserverMock,
-});
-*/ 
+
+
+// Mock IndexedDB utilities with default implementations
+const mockIndexedDB = {
+  initializeDB: jest.fn().mockResolvedValue({}),
+  getData: jest.fn().mockImplementation(() => Promise.resolve(null)),
+  saveData: jest.fn().mockResolvedValue(true),
+  // Add mocks for historical data functions
+  savePositionSnapshot: jest.fn().mockResolvedValue(true),
+  getPositionHistory: jest.fn().mockResolvedValue([]),
+  deletePositionHistory: jest.fn().mockResolvedValue(true),
+  clearAllHistory: jest.fn().mockResolvedValue(true),
+  // Add STORE_NAMES if they are used directly in tests
+  STORE_NAMES: {
+    SETTINGS: 'settings',
+    HISTORY: 'history' // Assuming a history store name
+  }
+};
+
+// Auto-mock the indexedDB module
+jest.mock('@/utils/indexedDB', () => mockIndexedDB);
+
+// Export the mock for direct access in tests
+module.exports = mockIndexedDB;
+
+// Reset all mocks to their default state
+export const resetIndexedDBMocks = () => {
+  mockIndexedDB.initializeDB.mockClear();
+  mockIndexedDB.getData.mockImplementation(() => Promise.resolve(null));
+  mockIndexedDB.saveData.mockImplementation(() => Promise.resolve(true));
+};
+
+// Mock successful data retrieval
+export const mockGetData = (key, value) => {
+  mockIndexedDB.getData.mockImplementation((db, storeName, dataKey) => {
+    if (dataKey === key) {
+      return Promise.resolve({ value });
+    }
+    return Promise.resolve(null);
+  });
+};
+
+// Mock failed data retrieval
+export const mockGetDataFailure = (error = new Error('IndexedDB is not available')) => {
+  mockIndexedDB.getData.mockImplementation(() => Promise.reject(error));
+};
+
+// Mock failed data saving
+export const mockSaveDataFailure = (error = new Error('IndexedDB is not available')) => {
+  mockIndexedDB.saveData.mockImplementation(() => Promise.reject(error));
+};
+
+// Jest mock setup
+export const setupIndexedDBMock = () => {
+  jest.mock('@/utils/indexedDB', () => mockIndexedDB);
+};
+
+// Reset all mocks before each test
+beforeEach(() => {
+  jest.clearAllMocks();
+  // Reset mocks to default behavior
+  mockIndexedDB.initializeDB.mockResolvedValue({});
+  mockIndexedDB.getData.mockImplementation(() => Promise.resolve(null));
+  mockIndexedDB.saveData.mockResolvedValue(true);
+  mockIndexedDB.savePositionSnapshot.mockResolvedValue(true);
+  mockIndexedDB.getPositionHistory.mockResolvedValue([]);
+  mockIndexedDB.deletePositionHistory.mockResolvedValue(true);
+  mockIndexedDB.clearAllHistory.mockResolvedValue(true);
+}); 

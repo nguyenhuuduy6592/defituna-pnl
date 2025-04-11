@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import PoolComparisonPage from '../../../pages/pools/compare';
-import { useComparison } from '../../../contexts/ComparisonContext';
-import * as formatters from '../../../utils/formatters'; // Import all formatters
+import PoolComparisonPage from '@/pages/pools/compare';
+import { useComparison } from '@/contexts/ComparisonContext';
+import * as formatters from '@/utils/formatters'; // Import all formatters
 
 // Mock Next.js components
 jest.mock('next/head', () => {
@@ -20,10 +20,10 @@ jest.mock('next/link', () => {
 });
 
 // Mock context hook
-jest.mock('../../../contexts/ComparisonContext');
+jest.mock('@/contexts/ComparisonContext');
 
 // Mock PoolMetrics component
-jest.mock('../../../components/pools/PoolMetrics', () => {
+jest.mock('@/components/pools/PoolMetrics', () => {
   return {
     __esModule: true,
     default: ({ poolAddress, timeframe }) => (

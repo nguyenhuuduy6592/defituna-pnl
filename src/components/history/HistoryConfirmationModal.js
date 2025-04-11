@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { HiX } from 'react-icons/hi';
-import styles from './HistoryConfirmationModal.module.scss';
+import styles from '@/styles/HistoryConfirmationModal.module.scss';
 
 /**
  * Information notice component for modal

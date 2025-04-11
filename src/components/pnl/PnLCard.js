@@ -7,12 +7,12 @@ import {
   FaExclamationTriangle,
   FaArrowsAltV
 } from 'react-icons/fa';
-import { Portal } from '../common/Portal';
-import styles from './PnLCard.module.scss';
-import { formatNumber, formatDuration, formatPercentage } from '../../utils/formatters';
-import { getValueClass } from '../../utils/styles';
-import { getStateClass } from '../../utils/positionUtils';
-import { exportCardAsImage, shareCard } from '../../utils/export';
+import { Portal } from '@/components/common/Portal';
+import styles from '@/styles/PnLCard.module.scss';
+import { formatNumber, formatDuration, formatPercentage } from '@/utils/formatters';
+import { getValueClass } from '@/utils/styles';
+import { getStateClass } from '@/utils/positionUtils';
+import { exportCardAsImage, shareCard } from '@/utils/export';
 
 /**
  * Renders a stat row with label and value

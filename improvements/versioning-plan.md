@@ -56,7 +56,7 @@ This plan outlines the steps to:
     *   Example Integration (conceptual, adapt to your structure):
         ```javascript
         // Example: In a Layout component or _app.js
-        import AppVersionDisplay from '../components/AppVersionDisplay';
+        import AppVersionDisplay from '@/components/AppVersionDisplay';
 
         function MyAppOrLayout({ Component, pageProps }) {
           // ... other layout code

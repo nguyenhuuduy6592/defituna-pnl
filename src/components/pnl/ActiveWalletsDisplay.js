@@ -1,6 +1,6 @@
 import React, { useCallback, memo } from 'react';
-import styles from './WalletForm.module.scss';
-import { formatWalletAddress, copyToClipboard } from '../../utils';
+import styles from '@/styles/WalletForm.module.scss';
+import { formatWalletAddress, copyToClipboard } from '@/utils';
 
 /**
  * Individual wallet chip component with copy and remove functionality

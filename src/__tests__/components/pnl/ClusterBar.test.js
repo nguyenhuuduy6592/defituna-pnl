@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ClusterBar } from '../../../components/pnl/ClusterBar';
+import { ClusterBar } from '@/components/pnl/ClusterBar';
 
 // Mock the TooltipPortal component
-jest.mock('../../../components/common/TooltipPortal', () => ({
+jest.mock('@/components/common/TooltipPortal', () => ({
   TooltipPortal: ({ children, targetRef, show }) => (
     show ? <div data-testid="tooltip-portal">{children}</div> : null
   )

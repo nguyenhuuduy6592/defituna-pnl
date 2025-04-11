@@ -1,9 +1,9 @@
 import { renderHook, act } from '@testing-library/react';
-import { useDebounceApi } from '../../hooks/useDebounceApi';
-import { debouncePromise } from '../../utils/debounce';
+import { useDebounceApi } from '@/hooks/useDebounceApi';
+import { debouncePromise } from '@/utils/debounce';
 
 // Mock the debouncePromise utility
-jest.mock('../../utils/debounce', () => ({
+jest.mock('@/utils/debounce', () => ({
   // The mock returns a function that immediately invokes the callback it receives.
   // This bypasses the actual timer/debouncing logic but allows us to test
   // the state management and race condition logic within useDebounceApi.

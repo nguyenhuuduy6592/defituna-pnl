@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './LoadingOverlay.module.scss';
+import styles from '@/styles/LoadingOverlay.module.scss';
 
 /**
  * A component that wraps its children and displays a loading overlay

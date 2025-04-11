@@ -3,7 +3,7 @@ import {
   batchGetTokenMetadata,
   calculatePriceFromSqrtPrice,
   enhancePoolWithTokenMetadata
-} from '../../utils/tokens';
+} from '@/utils/tokens';
 
 // Mock global fetch
 global.fetch = jest.fn();

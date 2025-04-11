@@ -1,6 +1,6 @@
 import React, { useCallback, memo } from 'react';
-import styles from './WalletForm.module.scss'; // Reuse styles for now
-import { formatWalletAddress } from '../../utils';
+import styles from '@/styles/WalletForm.module.scss'; // Reuse styles for now
+import { formatWalletAddress } from '@/utils';
 
 /**
  * Individual saved wallet item with selection and actions

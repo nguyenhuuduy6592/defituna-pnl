@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import ReleaseNotesPage, { getStaticProps } from '../../pages/release-notes';
+import ReleaseNotesPage, { getStaticProps } from '@/pages/release-notes';
 import fs from 'fs';
 import path from 'path';
 

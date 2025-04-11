@@ -1,14 +1,14 @@
 import React from 'react';
 import { render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import PoolMetrics from '../../../components/pools/PoolMetrics';
-import { usePoolData } from '../../../hooks/usePoolData';
+import PoolMetrics from '@/components/pools/PoolMetrics';
+import { usePoolData } from '@/hooks/usePoolData';
 
 // Mock the hooks
-jest.mock('../../../hooks/usePoolData');
+jest.mock('@/hooks/usePoolData');
 
 // Mock the tooltip utility functions to avoid errors
-jest.mock('../../../utils/tooltipContent', () => ({
+jest.mock('@/utils/tooltipContent', () => ({
   getFeeAPRTooltip: jest.fn(() => 'Fee APR tooltip'),
   getVolumeTVLTooltip: jest.fn(() => 'Volume/TVL tooltip'),
   getVolatilityTooltip: jest.fn(() => 'Volatility tooltip'),
@@ -19,7 +19,7 @@ jest.mock('../../../utils/tooltipContent', () => ({
 }));
 
 // Mock the formatters to ensure predictable output
-jest.mock('../../../utils/formatters', () => ({
+jest.mock('@/utils/formatters', () => ({
   formatNumber: jest.fn((value, type, decimals) => {
     if (type === 'currency') {
       if (value >= 1000000) return '1.00M';
@@ -34,7 +34,7 @@ jest.mock('../../../utils/formatters', () => ({
 }));
 
 // Mock the EnhancedTooltip component
-jest.mock('../../../components/common/EnhancedTooltip', () => {
+jest.mock('@/components/common/EnhancedTooltip', () => {
   return jest.fn(({ children, title, content }) => (
     <div data-testid="enhanced-tooltip" data-title={title} data-content={content}>
       {children}
@@ -43,7 +43,7 @@ jest.mock('../../../components/common/EnhancedTooltip', () => {
 });
 
 // Mock the InfoIcon component
-jest.mock('../../../components/common/InfoIcon', () => {
+jest.mock('@/components/common/InfoIcon', () => {
   return jest.fn(({ size }) => (
     <span data-testid="info-icon" data-size={size}>
       i

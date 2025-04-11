@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { PositionsTable, TableHeader, PairCell, WalletCell, ActionsCell } from '../../../components/pnl/PositionsTable';
-import { getValueClass, getStateClass, invertPairString, copyToClipboard } from '../../../utils';
+import { PositionsTable, TableHeader, PairCell, WalletCell, ActionsCell } from '@/components/pnl/PositionsTable';
+import { getValueClass, getStateClass, invertPairString, copyToClipboard } from '@/utils';
 
 // Mock dependencies
-jest.mock('../../../components/pnl/ClusterBar', () => ({
+jest.mock('@/components/pnl/ClusterBar', () => ({
   ClusterBar: ({ size, collateral }) => (
     <div data-testid="cluster-bar">
       Size: {size?.usd}, Collateral: {collateral?.usd}
@@ -12,7 +12,7 @@ jest.mock('../../../components/pnl/ClusterBar', () => ({
   )
 }));
 
-jest.mock('../../../components/pnl/PriceBar', () => ({
+jest.mock('@/components/pnl/PriceBar', () => ({
   PriceBar: ({ currentPrice }) => (
     <div data-testid="price-bar">
       Current Price: {currentPrice}
@@ -20,7 +20,7 @@ jest.mock('../../../components/pnl/PriceBar', () => ({
   )
 }));
 
-jest.mock('../../../utils', () => ({
+jest.mock('@/utils', () => ({
   formatNumber: (num) => num?.toLocaleString() || 'N/A',
   formatDuration: (days) => `${days} days`,
   formatWalletAddress: (addr) => addr?.substring(0, 6) + '...' + addr?.substring(addr.length - 4) || 'N/A',

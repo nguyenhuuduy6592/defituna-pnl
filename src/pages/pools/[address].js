@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import Link from 'next/link';
-import styles from '../../styles/PoolDetail.module.scss';
-import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '../../utils/formatters';
-import PoolMetrics from '../../components/pools/PoolMetrics';
-import usePoolsData from '../../hooks/usePoolsData';
-import ImpermanentLossExplainer from '../../components/education/ImpermanentLossExplainer';
-import InfoIcon from '../../components/common/InfoIcon';
+import styles from '@/styles/PoolDetail.module.scss';
+import { formatNumber, formatWalletAddress, formatPercentage, formatFee } from '@/utils/formatters';
+import PoolMetrics from '@/components/pools/PoolMetrics';
+import usePoolsData from '@/hooks/usePoolsData';
+import ImpermanentLossExplainer from '@/components/education/ImpermanentLossExplainer';
+import InfoIcon from '@/components/common/InfoIcon';
 import { 
   getImpermanentLossTooltip,
   getPriceImpactTooltip
-} from '../../utils/tooltipContent';
+} from '@/utils/tooltipContent';
 
 export default function PoolDetailPage() {
   const router = useRouter();

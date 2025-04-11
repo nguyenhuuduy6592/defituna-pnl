@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { Tooltip } from '../../../components/common/Tooltip';
+import { Tooltip } from '@/components/common/Tooltip';
 
 // Mock the Tooltip module SCSS
-jest.mock('../../../components/common/Tooltip.module.scss', () => ({
+jest.mock('@/components/common/Tooltip.module.scss', () => ({
   tooltipContainer: 'tooltipContainer',
   tooltipTrigger: 'tooltipTrigger',
   tooltip: 'tooltip',

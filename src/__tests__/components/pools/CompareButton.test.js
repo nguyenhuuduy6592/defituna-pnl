@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CompareButton from '../../../components/pools/CompareButton';
-import { useComparison } from '../../../contexts/ComparisonContext';
+import CompareButton from '@/components/pools/CompareButton';
+import { useComparison } from '@/contexts/ComparisonContext';
 
 // Mock the ComparisonContext
-jest.mock('../../../contexts/ComparisonContext', () => ({
+jest.mock('@/contexts/ComparisonContext', () => ({
   useComparison: jest.fn()
 }));
 

@@ -1,8 +1,8 @@
-import { SORT_FIELD_CONFIG, sortPositions } from '../../utils/sortUtils';
-import { calculateStatus } from '../../utils/positionUtils';
+import { SORT_FIELD_CONFIG, sortPositions } from '@/utils/sortUtils';
+import { calculateStatus } from '@/utils/positionUtils';
 
 // Mock positionUtils
-jest.mock('../../utils/positionUtils', () => ({
+jest.mock('@/utils/positionUtils', () => ({
   calculateStatus: jest.fn(position => position.status || 'active')
 }));
 

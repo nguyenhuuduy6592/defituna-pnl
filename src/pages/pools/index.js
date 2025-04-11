@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import usePoolsData from '../../hooks/usePoolsData';
-import PoolCard from '../../components/pools/PoolCard';
-import PoolFilters from '../../components/pools/PoolFilters';
-import { useComparison } from '../../contexts/ComparisonContext';
-import styles from '../../styles/Pools.module.scss';
-import { appTitle } from '../../utils/constants';
+import usePoolsData from '@/hooks/usePoolsData';
+import PoolCard from '@/components/pools/PoolCard';
+import PoolFilters from '@/components/pools/PoolFilters';
+import { useComparison } from '@/contexts/ComparisonContext';
+import styles from '@/styles/Pools.module.scss';
+import { appTitle } from '@/utils/constants';
 
 export default function PoolsPage() {
   // State for selected timeframe (24h, 7d, 30d)

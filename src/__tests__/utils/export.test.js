@@ -1,6 +1,6 @@
 import { toPng } from 'html-to-image';
 import html2canvas from 'html2canvas';
-import { exportChartAsImage, exportCardAsImage, shareCard } from '../../utils/export';
+import { exportChartAsImage, exportCardAsImage, shareCard } from '@/utils/export';
 
 // --- Mocks ---
 jest.mock('html-to-image', () => ({

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import styles from './DonationFooter.module.scss';
-import { formatWalletAddress, copyToClipboard } from '../../utils';
+import styles from '@/styles/DonationFooter.module.scss';
+import { formatWalletAddress, copyToClipboard } from '@/utils';
 
 /**
  * Component for displaying donation information with a copyable wallet address

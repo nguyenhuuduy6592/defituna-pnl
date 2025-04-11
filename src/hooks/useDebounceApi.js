@@ -1,5 +1,5 @@
 import { useCallback, useState, useRef, useEffect } from 'react';
-import { debouncePromise } from '../utils/debounce';
+import { debouncePromise } from '@/utils/debounce';
 
 /**
  * Custom hook for debounced API calls.

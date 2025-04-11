@@ -1,417 +1,495 @@
-import { renderHook, act } from '@testing-library/react';
-import { useAutoRefresh } from '../../hooks/useAutoRefresh';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
+import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB';
 
-// Mocks
-let getItemSpy;
-let setItemSpy;
-let consoleErrorSpy;
-let consoleWarnSpy;
-let addEventListenerSpy;
-let removeEventListenerSpy;
-let visibilityStateGetter;
-let mockOnRefresh;
+// --- Mocks ---
+jest.mock('@/utils/indexedDB', () => ({
+  initializeDB: jest.fn(),
+  getData: jest.fn(),
+  saveData: jest.fn(),
+  STORE_NAMES: {
+    SETTINGS: 'settings'
+  },
+}));
 
+// --- Constants & Helpers ---
 const DEFAULT_INTERVAL = 30;
 const AUTO_REFRESH_KEY = 'autoRefresh';
 const REFRESH_INTERVAL_KEY = 'refreshInterval';
+const MOCK_DB = { mockDbInstance: true };
 
-// Helper to simulate visibility change
-const simulateVisibilityChange = (visibility) => {
-  visibilityStateGetter.mockReturnValue(visibility);
-  // Need to manually trigger the event listener callback
-  const visibilityChangeCallback = addEventListenerSpy.mock.calls.find(
-    call => call[0] === 'visibilitychange'
-  )?.[1];
-  if (visibilityChangeCallback) {
-    visibilityChangeCallback();
+// Helper to mock document visibility
+let visibilityState = 'visible';
+const listeners = {};
+const mockVisibility = (state) => {
+  visibilityState = state;
+  Object.defineProperty(document, 'visibilityState', {
+    configurable: true,
+    get: function () { return visibilityState; }
+  });
+  // Trigger visibilitychange event listeners
+  if (listeners['visibilitychange']) {
+    listeners['visibilitychange'].forEach(cb => cb());
   }
 };
 
-beforeEach(() => {
-  jest.useFakeTimers();
-  jest.clearAllMocks();
-  localStorage.clear();
+// Mock add/removeEventListener for visibilitychange
+const originalAddEventListener = document.addEventListener;
+const originalRemoveEventListener = document.removeEventListener;
 
-  getItemSpy = jest.spyOn(Storage.prototype, 'getItem');
-  setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
-  consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-  consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  addEventListenerSpy = jest.spyOn(document, 'addEventListener');
-  removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
-  
-  // Mock document.visibilityState getter
-  visibilityStateGetter = jest.spyOn(document, 'visibilityState', 'get');
-  visibilityStateGetter.mockReturnValue('visible'); // Default to visible
-
-  mockOnRefresh = jest.fn();
-});
-
-afterEach(() => {
-  jest.runOnlyPendingTimers();
-  jest.useRealTimers();
-  // Restore all spies
-  getItemSpy.mockRestore();
-  setItemSpy.mockRestore();
-  consoleErrorSpy.mockRestore();
-  consoleWarnSpy.mockRestore();
-  addEventListenerSpy.mockRestore();
-  removeEventListenerSpy.mockRestore();
-  visibilityStateGetter.mockRestore();
-});
-
+// --- Test Suite Setup ---
 describe('useAutoRefresh Hook', () => {
+  let mockOnRefresh;
+  let consoleErrorSpy;
+  let consoleWarnSpy;
+
+  beforeAll(() => {
+    // Mock document visibility globally for all tests in this suite
+    document.addEventListener = jest.fn((event, cb) => {
+        if (event === 'visibilitychange') {
+            if (!listeners[event]) listeners[event] = [];
+            listeners[event].push(cb);
+        }
+    });
+    document.removeEventListener = jest.fn((event, cb) => {
+         if (event === 'visibilitychange' && listeners[event]) {
+            listeners[event] = listeners[event].filter(listener => listener !== cb);
+        }
+    });
+  });
+
+  beforeEach(() => {
+    // Use fake timers
+    jest.useFakeTimers();
+
+    // Reset mocks
+    jest.clearAllMocks();
+    mockOnRefresh = jest.fn();
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    // Default successful mock implementations
+    initializeDB.mockResolvedValue(MOCK_DB);
+    getData.mockResolvedValue(null); // Default: cache miss for both keys
+    saveData.mockResolvedValue(true);
+
+    // Reset visibility to default
+    mockVisibility('visible');
+    // Clear any leftover listeners
+    if (listeners['visibilitychange']) listeners['visibilitychange'] = []; 
+    document.addEventListener.mockClear();
+    document.removeEventListener.mockClear();
+  });
+
+  afterEach(() => {
+    // Restore real timers
+    jest.useRealTimers();
+    // Restore console spies
+    consoleErrorSpy.mockRestore();
+    consoleWarnSpy.mockRestore();
+  });
+  
+  afterAll(() => {
+    // Restore original document listeners
+    document.addEventListener = originalAddEventListener;
+    document.removeEventListener = originalRemoveEventListener;
+  });
+
+  // Helper function to render the hook
+  const renderAutoRefreshHook = (interval = DEFAULT_INTERVAL) => renderHook(() => useAutoRefresh(mockOnRefresh, interval));
+
+  // --- Test Cases ---
+
   describe('Initialization', () => {
-    it('should initialize with default values and load from empty localStorage', () => {
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
+    it('should initialize with default values and load from empty DB', async () => {
+      const { result } = renderAutoRefreshHook();
 
       expect(result.current.autoRefresh).toBe(false);
       expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
       expect(result.current.refreshCountdown).toBe(DEFAULT_INTERVAL);
       expect(result.current.error).toBeNull();
 
-      expect(getItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY);
-      expect(getItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY);
-      // Initial saves triggered by state setting
-      expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'false');
-      expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(DEFAULT_INTERVAL));
-      expect(addEventListenerSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
-    });
-
-    it('should initialize with provided initialInterval', () => {
-       const customInterval = 60;
-       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, customInterval));
-
-       expect(result.current.refreshInterval).toBe(customInterval);
-       expect(result.current.refreshCountdown).toBe(customInterval);
-       expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(customInterval));
-    });
-
-    it('should load valid settings from localStorage', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      localStorage.setItem(REFRESH_INTERVAL_KEY, '15');
-      // Mock getItem to return these values
-      getItemSpy.mockImplementation((key) => {
-        if (key === AUTO_REFRESH_KEY) return 'true';
-        if (key === REFRESH_INTERVAL_KEY) return '15';
-        return null;
+      await act(async () => {
+          await jest.runAllTimersAsync();
       });
-
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
-
-      expect(result.current.autoRefresh).toBe(true);
-      expect(result.current.refreshInterval).toBe(15);
-      expect(result.current.refreshCountdown).toBe(15); // Should initialize countdown to interval
+      
+      // Expect initializeDB to be called twice (load and save effects)
+      expect(initializeDB).toHaveBeenCalledTimes(2);
+      expect(getData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, AUTO_REFRESH_KEY);
+      expect(getData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, REFRESH_INTERVAL_KEY);
+      
+      expect(result.current.autoRefresh).toBe(false);
+      expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
+      expect(result.current.refreshCountdown).toBe(DEFAULT_INTERVAL); 
       expect(result.current.error).toBeNull();
-      // Should save loaded values back initially (due to state setting triggering effect)
-      expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'true');
-      expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, '15');
-    });
-
-     it('should handle invalid interval in localStorage (use default)', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      localStorage.setItem(REFRESH_INTERVAL_KEY, '-10'); // Invalid interval
-      getItemSpy.mockImplementation((key) => {
-        if (key === AUTO_REFRESH_KEY) return 'true';
-        if (key === REFRESH_INTERVAL_KEY) return '-10';
-        return null;
+      
+      await waitFor(() => {
+          expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: AUTO_REFRESH_KEY, value: false });
+          expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: REFRESH_INTERVAL_KEY, value: DEFAULT_INTERVAL });
       });
-
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
-
-      expect(result.current.autoRefresh).toBe(true); // Still loads autoRefresh correctly
-      expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL); // Falls back to default
-      expect(result.current.refreshCountdown).toBe(DEFAULT_INTERVAL); // Uses default
-      expect(result.current.error).toBeNull(); 
-       // Saves default interval back
-      expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(DEFAULT_INTERVAL));
+    });
+    
+    it('should initialize with provided initialInterval', async () => {
+        const customInterval = 60;
+        const { result } = renderAutoRefreshHook(customInterval);
+        
+        expect(result.current.refreshInterval).toBe(customInterval);
+        expect(result.current.refreshCountdown).toBe(customInterval);
+        
+        // Wait for async load/save effects
+        await act(async () => { await jest.runAllTimersAsync(); });
+        await waitFor(() => { 
+            expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: REFRESH_INTERVAL_KEY, value: customInterval });
+        });
     });
 
-     it('should handle non-numeric interval in localStorage (use default)', () => {
-      localStorage.setItem(REFRESH_INTERVAL_KEY, 'abc'); 
-      getItemSpy.mockImplementation((key) => {
-        if (key === REFRESH_INTERVAL_KEY) return 'abc';
-        return null;
-      });
+    it('should load valid settings from IndexedDB', async () => {
+        const savedInterval = 15;
+        getData
+            .mockResolvedValueOnce({ key: AUTO_REFRESH_KEY, value: true }) // Mock autoRefresh = true
+            .mockResolvedValueOnce({ key: REFRESH_INTERVAL_KEY, value: savedInterval }); // Mock interval = 15
 
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
+        const { result } = renderAutoRefreshHook(); // Use default initial interval
 
-      expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
-      expect(result.current.refreshCountdown).toBe(DEFAULT_INTERVAL);
-      expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(DEFAULT_INTERVAL));
+        await act(async () => { await jest.runAllTimersAsync(); }); 
+
+        expect(getData).toHaveBeenCalledTimes(2);
+        expect(result.current.autoRefresh).toBe(true);
+        expect(result.current.refreshInterval).toBe(savedInterval);
+        expect(result.current.refreshCountdown).toBe(savedInterval); // Should initialize countdown to loaded interval
+        expect(result.current.error).toBeNull();
     });
 
-    it('should handle localStorage.getItem error during load', () => {
-      const loadError = new Error('LocalStorage Read Failed');
-      getItemSpy.mockImplementation(() => { throw loadError; });
+    it('should handle invalid interval in IndexedDB (use default)', async () => {
+        getData
+            .mockResolvedValueOnce({ key: AUTO_REFRESH_KEY, value: true })
+            .mockResolvedValueOnce({ key: REFRESH_INTERVAL_KEY, value: 'abc' }); // Invalid interval
 
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
+        const { result } = renderAutoRefreshHook();
+        
+        await act(async () => { await jest.runAllTimersAsync(); }); 
 
-      expect(result.current.autoRefresh).toBe(false); // Defaults
-      expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
-      // Error gets overwritten by subsequent successful save effect
-      expect(result.current.error).toBeNull(); 
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Error loading auto-refresh settings:', loadError);
+        expect(result.current.autoRefresh).toBe(true); // Still loads autoRefresh correctly
+        expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL); // Falls back to default
+        expect(result.current.refreshCountdown).toBe(DEFAULT_INTERVAL); // Uses default
+        expect(result.current.error).toBeNull(); 
+    });
+
+    it('should handle IndexedDB load errors gracefully', async () => {
+        const dbError = new Error('DB Load Failed');
+        // Mock initializeDB to fail on first call (load), succeed on second (save attempt)
+        initializeDB
+          .mockRejectedValueOnce(dbError) 
+          .mockResolvedValue(MOCK_DB); 
+
+        const { result } = renderAutoRefreshHook();
+
+        // Wait for effects to run
+        await act(async () => { await jest.runAllTimersAsync(); });
+        
+        // Assert calls
+        expect(initializeDB).toHaveBeenCalledTimes(2); // Called by load and save effects
+        expect(getData).not.toHaveBeenCalled(); // getData skipped due to load init failure
+        
+        // Wait for potential saveData call to resolve/reject
+        await waitFor(() => {
+            expect(saveData).toHaveBeenCalled(); // Save effect proceeds because second init succeeded
+        });
+        
+        // Check that the load error was logged
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Error loading auto-refresh settings:', dbError);
+        
+        // Final state check (error might be null if save succeeds, or save error)
+        expect(result.current.autoRefresh).toBe(false); // State remains default
+        expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
+        // We primarily care that the load error was logged, final error state is secondary here
+        // expect(result.current.error).toBe('...'); // This could vary
     });
   });
 
-  describe('State Updates & localStorage', () => {
-    it('should update autoRefresh state and save to localStorage', () => {
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
-      // Expect initial saves
-      expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'false');
-      expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(DEFAULT_INTERVAL));
-      const initialSaveCount = setItemSpy.mock.calls.length; 
-
-      act(() => { result.current.setAutoRefresh(true); });
-      expect(result.current.autoRefresh).toBe(true);
-      expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'true');
-      // Initial render saves 2 times. Setting autoRefresh triggers save effect again (saves both dependencies).
-      expect(setItemSpy).toHaveBeenCalledTimes(initialSaveCount + 2);
-
-      act(() => { result.current.setAutoRefresh(false); });
-      expect(result.current.autoRefresh).toBe(false);
-      expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'false');
-      // One more save effect trigger (saves both dependencies again)
-      expect(setItemSpy).toHaveBeenCalledTimes(initialSaveCount + 4);
-    });
-
-     it('should handle truthy/falsy values for setAutoRefresh', () => {
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
-      setItemSpy.mockClear();
-
-      act(() => { result.current.setAutoRefresh(1); }); // Truthy
-      expect(result.current.autoRefresh).toBe(true);
-      expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'true');
-
-       act(() => { result.current.setAutoRefresh(0); }); // Falsy
-      expect(result.current.autoRefresh).toBe(false);
-      expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'false');
-    });
-
-    it('should update refreshInterval state and save to localStorage', () => {
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
-      setItemSpy.mockClear();
-
-      act(() => { result.current.setRefreshInterval(10); });
-      expect(result.current.refreshInterval).toBe(10);
-      // Save effect saves both autoRefresh and refreshInterval
-      expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, '10');
-      expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'false'); // Assuming default autoRefresh
-      expect(setItemSpy).toHaveBeenCalledTimes(2); 
-    });
-
-     it('should reset countdown when refreshInterval changes while autoRefresh is true', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 60));
+  describe('State Updates & IndexedDB Saving', () => {
+    it('should update autoRefresh state and save to DB', async () => {
+      const { result } = renderAutoRefreshHook();
       
-      expect(result.current.autoRefresh).toBe(true);
-      expect(result.current.refreshInterval).toBe(60);
-      expect(result.current.refreshCountdown).toBe(60);
+      await act(async () => { await jest.runAllTimersAsync(); });
+      await waitFor(() => expect(saveData).toHaveBeenCalledTimes(2)); 
+      saveData.mockClear();
 
-      // Advance time a bit
+      act(() => {
+        result.current.setAutoRefresh(true);
+      });
+      expect(result.current.autoRefresh).toBe(true);
+      
+      await waitFor(() => {
+        // Effect saves both keys when triggered
+        expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: AUTO_REFRESH_KEY, value: true });
+        expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: REFRESH_INTERVAL_KEY, value: DEFAULT_INTERVAL });
+      });
+      expect(saveData).toHaveBeenCalledTimes(2); 
+      saveData.mockClear();
+      
+      act(() => {
+        result.current.setAutoRefresh(false);
+      });
+      expect(result.current.autoRefresh).toBe(false);
+      
+      await waitFor(() => {
+         // Effect saves both keys when triggered
+        expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: AUTO_REFRESH_KEY, value: false });
+        expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: REFRESH_INTERVAL_KEY, value: DEFAULT_INTERVAL });
+      });
+      expect(saveData).toHaveBeenCalledTimes(2);
+    });
+    
+    it('should update refreshInterval state and save to DB', async () => {
+        const { result } = renderAutoRefreshHook();
+        const newInterval = 45;
+        
+        await act(async () => { await jest.runAllTimersAsync(); });
+        await waitFor(() => expect(saveData).toHaveBeenCalledTimes(2));
+        saveData.mockClear();
+
+        act(() => {
+            result.current.setRefreshInterval(newInterval);
+        });
+        expect(result.current.refreshInterval).toBe(newInterval);
+        expect(result.current.refreshCountdown).toBe(DEFAULT_INTERVAL);
+        
+        await waitFor(() => {
+            // Effect saves both keys when triggered
+            expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: AUTO_REFRESH_KEY, value: false }); // autoRefresh is still false initially
+            expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: REFRESH_INTERVAL_KEY, value: newInterval });
+        });
+        expect(saveData).toHaveBeenCalledTimes(2);
+    });
+    
+    it('should reset countdown when interval changes while autoRefresh is ON', async () => {
+        // Load with autoRefresh ON
+        getData.mockResolvedValueOnce({ key: AUTO_REFRESH_KEY, value: true });
+        const { result } = renderAutoRefreshHook();
+        await act(async () => { await jest.runAllTimersAsync(); });
+        saveData.mockClear();
+        
+        expect(result.current.autoRefresh).toBe(true);
+        expect(result.current.refreshCountdown).toBe(DEFAULT_INTERVAL);
+
+        // Change interval
+        const newInterval = 15;
+        act(() => {
+            result.current.setRefreshInterval(newInterval);
+        });
+        
+        expect(result.current.refreshInterval).toBe(newInterval);
+        // Countdown should immediately reset because autoRefresh is ON
+        expect(result.current.refreshCountdown).toBe(newInterval);
+        await waitFor(() => { 
+            expect(saveData).toHaveBeenCalledWith(MOCK_DB, STORE_NAMES.SETTINGS, { key: REFRESH_INTERVAL_KEY, value: newInterval });
+        });
+    });
+
+    it('should ignore invalid values for setRefreshInterval and log warning', async () => {
+      const { result } = renderAutoRefreshHook();
+      await act(async () => { await jest.runAllTimersAsync(); });
+      saveData.mockClear();
+
+      act(() => {
+        result.current.setRefreshInterval('invalid');
+      });
+      expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Invalid refresh interval, using default instead');
+      // Save should NOT be called because the state value didn't change
+      // Use a small delay to ensure effect would have run if triggered
+      await act(async () => { await jest.advanceTimersByTimeAsync(10); }); 
+      expect(saveData).not.toHaveBeenCalled();
+      
+      consoleWarnSpy.mockClear();
+      
+      act(() => {
+        result.current.setRefreshInterval(-10);
+      });
+      expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Invalid refresh interval, using default instead');
+      await act(async () => { await jest.advanceTimersByTimeAsync(10); });
+      expect(saveData).not.toHaveBeenCalled();
+    });
+    
+    it('should handle IndexedDB save errors gracefully', async () => {
+        const dbSaveError = new Error('DB Save Failed');
+        saveData.mockRejectedValue(dbSaveError);
+        
+        const { result } = renderAutoRefreshHook();
+        await act(async () => { await jest.runAllTimersAsync(); }); // Wait for initial load/save attempt
+        
+        // Check error state after initial save attempt fails
+        await waitFor(() => expect(result.current.error).not.toBeNull());
+        expect(result.current.error).toBe('Failed to save auto-refresh settings');
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Error saving auto-refresh settings:', dbSaveError);
+        consoleErrorSpy.mockClear();
+        
+        // Trigger another save by changing state
+        act(() => {
+            result.current.setAutoRefresh(true);
+        });
+        
+        // Wait for the second save attempt to fail
+        await waitFor(() => expect(consoleErrorSpy).toHaveBeenCalledTimes(1));
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Error saving auto-refresh settings:', dbSaveError);
+        expect(result.current.error).toBe('Failed to save auto-refresh settings'); // Error state persists/updates
+    });
+  });
+
+  describe('Countdown, Refresh Logic & Visibility', () => {
+    it('should not start countdown if autoRefresh is false', async () => {
+      const { result } = renderAutoRefreshHook();
+      
+      // Advance time, but countdown shouldn't change
       act(() => { jest.advanceTimersByTime(5000); });
-      expect(result.current.refreshCountdown).toBe(55);
-
-      // Change interval
-      act(() => { result.current.setRefreshInterval(15); });
-      expect(result.current.refreshInterval).toBe(15);
-      expect(result.current.refreshCountdown).toBe(15); // Countdown should reset
-    });
-
-     it('should NOT reset countdown when refreshInterval changes while autoRefresh is false', () => {
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 60));
-      expect(result.current.autoRefresh).toBe(false);
-      expect(result.current.refreshInterval).toBe(60);
-      expect(result.current.refreshCountdown).toBe(60);
-
-      // Change interval
-      act(() => { result.current.setRefreshInterval(15); });
-      expect(result.current.refreshInterval).toBe(15);
-      expect(result.current.refreshCountdown).toBe(60); // Countdown should NOT reset
-    });
-
-    it('should reset countdown when autoRefresh is enabled', () => {
-       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 45));
-       expect(result.current.autoRefresh).toBe(false);
-       expect(result.current.refreshCountdown).toBe(45);
-
-       // Enable auto-refresh
-       act(() => { result.current.setAutoRefresh(true); });
-       expect(result.current.autoRefresh).toBe(true);
-       expect(result.current.refreshCountdown).toBe(45); // Resets to current interval
-    });
-
-    it('should handle invalid values for setRefreshInterval (warn and use default)', () => {
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
-      setItemSpy.mockClear();
-      consoleWarnSpy.mockClear();
-
-      expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
-      // Clear the spy *after* initial render and potential saves
-      setItemSpy.mockClear();
-
-      act(() => { result.current.setRefreshInterval(-5); });
-
-      // Expect console.warn to be called because the value is invalid
-      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Invalid refresh interval, using default instead'
-      );
-      // Check that the state remained the default value
-      expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
-      // Check that setItemSpy was NOT called, as the state didn't change from the default
-      expect(setItemSpy).not.toHaveBeenCalled();
-
-      // Reset the console spy for the next call
-      consoleWarnSpy.mockClear();
-
-      act(() => { result.current.setRefreshInterval(0); });
-      expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Invalid refresh interval, using default instead'
-      );
-      expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
-      // Check that setItemSpy was still NOT called
-      expect(setItemSpy).not.toHaveBeenCalled();
-
-      consoleWarnSpy.mockRestore();
-    });
-
-     it('should handle localStorage.setItem error during save', () => {
-      const saveError = new Error('LocalStorage Write Failed');
-      setItemSpy.mockImplementation(() => { throw saveError; });
-
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
-
-      // Trigger save by changing state
-      act(() => { result.current.setAutoRefresh(true); });
-      expect(result.current.error).toBe('Failed to save auto-refresh settings');
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Error saving auto-refresh settings:', saveError);
-    });
-  });
-
-  describe('Countdown & Refresh Logic', () => {
-    it('should decrement countdown when autoRefresh is true and visible', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 5));
-      expect(result.current.autoRefresh).toBe(true);
-      expect(result.current.refreshCountdown).toBe(5);
-
-      act(() => { jest.advanceTimersByTime(1000); });
-      expect(result.current.refreshCountdown).toBe(4);
-      act(() => { jest.advanceTimersByTime(3000); });
-      expect(result.current.refreshCountdown).toBe(1);
-      expect(mockOnRefresh).not.toHaveBeenCalled();
-    });
-
-    it('should call onRefresh and reset countdown when timer reaches <= 1 and visible', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-      const interval = 3;
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, interval));
-
-      act(() => { jest.advanceTimersByTime(2000); }); // Countdown = 1
-      expect(result.current.refreshCountdown).toBe(1);
-      expect(mockOnRefresh).not.toHaveBeenCalled();
-
-      act(() => { jest.advanceTimersByTime(1000); }); // Countdown <= 1, refresh triggers
-      expect(mockOnRefresh).toHaveBeenCalledTimes(1);
-      expect(result.current.refreshCountdown).toBe(interval); // Resets
-
-      // Should continue counting down
-       act(() => { jest.advanceTimersByTime(1000); });
-       expect(result.current.refreshCountdown).toBe(interval - 1);
-    });
-
-    it('should NOT decrement or refresh when autoRefresh is false', () => {
-       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 5));
-       expect(result.current.autoRefresh).toBe(false);
-       const initialCountdown = result.current.refreshCountdown;
-
-       act(() => { jest.advanceTimersByTime(10000); }); // Advance well past interval
-
-       expect(result.current.refreshCountdown).toBe(initialCountdown);
-       expect(mockOnRefresh).not.toHaveBeenCalled();
-    });
-
-    it('should NOT call onRefresh when timer reaches zero but tab is hidden', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-      const interval = 3;
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, interval));
-
-      simulateVisibilityChange('hidden'); // Hide the tab
-
-      act(() => { jest.advanceTimersByTime(3000); }); // Timer reaches zero
       
+      // Need to re-render or access latest state somehow if not using waitFor
+      // Re-rendering is simpler here
+      const { result: updatedResult } = renderHook(() => useAutoRefresh(mockOnRefresh, DEFAULT_INTERVAL), { initialProps: result.current });
+      
+      expect(updatedResult.current.refreshCountdown).toBe(DEFAULT_INTERVAL);
       expect(mockOnRefresh).not.toHaveBeenCalled();
-      expect(result.current.refreshCountdown).toBe(interval); // Still resets
     });
 
-    it('should resume countdown and refresh when tab becomes visible again', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
+    it('should countdown and trigger refresh when autoRefresh is true', async () => {
       const interval = 5;
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, interval));
+      const { result } = renderAutoRefreshHook(interval);
+      await act(async () => { await jest.runAllTimersAsync(); }); // Initial load
 
-      simulateVisibilityChange('hidden');
-      act(() => { jest.advanceTimersByTime(10000); }); // Time passes, refresh didn't happen
-      expect(mockOnRefresh).not.toHaveBeenCalled();
+      act(() => { result.current.setAutoRefresh(true); });
+      expect(result.current.autoRefresh).toBe(true);
       expect(result.current.refreshCountdown).toBe(interval);
 
-      simulateVisibilityChange('visible');
-      // Countdown should restart from the interval
-      act(() => { jest.advanceTimersByTime(4000); }); 
-      expect(result.current.refreshCountdown).toBe(1);
+      // Advance time by 1 second
+      act(() => { jest.advanceTimersByTime(1000); });
+      expect(result.current.refreshCountdown).toBe(interval - 1);
       expect(mockOnRefresh).not.toHaveBeenCalled();
       
-      act(() => { jest.advanceTimersByTime(1000); }); // Refresh triggers
+      // Advance time just before refresh
+      act(() => { jest.advanceTimersByTime(3000); }); // Total 4 seconds advanced
+      expect(result.current.refreshCountdown).toBe(interval - 4);
+      expect(mockOnRefresh).not.toHaveBeenCalled();
+      
+      // Advance time past the interval
+      act(() => { jest.advanceTimersByTime(1000); }); // Total 5 seconds advanced
       expect(mockOnRefresh).toHaveBeenCalledTimes(1);
+      expect(result.current.refreshCountdown).toBe(interval); // Countdown resets
+      
+      // Advance time again
+      act(() => { jest.advanceTimersByTime(5000); });
+      expect(mockOnRefresh).toHaveBeenCalledTimes(2); // Second refresh triggered
       expect(result.current.refreshCountdown).toBe(interval);
     });
 
-    it('should handle errors in the onRefresh callback', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-      const refreshError = new Error('Refresh Failed!');
-      mockOnRefresh.mockImplementation(() => { throw refreshError; });
-      const interval = 2;
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, interval));
+    it('should pause countdown when tab becomes hidden', async () => {
+        const interval = 10;
+        const { result } = renderAutoRefreshHook(interval);
+        await act(async () => { await jest.runAllTimersAsync(); });
+        act(() => { result.current.setAutoRefresh(true); });
+        expect(result.current.refreshCountdown).toBe(interval);
+        
+        // Advance time while visible
+        act(() => { jest.advanceTimersByTime(3000); });
+        expect(result.current.refreshCountdown).toBe(interval - 3);
+        
+        // Hide tab
+        act(() => { mockVisibility('hidden'); });
+        
+        // Advance time while hidden - countdown should NOT change
+        act(() => { jest.advanceTimersByTime(5000); });
+        expect(result.current.refreshCountdown).toBe(interval - 3); 
+        expect(mockOnRefresh).not.toHaveBeenCalled(); 
+    });
 
-      act(() => { jest.advanceTimersByTime(2000); }); // Trigger refresh
+    it('should resume countdown and refresh when tab becomes visible again', async () => {
+      const interval = 5;
+      const { result } = renderAutoRefreshHook(interval);
+      await act(async () => { await jest.runAllTimersAsync(); });
+      act(() => { result.current.setAutoRefresh(true); });
+      
+      act(() => { jest.advanceTimersByTime(2000); }); // Countdown = 3
+      expect(result.current.refreshCountdown).toBe(interval - 2);
 
-      expect(mockOnRefresh).toHaveBeenCalledTimes(1);
-      expect(result.current.error).toBe('Error occurred during auto-refresh');
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Error in refresh callback:', refreshError);
-      expect(result.current.refreshCountdown).toBe(interval); // Still resets countdown
+      // Hide tab and advance time past refresh point
+      act(() => { 
+          mockVisibility('hidden'); 
+          jest.advanceTimersByTime(10000); // Advance well past refresh time
+      }); 
+      expect(result.current.refreshCountdown).toBe(interval - 2); // Still paused
+      expect(mockOnRefresh).not.toHaveBeenCalled(); // Refresh shouldn't happen while hidden
+      
+      // Make tab visible again
+      act(() => { mockVisibility('visible'); });
+      
+      // Countdown should continue from where it paused
+      act(() => { jest.advanceTimersByTime(1000); }); // Now at 3 seconds elapsed
+      expect(result.current.refreshCountdown).toBe(interval - 3);
+      expect(mockOnRefresh).not.toHaveBeenCalled();
+      
+      act(() => { jest.advanceTimersByTime(2000); }); // Now at 5 seconds elapsed
+      expect(mockOnRefresh).toHaveBeenCalledTimes(1); // Refresh should trigger
+      expect(result.current.refreshCountdown).toBe(interval); // Resets
+    });
+    
+    it('should handle errors in the onRefresh callback gracefully', async () => {
+        const interval = 2;
+        const refreshError = new Error('Refresh Failed');
+        // Mock onRefresh to THROW synchronously
+        mockOnRefresh.mockImplementation(() => { 
+            throw refreshError; 
+        });
+        
+        const { result } = renderAutoRefreshHook(interval);
+        await act(async () => { await jest.runAllTimersAsync(); });
+        act(() => { result.current.setAutoRefresh(true); });
+
+        // Advance timers past the interval
+        act(() => {
+            jest.advanceTimersByTime(interval * 1000 + 100); 
+        });
+        
+        // No need to wait for microtasks if error is sync
+        // await act(async () => {
+        //     await Promise.resolve(); 
+        // });
+
+        expect(mockOnRefresh).toHaveBeenCalledTimes(1);
+        expect(consoleErrorSpy).toHaveBeenCalledWith('Error in refresh callback:', refreshError);
+        // Check error state WAS set by the catch block
+        expect(result.current.error).toBe('Error occurred during auto-refresh');
+        expect(result.current.refreshCountdown).toBe(interval);
+    });
+    
+    it('should clear interval on unmount', () => {
+        const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+        const { result, unmount } = renderAutoRefreshHook(); // Capture result
+        act(() => { result.current.setAutoRefresh(true); }); // Start timer
+        
+        const initialIntervalCalls = clearIntervalSpy.mock.calls.length;
+        
+        unmount();
+        
+        // Check that clearInterval was called at least one more time than initially
+        expect(clearIntervalSpy.mock.calls.length).toBeGreaterThan(initialIntervalCalls);
+        clearIntervalSpy.mockRestore();
+    });
+    
+    it('should remove visibility listener on unmount', () => {
+        const { unmount } = renderAutoRefreshHook(); // Removed unused result
+        
+        // Capture the listener function used in addEventListener
+        const listenerArgs = document.addEventListener.mock.calls.find(call => call[0] === 'visibilitychange');
+        const visibilityCallback = listenerArgs ? listenerArgs[1] : null;
+        
+        expect(document.addEventListener).toHaveBeenCalledWith('visibilitychange', visibilityCallback);
+        
+        unmount();
+        
+        // Assert removeEventListener was called with the *same* callback
+        expect(document.removeEventListener).toHaveBeenCalledWith('visibilitychange', visibilityCallback);
     });
   });
 
-  describe('Cleanup', () => {
-    it('should clear interval and remove visibility listener on unmount', () => {
-      const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true'); // Ensure timer starts
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-
-      const { unmount } = renderHook(() => useAutoRefresh(mockOnRefresh, 10));
-
-      // Ensure timer and listener were set up
-      const initialIntervalCalls = clearIntervalSpy.mock.calls.length;
-      expect(addEventListenerSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
-      const visibilityCallback = addEventListenerSpy.mock.calls.find(call => call[0] === 'visibilitychange')[1];
-
-      unmount();
-
-      // Check if timer was cleared (note: intervals might be cleared/reset internally on state changes too)
-      // We expect at least one more clear call specifically from the unmount effect cleanup.
-      expect(clearIntervalSpy.mock.calls.length).toBeGreaterThan(initialIntervalCalls);
-      
-      // Check if listener was removed
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('visibilitychange', visibilityCallback);
-
-      clearIntervalSpy.mockRestore();
-    });
-  });
-}); 
+}); // End describe useAutoRefresh

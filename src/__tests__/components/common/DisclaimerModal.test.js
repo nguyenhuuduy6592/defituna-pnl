@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { DisclaimerModal } from '../../../components/common/DisclaimerModal';
+import { DisclaimerModal } from '@/components/common/DisclaimerModal';
 
 // Mock HiX icon component
 jest.mock('react-icons/hi', () => ({
@@ -9,7 +9,7 @@ jest.mock('react-icons/hi', () => ({
 }));
 
 // Mock the styles
-jest.mock('../../../components/common/DisclaimerModal.module.scss', () => ({
+jest.mock('@/components/common/DisclaimerModal.module.scss', () => ({
   overlay: 'overlay',
   modal: 'modal',
   header: 'header',

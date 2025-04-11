@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { calculatePriceFromSqrtPrice } from '../utils/tokens';
+import { calculatePriceFromSqrtPrice } from '@/utils/tokens';
+import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB';
 
 // In-memory cache for token metadata
 let tokenMetadataCache = null;
@@ -58,8 +59,8 @@ export default function usePoolsData() {
   const [filterOptions, setFilterOptions] = useState(DEFAULT_FILTER_OPTIONS);
 
   const fetchTokenMetadata = useCallback(async () => {
-    // Return cached data if it's still valid
-    if (tokenMetadataCache && Date.now() - lastFetchTime < CACHE_TTL) {
+    // Return cached data if it's still valid (bypass cache in test environment)
+    if (process.env.NODE_ENV !== 'test' && tokenMetadataCache && Date.now() - lastFetchTime < CACHE_TTL) {
       return tokenMetadataCache;
     }
 
@@ -85,24 +86,26 @@ export default function usePoolsData() {
     try {
       setLoading(true);
       
-      // Check localStorage cache first if not forcing refresh
+      // Check IndexedDB cache first if not forcing refresh
       if (!forceRefresh) {
         try {
-          const cachedPoolsData = localStorage.getItem('poolsData');
-          if (cachedPoolsData) {
-            const parsedCache = JSON.parse(cachedPoolsData);
-            if (isCacheValid(parsedCache, POOL_CACHE_TTL)) {
-              // Set pools from cache
-              setPools(parsedCache.data);
-              
-              // Set filter options from cache
-              if (parsedCache.filterOptions) {
-                setFilterOptions(parsedCache.filterOptions);
-              }
-              
-              setLoading(false);
-              return;
+          const db = await initializeDB();
+          if (!db) {
+            throw new Error('Failed to initialize IndexedDB');
+          }
+
+          const cachedData = await getData(db, STORE_NAMES.POOLS, 'poolsData');
+          if (cachedData?.value && isCacheValid(cachedData.value, POOL_CACHE_TTL)) {
+            // Set pools from cache
+            setPools(cachedData.value.data);
+            
+            // Set filter options from cache
+            if (cachedData.value.filterOptions) {
+              setFilterOptions(cachedData.value.filterOptions);
             }
+            
+            setLoading(false);
+            return;
           }
         } catch (cacheError) {
           console.error('[usePoolsData] Error reading cache:', cacheError);
@@ -189,14 +192,23 @@ export default function usePoolsData() {
       
       setFilterOptions(newFilterOptions);
       
-      // Save to localStorage cache
+      // Save to IndexedDB cache
       try {
+        const db = await initializeDB();
+        if (!db) {
+          throw new Error('Failed to initialize IndexedDB');
+        }
+
         const cacheData = {
           timestamp: Date.now(),
           data: enhancedPools,
           filterOptions: newFilterOptions
         };
-        localStorage.setItem('poolsData', JSON.stringify(cacheData));
+
+        await saveData(db, STORE_NAMES.POOLS, {
+          key: 'poolsData',
+          value: cacheData
+        });
       } catch (saveError) {
         console.error('[usePoolsData] Error saving to cache:', saveError);
         // Continue even if cache saving fails

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import usePoolsData from './usePoolsData';
+import usePoolsData from '@/hooks/usePoolsData';
 
 /**
  * Custom hook for managing pool data with derived metrics

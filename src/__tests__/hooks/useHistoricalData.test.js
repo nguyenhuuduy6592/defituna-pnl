@@ -1,207 +1,205 @@
-import { renderHook, act } from '@testing-library/react';
-import { useHistoricalData } from '../../hooks/useHistoricalData';
-import * as indexedDB from '../../utils/indexedDB';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { useHistoricalData } from '@/hooks/useHistoricalData';
+import { 
+  initializeDB, 
+  savePositionSnapshot as mockSaveSnapshot, // Alias imported mock
+  getPositionHistory as mockGetHistory,   // Alias imported mock
+  deletePositionHistory as mockDeleteHistory, // Alias imported mock
+  clearAllHistory as mockClearHistory,     // Alias imported mock
+  getData, 
+  saveData, 
+  STORE_NAMES
+} from '@/utils/indexedDB'; // Import mocked functions
 
-// Mock the indexedDB utility functions
-jest.mock('../../utils/indexedDB', () => ({
-  initializeDB: jest.fn(),
-  savePositionSnapshot: jest.fn(),
-  getPositionHistory: jest.fn(),
-  cleanupOldData: jest.fn(),
-  DEFAULT_RETENTION_DAYS: 30
-}));
+// Mock position data
+const mockPosition = { 
+  id: 'pos1', 
+  symbol: 'ETH/USD', 
+  currentPrice: 2000, 
+  liquidationPrice: 1500 
+};
+const mockPositions = [mockPosition];
 
-// Mock localStorage
-const localStorageMock = (() => {
-  let store = {};
-  return {
-    getItem: jest.fn(key => store[key]),
-    setItem: jest.fn((key, value) => {
-      store[key] = value;
-    }),
-    clear: jest.fn(() => {
-      store = {};
-    })
-  };
-})();
-
-// Replace localStorage with our mock
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-  writable: true
-});
-
-// Setup
+// Helper to reset mocks before each test
 beforeEach(() => {
   jest.clearAllMocks();
-  localStorageMock.clear();
-  jest.useFakeTimers();
-  
-  // Reset mock values and functions with successful responses
-  const mockDB = {};
-  indexedDB.initializeDB.mockResolvedValue(mockDB);
-  indexedDB.savePositionSnapshot.mockResolvedValue(true);
-  indexedDB.getPositionHistory.mockResolvedValue([]);
-  indexedDB.cleanupOldData.mockResolvedValue(true);
-  
-  // Spy on console.error to prevent cluttering test output
-  jest.spyOn(console, 'error').mockImplementation(() => {});
+  // Reset mocks to default implementations
+  initializeDB.mockResolvedValue({});
+  mockSaveSnapshot.mockResolvedValue(true);
+  mockGetHistory.mockResolvedValue([]);
+  mockDeleteHistory.mockResolvedValue(true);
+  mockClearHistory.mockResolvedValue(true);
+  getData.mockImplementation((db, store, key) => {
+    if (key === 'historicalDataEnabled') return Promise.resolve(null); // Default disabled
+    return Promise.resolve(null);
+  });
+  saveData.mockResolvedValue(true);
 });
 
 describe('useHistoricalData Hook', () => {
-  test('should initialize as disabled by default', () => {
-    const { result } = renderHook(() => useHistoricalData());
-    
-    expect(result.current.enabled).toBe(false);
-    expect(result.current.error).toBeNull();
-    expect(indexedDB.initializeDB).not.toHaveBeenCalled();
+  let consoleErrorSpy;
+
+  beforeEach(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+  });
+
+  afterEach(() => {
+    consoleErrorSpy.mockRestore();
   });
   
-  test('should initialize as enabled if localStorage has it enabled', async () => {
-    localStorageMock.setItem('historicalDataEnabled', 'true');
-    
-    const { result } = renderHook(() => useHistoricalData());
-    
-    // Wait for all promises to resolve
-    await act(async () => {
-      await Promise.resolve();
-      jest.runAllTimers();
-    });
+  test('should initialize as disabled by default and initialize DB', async () => {
+    const { result, waitForNextUpdate } = renderHook(() => useHistoricalData());
+    // Wait for initial useEffect to run
+    await act(async () => { if (waitForNextUpdate) await waitForNextUpdate(); });
+
+    expect(result.current.enabled).toBe(false);
+    expect(result.current.error).toBeNull();
+    // initializeDB *is* called in the initial useEffect, regardless of enabled state
+    expect(initializeDB).toHaveBeenCalled();
+  });
+  
+  test('should initialize as enabled if IndexedDB has it enabled', async () => {
+    // Mock getData to return enabled state
+    getData.mockResolvedValue({ value: true });
+
+    const { result, waitForNextUpdate } = renderHook(() => useHistoricalData());
+    await act(async () => { if (waitForNextUpdate) await waitForNextUpdate(); });
     
     expect(result.current.enabled).toBe(true);
-    expect(indexedDB.initializeDB).toHaveBeenCalled();
+    expect(initializeDB).toHaveBeenCalled();
   });
   
   test('should handle initialization errors', async () => {
-    indexedDB.initializeDB.mockRejectedValueOnce(new Error('DB initialization error'));
-    localStorageMock.setItem('historicalDataEnabled', 'true');
-    
-    const { result } = renderHook(() => useHistoricalData());
-    
-    await act(async () => {
-      await Promise.resolve();
-      jest.runAllTimers();
-    });
-    
-    expect(result.current.error).toBe('Failed to initialize position history database');
-    expect(console.error).toHaveBeenCalled();
-  });
-  
-  test('should toggle history enabled state', async () => {
-    const { result } = renderHook(() => useHistoricalData());
-    
+    const initError = new Error('DB Init Failed');
+    initializeDB.mockRejectedValue(initError);
+    getData.mockResolvedValue(null);
+
+    const { result, waitForNextUpdate } = renderHook(() => useHistoricalData());
+    await act(async () => { if (waitForNextUpdate) await waitForNextUpdate(); });
+
     expect(result.current.enabled).toBe(false);
-    
+    expect(result.current.error).toBe('Failed to initialize position history database');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to initialize position history database', initError);
+  });
+
+  test('should toggle history enabled state', async () => {
+    const { result, waitForNextUpdate } = renderHook(() => useHistoricalData());
+    await act(async () => { if (waitForNextUpdate) await waitForNextUpdate(); }); // Initial load (disabled)
+
+    expect(result.current.enabled).toBe(false);
+    const initialDbInitCalls = initializeDB.mock.calls.length; // DB initialized once on load
+
+    // Enable
     await act(async () => {
       await result.current.toggleHistoryEnabled(true);
-      await Promise.resolve();
-      jest.runAllTimers();
+    });
+    expect(result.current.enabled).toBe(true);
+    // initializeDB should NOT be called again if already initialized successfully
+    expect(initializeDB).toHaveBeenCalledTimes(initialDbInitCalls);
+    // Correct assertion for saveData arguments
+    expect(saveData).toHaveBeenCalledWith(expect.anything(), STORE_NAMES.SETTINGS, {
+      key: 'historicalDataEnabled',
+      value: true
     });
     
-    expect(result.current.enabled).toBe(true);
-    expect(indexedDB.initializeDB).toHaveBeenCalled();
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('historicalDataEnabled', 'true');
-    
+    // Disable
     await act(async () => {
       await result.current.toggleHistoryEnabled(false);
-      await Promise.resolve();
     });
-    
     expect(result.current.enabled).toBe(false);
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('historicalDataEnabled', 'false');
+    expect(initializeDB).toHaveBeenCalledTimes(initialDbInitCalls);
+    expect(saveData).toHaveBeenCalledWith(expect.anything(), STORE_NAMES.SETTINGS, {
+      key: 'historicalDataEnabled',
+      value: false
+    });
   });
-  
-  test('should save position snapshots when enabled', async () => {
-    const { result } = renderHook(() => useHistoricalData());
-    
+
+  test('should call savePositionSnapshot when enabled', async () => {
+    // Start enabled
+    getData.mockResolvedValue({ value: true });
+    const { result, waitForNextUpdate } = renderHook(() => useHistoricalData());
+    // Wait for DB initialization and setting enabled to true
+    await act(async () => { if (waitForNextUpdate) await waitForNextUpdate(); }); 
+    expect(result.current.enabled).toBe(true);
+
+    // Call the returned function
     await act(async () => {
-      await result.current.toggleHistoryEnabled(true);
-      await Promise.resolve();
+      await result.current.savePositionSnapshot(mockPositions);
     });
-    
-    const testPositions = [
-      { 
-        id: 'pos1', 
-        positionAddress: '0xabc123',
-        pair: 'ETH-USDC',
-        pnl: 100
-      },
-      { 
-        id: 'pos2', 
-        positionAddress: '0xdef456',
-        pair: 'BTC-USDC',
-        pnl: 200
-      }
-    ];
-    
-    await act(async () => {
-      await result.current.savePositionSnapshot(testPositions);
-      await Promise.resolve();
-    });
-    
-    expect(indexedDB.savePositionSnapshot).toHaveBeenCalledWith(
-      expect.anything(),
-      testPositions,
-      expect.any(Number)
-    );
+
+    expect(mockSaveSnapshot).toHaveBeenCalledTimes(1);
+    // The hook passes dbInstance, positions array, and a timestamp
+    expect(mockSaveSnapshot).toHaveBeenCalledWith(expect.anything(), mockPositions, expect.any(Number)); 
   });
-  
-  test('should retrieve position history', async () => {
-    const mockHistoryData = [
-      { id: 'pos1', timestamp: Date.now() - 1000, pnl: 100 },
-      { id: 'pos1', timestamp: Date.now() - 2000, pnl: 90 }
-    ];
-    
-    indexedDB.getPositionHistory.mockResolvedValueOnce(mockHistoryData);
-    
-    const { result } = renderHook(() => useHistoricalData());
-    
+
+  test('should NOT call savePositionSnapshot when disabled', async () => {
+    const { result, waitForNextUpdate } = renderHook(() => useHistoricalData());
+    await act(async () => { if (waitForNextUpdate) await waitForNextUpdate(); });
+    expect(result.current.enabled).toBe(false);
+
+    // Call the returned function
     await act(async () => {
-      await result.current.toggleHistoryEnabled(true);
-      await Promise.resolve();
+      await result.current.savePositionSnapshot(mockPositions);
     });
-    
-    let history;
-    await act(async () => {
-      history = await result.current.getPositionHistory('pos1');
-      await Promise.resolve();
-    });
-    
-    expect(history).toEqual(mockHistoryData);
-    expect(indexedDB.getPositionHistory).toHaveBeenCalledWith(
-      expect.anything(),
-      'pos1',
-      undefined
-    );
+
+    expect(mockSaveSnapshot).not.toHaveBeenCalled();
   });
-  
-  test('should clean up old data', async () => {
-    const { result } = renderHook(() => useHistoricalData());
-    
+
+  test('should call getPositionHistory', async () => {
+    const mockHistory = [{ timestamp: 1, price: 100 }, { timestamp: 2, price: 110 }];
+    mockGetHistory.mockResolvedValue(mockHistory);
+    // Start enabled
+    getData.mockResolvedValue({ value: true });
+
+    const { result, waitForNextUpdate } = renderHook(() => useHistoricalData());
+    await act(async () => { if (waitForNextUpdate) await waitForNextUpdate(); });
+
+    let historyData = [];
+    // Call the returned function
     await act(async () => {
-      await result.current.toggleHistoryEnabled(true);
-      await Promise.resolve();
-      jest.runAllTimers();
+      historyData = await result.current.getPositionHistory('pos1');
     });
-    
-    expect(indexedDB.cleanupOldData).toHaveBeenCalledWith(
-      expect.anything(),
-      indexedDB.DEFAULT_RETENTION_DAYS
-    );
+
+    expect(mockGetHistory).toHaveBeenCalledTimes(1);
+    // Hook passes dbInstance, positionId, and potentially timeRange (undefined in this case)
+    expect(mockGetHistory).toHaveBeenCalledWith(expect.anything(), 'pos1', undefined);
+    expect(historyData).toEqual(mockHistory);
   });
-  
-  test('should handle cleanup errors', async () => {
-    indexedDB.cleanupOldData.mockRejectedValueOnce(new Error('Cleanup error'));
-    
-    const { result } = renderHook(() => useHistoricalData());
-    
+
+  test('should handle errors during snapshot saving via hook fn', async () => {
+    const saveError = new Error('Save Failed');
+    mockSaveSnapshot.mockRejectedValue(saveError);
+    getData.mockResolvedValue({ value: true });
+
+    const { result, waitForNextUpdate } = renderHook(() => useHistoricalData());
+    await act(async () => { if (waitForNextUpdate) await waitForNextUpdate(); });
+
     await act(async () => {
-      await result.current.toggleHistoryEnabled(true);
-      await Promise.resolve();
-      jest.runAllTimers();
+      // Call the returned function
+      await result.current.savePositionSnapshot(mockPositions);
     });
-    
-    expect(console.error).toHaveBeenCalled();
-    expect(result.current.error).toBe('Failed to clean up old position history data');
+
+    expect(result.current.error).toBe('Failed to save position history data');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to save position history data', saveError);
   });
+
+  test('should handle errors during history retrieval via hook fn', async () => {
+    const getError = new Error('Get Failed');
+    mockGetHistory.mockRejectedValue(getError);
+    getData.mockResolvedValue({ value: true });
+
+    const { result, waitForNextUpdate } = renderHook(() => useHistoricalData());
+    await act(async () => { if (waitForNextUpdate) await waitForNextUpdate(); });
+
+    await act(async () => {
+      // Call the returned function
+      await result.current.getPositionHistory('pos1');
+    });
+
+    expect(result.current.error).toBe('Failed to retrieve position history data');
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to retrieve position history data', getError);
+  });
+
+  // Tests for deleteHistory and clearHistory cannot be added 
+  // as the hook doesn't expose these functions directly.
 }); 

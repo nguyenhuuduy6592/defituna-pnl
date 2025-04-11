@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import InfoIcon from '../../../components/common/InfoIcon';
-import EnhancedTooltip from '../../../components/common/EnhancedTooltip';
+import InfoIcon from '@/components/common/InfoIcon';
+import EnhancedTooltip from '@/components/common/EnhancedTooltip';
 
 // Mock the EnhancedTooltip component
-jest.mock('../../../components/common/EnhancedTooltip', () => {
+jest.mock('@/components/common/EnhancedTooltip', () => {
   return jest.fn(({ children, content, position }) => (
     <div data-testid="mocked-enhanced-tooltip" data-content={content} data-position={position}>
       {children}
@@ -14,7 +14,7 @@ jest.mock('../../../components/common/EnhancedTooltip', () => {
 });
 
 // Mock the InfoIcon module SCSS
-jest.mock('../../../components/common/InfoIcon.module.scss', () => ({
+jest.mock('@/components/common/InfoIcon.module.scss', () => ({
   infoIcon: 'infoIcon',
   small: 'small',
   medium: 'medium',

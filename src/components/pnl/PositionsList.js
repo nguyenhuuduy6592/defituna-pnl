@@ -1,20 +1,20 @@
 import { memo, useState, useMemo, useCallback } from 'react';
-import styles from './PositionsList.module.scss';
-import { PnLCard } from './PnLCard';
-import { PositionChart } from './PositionChart';
-import { PositionsTable } from './PositionsTable';
+import styles from '@/styles/PositionsList.module.scss';
+import { PnLCard } from '@/components/pnl/PnLCard';
+import { PositionChart } from '@/components/pnl/PositionChart';
+import { PositionsTable } from '@/components/pnl/PositionsTable';
 import { 
   useHistoricalData, 
   useSortState, 
   useInvertedPairs 
-} from '../../hooks';
+} from '@/hooks';
 import { 
   calculatePnlPercentage, 
   calculateStatus, 
   getAdjustedPosition, 
   sortPositions,
   invertPairString
-} from '../../utils';
+} from '@/utils';
 
 /**
  * Empty state component when no positions are available

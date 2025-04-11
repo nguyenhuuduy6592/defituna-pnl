@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react';
 import { HiX } from 'react-icons/hi';
-import styles from './DisclaimerModal.module.scss';
+import styles from '@/styles/DisclaimerModal.module.scss';
 
 /**
  * Modal section component for displaying grouped content
@@ -81,7 +81,7 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
           <DisclaimerSection title="Data & Privacy">
             <ul>
               <li>I do not collect any user data</li>
-              <li>All data is stored locally in your browser using localStorage or IndexedDB</li>
+              <li>All data is stored locally in your browser using IndexedDB</li>
               <li>This site is hosted on Vercel, which may collect server usage metrics (outside of my control)</li>
               <li>No tracking or analytics scripts are included in this application</li>
             </ul>

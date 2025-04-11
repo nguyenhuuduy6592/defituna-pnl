@@ -1,4 +1,4 @@
-import { fetchAllPools } from '../../utils/defituna';
+import { fetchAllPools } from '@/utils/defituna';
 
 /**
  * Calculates the Fee APR for a pool based on fees and TVL

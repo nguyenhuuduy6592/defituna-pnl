@@ -14,28 +14,7 @@ export function setupPageTests() {
     })
   );
 
-  // Setup localStorage mock
-  const localStorageMock = (() => {
-    let store = {};
-    return {
-      getItem: jest.fn(key => store[key] || null),
-      setItem: jest.fn((key, value) => {
-        store[key] = value.toString();
-      }),
-      clear: jest.fn(() => {
-        store = {};
-      }),
-      removeItem: jest.fn(key => {
-        delete store[key];
-      })
-    };
-  })();
-
-  Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock
-  });
-
-  return { localStorageMock };
+  return {  };
 }
 
 /**
@@ -146,7 +125,7 @@ export function createMockPools() {
  * Mock for common components
  */
 export function mockCommonComponents() {
-  jest.mock('../../../components/common/TimeframeSelector', () => {
+  jest.mock('@/components/common/TimeframeSelector', () => {
     const MockTimeframeSelector = ({ timeframes, selected, onChange }) => (
       <div data-testid="timeframe-selector">
         {timeframes.map(timeframe => (
@@ -165,7 +144,7 @@ export function mockCommonComponents() {
     return MockTimeframeSelector;
   });
   
-  jest.mock('../../../components/common/LoadingOverlay', () => {
+  jest.mock('@/components/common/LoadingOverlay', () => {
     const MockLoadingOverlay = ({ loading, children }) => (
       <div data-testid="loading-overlay" data-loading={loading}>
         {loading ? <div>Loading...</div> : children}
@@ -180,7 +159,7 @@ export function mockCommonComponents() {
  * Mock for pools components
  */
 export function mockPoolComponents() {
-  jest.mock('../../../components/pools/PoolCard', () => {
+  jest.mock('@/components/pools/PoolCard', () => {
     const MockPoolCard = ({ pool, timeframe }) => (
       <div 
         data-testid="pool-card" 
@@ -194,7 +173,7 @@ export function mockPoolComponents() {
     return MockPoolCard;
   });
   
-  jest.mock('../../../components/pools/PoolMetrics', () => {
+  jest.mock('@/components/pools/PoolMetrics', () => {
     const MockPoolMetrics = ({ poolId, timeframe }) => (
       <div 
         data-testid="pool-metrics" 
@@ -208,7 +187,7 @@ export function mockPoolComponents() {
     return MockPoolMetrics;
   });
   
-  jest.mock('../../../components/pools/PoolFilters', () => {
+  jest.mock('@/components/pools/PoolFilters', () => {
     const MockPoolFilters = ({ filters, onFilterChange, filterOptions }) => (
       <div data-testid="pool-filters">
         <button 
@@ -228,7 +207,7 @@ export function mockPoolComponents() {
  * Mock for contexts
  */
 export function mockContexts() {
-  jest.mock('../../../contexts/ComparisonContext', () => ({
+  jest.mock('@/contexts/ComparisonContext', () => ({
     useComparison: jest.fn(() => ({
       comparisonPools: [],
       isInComparison: jest.fn(() => false),
@@ -243,7 +222,7 @@ export function mockContexts() {
  * Mock for hooks
  */
 export function mockHooks() {
-  jest.mock('../../../hooks/usePoolsData', () => {
+  jest.mock('@/hooks/usePoolsData', () => {
     return jest.fn(() => ({
       pools: createMockPools(),
       loading: false,
@@ -266,7 +245,7 @@ export function mockHooks() {
     }));
   });
   
-  jest.mock('../../../hooks/usePoolData', () => ({
+  jest.mock('@/hooks/usePoolData', () => ({
     usePoolData: jest.fn((poolId) => {
       const pool = createMockPools().find(p => p.address === poolId);
       return {

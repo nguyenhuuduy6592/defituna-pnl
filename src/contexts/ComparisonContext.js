@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB';
 
 // Maximum number of pools that can be compared
 const MAX_COMPARISON_POOLS = 3;
@@ -12,28 +13,44 @@ const ComparisonContext = createContext(null);
  * @param {React.ReactNode} props.children Child components
  */
 export function ComparisonProvider({ children }) {
-  // State for selected pools
   const [comparisonPools, setComparisonPools] = useState([]);
   
-  // Load saved comparison pools from localStorage on mount
+  // Load saved comparison pools from IndexedDB on mount
   useEffect(() => {
-    try {
-      const savedPools = localStorage.getItem('comparisonPools');
-      if (savedPools) {
-        setComparisonPools(JSON.parse(savedPools));
+    const loadComparisonPools = async () => {
+      try {
+        const db = await initializeDB();
+        if (!db) return;
+
+        const savedPoolsData = await getData(db, STORE_NAMES.SETTINGS, 'comparisonPools');
+        if (savedPoolsData?.value) {
+          setComparisonPools(savedPoolsData.value);
+        }
+      } catch (error) {
+        console.error('Error loading comparison pools from IndexedDB:', error);
       }
-    } catch (error) {
-      console.error('Error loading saved comparison pools:', error);
-    }
+    };
+
+    loadComparisonPools();
   }, []);
   
-  // Save comparison pools to localStorage when they change
+  // Save comparison pools to IndexedDB when they change
   useEffect(() => {
-    try {
-      localStorage.setItem('comparisonPools', JSON.stringify(comparisonPools));
-    } catch (error) {
-      console.error('Error saving comparison pools:', error);
-    }
+    const saveComparisonPools = async () => {
+      try {
+        const db = await initializeDB();
+        if (!db) return;
+
+        await saveData(db, STORE_NAMES.SETTINGS, {
+          key: 'comparisonPools',
+          value: comparisonPools
+        });
+      } catch (error) {
+        console.error('Error saving comparison pools to IndexedDB:', error);
+      }
+    };
+
+    saveComparisonPools();
   }, [comparisonPools]);
 
   // Add a pool to comparison
@@ -99,4 +116,4 @@ export function useComparison() {
   }
   
   return context;
-} 
+}

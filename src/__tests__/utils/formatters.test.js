@@ -5,7 +5,7 @@ import {
   formatDuration,
   formatWalletAddress,
   formatFee
-} from '../../utils/formatters';
+} from '@/utils/formatters';
 
 describe('formatNumber', () => {
   test('handles null and undefined', () => {

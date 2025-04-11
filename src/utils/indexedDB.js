@@ -2,12 +2,16 @@ import { openDB } from 'idb';
 
 // Constants for IndexedDB configuration
 export const DB_NAME = 'defituna-pnl';
-export const DB_VERSION = 1;
-export const STORE_NAME = 'positions';
+export const DB_VERSION = 2;
+export const STORE_NAMES = {
+  POSITIONS: 'positions',
+  SETTINGS: 'settings',
+  WALLETS: 'wallets'
+};
 export const DEFAULT_RETENTION_DAYS = 30;
 
 /**
- * Initialize IndexedDB database for storing position history
+ * Initialize IndexedDB database for storing position history and app data
  * Creates necessary object stores and indexes if they don't exist
  * 
  * @returns {Promise<IDBDatabase|null>} Database instance or null on failure
@@ -15,15 +19,25 @@ export const DEFAULT_RETENTION_DAYS = 30;
 export const initializeDB = async () => {
   try {
     const db = await openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains(STORE_NAME)) {
-          const store = db.createObjectStore(STORE_NAME, {
+      upgrade(db, oldVersion, newVersion) {
+        // Create positions store if it doesn't exist
+        if (!db.objectStoreNames.contains(STORE_NAMES.POSITIONS)) {
+          const store = db.createObjectStore(STORE_NAMES.POSITIONS, {
             keyPath: ['id', 'timestamp']
           });
-          // Create indexes for efficient queries
           store.createIndex('timestamp', 'timestamp');
           store.createIndex('pair', 'pair');
           store.createIndex('walletAddress', 'walletAddress');
+        }
+
+        // Create settings store if it doesn't exist (v2)
+        if (!db.objectStoreNames.contains(STORE_NAMES.SETTINGS)) {
+          db.createObjectStore(STORE_NAMES.SETTINGS, { keyPath: 'key' });
+        }
+
+        // Create wallets store if it doesn't exist (v2)
+        if (!db.objectStoreNames.contains(STORE_NAMES.WALLETS)) {
+          db.createObjectStore(STORE_NAMES.WALLETS, { keyPath: 'key' });
         }
       }
     });
@@ -48,8 +62,8 @@ export const savePositionSnapshot = async (db, positions, timestamp = Date.now()
   if (!db || !Array.isArray(positions)) return false;
 
   try {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
+    const tx = db.transaction(STORE_NAMES.POSITIONS, 'readwrite');
+    const store = tx.objectStore(STORE_NAMES.POSITIONS);
 
     // Save each position in the transaction
     await Promise.all(positions.map(position => {
@@ -85,8 +99,8 @@ export const getPositionHistory = async (db, positionId, timeRange) => {
   if (!db) return [];
 
   try {
-    const tx = db.transaction(STORE_NAME, 'readonly');
-    const store = tx.objectStore(STORE_NAME);
+    const tx = db.transaction(STORE_NAMES.POSITIONS, 'readonly');
+    const store = tx.objectStore(STORE_NAMES.POSITIONS);
     const index = store.index('timestamp');
 
     // Filter by timestamp if timeRange is provided
@@ -108,29 +122,71 @@ export const getPositionHistory = async (db, positionId, timeRange) => {
  * @param {number} retentionDays - Number of days to retain data for
  * @returns {Promise<boolean>} Success status
  */
-export const cleanupOldData = async (db, retentionDays = DEFAULT_RETENTION_DAYS) => {
-  if (!db) return false;
+/**
+ * Save data to a specific store
+ * 
+ * @param {IDBDatabase} db - Database instance
+ * @param {string} storeName - Name of the store to save to
+ * @param {Object} data - Data to save, must include a 'key' property
+ * @returns {Promise<boolean>} Success status
+ */
+export const saveData = async (db, storeName, data) => {
+  if (!db || !data?.key) return false;
 
   try {
-    const tx = db.transaction(STORE_NAME, 'readwrite');
-    const store = tx.objectStore(STORE_NAME);
-    const index = store.index('timestamp');
-
-    // Calculate cutoff time based on retention period
-    const cutoffTime = Date.now() - (retentionDays * 24 * 60 * 60 * 1000);
-    const range = IDBKeyRange.upperBound(cutoffTime);
-
-    // Delete all records older than the cutoff time
-    let cursor = await index.openCursor(range);
-    while (cursor) {
-      await cursor.delete();
-      cursor = await cursor.continue();
-    }
-
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    await store.put(data);
     await tx.done;
     return true;
   } catch (error) {
-    console.error('Failed to cleanup old data:', error);
+    console.error(`Failed to save data to ${storeName}:`, error);
     return false;
   }
-}; 
+};
+
+/**
+ * Get data from a specific store
+ * 
+ * @param {IDBDatabase} db - Database instance
+ * @param {string} storeName - Name of the store to get from
+ * @param {string} key - Key of the data to retrieve
+ * @returns {Promise<Object|null>} Retrieved data or null on failure
+ */
+export const getData = async (db, storeName, key) => {
+  if (!db) return null;
+
+  try {
+    const tx = db.transaction(storeName, 'readonly');
+    const store = tx.objectStore(storeName);
+    const data = await store.get(key);
+    return data || null;
+  } catch (error) {
+    console.error(`Failed to get data from ${storeName}:`, error);
+    return null;
+  }
+};
+
+/**
+ * Delete data from a specific store
+ * 
+ * @param {IDBDatabase} db - Database instance
+ * @param {string} storeName - Name of the store to delete from
+ * @param {string} key - Key of the data to delete
+ * @returns {Promise<boolean>} Success status
+ */
+export const deleteData = async (db, storeName, key) => {
+  if (!db) return false;
+
+  try {
+    const tx = db.transaction(storeName, 'readwrite');
+    const store = tx.objectStore(storeName);
+    await store.delete(key);
+    await tx.done;
+    return true;
+  } catch (error) {
+    console.error(`Failed to delete data from ${storeName}:`, error);
+    return false;
+  }
+};
+

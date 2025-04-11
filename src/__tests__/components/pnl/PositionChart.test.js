@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
-import { PositionChart } from '../../../components/pnl/PositionChart';
-import { prepareChartData, groupChartData, TIME_PERIODS } from '../../../utils';
-import { exportChartAsImage, shareCard } from '../../../utils/export';
+import { PositionChart } from '@/components/pnl/PositionChart';
+import { prepareChartData, groupChartData, TIME_PERIODS } from '@/utils';
+import { exportChartAsImage, shareCard } from '@/utils/export';
 
 // Mock dependencies
 jest.mock('recharts', () => ({
@@ -25,11 +25,11 @@ jest.mock('recharts', () => ({
   ReferenceLine: ({ y, label }) => <div data-testid="reference-line" data-y={y}>{label?.value}</div>,
 }));
 
-jest.mock('../../../components/common/Portal', () => ({
+jest.mock('@/components/common/Portal', () => ({
   Portal: ({ children }) => <div data-testid="portal-container">{children}</div>,
 }));
 
-jest.mock('../../../components/common/Tooltip', () => ({
+jest.mock('@/components/common/Tooltip', () => ({
   Tooltip: ({ children, content }) => (
     <div data-testid="tooltip-container" data-content={content}>
       {children}
@@ -37,7 +37,7 @@ jest.mock('../../../components/common/Tooltip', () => ({
   ),
 }));
 
-jest.mock('../../../utils', () => {
+jest.mock('@/utils', () => {
   const originalModule = jest.requireActual('../../../utils');
   return {
     ...originalModule,
@@ -54,7 +54,7 @@ jest.mock('../../../utils', () => {
   };
 });
 
-jest.mock('../../../utils/export', () => ({
+jest.mock('@/utils/export', () => ({
   exportChartAsImage: jest.fn().mockResolvedValue(true),
   shareCard: jest.fn().mockResolvedValue(true),
 }));

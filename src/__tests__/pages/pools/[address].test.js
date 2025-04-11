@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import PoolDetailPage from '../../../pages/pools/[address]';
+import PoolDetailPage from '@/pages/pools/[address]';
 import { useRouter } from 'next/router';
-import usePoolsData from '../../../hooks/usePoolsData';
+import usePoolsData from '@/hooks/usePoolsData';
 
 // Mock Next.js router
 jest.mock('next/router', () => ({
@@ -11,7 +11,7 @@ jest.mock('next/router', () => ({
 }));
 
 // Mock the usePoolsData hook (the one actually used by the component)
-jest.mock('../../../hooks/usePoolsData', () => ({
+jest.mock('@/hooks/usePoolsData', () => ({
   __esModule: true,
   default: jest.fn()
 }));
@@ -26,7 +26,7 @@ jest.mock('next/link', () => {
 });
 
 // Mock the PoolMetrics component
-jest.mock('../../../components/pools/PoolMetrics', () => {
+jest.mock('@/components/pools/PoolMetrics', () => {
   // Mock needs to accept poolAddress prop
   return function MockPoolMetrics({ poolAddress, timeframe }) {
     return (

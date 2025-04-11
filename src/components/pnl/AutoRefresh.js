@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import styles from './AutoRefresh.module.scss';
-import { HistoryToggle } from '../history/HistoryToggle';
+import styles from '@/styles/AutoRefresh.module.scss';
+import { HistoryToggle } from '@/components/history/HistoryToggle';
 
 /**
  * Displays the refresh status text based on loading state and countdown

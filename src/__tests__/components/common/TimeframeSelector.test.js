@@ -1,10 +1,10 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import TimeframeSelector from '../../../components/common/TimeframeSelector';
+import TimeframeSelector from '@/components/common/TimeframeSelector';
 
 // Mock the TimeframeSelector styles
-jest.mock('../../../styles/TimeframeSelector.module.scss', () => ({
+jest.mock('@/styles/TimeframeSelector.module.scss', () => ({
   timeframeSelector: 'timeframeSelector',
   timeframeButton: 'timeframeButton',
   active: 'active'

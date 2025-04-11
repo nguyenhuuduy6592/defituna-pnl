@@ -1,31 +1,21 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import PoolFilters from '../../../components/pools/PoolFilters';
+import PoolFilters from '@/components/pools/PoolFilters';
+import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB';
 
-// Mock localStorage
-const localStorageMock = (function() {
-  let store = {};
-  return {
-    getItem: jest.fn(key => store[key]),
-    setItem: jest.fn((key, value) => {
-      store[key] = value.toString();
-    }),
-    clear: jest.fn(() => {
-      store = {};
-    }),
-    removeItem: jest.fn(key => {
-      delete store[key];
-    }),
-  };
-})();
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock
-});
+// Mock IndexedDB utility functions
+jest.mock('@/utils/indexedDB', () => ({
+  initializeDB: jest.fn().mockResolvedValue({}),
+  getData: jest.fn(),
+  saveData: jest.fn().mockResolvedValue(true),
+  STORE_NAMES: {
+    SETTINGS: 'settings'
+  }
+}));
 
 // Mock TimeframeSelector since it's a UI component we can test separately
-jest.mock('../../../components/common/TimeframeSelector', () => {
+jest.mock('@/components/common/TimeframeSelector', () => {
   return jest.fn(({ timeframes, selected, onChange }) => (
     <div data-testid="timeframe-selector">
       {timeframes.map(timeframe => (
@@ -64,7 +54,6 @@ describe('PoolFilters Component', () => {
   
   beforeEach(() => {
     jest.clearAllMocks();
-    localStorage.clear();
   });
   
   test('renders all filter controls correctly', () => {
@@ -99,7 +88,7 @@ describe('PoolFilters Component', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
   });
   
-  test('loads filters from localStorage on mount', () => {
+  test('loads filters from IndexedDB on mount', async () => {
     const savedFilters = {
       sortBy: 'volume24h',
       sortOrder: 'asc',
@@ -108,8 +97,12 @@ describe('PoolFilters Component', () => {
       timeframe: '7d'
     };
     
-    localStorage.getItem.mockReturnValueOnce(null); // savedFilters
-    localStorage.getItem.mockReturnValueOnce(JSON.stringify(savedFilters)); // poolFilters
+    getData.mockImplementation((db, storeName, key) => {
+      if (key === 'poolFilters') {
+        return Promise.resolve({ value: savedFilters });
+      }
+      return Promise.resolve(null);
+    });
     
     render(
       <PoolFilters 
@@ -119,7 +112,9 @@ describe('PoolFilters Component', () => {
       />
     );
     
-    expect(mockOnFilterChange).toHaveBeenCalledWith(savedFilters);
+    await waitFor(() => {
+      expect(mockOnFilterChange).toHaveBeenCalledWith(savedFilters);
+    });
   });
   
   test('handles sort change correctly', () => {
@@ -234,6 +229,13 @@ describe('PoolFilters Component', () => {
     
     jest.spyOn(Date, 'now').mockImplementation(() => 12345);
     
+    getData.mockImplementation((db, storeName, key) => {
+      if (key === 'poolSavedFilters') {
+        return Promise.resolve({ value: [] });
+      }
+      return Promise.resolve(null);
+    });
+    
     render(
       <PoolFilters 
         filters={customFilters} 
@@ -246,21 +248,19 @@ describe('PoolFilters Component', () => {
     fireEvent.click(saveButton);
     
     await waitFor(() => {
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        'poolSavedFilters',
-        expect.stringContaining('"id":12345')
+      expect(saveData).toHaveBeenCalledWith(
+        expect.anything(),
+        STORE_NAMES.SETTINGS,
+        {
+          key: 'poolSavedFilters',
+          value: [{
+            id: 12345,
+            label: 'Volume (Low to High) | Time: 7d | Token: ETH | Min TVL: $10K+',
+            filters: customFilters
+          }]
+        }
       );
     });
-    
-    const savedFiltersJson = JSON.parse(localStorage.setItem.mock.calls.find(
-      call => call[0] === 'poolSavedFilters'
-    )[1]);
-    
-    expect(savedFiltersJson[0].filters).toEqual(customFilters);
-    expect(savedFiltersJson[0].label).toContain('Volume (Low to High)');
-    expect(savedFiltersJson[0].label).toContain('Time: 7d');
-    expect(savedFiltersJson[0].label).toContain('Token: ETH');
-    expect(savedFiltersJson[0].label).toContain('Min TVL: $10K+');
   });
   
   test('renders and applies saved filters', async () => {
@@ -276,7 +276,12 @@ describe('PoolFilters Component', () => {
       }
     }];
     
-    localStorage.getItem.mockReturnValueOnce(JSON.stringify(savedFiltersData));
+    getData.mockImplementation((db, storeName, key) => {
+      if (key === 'poolSavedFilters') {
+        return Promise.resolve({ value: savedFiltersData });
+      }
+      return Promise.resolve(null);
+    });
     
     render(
       <PoolFilters 
@@ -286,12 +291,13 @@ describe('PoolFilters Component', () => {
       />
     );
     
-    // Check if saved filter is displayed
-    const savedFilter = screen.getByText(savedFiltersData[0].label);
-    expect(savedFilter).toBeInTheDocument();
+    // Wait for saved filters to load
+    await waitFor(() => {
+      expect(screen.getByText(savedFiltersData[0].label)).toBeInTheDocument();
+    });
     
     // Apply saved filter
-    fireEvent.click(savedFilter);
+    fireEvent.click(screen.getByText(savedFiltersData[0].label));
     
     expect(mockOnFilterChange).toHaveBeenCalledWith(savedFiltersData[0].filters);
   });
@@ -309,7 +315,12 @@ describe('PoolFilters Component', () => {
       }
     }];
     
-    localStorage.getItem.mockReturnValueOnce(JSON.stringify(savedFiltersData));
+    getData.mockImplementation((db, storeName, key) => {
+      if (key === 'poolSavedFilters') {
+        return Promise.resolve({ value: savedFiltersData });
+      }
+      return Promise.resolve(null);
+    });
     
     render(
       <PoolFilters 
@@ -319,17 +330,22 @@ describe('PoolFilters Component', () => {
       />
     );
     
-    // Find delete button (× character)
-    const deleteButton = screen.getByTitle('Delete this saved filter');
+    // Wait for saved filters to load
+    await waitFor(() => {
+      expect(screen.getByTitle('Delete this saved filter')).toBeInTheDocument();
+    });
     
     // Click delete button
-    fireEvent.click(deleteButton);
+    fireEvent.click(screen.getByTitle('Delete this saved filter'));
     
-    // Check if localStorage was updated with empty array
     await waitFor(() => {
-      expect(localStorage.setItem).toHaveBeenCalledWith(
-        'poolSavedFilters',
-        '[]'
+      expect(saveData).toHaveBeenCalledWith(
+        expect.anything(),
+        STORE_NAMES.SETTINGS,
+        {
+          key: 'poolSavedFilters',
+          value: []
+        }
       );
     });
   });
@@ -349,7 +365,12 @@ describe('PoolFilters Component', () => {
       filters: customFilters
     }];
     
-    localStorage.getItem.mockReturnValueOnce(JSON.stringify(savedFiltersData));
+    getData.mockImplementation((db, storeName, key) => {
+      if (key === 'poolSavedFilters') {
+        return Promise.resolve({ value: savedFiltersData });
+      }
+      return Promise.resolve(null);
+    });
     
     render(
       <PoolFilters 
@@ -363,14 +384,11 @@ describe('PoolFilters Component', () => {
     const saveButton = screen.getByRole('button', { name: 'Save' });
     fireEvent.click(saveButton);
     
-    // Should not call setItem with a new entry
-    expect(localStorage.setItem).not.toHaveBeenCalledWith(
-      'poolSavedFilters',
-      expect.stringContaining('"id":12345')
-    );
+    // Should not call saveData with a new entry
+    expect(saveData).not.toHaveBeenCalled();
   });
   
-  test('saves filters to localStorage when they change', () => {
+  test('saves filters to IndexedDB when they change', async () => {
     render(
       <PoolFilters 
         filters={defaultFilters} 
@@ -380,13 +398,19 @@ describe('PoolFilters Component', () => {
     );
     
     // Verify initial save
-    expect(localStorage.setItem).toHaveBeenCalledWith(
-      'poolFilters',
-      JSON.stringify(defaultFilters)
-    );
+    await waitFor(() => {
+      expect(saveData).toHaveBeenCalledWith(
+        expect.anything(),
+        STORE_NAMES.SETTINGS,
+        {
+          key: 'poolFilters',
+          value: defaultFilters
+        }
+      );
+    });
     
     // Clear mock to check next call
-    localStorage.setItem.mockClear();
+    saveData.mockClear();
     
     // Simulate props update
     const updatedFilters = {
@@ -402,9 +426,15 @@ describe('PoolFilters Component', () => {
       />
     );
     
-    expect(localStorage.setItem).toHaveBeenCalledWith(
-      'poolFilters',
-      JSON.stringify(updatedFilters)
-    );
+    await waitFor(() => {
+      expect(saveData).toHaveBeenCalledWith(
+        expect.anything(),
+        STORE_NAMES.SETTINGS,
+        {
+          key: 'poolFilters',
+          value: updatedFilters
+        }
+      );
+    });
   });
 }); 

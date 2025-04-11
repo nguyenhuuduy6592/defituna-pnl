@@ -1,17 +1,17 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ActiveWalletsDisplay } from '../../../components/pnl/ActiveWalletsDisplay';
-import { formatWalletAddress, copyToClipboard } from '../../../utils';
+import { ActiveWalletsDisplay } from '@/components/pnl/ActiveWalletsDisplay';
+import { formatWalletAddress, copyToClipboard } from '@/utils';
 
 // Mock the utility functions
-jest.mock('../../../utils', () => ({
+jest.mock('@/utils', () => ({
   formatWalletAddress: jest.fn(address => `formatted-${address}`),
   copyToClipboard: jest.fn()
 }));
 
 // Mock styles
-jest.mock('../../../components/pnl/WalletForm.module.scss', () => ({
+jest.mock('@/components/pnl/WalletForm.module.scss', () => ({
   activeWallets: 'activeWallets-mock',
   walletChips: 'walletChips-mock',
   walletChip: 'walletChip-mock',
