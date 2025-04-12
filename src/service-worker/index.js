@@ -49,7 +49,8 @@ const fetchAllPositions = async () => {
     return;
   }
   
-  console.log('[SW] Running background sync for wallets:', currentWallets);
+  console.log(`[SW] Running background sync for wallets:`, currentWallets);
+  console.log(`[SW Background Debug] Attempting fetchAllPositions at ${new Date().toISOString()}`);
 
   // Throttle API calls - ensure minimum time between fetches
   const now = Date.now();
@@ -62,6 +63,7 @@ const fetchAllPositions = async () => {
   // Allow a small tolerance buffer to avoid throttling requests that are very close to the minimum
   if (timeSinceLastFetch < throttleThreshold) {
     console.log(`[SW] Throttling fetch. Will retry on next scheduled interval.`);
+    console.log(`[SW Background Debug] Throttled fetch at ${new Date().toISOString()}. Time since last: ${timeSinceLastFetch}ms`);
     return;
   }
   
@@ -130,6 +132,8 @@ const fetchAllPositions = async () => {
 
   } catch (error) {
     console.error('[SW] Error during fetchAllPositions:', error);
+  } finally {
+      console.log(`[SW Background Debug] Completed fetchAllPositions attempt at ${new Date().toISOString()}`);
   }
 };
 
@@ -174,8 +178,9 @@ const startSyncTimer = () => {
   
   // Create new timer
   syncTimer = setInterval(() => {
-    const currentTime = new Date().toLocaleTimeString();
+    const currentTime = new Date().toISOString();
     console.log(`[SW Timer Debug] 🔄 Timer tick at ${currentTime}`);
+    console.log(`[SW Background Debug] Timer tick - initiating fetch check at ${currentTime}`);
     fetchAllPositions();
   }, syncIntervalId);
 };
