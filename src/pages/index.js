@@ -120,10 +120,6 @@ export default () => {
         setErrorMessage(`Failed to fetch data for ${fetchErrors.length} wallet(s). Please wait for next refresh.`);
         // Attempt to aggregate still, maybe some wallets succeeded
         combined = aggregatePnLData(results);
-        if (!combined) {
-          // If aggregation fails completely after errors, clear data
-          setAggregatedData(null);
-        }
       } else {
          // Clear error message on successful fetch/refresh
          setErrorMessage('');
@@ -157,9 +153,19 @@ export default () => {
     } catch (err) {
       console.error('Error in fetchPnLData:', err);
       setErrorMessage(err.message || 'An unexpected error occurred while fetching data.');
-      setAggregatedData(null);
     } finally {
       setLoading(false);
+    }
+
+    // Clear data/error if no wallets are active
+    if (activeWallets.length === 0) {
+      // Only clear if there is data to clear
+      if (aggregatedData !== null) {
+        setAggregatedData(null);
+      }
+      if (errorMessage !== '') {
+        setErrorMessage('');
+      }
     }
   }, [
     activeWallets, 
@@ -263,13 +269,7 @@ export default () => {
           console.log('Updating UI with latest position data from service worker');
           setAggregatedData(aggregated);
           setUpdateSource('service-worker-direct');
-        } else {
-          setAggregatedData(null); 
-          setUpdateSource('service-worker-empty'); 
         }
-      } else {
-        setAggregatedData(null); 
-        setUpdateSource('service-worker-empty'); 
       }
 
     } catch (error) {
