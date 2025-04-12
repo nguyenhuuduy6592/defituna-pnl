@@ -138,16 +138,12 @@ export const cleanupData = async (db, retentionDays = DEFAULT_RETENTION_DAYS) =>
     let deleteCount = 0;
 
     while (cursor) {
-      // console.log('[cleanupData] Deleting old record with timestamp:', cursor.value.timestamp);
       await cursor.delete();
       deleteCount++;
       cursor = await cursor.continue();
     }
 
     await tx.done;
-    if (deleteCount > 0) {
-        console.log(`[cleanupData] Successfully deleted ${deleteCount} old position records.`);
-    }
     return true;
   } catch (error) {
     console.error('Failed to clean up old data:', error);

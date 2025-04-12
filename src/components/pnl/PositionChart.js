@@ -248,10 +248,6 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
                       : (item.yield || 0) + (item.compounded || 0)
       }));
       
-      // Remove logs added for debugging
-      // console.log("[PositionChart useEffect] Final chartData length:", validData.length);
-      // console.log("[PositionChart useEffect] Final chartData sample (incl. nulls?):", validData.slice(0, 20));
-      
       setChartData(validData);
     } catch (error) {
       console.error('Error processing chart data in useEffect:', error);
