@@ -24,22 +24,50 @@ precacheAndRoute(self.__WB_MANIFEST || []);
 // --- Imports ---
 // Import necessary utilities from the /src directory
 import { initializeDB, savePositionSnapshot, STORE_NAMES } from '@/utils/indexedDB';
-import { fetchWalletPnL } from '@/utils/pnlUtils'; // Assuming fetchWalletPnL handles decoding and address adding now
+import { fetchWalletPnL } from '@/utils/pnlUtils';
+import { REFRESH_INTERVALS } from '@/utils/constants';
 
 // --- Configuration ---
-const SYNC_INTERVAL = 30 * 1000; // Default sync interval (30 seconds)
+// How often the timer should attempt to sync data (scheduler)
+const DEFAULT_SYNC_INTERVAL = REFRESH_INTERVALS.DEFAULT * REFRESH_INTERVALS.SECONDS;
+// Minimum time that must pass between actual API calls (throttling)
+const MIN_FETCH_INTERVAL = REFRESH_INTERVALS.getMinimum() * REFRESH_INTERVALS.SECONDS;
+// More generous buffer (200ms) to avoid throttling requests that are very close to the minimum interval
+const THROTTLE_TOLERANCE = 200;
 
 // --- Background Sync Logic ---
 let syncTimer = null;
 let currentWallets = []; // Keep track of wallets to sync
-let syncIntervalId = SYNC_INTERVAL; // Use default initially
+let syncIntervalId = DEFAULT_SYNC_INTERVAL; // Use default initially
+let lastFetchTime = 0; // Track when we last performed a fetch
+let isTimerRunning = false; // Track if a timer is already running
 
 const fetchAllPositions = async () => {
-  console.log('[SW] Running background sync for wallets:', currentWallets);
+  // Skip if no wallets configured
   if (currentWallets.length === 0) {
     console.log('[SW] No wallets to sync. Skipping fetch.');
     return;
   }
+  
+  console.log('[SW] Running background sync for wallets:', currentWallets);
+
+  // Throttle API calls - ensure minimum time between fetches
+  const now = Date.now();
+  const timeSinceLastFetch = now - lastFetchTime;
+  const throttleThreshold = MIN_FETCH_INTERVAL - THROTTLE_TOLERANCE;
+  
+  // Debug logging
+  console.log(`[SW] Time since last fetch: ${timeSinceLastFetch}ms, Threshold: ${throttleThreshold}ms (Min: ${MIN_FETCH_INTERVAL}ms, Tolerance: ${THROTTLE_TOLERANCE}ms)`);
+  
+  // Allow a small tolerance buffer to avoid throttling requests that are very close to the minimum
+  if (timeSinceLastFetch < throttleThreshold) {
+    console.log(`[SW] Throttling fetch. Will retry on next scheduled interval.`);
+    return;
+  }
+  
+  // Update last fetch time before making the API call
+  lastFetchTime = now;
+  console.log(`[SW] Starting API fetch at ${new Date(now).toLocaleTimeString()}`);
 
   try {
     const db = await initializeDB();
@@ -64,6 +92,37 @@ const fetchAllPositions = async () => {
       const success = await savePositionSnapshot(db, allPositions); 
       if (!success) {
         console.error('[SW] Failed to save combined position snapshot.');
+      } else {
+        // Notify all clients about the new data
+        try {
+          // Get all clients, including uncontrolled ones
+          const clients = await self.clients.matchAll({
+            type: 'window',
+            includeUncontrolled: true
+          });
+          
+          if (clients.length === 0) {
+            console.log('[SW] No active clients found to notify about new data.');
+          } else {
+            console.log(`[SW] Found ${clients.length} client(s) to notify about new data.`);
+            
+            // Send message to each client
+            clients.forEach(client => {
+              try {
+                client.postMessage({
+                  type: 'NEW_POSITIONS_DATA',
+                  timestamp: now,
+                  count: allPositions.length
+                });
+                console.log(`[SW] Notified client: ${client.id} (URL: ${client.url})`);
+              } catch (err) {
+                console.error(`[SW] Failed to notify client ${client.id}:`, err);
+              }
+            });
+          }
+        } catch (error) {
+          console.error('[SW] Error notifying clients about new data:', error);
+        }
       }
     } else {
       console.log('[SW] No valid positions found across all wallets to save.');
@@ -74,18 +133,65 @@ const fetchAllPositions = async () => {
   }
 };
 
+// Handle the FORCE_SYNC message type
+const handleForceSync = async () => {
+  // Only allow forced sync if enough time has passed since last fetch
+  const now = Date.now();
+  const timeSinceLastFetch = now - lastFetchTime;
+  const throttleThreshold = MIN_FETCH_INTERVAL - THROTTLE_TOLERANCE;
+  
+  // Debug logging
+  console.log(`[SW] Time since last fetch: ${timeSinceLastFetch}ms, Threshold: ${throttleThreshold}ms (Min: ${MIN_FETCH_INTERVAL}ms, Tolerance: ${THROTTLE_TOLERANCE}ms)`);
+  
+  if (timeSinceLastFetch < throttleThreshold) {
+    console.log(`[SW] Throttling forced sync. Will retry later.`);
+    return;
+  }
+  
+  console.log('[SW] Forcing immediate sync');
+  await fetchAllPositions();
+};
+
 const startSyncTimer = () => {
-  console.log(`[SW] Starting background sync timer with interval: ${syncIntervalId / 1000}s`);
+  // If a timer is already running, clear it first
+  stopSyncTimer();
+  
+  // Set flag indicating timer is running
+  isTimerRunning = true;
+  const now = Date.now();
+  const nextSyncTime = new Date(now + syncIntervalId).toLocaleTimeString();
+  
+  console.log(`[SW Timer Debug] ⏰ Starting background sync timer at ${new Date(now).toLocaleTimeString()}`);
+  console.log(`[SW Timer Debug] 📅 Next sync scheduled for: ${nextSyncTime}`);
+  console.log(`[SW Timer Debug] ⚙️ Timer config:`, {
+    interval: `${syncIntervalId / REFRESH_INTERVALS.SECONDS}s`,
+    timerId: now,
+    isTimerRunning
+  });
+  
   // Run immediately first time
   fetchAllPositions(); 
-  syncTimer = setInterval(fetchAllPositions, syncIntervalId);
+  
+  // Create new timer
+  syncTimer = setInterval(() => {
+    const currentTime = new Date().toLocaleTimeString();
+    console.log(`[SW Timer Debug] 🔄 Timer tick at ${currentTime}`);
+    fetchAllPositions();
+  }, syncIntervalId);
 };
 
 const stopSyncTimer = () => {
   if (syncTimer) {
-    console.log('[SW] Stopping background sync timer.');
+    const currentTime = new Date().toLocaleTimeString();
+    console.log(`[SW Timer Debug] ⏹️ Stopping background sync timer at ${currentTime}`);
+    console.log(`[SW Timer Debug] 📊 Timer final state:`, {
+      wasRunning: isTimerRunning,
+      interval: `${syncIntervalId / REFRESH_INTERVALS.SECONDS}s`
+    });
+    
     clearInterval(syncTimer);
     syncTimer = null;
+    isTimerRunning = false;
   }
 };
 
@@ -93,7 +199,7 @@ const stopSyncTimer = () => {
 
 self.addEventListener('install', (event) => {
   console.log('[SW] Installed');
-  event.waitUntil(self.skipWaiting());
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -117,7 +223,12 @@ self.addEventListener('message', (event) => {
     case 'START_SYNC':
       console.log('[SW] Received START_SYNC message.');
       if (currentWallets.length > 0) {
-        startSyncTimer();
+        // Only start if not already running
+        if (!isTimerRunning) {
+          startSyncTimer();
+        } else {
+          console.log('[SW] Sync timer already running, ignoring duplicate START_SYNC.');
+        }
       } else {
         console.log('[SW] Cannot start sync: No wallets provided yet.');
       }
@@ -127,16 +238,21 @@ self.addEventListener('message', (event) => {
       stopSyncTimer();
       break;
     case 'SET_INTERVAL':
-      const newInterval = Number(event.data.interval) * 1000;
+      const newInterval = Number(event.data.interval) * REFRESH_INTERVALS.SECONDS;
       if (!isNaN(newInterval) && newInterval > 0) {
         syncIntervalId = newInterval;
-        console.log(`[SW] Sync interval updated to: ${syncIntervalId / 1000}s`);
-        if (syncTimer) {
-          startSyncTimer(); // Restart timer with new interval
+        console.log(`[SW] Sync interval updated to: ${syncIntervalId / REFRESH_INTERVALS.SECONDS}s`);
+        if (isTimerRunning) {
+          // Restart timer with new interval
+          console.log('[SW] Restarting timer with new interval');
+          startSyncTimer();
         }
       } else {
         console.warn(`[SW] Received invalid interval: ${event.data.interval}`);
       }
+      break;
+    case 'FORCE_SYNC':
+      handleForceSync();
       break;
     default:
       console.warn('[SW] Received unknown message type:', event.data.type);

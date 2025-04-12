@@ -23,6 +23,25 @@ export const TIME_PERIODS = {
 };
 
 /**
+ * Auto-refresh interval options in seconds
+ * These values should match the options in the UI dropdown
+ * @type {Object}
+ */
+export const REFRESH_INTERVALS = {
+  SECONDS: 1000,
+  TEN_SECONDS: 10,
+  THIRTY_SECONDS: 30,
+  ONE_MINUTE: 60,
+  FIVE_MINUTES: 300,
+  // Default refresh interval
+  DEFAULT: 30,
+  // Get the minimum allowed refresh interval
+  getMinimum: () => process.env.NODE_ENV === 'development' ? 
+    REFRESH_INTERVALS.TEN_SECONDS : 
+    REFRESH_INTERVALS.THIRTY_SECONDS
+};
+
+/**
  * Default chart styling properties
  * @type {Object}
  */

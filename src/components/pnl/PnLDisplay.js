@@ -1,10 +1,11 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import { PositionsList } from '@/components/pnl/PositionsList';
 import { DonationFooter } from '@/components/pnl/DonationFooter';
 import { TotalPnLDisplay } from '@/components/pnl/TotalPnLDisplay';
 import styles from '@/styles/PnLDisplay.module.scss';
 import { LoadingOverlay } from '@/components/common/LoadingOverlay';
 import { usePositionAges } from '@/components/pnl/hooks/usePositionAges';
+import { FiAlertTriangle } from 'react-icons/fi';
 
 // Default structure when data is not yet available
 const defaultData = {
@@ -20,12 +21,18 @@ const defaultData = {
  * @param {Object} props.data Data containing PnL and positions information
  * @param {boolean} props.historyEnabled Whether position history is enabled
  * @param {boolean} props.loading Whether data is currently loading
+ * @param {string} props.errorMessage Error message to display
+ * @param {boolean} props.showWallet Whether to show wallet information
+ * @param {string} props.lastUpdateSource Source of the last update
  * @returns {JSX.Element} Rendered component
  */
 export const PnLDisplay = ({ 
   data, 
   historyEnabled = false, 
-  loading = false
+  loading = false,
+  errorMessage,
+  showWallet = false,
+  lastUpdateSource = null,
 }) => {
   // Use provided data or default data
   const displayData = useMemo(() => {
@@ -65,6 +72,23 @@ export const PnLDisplay = ({
   // Only show donation footer if we have positions
   const showDonationFooter = displayData.positions.length > 0;
 
+  // Add small notification when data was updated by service worker
+  useEffect(() => {
+    let notificationTimeout;
+    if (lastUpdateSource === 'service-worker') {
+      setShowUpdateNotification(true);
+      notificationTimeout = setTimeout(() => {
+        setShowUpdateNotification(false);
+      }, 3000); // Hide after 3 seconds
+    }
+    return () => {
+      if (notificationTimeout) clearTimeout(notificationTimeout);
+    };
+  }, [lastUpdateSource]);
+
+  // State to track notification visibility
+  const [showUpdateNotification, setShowUpdateNotification] = useState(false);
+
   return (
     <LoadingOverlay loading={loading}>
       <div className={styles.pnlContainer}>
@@ -84,11 +108,23 @@ export const PnLDisplay = ({
 
         <PositionsList 
           positions={positionsWithAge}
-          showWallet={true}
+          showWallet={showWallet}
           historyEnabled={historyEnabled}
         />
 
         <DonationFooter visible={showDonationFooter} />
+
+        {errorMessage && (
+          <div className={styles.errorMessage}>
+            <FiAlertTriangle /> {errorMessage}
+          </div>
+        )}
+
+        {showUpdateNotification && (
+          <div className={styles.updateNotification}>
+            Data updated in background
+          </div>
+        )}
       </div>
     </LoadingOverlay>
   );

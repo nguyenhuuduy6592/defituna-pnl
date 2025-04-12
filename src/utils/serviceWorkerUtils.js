@@ -30,11 +30,33 @@ export const postMessageToSW = async (message) => {
 /**
  * Enable or disable auto-refresh functionality
  * @param {boolean} enabled - Whether to enable auto-refresh
+ * @param {number} [interval] - Optional refresh interval in seconds
  */
-export const setAutoRefresh = async (enabled) => {
+export const setAutoRefresh = async (enabled, interval) => {
+  // First set the interval if provided
+  if (typeof interval === 'number' && interval > 0) {
+    await setRefreshInterval(interval);
+  }
+  
+  // Then start/stop the sync
   await postMessageToSW({
-    type: 'SET_AUTO_REFRESH',
-    enabled
+    type: enabled ? 'START_SYNC' : 'STOP_SYNC'
+  });
+};
+
+/**
+ * Set the refresh interval for auto-refresh
+ * @param {number} interval - Refresh interval in seconds
+ */
+export const setRefreshInterval = async (interval) => {
+  if (typeof interval !== 'number' || interval <= 0) {
+    console.warn('[SW Utils] Invalid interval:', interval);
+    return;
+  }
+  
+  await postMessageToSW({
+    type: 'SET_INTERVAL',
+    interval
   });
 };
 

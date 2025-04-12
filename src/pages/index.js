@@ -11,6 +11,7 @@ import {
   useHistoricalData, 
   useDebounceApi 
 } from '@/hooks';
+import { useServiceWorkerMessages } from '@/hooks/useServiceWorkerMessages';
 import { WalletForm } from '@/components/pnl/WalletForm';
 import { AutoRefresh } from '@/components/pnl/AutoRefresh';
 import { PnLDisplay } from '@/components/pnl/PnLDisplay';
@@ -19,6 +20,7 @@ import { postMessageToSW } from '@/utils/serviceWorkerUtils';
 import styles from '@/styles/index.module.scss';
 import Link from 'next/link';
 import Head from 'next/head';
+import { BiLineChart } from 'react-icons/bi';
 
 export default () => {
   const [loading, setLoading] = useState(false);
@@ -28,6 +30,7 @@ export default () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const [allPositionsHistory, setAllPositionsHistory] = useState([]);
+  const [updateSource, setUpdateSource] = useState(null);
 
   const {
     wallet,
@@ -129,6 +132,7 @@ export default () => {
 
       if (combined) {
         setAggregatedData(combined);
+        setUpdateSource(isSubmission ? 'user-submission' : 'auto-refresh');
         
         // Handle history data if enabled
         if (historyEnabled) {
@@ -167,16 +171,26 @@ export default () => {
     wallet, 
     addWallet, 
     setWallet, 
-    debouncedExecuteFetchWalletPnL
+    debouncedExecuteFetchWalletPnL,
+    setUpdateSource
   ]);
 
+  // Auto-refresh hook now delegates refresh logic to service worker
   const {
     autoRefresh,
     setAutoRefresh,
     refreshInterval,
     setRefreshInterval,
-    refreshCountdown
+    refreshCountdown,
+    isRefreshing
   } = useAutoRefresh();
+
+  // This handler no longer needs to trigger data fetching - it just updates the interval in the UI
+  const handleIntervalChange = (e) => {
+    const newInterval = parseInt(e.target.value);
+    setRefreshInterval(newInterval);
+    // Service worker is notified directly from setRefreshInterval
+  };
 
   // Auto fetch data if there are active wallets on page load
   useEffect(() => {
@@ -222,6 +236,97 @@ export default () => {
     postMessageToSW({ type: 'SET_WALLETS', wallets: activeWallets });
   }, [activeWallets]);
 
+  // Handle new positions data from service worker
+  const handleNewPositionsData = useCallback(async (data) => {
+    console.log('Executing debounced position data handler with data:', data);
+    
+    // Skip updating if we're currently loading or have no wallets
+    if (activeWallets.length === 0 || loading) {
+      console.log('Skipping update: No active wallets or already loading');
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      const db = await initializeDB();
+      if (!db) return;
+      
+      // Find the most recent snapshot - this avoids multiple DB operations when handling grouped updates
+      const tx = db.transaction(STORE_NAMES.POSITIONS, 'readonly');
+      const store = tx.objectStore(STORE_NAMES.POSITIONS);
+      const index = store.index('timestamp');
+      
+      // Get the latest timestamp
+      const allPositions = await index.getAll(IDBKeyRange.lowerBound(0));
+      if (!allPositions || allPositions.length === 0) {
+        console.log('No positions found in IndexedDB');
+        setLoading(false);
+        return;
+      }
+      
+      // Group positions by timestamp
+      const positionsByTimestamp = {};
+      allPositions.forEach(position => {
+        if (!position.timestamp) return;
+        
+        const timestamp = position.timestamp;
+        if (!positionsByTimestamp[timestamp]) {
+          positionsByTimestamp[timestamp] = [];
+        }
+        positionsByTimestamp[timestamp].push(position);
+      });
+      
+      // Find latest timestamp
+      const timestamps = Object.keys(positionsByTimestamp).map(Number).sort((a, b) => b - a);
+      const latestTimestamp = timestamps[0];
+      
+      if (!latestTimestamp) {
+        console.log('No valid timestamps found in position data');
+        setLoading(false);
+        return;
+      }
+      
+      // Get all positions at latest timestamp
+      const latestPositions = positionsByTimestamp[latestTimestamp];
+      
+      // Filter and process positions by wallet
+      const results = activeWallets.map(walletAddress => {
+        const walletPositions = latestPositions.filter(
+          position => position.walletAddress === walletAddress
+        );
+        
+        if (walletPositions.length === 0) return null;
+        
+        // Format data similar to API response
+        return {
+          positions: walletPositions,
+          totalPnL: walletPositions.reduce((sum, pos) => sum + (pos.pnl?.usd || 0), 0)
+        };
+      }).filter(Boolean); // Remove null results
+      
+      // Only update if we have results
+      if (results.length > 0) {
+        const aggregated = aggregatePnLData(results);
+        if (aggregated) {
+          console.log('Updating UI with latest position data from service worker');
+          setAggregatedData(aggregated);
+          setUpdateSource('service-worker');
+        }
+      } else {
+        console.log('No matching wallet positions found in latest snapshot');
+      }
+    } catch (error) {
+      console.error('Error handling service worker data update:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [activeWallets, loading, aggregatePnLData]);
+  
+  // Setup service worker message listener
+  const { isConnected } = useServiceWorkerMessages({
+    onNewPositionsData: handleNewPositionsData
+  });
+
   const handleSubmit = async e => {
     e.preventDefault();
     const walletsToSubmit = wallet ? [wallet] : activeWallets; 
@@ -233,10 +338,6 @@ export default () => {
     }
   };
 
-  const handleIntervalChange = (e) => {
-    const newInterval = parseInt(e.target.value);
-    setRefreshInterval(newInterval);
-  };
   const handleCloseDisclaimer = async () => {
     setDisclaimerOpen(false);
     try {
@@ -294,7 +395,7 @@ export default () => {
         toggleWalletActive={toggleWalletActive}
         onSubmit={handleSubmit}
         loading={loading}
-        countdown={fetchCooldown}
+        fetchCooldown={fetchCooldown}
         savedWallets={savedWallets}
         onRemoveWallet={removeWallet}
         onClearWallets={clearWallets}
@@ -314,14 +415,18 @@ export default () => {
           loading={loading}
           historyEnabled={historyEnabled}
           onHistoryToggle={toggleHistoryEnabled}
+          isRefreshing={isRefreshing}
         />
       )}
 
       {activeWallets.length > 0 && (
         <PnLDisplay
           data={aggregatedData}
+          errorMessage={errorMessage}
+          showWallet={true}
           historyEnabled={historyEnabled}
           loading={loading}
+          lastUpdateSource={updateSource}
           positionsHistory={allPositionsHistory}
         />
       )}
