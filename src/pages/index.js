@@ -236,98 +236,51 @@ export default () => {
 
   // Effect to send wallet updates to Service Worker
   useEffect(() => {
+    console.log('[UI] Sending SET_WALLETS to SW:', activeWallets);
     postMessageToSW({ type: 'SET_WALLETS', wallets: activeWallets });
   }, [activeWallets]);
 
   // Handle new positions data from service worker
   const handleNewPositionsData = useCallback(async (data) => {
-    console.log('Executing debounced position data handler with data:', data);
-    
-    // Skip updating if we're currently loading or have no wallets
-    if (activeWallets.length === 0 || loading) {
+    if (!data || !data.results) {
+        console.warn('[UI Update] Received message without results data. Cannot update UI based on direct results.');
+        return;
+    }
+
+    if (activeWallets.length === 0) {
       console.log('Skipping update: No active wallets or already loading');
       return;
     }
     
     try {
-      setLoading(true);
-      const db = await initializeDB();
-      if (!db) return;
+      const results = data.results;
       
-      // Find the most recent snapshot - this avoids multiple DB operations when handling grouped updates
-      const tx = db.transaction(STORE_NAMES.POSITIONS, 'readonly');
-      const store = tx.objectStore(STORE_NAMES.POSITIONS);
-      const index = store.index('timestamp');
-      
-      // Get the latest timestamp
-      const allPositions = await index.getAll(IDBKeyRange.lowerBound(0));
-      if (!allPositions || allPositions.length === 0) {
-        console.log('No positions found in IndexedDB');
-        setLoading(false);
-        return;
-      }
-      
-      // Group positions by timestamp
-      const positionsByTimestamp = {};
-      allPositions.forEach(position => {
-        if (!position.timestamp) return;
-        
-        const timestamp = position.timestamp;
-        if (!positionsByTimestamp[timestamp]) {
-          positionsByTimestamp[timestamp] = [];
-        }
-        positionsByTimestamp[timestamp].push(position);
-      });
-      
-      // Find latest timestamp
-      const timestamps = Object.keys(positionsByTimestamp).map(Number).sort((a, b) => b - a);
-      const latestTimestamp = timestamps[0];
-      
-      if (!latestTimestamp) {
-        console.log('No valid timestamps found in position data');
-        setLoading(false);
-        return;
-      }
-      
-      // Get all positions at latest timestamp
-      const latestPositions = positionsByTimestamp[latestTimestamp];
-      
-      // Filter and process positions by wallet
-      const results = activeWallets.map(walletAddress => {
-        const walletPositions = latestPositions.filter(
-          position => position.walletAddress === walletAddress
-        );
-        
-        if (walletPositions.length === 0) return null;
-        
-        // Format data similar to API response
-        return {
-          positions: walletPositions,
-          totalPnL: walletPositions.reduce((sum, pos) => sum + (pos.pnl?.usd || 0), 0)
-        };
-      }).filter(Boolean); // Remove null results
-      
-      // Only update if we have results
-      if (results.length > 0) {
-        const aggregated = aggregatePnLData(results);
+      const relevantResults = results.filter(r => r && !r.error && activeWallets.includes(r.walletAddress));
+
+      if (relevantResults.length > 0) {
+        const aggregated = aggregatePnLData(relevantResults);
         if (aggregated) {
           console.log('Updating UI with latest position data from service worker');
           setAggregatedData(aggregated);
-          setUpdateSource('service-worker');
+          setUpdateSource('service-worker-direct');
+        } else {
+          setAggregatedData(null); 
+          setUpdateSource('service-worker-empty'); 
         }
       } else {
-        console.log('No matching wallet positions found in latest snapshot');
+        setAggregatedData(null); 
+        setUpdateSource('service-worker-empty'); 
       }
+
     } catch (error) {
-      console.error('Error handling service worker data update:', error);
-    } finally {
-      setLoading(false);
+      console.error('[UI Update] Error processing direct results:', error);
     }
-  }, [activeWallets, loading, aggregatePnLData]);
-  
+  }, [activeWallets, aggregatePnLData]);
+
   // Setup service worker message listener
   const { isConnected } = useServiceWorkerMessages({
-    onNewPositionsData: handleNewPositionsData
+    onNewPositionsData: handleNewPositionsData,
+    activeWallets: activeWallets
   });
 
   const handleSubmit = async e => {

@@ -23,7 +23,7 @@ precacheAndRoute(self.__WB_MANIFEST || []);
 
 // --- Imports ---
 // Import necessary utilities from the /src directory
-import { initializeDB, savePositionSnapshot, STORE_NAMES } from '@/utils/indexedDB';
+import { initializeDB, savePositionSnapshot, getData, STORE_NAMES } from '@/utils/indexedDB';
 import { fetchWalletPnL } from '@/utils/pnlUtils';
 import { REFRESH_INTERVALS } from '@/utils/constants';
 
@@ -41,121 +41,137 @@ let currentWallets = []; // Keep track of wallets to sync
 let syncIntervalId = DEFAULT_SYNC_INTERVAL; // Use default initially
 let lastFetchTime = 0; // Track when we last performed a fetch
 let isTimerRunning = false; // Track if a timer is already running
+let syncInProgress = false; // Track if a fetch operation is currently running
 
 const fetchAllPositions = async () => {
-  // Skip if no wallets configured
-  if (currentWallets.length === 0) {
-    console.log('[SW] No wallets to sync. Skipping fetch.');
-    return;
-  }
-  
-  console.log(`[SW] Running background sync for wallets:`, currentWallets);
-  console.log(`[SW Background Debug] Attempting fetchAllPositions at ${new Date().toISOString()}`);
-
-  // Throttle API calls - ensure minimum time between fetches
-  const now = Date.now();
-  const timeSinceLastFetch = now - lastFetchTime;
-  const throttleThreshold = MIN_FETCH_INTERVAL - THROTTLE_TOLERANCE;
-  
-  // Debug logging
-  console.log(`[SW] Time since last fetch: ${timeSinceLastFetch}ms, Threshold: ${throttleThreshold}ms (Min: ${MIN_FETCH_INTERVAL}ms, Tolerance: ${THROTTLE_TOLERANCE}ms)`);
-  
-  // Allow a small tolerance buffer to avoid throttling requests that are very close to the minimum
-  if (timeSinceLastFetch < throttleThreshold) {
-    console.log(`[SW] Throttling fetch. Will retry on next scheduled interval.`);
-    console.log(`[SW Background Debug] Throttled fetch at ${new Date().toISOString()}. Time since last: ${timeSinceLastFetch}ms`);
-    return;
-  }
-  
-  // Update last fetch time before making the API call
-  lastFetchTime = now;
-  console.log(`[SW] Starting API fetch at ${new Date(now).toLocaleTimeString()}`);
+  syncInProgress = true;
+  let fetchOutcome = { success: false, positionsFound: 0, timestamp: Date.now(), results: null }; 
 
   try {
+    // Skip if no wallets configured
+    if (currentWallets.length === 0) {
+      console.log('[SW] No wallets to sync. Skipping fetch.');
+      fetchOutcome.success = true; // Technically successful, just skipped
+      return; // Return early
+    }
+    
+    console.log(`[SW] Running background sync for wallets:`, currentWallets);
+    const startTime = Date.now(); // Use start time for fetch timestamp logic
+    fetchOutcome.timestamp = startTime;
+    console.log(`[SW Background Debug] Attempting fetchAllPositions at ${new Date(startTime).toISOString()}`);
+
+    // Throttle API calls
+    const timeSinceLastFetch = startTime - lastFetchTime;
+    const throttleThreshold = MIN_FETCH_INTERVAL - THROTTLE_TOLERANCE;
+    console.log(`[SW] Time since last fetch: ${timeSinceLastFetch}ms, Threshold: ${throttleThreshold}ms (Min: ${MIN_FETCH_INTERVAL}ms, Tolerance: ${THROTTLE_TOLERANCE}ms)`);
+    if (timeSinceLastFetch < throttleThreshold) {
+      console.log(`[SW] Throttling fetch. Will retry on next scheduled interval.`);
+      fetchOutcome.success = false; // Throttled, not successful fetch
+      return; // Return early if throttled
+    }
+    
+    // Update last fetch time *before* making the API call
+    lastFetchTime = startTime;
+    console.log(`[SW] Starting API fetch at ${new Date(startTime).toLocaleTimeString()}`);
+
+    // --- Actual Fetch Logic ---
     const db = await initializeDB();
     if (!db) {
       console.error('[SW] Failed to initialize DB for sync.');
-      return;
+      return; // DB failure, don't proceed
     }
 
-    // Fetch data for all wallets concurrently
-    const results = await Promise.all(
-      currentWallets.map(wallet => fetchWalletPnL(wallet)) // Use imported fetchWalletPnL
+    // Fetch and store results directly in the outcome object
+    fetchOutcome.results = await Promise.all(
+      currentWallets.map(wallet => fetchWalletPnL(wallet))
     );
 
-    // Filter out null/error results and flatten positions
-    const allPositions = results
-                            .filter(data => data && !data.error && Array.isArray(data.positions)) // Check for error property
+    const allPositions = fetchOutcome.results
+                            .filter(data => data && !data.error && Array.isArray(data.positions))
                             .flatMap(data => data.positions);
+                            
+    fetchOutcome.positionsFound = allPositions.length;
 
     if (allPositions.length > 0) {
       console.log(`[SW] Saving snapshot for ${allPositions.length} total positions.`);
-      // Use imported savePositionSnapshot
-      const success = await savePositionSnapshot(db, allPositions); 
+      const success = await savePositionSnapshot(db, allPositions);
       if (!success) {
         console.error('[SW] Failed to save combined position snapshot.');
+        fetchOutcome.success = false; // Mark as failed if save failed
       } else {
-        // Notify all clients about the new data
-        try {
-          // Get all clients, including uncontrolled ones
-          const clients = await self.clients.matchAll({
-            type: 'window',
-            includeUncontrolled: true
-          });
-          
-          if (clients.length === 0) {
-            console.log('[SW] No active clients found to notify about new data.');
-          } else {
-            console.log(`[SW] Found ${clients.length} client(s) to notify about new data.`);
-            
-            // Send message to each client
-            clients.forEach(client => {
-              try {
-                client.postMessage({
-                  type: 'NEW_POSITIONS_DATA',
-                  timestamp: now,
-                  count: allPositions.length
-                });
-                console.log(`[SW] Notified client: ${client.id} (URL: ${client.url})`);
-              } catch (err) {
-                console.error(`[SW] Failed to notify client ${client.id}:`, err);
-              }
-            });
-          }
-        } catch (error) {
-          console.error('[SW] Error notifying clients about new data:', error);
-        }
+        fetchOutcome.success = true; // Mark as successful
       }
     } else {
-      console.log('[SW] No valid positions found across all wallets to save.');
+      const fetchErrors = fetchOutcome.results.filter(data => data && data.error);
+      if (fetchErrors.length > 0) {
+          console.warn(`[SW] Fetched data contained errors for ${fetchErrors.length} wallet(s). No valid positions saved.`);
+          fetchOutcome.success = false; // Consider fetch with errors as not fully successful
+      } else {
+          console.log('[SW] No valid positions found across all wallets to save.');
+          fetchOutcome.success = true; // Successful fetch, just no data
+      }
     }
 
   } catch (error) {
     console.error('[SW] Error during fetchAllPositions:', error);
+    fetchOutcome.success = false; // Mark as failed on general error
   } finally {
+      syncInProgress = false;
       console.log(`[SW Background Debug] Completed fetchAllPositions attempt at ${new Date().toISOString()}`);
+
+      // Always notify clients about the attempt completion in finally block
+      try {
+          const clients = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+          if (clients.length > 0) {
+            clients.forEach(client => {
+              try {
+                client.postMessage({
+                  type: 'NEW_POSITIONS_DATA', 
+                  timestamp: fetchOutcome.timestamp, 
+                  success: fetchOutcome.success, 
+                  results: fetchOutcome.results, 
+                  completed: true 
+                });
+              } catch (err) {
+                console.error(`[SW Finally Notify] Failed to notify client ${client.id}:`, err);
+              }
+            });
+          }
+      } catch (error) {
+        console.error('[SW Finally Notify] Error notifying clients:', error);
+      }
   }
 };
 
-// Handle the FORCE_SYNC message type
-const handleForceSync = async () => {
-  // Only allow forced sync if enough time has passed since last fetch
-  const now = Date.now();
-  const timeSinceLastFetch = now - lastFetchTime;
-  const throttleThreshold = MIN_FETCH_INTERVAL - THROTTLE_TOLERANCE;
-  
-  // Debug logging
-  console.log(`[SW] Time since last fetch: ${timeSinceLastFetch}ms, Threshold: ${throttleThreshold}ms (Min: ${MIN_FETCH_INTERVAL}ms, Tolerance: ${THROTTLE_TOLERANCE}ms)`);
-  
-  if (timeSinceLastFetch < throttleThreshold) {
-    console.log(`[SW] Throttling forced sync. Will retry later.`);
+/**
+ * Gatekeeper function to request a sync attempt.
+ * Prevents multiple concurrent executions of fetchAllPositions.
+ */
+const requestSyncAttempt = async () => {
+  if (syncInProgress) {
+    console.log('[SW Request Sync] Sync already in progress. Request ignored.');
     return;
   }
-  
-  console.log('[SW] Forcing immediate sync');
+  console.log('[SW Request Sync] Initiating sync attempt.');
   await fetchAllPositions();
 };
 
+/**
+ * Handles the FORCE_SYNC message type from the UI.
+ * Uses the requestSyncAttempt gatekeeper.
+ */
+const handleForceSync = async () => {
+  console.log('[SW] Received FORCE_SYNC message. Requesting sync attempt.');
+  // The actual throttling check is now inside fetchAllPositions,
+  // called via the requestSyncAttempt gatekeeper.
+  await requestSyncAttempt();
+};
+
+/**
+ * Starts the periodic background sync timer.
+ * Ensures any existing timer is stopped first.
+ * Uses the requestSyncAttempt gatekeeper.
+ */
 const startSyncTimer = () => {
   // If a timer is already running, clear it first
   stopSyncTimer();
@@ -173,15 +189,16 @@ const startSyncTimer = () => {
     isTimerRunning
   });
   
-  // Run immediately first time
-  fetchAllPositions(); 
+  // Run immediately first time via the gatekeeper
+  console.log('[SW Timer Debug] Requesting initial sync attempt on timer start.');
+  requestSyncAttempt(); 
   
   // Create new timer
   syncTimer = setInterval(() => {
     const currentTime = new Date().toISOString();
     console.log(`[SW Timer Debug] 🔄 Timer tick at ${currentTime}`);
-    console.log(`[SW Background Debug] Timer tick - initiating fetch check at ${currentTime}`);
-    fetchAllPositions();
+    console.log(`[SW Background Debug] Timer tick - initiating sync check via gatekeeper at ${currentTime}`);
+    requestSyncAttempt(); // Use gatekeeper for subsequent ticks
   }, syncIntervalId);
 };
 
@@ -209,13 +226,31 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   console.log('[SW] Activated');
-  event.waitUntil(self.clients.claim());
-  // Initialize DB on activation to ensure stores are created
-  event.waitUntil(initializeDB().then(() => {
+  // Claim clients immediately and then proceed with initialization and requests
+  event.waitUntil(self.clients.claim().then(() => {
+    // After claiming, initialize DB and load initial state directly
+    return initializeDB().then(async (db) => { // Get DB instance
       console.log('[SW] DB initialized on activation.');
-      // Initialize lastFetchTime to prevent incorrect throttling on first run
+      if (!db) {
+        console.error('[SW Activate] Failed to get DB instance for initial load.');
+        return; 
+      }
+
+      // Initialize lastFetchTime
       lastFetchTime = Date.now(); 
       console.log(`[SW] Initialized lastFetchTime to ${new Date(lastFetchTime).toISOString()}`);
+      
+      // Load active wallets directly from IndexedDB
+      try {
+        const activeWalletsData = await getData(db, STORE_NAMES.WALLETS, 'activeWallets');
+        const loadedWallets = activeWalletsData?.value || [];
+        currentWallets = Array.isArray(loadedWallets) ? loadedWallets : []; 
+      } catch (error) {
+        console.error('[SW Activate] Error loading wallets directly from DB:', error);
+        currentWallets = []; // Default to empty on error
+      }
+
+    });
   }));
 });
 

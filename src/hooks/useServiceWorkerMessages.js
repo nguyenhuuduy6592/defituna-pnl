@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { postMessageToSW } from '@/utils/serviceWorkerUtils'; // Import the utility
 
 /**
  * Simple debounce function to prevent multiple rapid calls
@@ -50,38 +51,32 @@ export const useServiceWorkerMessages = ({ onNewPositionsData }) => {
   const listenerAddedRef = useRef(false);
   const callbackRef = useRef(onNewPositionsData);
   
-  // Update the callback ref whenever the passed callback changes
   useEffect(() => {
     callbackRef.current = onNewPositionsData;
   }, [onNewPositionsData]);
   
-  // Create a stable debounced handler that always uses the latest callback
-  const stablePositionHandler = useRef(
-    debounce((data) => {
-      if (typeof callbackRef.current === 'function') {
-        console.log('Executing debounced position data handler');
-        callbackRef.current(data);
-      }
-    }, 1000)
-  ).current;
-  
-  // Create a stable message handler that doesn't change on rerenders
   const stableMessageHandler = useRef((event) => {
     console.log('[SW Message]', event.data);
-    
-    // Store the last message received
     setLastMessage(event.data);
     
-    // Handle specific message types
-    if (event.data && event.data.type === 'NEW_POSITIONS_DATA') {
-      // Check if this message has a timestamp and if it's newer than the last one we handled
-      if (event.data.timestamp && event.data.timestamp > lastHandledTimestampRef.current) {
-        lastHandledTimestampRef.current = event.data.timestamp;
-        console.log('Received new positions data notification:', event.data);
-        stablePositionHandler(event.data);
-      } else {
-        console.log('Skipping duplicate/old position data message');
-      }
+    if (!event.data || !event.data.type) return;
+
+    switch (event.data.type) {
+      case 'NEW_POSITIONS_DATA':
+        if (event.data.timestamp && event.data.timestamp > lastHandledTimestampRef.current) {
+          lastHandledTimestampRef.current = event.data.timestamp;
+          console.log('Received new positions data notification:', event.data);
+          if (typeof callbackRef.current === 'function') {
+            callbackRef.current(event.data);
+          } 
+        } else {
+          console.log('Skipping duplicate/old position data message');
+        }
+        break;
+
+      default:
+        console.log('[UI] Received unhandled message type from SW:', event.data.type);
+        break;
     }
   }).current;
   
@@ -122,14 +117,16 @@ export const useServiceWorkerMessages = ({ onNewPositionsData }) => {
         console.log('Service worker message listener removed (component unmounted)');
       }
     };
-  }, []); // Empty dependency array means this runs once on mount
+  }, [stableMessageHandler]);
   
   // Also set up a visibility change listener to check for updates when the tab becomes visible
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         console.log('[SW] Tab became visible, checking for updates');
-        checkForUpdates(stableMessageHandler);
+        if (typeof callbackRef.current === 'function') {
+          checkForUpdates(callbackRef.current);
+        }
       }
     };
     
@@ -138,11 +135,15 @@ export const useServiceWorkerMessages = ({ onNewPositionsData }) => {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [stableMessageHandler]);
+  }, []);
   
   return {
     lastMessage,
     isConnected,
-    forceCheck: () => checkForUpdates(stableMessageHandler)
+    forceCheck: () => {
+       if (typeof callbackRef.current === 'function') {
+           checkForUpdates(callbackRef.current);
+       }
+    }
   };
 }; 
