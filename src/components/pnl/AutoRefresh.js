@@ -99,13 +99,6 @@ export const AutoRefresh = ({
     const newInterval = parseInt(e.target.value, 10);
     console.log(`[AutoRefresh Component] handleIntervalChange: NewInterval=${newInterval}`);
     
-    // Send new interval to service worker
-    console.log(`[AutoRefresh Component] Posting SET_INTERVAL (${newInterval}) to SW.`);
-    postMessageToSW({ 
-      type: 'SET_INTERVAL', 
-      interval: newInterval 
-    });
-    
     // Still update UI
     if (onIntervalChange) {
       console.log('[AutoRefresh Component] Calling onIntervalChange prop.');

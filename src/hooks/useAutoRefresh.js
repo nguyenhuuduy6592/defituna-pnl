@@ -132,10 +132,6 @@ export const useAutoRefresh = (initialInterval = REFRESH_INTERVALS.DEFAULT) => {
     // Pass db instance to the debounced function
     debounce(async (intervalToSave, db) => { 
       console.log(`[Save Interval Debug] Debounced function EXECUTION for interval: ${intervalToSave}`); // Log execution start
-      if (!initialLoadComplete.current) {
-        console.log('[Save Interval Debug] Skipping save: Initial load not complete.');
-        return;
-      }
       
       // Use the passed db instance
       if (!db) { 
