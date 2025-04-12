@@ -7,7 +7,7 @@ const nextConfig = {
   },
   experimental: {
     turbo: {
-      enabled: true // Enable Turbopack
+      enabled: false // Disable Turbopack to allow service worker
     }
   },
   headers: async () => [
@@ -33,12 +33,9 @@ const nextConfig = {
 };
 
 export default withPWA({
-  dest: 'public', // RESTORED: Ensure SW is output to public directory
-  // disable: process.env.NODE_ENV === 'development', // Keep REMOVED
+  dest: 'public',
   swSrc: 'src/service-worker/index.js',
-  // swDest: 'public/service-worker.js', // Keep REMOVED (dest handles this)
-  register: true, // Keep registration enabled
+  register: true,
   skipWaiting: true,
-  // runtimeCaching: [], // Keep REMOVED
   buildExcludes: [/middleware-manifest\.json$/],
 })(nextConfig);

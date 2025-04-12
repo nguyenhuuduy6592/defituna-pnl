@@ -75,7 +75,6 @@ const fetchAllPositions = async () => {
 };
 
 const startSyncTimer = () => {
-  if (syncTimer) clearInterval(syncTimer); // Clear existing timer
   console.log(`[SW] Starting background sync timer with interval: ${syncIntervalId / 1000}s`);
   // Run immediately first time
   fetchAllPositions(); 
@@ -114,23 +113,6 @@ self.addEventListener('message', (event) => {
     case 'SET_WALLETS':
       currentWallets = event.data.wallets || [];
       console.log('[SW] Updated wallets for sync:', currentWallets);
-      if (!syncTimer && currentWallets.length > 0) {
-        startSyncTimer();
-      } else if (syncTimer && currentWallets.length === 0) {
-        stopSyncTimer(); // Stop if no wallets left
-      }
-      break;
-    case 'SET_INTERVAL':
-      const newInterval = Number(event.data.interval) * 1000;
-      if (!isNaN(newInterval) && newInterval > 0) {
-        syncIntervalId = newInterval;
-        console.log(`[SW] Sync interval updated to: ${syncIntervalId / 1000}s`);
-        if (syncTimer) {
-          startSyncTimer(); // Restart timer with new interval
-        }
-      } else {
-        console.warn(`[SW] Received invalid interval: ${event.data.interval}`);
-      }
       break;
     case 'START_SYNC':
       console.log('[SW] Received START_SYNC message.');
@@ -143,6 +125,18 @@ self.addEventListener('message', (event) => {
     case 'STOP_SYNC':
       console.log('[SW] Received STOP_SYNC message.');
       stopSyncTimer();
+      break;
+    case 'SET_INTERVAL':
+      const newInterval = Number(event.data.interval) * 1000;
+      if (!isNaN(newInterval) && newInterval > 0) {
+        syncIntervalId = newInterval;
+        console.log(`[SW] Sync interval updated to: ${syncIntervalId / 1000}s`);
+        if (syncTimer) {
+          startSyncTimer(); // Restart timer with new interval
+        }
+      } else {
+        console.warn(`[SW] Received invalid interval: ${event.data.interval}`);
+      }
       break;
     default:
       console.warn('[SW] Received unknown message type:', event.data.type);
