@@ -181,7 +181,6 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
             dot={false} 
             activeDot={{ r: 6 }}
             name="PnL ($)"
-            connectNulls={true}
           />
         )}
         {activeMetrics.totalYield && (
@@ -193,7 +192,6 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
             dot={false}
             activeDot={{ r: 6 }}
             name="Yield + Compound ($)"
-            connectNulls={true}
           />
         )}
       </LineChart>

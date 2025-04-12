@@ -7,11 +7,10 @@ import { exportChartAsImage, shareCard } from '@/utils/export';
 // Mock dependencies
 jest.mock('recharts', () => ({
   LineChart: ({ children }) => <div data-testid="line-chart">{children}</div>,
-  Line: ({ name, dataKey, connectNulls }) => (
+  Line: ({ name, dataKey }) => (
     <div 
       data-testid={`line-${dataKey}`} 
       data-name={name} 
-      data-connect-nulls={connectNulls}
     >
       {name}
     </div>
@@ -173,10 +172,6 @@ describe('PositionChart', () => {
     expect(visibleChart.getByTestId('line-chart')).toBeInTheDocument();
     expect(visibleChart.getByTestId('line-pnl')).toBeInTheDocument();
     expect(visibleChart.getByTestId('line-totalYield')).toBeInTheDocument();
-
-    // Assert that connectNulls is true for both lines within the visible chart
-    expect(visibleChart.getByTestId('line-pnl')).toHaveAttribute('data-connect-nulls', 'true');
-    expect(visibleChart.getByTestId('line-totalYield')).toHaveAttribute('data-connect-nulls', 'true');
 
     // Check for other chart elements within the visible chart
     expect(visibleChart.getByTestId('reference-line')).toBeInTheDocument();
