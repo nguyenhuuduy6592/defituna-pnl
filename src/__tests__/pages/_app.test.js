@@ -89,25 +89,6 @@ describe('App Component (_app.js)', () => {
     });
   });
 
-  it('does not attempt to register service worker if not in production', () => {
-    process.env.NODE_ENV = 'development'; // Set to non-production
-
-    // Fake window.addEventListener
-    const map = {};
-    window.addEventListener = jest.fn((event, cb) => {
-      map[event] = cb;
-    });
-
-    render(<App Component={MockComponent} pageProps={mockPageProps} />);
-
-    // Simulate window load event
-    act(() => {
-       if (map.load) map.load();
-    });
-
-    expect(navigator.serviceWorker.register).not.toHaveBeenCalled();
-  });
-  
   it('logs an error if service worker registration fails', async () => {
     const registrationError = new Error('Registration Failed');
     navigator.serviceWorker.register.mockImplementationOnce(() => Promise.reject(registrationError));

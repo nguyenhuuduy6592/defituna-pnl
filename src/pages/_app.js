@@ -7,7 +7,7 @@ import styles from '@/styles/AppVersion.module.scss';
 export default function App({ Component, pageProps }) {
   // Register service worker
   useEffect(() => {
-    if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+    if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/service-worker.js')

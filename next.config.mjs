@@ -37,5 +37,6 @@ export default withPWA({
   swSrc: 'src/service-worker/index.js',
   register: true,
   skipWaiting: true,
+  disable: false,
   buildExcludes: [/middleware-manifest\.json$/],
 })(nextConfig);
