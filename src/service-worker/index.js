@@ -213,6 +213,9 @@ self.addEventListener('activate', (event) => {
   // Initialize DB on activation to ensure stores are created
   event.waitUntil(initializeDB().then(() => {
       console.log('[SW] DB initialized on activation.');
+      // Initialize lastFetchTime to prevent incorrect throttling on first run
+      lastFetchTime = Date.now(); 
+      console.log(`[SW] Initialized lastFetchTime to ${new Date(lastFetchTime).toISOString()}`);
   }));
 });
 
