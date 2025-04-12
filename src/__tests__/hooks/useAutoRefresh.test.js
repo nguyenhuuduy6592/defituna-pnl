@@ -75,7 +75,7 @@ describe('useAutoRefresh', () => {
       await new Promise(resolve => setTimeout(resolve, 0));
     });
 
-    expect(result.current.error).toBe('Failed to load auto-refresh settings');
+    expect(result.current.error).toBe(`Failed to load settings: DB Init Failed`);
   });
 
   it('should update auto-refresh state and save to IndexedDB', async () => {

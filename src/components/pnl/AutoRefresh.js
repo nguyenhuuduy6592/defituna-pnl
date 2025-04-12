@@ -51,6 +51,7 @@ const IntervalSelector = ({ value, onChange }) => (
  * @param {boolean} props.historyEnabled Whether historical data storage is enabled
  * @param {Function} props.onHistoryToggle Handler for history toggle changes
  * @param {boolean} props.isRefreshing Whether a refresh is currently in progress (visual only)
+ * @param {boolean} props.isLoading Whether the initial hook settings are loading
  */
 export const AutoRefresh = ({
   autoRefresh,
@@ -61,27 +62,45 @@ export const AutoRefresh = ({
   loading,
   historyEnabled,
   onHistoryToggle,
-  isRefreshing = false
+  isRefreshing = false,
+  isLoading = false
 }) => {
+
+  console.log('[AutoRefresh Component] Rendering with props:', {
+    autoRefresh,
+    refreshInterval,
+    autoRefreshCountdown,
+    loading,
+    historyEnabled,
+    isRefreshing,
+    isLoading
+  });
+
   // Update to handle toggling through service worker
   const handleAutoRefreshToggle = useCallback((e) => {
     const isChecked = e.target.checked;
+    console.log(`[AutoRefresh Component] handleAutoRefreshToggle: Checked=${isChecked}, CurrentInterval=${refreshInterval}`);
     
     // Send message to service worker to start/stop sync
+    const messageType = isChecked ? 'START_SYNC' : 'STOP_SYNC';
+    console.log(`[AutoRefresh Component] Posting ${messageType} to SW.`);
     postMessageToSW({ 
-      type: isChecked ? 'START_SYNC' : 'STOP_SYNC',
+      type: messageType, 
       interval: refreshInterval
     });
     
     // Still update UI state
+    console.log('[AutoRefresh Component] Calling setAutoRefresh prop.');
     setAutoRefresh(isChecked);
   }, [setAutoRefresh, refreshInterval]);
 
   // Update interval change to also notify service worker
   const handleIntervalChange = useCallback((e) => {
     const newInterval = parseInt(e.target.value, 10);
+    console.log(`[AutoRefresh Component] handleIntervalChange: NewInterval=${newInterval}`);
     
     // Send new interval to service worker
+    console.log(`[AutoRefresh Component] Posting SET_INTERVAL (${newInterval}) to SW.`);
     postMessageToSW({ 
       type: 'SET_INTERVAL', 
       interval: newInterval 
@@ -89,7 +108,10 @@ export const AutoRefresh = ({
     
     // Still update UI
     if (onIntervalChange) {
+      console.log('[AutoRefresh Component] Calling onIntervalChange prop.');
       onIntervalChange(e);
+    } else {
+      console.warn('[AutoRefresh Component] onIntervalChange prop is missing!');
     }
   }, [onIntervalChange]);
 
