@@ -136,16 +136,16 @@ describe('AutoRefresh Component', () => {
       process.env.NODE_ENV = originalNodeEnv;
     });
 
-    it.skip('includes 5 second option in development', () => {
+    it('includes 10 second option in development', () => {
       const originalNodeEnv = process.env.NODE_ENV;
       
-      // Test development environment (includes 5 second option)
+      // Test development environment (includes 10 second option)
       process.env.NODE_ENV = 'development';
       render(<AutoRefresh {...defaultProps} autoRefresh={true} />);
       
       const selectDev = screen.getByRole('combobox');
       const optionsDev = Array.from(selectDev.children).map(option => option.value);
-      expect(optionsDev).toEqual(['5', '30', '60', '300']);
+      expect(optionsDev).toEqual(['10', '30', '60', '300']);
       
       // Cleanup
       process.env.NODE_ENV = originalNodeEnv;

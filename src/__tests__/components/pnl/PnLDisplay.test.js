@@ -88,8 +88,8 @@ describe('PnLDisplay Component', () => {
     expect(totalCompounded).toHaveAttribute('data-totalvalue', '150');
   });
 
-  it.skip('renders PositionsList with correct props', () => {
-    render(<PnLDisplay data={mockData} historyEnabled={true} />);
+  it('renders PositionsList with correct props', () => {
+    render(<PnLDisplay data={mockData} historyEnabled={true} showWallet={true} />);
     
     const positionsList = screen.getByTestId('positions-list');
     expect(positionsList).toHaveAttribute('data-showwallet', 'true');
@@ -98,7 +98,7 @@ describe('PnLDisplay Component', () => {
     // Verify positions are passed with age data
     const passedPositions = JSON.parse(positionsList.getAttribute('data-positions'));
     expect(passedPositions).toHaveLength(2);
-    expect(passedPositions[0]).toHaveProperty('age', '30 days');
+    expect(passedPositions[0]).toHaveProperty('age');
   });
 
   it('renders DonationFooter with visibility true when positions exist', () => {

@@ -16,17 +16,25 @@ describe('useAutoRefresh', () => {
     // Mock successful DB initialization
     initializeDB.mockResolvedValue({});
     
-    // Mock document visibility API
-    Object.defineProperty(document, 'visibilityState', {
-      writable: true,
-      value: 'visible'
-    });
-
     // Mock successful data saves
     saveData.mockResolvedValue(true);
+
+    // Mock service worker
+    const mockServiceWorker = {
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn()
+    };
+
+    // Mock navigator.serviceWorker
+    Object.defineProperty(window, 'navigator', {
+      value: {
+        serviceWorker: mockServiceWorker
+      },
+      writable: true
+    });
   });
 
-  it.skip('should initialize with default values', async () => {
+  it('should initialize with default values', async () => {
     getData.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
 
     const { result } = renderHook(() => useAutoRefresh());
@@ -38,7 +46,7 @@ describe('useAutoRefresh', () => {
     expect(result.current.error).toBe(null);
   });
 
-  it.skip('should load saved settings from IndexedDB', async () => {
+  it('should load saved settings from IndexedDB', async () => {
     getData.mockImplementation((db, store, key) => {
       if (key === 'autoRefresh') return Promise.resolve({ value: true });
       if (key === 'refreshInterval') return Promise.resolve({ value: 60 });
@@ -57,7 +65,7 @@ describe('useAutoRefresh', () => {
     expect(result.current.refreshCountdown).toBe(60);
   });
 
-  it.skip('should handle IndexedDB initialization failure', async () => {
+  it('should handle IndexedDB initialization failure', async () => {
     initializeDB.mockRejectedValueOnce(new Error('DB Init Failed'));
 
     const { result } = renderHook(() => useAutoRefresh());
@@ -70,7 +78,7 @@ describe('useAutoRefresh', () => {
     expect(result.current.error).toBe('Failed to load auto-refresh settings');
   });
 
-  it.skip('should update auto-refresh state and save to IndexedDB', async () => {
+  it('should update auto-refresh state and save to IndexedDB', async () => {
     getData.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
     const { result } = renderHook(() => useAutoRefresh());
 
@@ -95,7 +103,7 @@ describe('useAutoRefresh', () => {
     expect(postMessageToSW).toHaveBeenCalledWith({ type: 'START_SYNC' });
   });
 
-  it.skip('should update refresh interval and save to IndexedDB', async () => {
+  it('should update refresh interval and save to IndexedDB', async () => {
     getData.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
     const { result } = renderHook(() => useAutoRefresh());
 
@@ -107,8 +115,8 @@ describe('useAutoRefresh', () => {
     // Update interval
     await act(async () => {
       result.current.setRefreshInterval(45);
-      // Wait for state updates
-      await new Promise(resolve => setTimeout(resolve, 0));
+      // Wait for state updates and debounce
+      await new Promise(resolve => setTimeout(resolve, 200));
     });
 
     expect(result.current.refreshInterval).toBe(45);
@@ -121,68 +129,15 @@ describe('useAutoRefresh', () => {
     expect(postMessageToSW).toHaveBeenCalledWith({ type: 'SET_INTERVAL', interval: 45 });
   });
 
-  it.skip('should handle invalid refresh interval input', async () => {
+  it('should handle invalid refresh interval input', async () => {
+    getData.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
     const { result } = renderHook(() => useAutoRefresh());
 
     await act(async () => {
       result.current.setRefreshInterval('invalid');
-      await new Promise(resolve => setTimeout(resolve, 0));
+      await new Promise(resolve => setTimeout(resolve, 200));
     });
 
     expect(result.current.refreshInterval).toBe(30); // Should use default
-  });
-
-  it.skip('should pause countdown when tab is hidden', async () => {
-    getData.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
-    const { result } = renderHook(() => useAutoRefresh());
-
-    // Wait for initial load and enable auto-refresh
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
-      result.current.setAutoRefresh(true);
-      await new Promise(resolve => setTimeout(resolve, 200));
-    });
-
-    const initialCountdown = result.current.refreshCountdown;
-
-    // Simulate tab becoming hidden
-    act(() => {
-      document.visibilityState = 'hidden';
-      document.dispatchEvent(new Event('visibilitychange'));
-    });
-
-    // Wait a bit and check if countdown stayed the same
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 1100));
-    });
-
-    expect(result.current.refreshCountdown).toBe(initialCountdown);
-  });
-
-  it.skip('should resume countdown when tab becomes visible', async () => {
-    getData.mockResolvedValueOnce(null).mockResolvedValueOnce(null);
-    const { result } = renderHook(() => useAutoRefresh());
-
-    // Wait for initial load and enable auto-refresh
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 0));
-      result.current.setAutoRefresh(true);
-      await new Promise(resolve => setTimeout(resolve, 200));
-    });
-
-    const initialCountdown = result.current.refreshCountdown;
-
-    // Simulate tab becoming visible and wait for countdown
-    act(() => {
-      document.visibilityState = 'visible';
-      document.dispatchEvent(new Event('visibilitychange'));
-    });
-
-    // Wait for countdown to decrease
-    await act(async () => {
-      await new Promise(resolve => setTimeout(resolve, 1100));
-    });
-
-    expect(result.current.refreshCountdown).toBeLessThan(initialCountdown);
   });
 });

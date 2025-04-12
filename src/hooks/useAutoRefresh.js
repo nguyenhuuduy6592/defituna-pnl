@@ -42,7 +42,6 @@ export const useAutoRefresh = (initialInterval = REFRESH_INTERVALS.DEFAULT) => {
   const [refreshCountdown, setRefreshCountdown] = useState(initialInterval);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  const isVisibleRef = useRef(true);
 
   // Ref to track if initial load is complete
   const initialLoadComplete = useRef(false);
@@ -159,19 +158,6 @@ export const useAutoRefresh = (initialInterval = REFRESH_INTERVALS.DEFAULT) => {
   );
 
   /**
-   * Update visibility state when tab visibility changes
-   */
-  const handleVisibilityChange = useCallback(() => {
-    isVisibleRef.current = document.visibilityState === 'visible';
-  }, []);
-
-  // Set up visibility change listener
-  useEffect(() => {
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [handleVisibilityChange]);
-
-  /**
    * Reset countdown when interval changes 
    */
   useEffect(() => {
@@ -184,10 +170,10 @@ export const useAutoRefresh = (initialInterval = REFRESH_INTERVALS.DEFAULT) => {
    * Note: The actual refresh is handled by the service worker, this is just for UI feedback
    */
   useEffect(() => {
-    // Timer only runs if autoRefresh is on AND tab is visible
-    if (!autoRefresh || !isVisibleRef.current) {
+    // Timer only runs if autoRefresh is on
+    if (!autoRefresh) {
       console.log('[Timer Debug] ⏹️ Timer stopped:', {
-        reason: !autoRefresh ? 'auto-refresh disabled' : 'tab hidden',
+        reason: 'auto-refresh disabled',
         resettingTo: refreshInterval
       });
       setRefreshCountdown(refreshInterval);
@@ -242,8 +228,12 @@ export const useAutoRefresh = (initialInterval = REFRESH_INTERVALS.DEFAULT) => {
       }
     };
 
-    navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
-    return () => navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+    // Only add listener if service worker is available
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+      return () => navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+    }
+    return () => {}; // Return empty cleanup function if no service worker
   }, [refreshInterval]);
 
   /**
