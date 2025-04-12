@@ -185,6 +185,9 @@ export default () => {
     isRefreshing
   } = useAutoRefresh();
 
+  // Combine general loading and auto-refresh loading states
+  const isDataLoading = loading || isRefreshing;
+
   // This handler no longer needs to trigger data fetching - it just updates the interval in the UI
   const handleIntervalChange = (e) => {
     const newInterval = parseInt(e.target.value);
@@ -412,7 +415,7 @@ export default () => {
           refreshInterval={refreshInterval}
           onIntervalChange={handleIntervalChange}
           autoRefreshCountdown={refreshCountdown}
-          loading={loading}
+          loading={isDataLoading}
           historyEnabled={historyEnabled}
           onHistoryToggle={toggleHistoryEnabled}
           isRefreshing={isRefreshing}
@@ -425,13 +428,13 @@ export default () => {
           errorMessage={errorMessage}
           showWallet={true}
           historyEnabled={historyEnabled}
-          loading={loading}
+          loading={isDataLoading}
           lastUpdateSource={updateSource}
           positionsHistory={allPositionsHistory}
         />
       )}
 
-      {!loading && !errorMessage && !aggregatedData && activeWallets.length > 0 && (
+      {!isDataLoading && !errorMessage && !aggregatedData && activeWallets.length > 0 && (
          <div className={styles.noDataMessage}>No position data found for the selected wallet(s).</div>
       )}
       

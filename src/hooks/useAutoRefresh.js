@@ -166,6 +166,32 @@ export const useAutoRefresh = (initialInterval = REFRESH_INTERVALS.DEFAULT) => {
   }, [refreshInterval]);
 
   /**
+   * Handle service worker messages to reset countdown
+   */
+  useEffect(() => {
+    const handleServiceWorkerMessage = (event) => {
+      const message = event.data;
+      
+      if (message.type === 'NEW_POSITIONS_DATA') {
+        console.log('[Timer Debug] 🔄 Received new data:', {
+          timestamp: new Date().toISOString(),
+          resettingTo: refreshInterval
+        });
+        // Reset countdown and refreshing state immediately
+        setIsRefreshing(false);
+        setRefreshCountdown(refreshInterval);
+      }
+    };
+
+    // Only add listener if service worker is available
+    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
+      return () => navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
+    }
+    return () => {}; // Return empty cleanup function if no service worker
+  }, [refreshInterval]);
+
+  /**
    * Visual countdown timer useEffect - only for UI display
    * Note: The actual refresh is handled by the service worker, this is just for UI feedback
    */
@@ -188,18 +214,24 @@ export const useAutoRefresh = (initialInterval = REFRESH_INTERVALS.DEFAULT) => {
 
     const timer = setInterval(() => {
       setRefreshCountdown((prev) => {
-        const next = prev <= 1 ? 0 : prev - 1;
-        console.log('[Timer Debug] 📉 Countdown tick:', {
-          from: prev,
-          to: next,
-          isRefreshing: prev <= 1
-        });
-
+        // Ensure countdown doesn't go below 1 to prevent early triggers
+        const next = prev <= 1 ? 1 : prev - 1;
+        
+        // Only set refreshing state when countdown reaches 1
         if (prev <= 1) {
           setIsRefreshing(true);
-          // Trigger a sync when we reach zero
+          // Trigger a sync when we reach the end
           postMessageToSW({ type: 'FORCE_SYNC' });
         }
+        else {
+          console.log('[Timer Debug] 📉 Countdown tick:', {
+            from: prev,
+            to: next,
+            isRefreshing: prev <= 1
+          });
+
+        }
+        
         return next;
       });
     }, REFRESH_INTERVALS.SECONDS);
@@ -209,32 +241,6 @@ export const useAutoRefresh = (initialInterval = REFRESH_INTERVALS.DEFAULT) => {
       clearInterval(timer);
     };
   }, [autoRefresh, refreshInterval]);
-
-  // Handle service worker messages to reset countdown
-  useEffect(() => {
-    const handleServiceWorkerMessage = (event) => {
-      const message = event.data;
-      
-      if (message.type === 'NEW_POSITIONS_DATA') {
-        console.log('[Timer Debug] 🔄 Received new data:', {
-          timestamp: new Date().toISOString(),
-          resettingTo: refreshInterval
-        });
-        // Small delay to ensure UI shows refreshing state
-        setTimeout(() => {
-          setIsRefreshing(false);
-          setRefreshCountdown(refreshInterval);
-        }, 500);
-      }
-    };
-
-    // Only add listener if service worker is available
-    if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator && navigator.serviceWorker) {
-      navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
-      return () => navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
-    }
-    return () => {}; // Return empty cleanup function if no service worker
-  }, [refreshInterval]);
 
   /**
    * Update auto-refresh state
