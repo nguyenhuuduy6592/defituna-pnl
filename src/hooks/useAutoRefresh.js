@@ -3,11 +3,6 @@ import { initializeDB, getData, saveData, STORE_NAMES } from '@/utils/indexedDB'
 import { postMessageToSW } from '@/utils/serviceWorkerUtils';
 import { REFRESH_INTERVALS } from '@/utils/constants';
 
-// Constants
-const DEFAULT_INTERVAL = 30;
-const AUTO_REFRESH_KEY = 'autoRefresh';
-const REFRESH_INTERVAL_KEY = 'refreshInterval';
-
 // --- Debounce Utility ---
 function debounce(func, wait) {
   let timeout;
@@ -59,9 +54,11 @@ export const useAutoRefresh = (initialInterval = REFRESH_INTERVALS.DEFAULT) => {
         
         // First, load saved settings
         const autoRefreshData = await getData(db, STORE_NAMES.SETTINGS, 'autoRefresh');
+        console.log('[Auto-Refresh] Auto-Refresh Data:', autoRefreshData);
         const loadedAutoRefresh = autoRefreshData?.value === true;
         
         const intervalData = await getData(db, STORE_NAMES.SETTINGS, 'refreshInterval');
+        console.log('[Auto-Refresh] Interval Data:', intervalData);
         const savedInterval = Number(intervalData?.value);
         let effectiveInterval = initialInterval;
         
