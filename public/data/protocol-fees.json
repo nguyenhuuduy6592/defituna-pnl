@@ -1,0 +1,550 @@
+{
+  "lastUpdatedTimestamp": 1744564485,
+  "feesByToken": [
+    {
+      "mint": "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",
+      "symbol": "JLP",
+      "decimals": 0,
+      "totalAmountRaw": "1.480914",
+      "totalAmountUI": 1.480914,
+      "lastTransactionTime": 1739537268000,
+      "dailyFees": [
+        {
+          "date": "2025-02-14",
+          "amountRaw": "0.228086",
+          "amountUI": 0.228086
+        },
+        {
+          "date": "2025-02-03",
+          "amountRaw": "0.017088",
+          "amountUI": 0.017088
+        },
+        {
+          "date": "2025-02-02",
+          "amountRaw": "0.59388",
+          "amountUI": 0.59388
+        },
+        {
+          "date": "2025-01-18",
+          "amountRaw": "0.586149",
+          "amountUI": 0.586149
+        },
+        {
+          "date": "2025-01-11",
+          "amountRaw": "0.020621",
+          "amountUI": 0.020621
+        },
+        {
+          "date": "2024-12-22",
+          "amountRaw": "0.03509",
+          "amountUI": 0.03509
+        }
+      ]
+    },
+    {
+      "mint": "2zMMhcVQEXDtdE6vsFS7S7D5oUodfJHE8vd1gnBouauv",
+      "symbol": "PENGU",
+      "decimals": 0,
+      "totalAmountRaw": "94.99849800000001",
+      "totalAmountUI": 94.99849800000001,
+      "lastTransactionTime": 1739299020000,
+      "dailyFees": [
+        {
+          "date": "2025-02-11",
+          "amountRaw": "94.99849800000001",
+          "amountUI": 94.99849800000001
+        }
+      ]
+    },
+    {
+      "mint": "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
+      "symbol": "WBTC",
+      "decimals": 0,
+      "totalAmountRaw": "0.00001736",
+      "totalAmountUI": 0.00001736,
+      "lastTransactionTime": 1742581446000,
+      "dailyFees": [
+        {
+          "date": "2025-03-21",
+          "amountRaw": "0.00001736",
+          "amountUI": 0.00001736
+        }
+      ]
+    },
+    {
+      "mint": "6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",
+      "symbol": "TRUMP",
+      "decimals": 0,
+      "totalAmountRaw": "0.021613",
+      "totalAmountUI": 0.021613,
+      "lastTransactionTime": 1737467359000,
+      "dailyFees": [
+        {
+          "date": "2025-01-21",
+          "amountRaw": "0.021613",
+          "amountUI": 0.021613
+        }
+      ]
+    },
+    {
+      "mint": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+      "symbol": "WETH",
+      "decimals": 0,
+      "totalAmountRaw": "0.00003424",
+      "totalAmountUI": 0.00003424,
+      "lastTransactionTime": 1735735724000,
+      "dailyFees": [
+        {
+          "date": "2025-01-01",
+          "amountRaw": "0.00003424",
+          "amountUI": 0.00003424
+        }
+      ]
+    },
+    {
+      "mint": "9BB6NFEcjBCtnNLFko2FqVQBq8HHM13kCyYcdQbgpump",
+      "symbol": "Fartcoin ",
+      "decimals": 0,
+      "totalAmountRaw": "0.000033",
+      "totalAmountUI": 0.000033,
+      "lastTransactionTime": 1742983234000,
+      "dailyFees": [
+        {
+          "date": "2025-03-26",
+          "amountRaw": "0.000033",
+          "amountUI": 0.000033
+        }
+      ]
+    },
+    {
+      "mint": "BqSUc3PS4j3GiHSr9mFHhHqDYeDaTgSU3Q9yrr5de3mN",
+      "symbol": "Trump2x",
+      "decimals": 0,
+      "totalAmountRaw": "0.004857",
+      "totalAmountUI": 0.004857,
+      "lastTransactionTime": 1739106299000,
+      "dailyFees": [
+        {
+          "date": "2025-02-09",
+          "amountRaw": "0.004857",
+          "amountUI": 0.004857
+        }
+      ]
+    },
+    {
+      "mint": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+      "symbol": "Bonk",
+      "decimals": 0,
+      "totalAmountRaw": "449.53545",
+      "totalAmountUI": 449.53545,
+      "lastTransactionTime": 1735847139000,
+      "dailyFees": [
+        {
+          "date": "2025-01-02",
+          "amountRaw": "449.53545",
+          "amountUI": 449.53545
+        }
+      ]
+    },
+    {
+      "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "symbol": "USDC",
+      "decimals": 0,
+      "totalAmountRaw": "16895.474903000002",
+      "totalAmountUI": 16895.474903000002,
+      "lastTransactionTime": 1743957372000,
+      "dailyFees": [
+        {
+          "date": "2025-04-06",
+          "amountRaw": "164.409078",
+          "amountUI": 164.409078
+        },
+        {
+          "date": "2025-03-26",
+          "amountRaw": "144.059401",
+          "amountUI": 144.059401
+        },
+        {
+          "date": "2025-03-04",
+          "amountRaw": "0.1",
+          "amountUI": 0.1
+        },
+        {
+          "date": "2025-03-03",
+          "amountRaw": "0.005075",
+          "amountUI": 0.005075
+        },
+        {
+          "date": "2025-02-26",
+          "amountRaw": "325.08882800000003",
+          "amountUI": 325.08882800000003
+        },
+        {
+          "date": "2025-02-25",
+          "amountRaw": "452.039398",
+          "amountUI": 452.039398
+        },
+        {
+          "date": "2025-02-21",
+          "amountRaw": "563.0929100000001",
+          "amountUI": 563.0929100000001
+        },
+        {
+          "date": "2025-02-20",
+          "amountRaw": "1947.847582",
+          "amountUI": 1947.847582
+        },
+        {
+          "date": "2025-02-18",
+          "amountRaw": "5.429781",
+          "amountUI": 5.429781
+        },
+        {
+          "date": "2025-02-14",
+          "amountRaw": "0.000984",
+          "amountUI": 0.000984
+        },
+        {
+          "date": "2025-02-11",
+          "amountRaw": "3.343289",
+          "amountUI": 3.343289
+        },
+        {
+          "date": "2025-02-10",
+          "amountRaw": "1010.838848",
+          "amountUI": 1010.838848
+        },
+        {
+          "date": "2025-02-01",
+          "amountRaw": "0.096033",
+          "amountUI": 0.096033
+        },
+        {
+          "date": "2025-01-29",
+          "amountRaw": "5.181157",
+          "amountUI": 5.181157
+        },
+        {
+          "date": "2025-01-23",
+          "amountRaw": "0.499205",
+          "amountUI": 0.499205
+        },
+        {
+          "date": "2025-01-21",
+          "amountRaw": "2.467191",
+          "amountUI": 2.467191
+        },
+        {
+          "date": "2025-01-20",
+          "amountRaw": "0.238694",
+          "amountUI": 0.238694
+        },
+        {
+          "date": "2025-01-19",
+          "amountRaw": "1.459165",
+          "amountUI": 1.459165
+        },
+        {
+          "date": "2025-01-18",
+          "amountRaw": "1124.5193359999998",
+          "amountUI": 1124.5193359999998
+        },
+        {
+          "date": "2025-01-02",
+          "amountRaw": "10535.137896",
+          "amountUI": 10535.137896
+        },
+        {
+          "date": "2024-12-27",
+          "amountRaw": "607.438462",
+          "amountUI": 607.438462
+        },
+        {
+          "date": "2024-12-22",
+          "amountRaw": "0.365593",
+          "amountUI": 0.365593
+        },
+        {
+          "date": "2024-12-10",
+          "amountRaw": "1.816997",
+          "amountUI": 1.816997
+        }
+      ]
+    },
+    {
+      "mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+      "symbol": "USDT",
+      "decimals": 0,
+      "totalAmountRaw": "3.558943",
+      "totalAmountUI": 3.558943,
+      "lastTransactionTime": 1737211352000,
+      "dailyFees": [
+        {
+          "date": "2025-01-18",
+          "amountRaw": "3",
+          "amountUI": 3
+        },
+        {
+          "date": "2024-12-10",
+          "amountRaw": "0.558943",
+          "amountUI": 0.558943
+        }
+      ]
+    },
+    {
+      "mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+      "symbol": "JUP",
+      "decimals": 0,
+      "totalAmountRaw": "33.283046",
+      "totalAmountUI": 33.283046,
+      "lastTransactionTime": 1740236067000,
+      "dailyFees": [
+        {
+          "date": "2025-02-22",
+          "amountRaw": "6.006277",
+          "amountUI": 6.006277
+        },
+        {
+          "date": "2025-02-20",
+          "amountRaw": "0.180628",
+          "amountUI": 0.180628
+        },
+        {
+          "date": "2025-02-17",
+          "amountRaw": "2.608231",
+          "amountUI": 2.608231
+        },
+        {
+          "date": "2025-02-10",
+          "amountRaw": "0.068986",
+          "amountUI": 0.068986
+        },
+        {
+          "date": "2025-02-08",
+          "amountRaw": "13.756173",
+          "amountUI": 13.756173
+        },
+        {
+          "date": "2025-02-01",
+          "amountRaw": "0.239399",
+          "amountUI": 0.239399
+        },
+        {
+          "date": "2025-01-25",
+          "amountRaw": "0.26976",
+          "amountUI": 0.26976
+        },
+        {
+          "date": "2025-01-22",
+          "amountRaw": "8.15255",
+          "amountUI": 8.15255
+        },
+        {
+          "date": "2024-12-13",
+          "amountRaw": "2.0010410000000003",
+          "amountUI": 2.0010410000000003
+        },
+        {
+          "date": "2024-12-10",
+          "amountRaw": "0.000001",
+          "amountUI": 0.000001
+        }
+      ]
+    },
+    {
+      "mint": "So11111111111111111111111111111111111111112",
+      "symbol": "SOL",
+      "decimals": 0,
+      "totalAmountRaw": "10.874175355",
+      "totalAmountUI": 10.874175355,
+      "lastTransactionTime": 1742983234000,
+      "dailyFees": [
+        {
+          "date": "2025-03-26",
+          "amountRaw": "1.59e-7",
+          "amountUI": 1.59e-7
+        },
+        {
+          "date": "2025-03-21",
+          "amountRaw": "0.011535362",
+          "amountUI": 0.011535362
+        },
+        {
+          "date": "2025-03-20",
+          "amountRaw": "0.00025",
+          "amountUI": 0.00025
+        },
+        {
+          "date": "2025-03-09",
+          "amountRaw": "0.000005",
+          "amountUI": 0.000005
+        },
+        {
+          "date": "2025-03-03",
+          "amountRaw": "0.000038675",
+          "amountUI": 0.000038675
+        },
+        {
+          "date": "2025-02-25",
+          "amountRaw": "0.17748387",
+          "amountUI": 0.17748387
+        },
+        {
+          "date": "2025-02-22",
+          "amountRaw": "0.055",
+          "amountUI": 0.055
+        },
+        {
+          "date": "2025-02-21",
+          "amountRaw": "0.14592753",
+          "amountUI": 0.14592753
+        },
+        {
+          "date": "2025-02-20",
+          "amountRaw": "0.000533123",
+          "amountUI": 0.000533123
+        },
+        {
+          "date": "2025-02-18",
+          "amountRaw": "0.012053963",
+          "amountUI": 0.012053963
+        },
+        {
+          "date": "2025-02-17",
+          "amountRaw": "0.007185629",
+          "amountUI": 0.007185629
+        },
+        {
+          "date": "2025-02-14",
+          "amountRaw": "0.015193959",
+          "amountUI": 0.015193959
+        },
+        {
+          "date": "2025-02-11",
+          "amountRaw": "0.037243829",
+          "amountUI": 0.037243829
+        },
+        {
+          "date": "2025-02-10",
+          "amountRaw": "0.000570135",
+          "amountUI": 0.000570135
+        },
+        {
+          "date": "2025-02-08",
+          "amountRaw": "0.07038",
+          "amountUI": 0.07038
+        },
+        {
+          "date": "2025-02-04",
+          "amountRaw": "0.000025",
+          "amountUI": 0.000025
+        },
+        {
+          "date": "2025-02-03",
+          "amountRaw": "0.000751875",
+          "amountUI": 0.000751875
+        },
+        {
+          "date": "2025-02-02",
+          "amountRaw": "0.021875",
+          "amountUI": 0.021875
+        },
+        {
+          "date": "2025-02-01",
+          "amountRaw": "0.001448584",
+          "amountUI": 0.001448584
+        },
+        {
+          "date": "2025-01-29",
+          "amountRaw": "0.016134271",
+          "amountUI": 0.016134271
+        },
+        {
+          "date": "2025-01-25",
+          "amountRaw": "0.000995",
+          "amountUI": 0.000995
+        },
+        {
+          "date": "2025-01-23",
+          "amountRaw": "0.003",
+          "amountUI": 0.003
+        },
+        {
+          "date": "2025-01-22",
+          "amountRaw": "0.015265881",
+          "amountUI": 0.015265881
+        },
+        {
+          "date": "2025-01-20",
+          "amountRaw": "0.0015",
+          "amountUI": 0.0015
+        },
+        {
+          "date": "2025-01-19",
+          "amountRaw": "7.029084949",
+          "amountUI": 7.029084949
+        },
+        {
+          "date": "2025-01-18",
+          "amountRaw": "0.021597598",
+          "amountUI": 0.021597598
+        },
+        {
+          "date": "2025-01-17",
+          "amountRaw": "0.000937907",
+          "amountUI": 0.000937907
+        },
+        {
+          "date": "2025-01-11",
+          "amountRaw": "0.002319437",
+          "amountUI": 0.002319437
+        },
+        {
+          "date": "2025-01-02",
+          "amountRaw": "0.000081375",
+          "amountUI": 0.000081375
+        },
+        {
+          "date": "2025-01-01",
+          "amountRaw": "0.002999999",
+          "amountUI": 0.002999999
+        },
+        {
+          "date": "2024-12-27",
+          "amountRaw": "3.208375505",
+          "amountUI": 3.208375505
+        },
+        {
+          "date": "2024-12-17",
+          "amountRaw": "1e-7",
+          "amountUI": 1e-7
+        },
+        {
+          "date": "2024-12-13",
+          "amountRaw": "0.01005164",
+          "amountUI": 0.01005164
+        },
+        {
+          "date": "2024-12-10",
+          "amountRaw": "0.00433",
+          "amountUI": 0.00433
+        }
+      ]
+    },
+    {
+      "mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+      "symbol": "cbBTC",
+      "decimals": 0,
+      "totalAmountRaw": "9.6e-7",
+      "totalAmountUI": 9.6e-7,
+      "lastTransactionTime": 1737108748000,
+      "dailyFees": [
+        {
+          "date": "2025-01-17",
+          "amountRaw": "9.6e-7",
+          "amountUI": 9.6e-7
+        }
+      ]
+    }
+  ]
+}

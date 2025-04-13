@@ -10,7 +10,10 @@ import EnhancedTooltip from './EnhancedTooltip';
  * @param {string} [props.size='small'] Size of the icon ('small', 'medium', 'large')
  */
 const InfoIcon = ({ content, position = 'top', size = 'small' }) => {
-  const sizeClass = styles[size] || styles.small;
+  // Only allow valid sizes
+  const validSizes = ['small', 'medium', 'large'];
+  const validSize = validSizes.includes(size) ? size : 'small';
+  const sizeClass = styles[validSize];
   
   return (
     <EnhancedTooltip content={content} position={position}>

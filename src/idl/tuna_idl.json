@@ -1,0 +1,57 @@
+{
+  "version": "0.1.0",
+  "name": "tuna",
+  "instructions": [
+    {
+      "name": "create_tuna_config",
+      "discriminator": [
+        79,
+        78,
+        175,
+        62,
+        234,
+        68,
+        202,
+        241
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "tuna_config",
+          "writable": true
+        },
+        {
+          "name": "system_program"
+        },
+        {
+          "name": "rent"
+        }
+      ],
+      "args": [
+        {
+          "name": "owner_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "admin_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "liquidator_authority",
+          "type": "pubkey"
+        },
+        {
+          "name": "fee_recipient",
+          "type": "pubkey"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "address": "TunaWoJVp8t5QEWzDCTxDge8SsVw4YWGzNQrQBYu1yT"
+  }
+} 

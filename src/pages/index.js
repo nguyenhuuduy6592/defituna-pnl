@@ -246,6 +246,9 @@ export default () => {
           <Link href="/pools" className={styles.navButton}>
             <span>Pools</span>
           </Link>
+          <Link href="/admin/protocol-fees" className={styles.navButton}>
+            <span>Protocol Fees</span>
+          </Link>
           <button 
             className={styles.disclaimerButton} 
             onClick={() => setDisclaimerOpen(true)}
