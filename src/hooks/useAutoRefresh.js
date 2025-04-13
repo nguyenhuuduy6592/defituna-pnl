@@ -24,7 +24,6 @@ export const useAutoRefresh = (onRefresh, initialInterval = DEFAULT_INTERVAL) =>
   const [refreshInterval, setRefreshInterval] = useState(initialInterval);
   const [refreshCountdown, setRefreshCountdown] = useState(initialInterval);
   const [error, setError] = useState(null);
-  const isVisibleRef = useRef(true);
   const onRefreshRef = useRef(onRefresh); // Store callback in ref to avoid dependency changes
 
   // Update callback ref when onRefresh changes
@@ -70,19 +69,6 @@ export const useAutoRefresh = (onRefresh, initialInterval = DEFAULT_INTERVAL) =>
   }, [autoRefresh, refreshInterval]);
 
   /**
-   * Update visibility state when tab visibility changes
-   */
-  const handleVisibilityChange = useCallback(() => {
-    isVisibleRef.current = document.visibilityState === 'visible';
-  }, []);
-
-  // Set up visibility change listener
-  useEffect(() => {
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [handleVisibilityChange]);
-
-  /**
    * Reset countdown when interval changes or auto-refresh is enabled
    */
   useEffect(() => {
@@ -103,8 +89,8 @@ export const useAutoRefresh = (onRefresh, initialInterval = DEFAULT_INTERVAL) =>
       setRefreshCountdown((prev) => {
         if (prev <= 1) {
           try {
-            // Only refresh if tab is visible
-            if (isVisibleRef.current && onRefreshRef.current) {
+            // Only refresh if tab is visible - Removing visibility check
+            if (onRefreshRef.current) {
               onRefreshRef.current();
             }
           } catch (error) {

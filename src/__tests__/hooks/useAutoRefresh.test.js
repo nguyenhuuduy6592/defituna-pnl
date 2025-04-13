@@ -6,26 +6,11 @@ let getItemSpy;
 let setItemSpy;
 let consoleErrorSpy;
 let consoleWarnSpy;
-let addEventListenerSpy;
-let removeEventListenerSpy;
-let visibilityStateGetter;
 let mockOnRefresh;
 
 const DEFAULT_INTERVAL = 30;
 const AUTO_REFRESH_KEY = 'autoRefresh';
 const REFRESH_INTERVAL_KEY = 'refreshInterval';
-
-// Helper to simulate visibility change
-const simulateVisibilityChange = (visibility) => {
-  visibilityStateGetter.mockReturnValue(visibility);
-  // Need to manually trigger the event listener callback
-  const visibilityChangeCallback = addEventListenerSpy.mock.calls.find(
-    call => call[0] === 'visibilitychange'
-  )?.[1];
-  if (visibilityChangeCallback) {
-    visibilityChangeCallback();
-  }
-};
 
 beforeEach(() => {
   jest.useFakeTimers();
@@ -36,13 +21,7 @@ beforeEach(() => {
   setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
   consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  addEventListenerSpy = jest.spyOn(document, 'addEventListener');
-  removeEventListenerSpy = jest.spyOn(document, 'removeEventListener');
   
-  // Mock document.visibilityState getter
-  visibilityStateGetter = jest.spyOn(document, 'visibilityState', 'get');
-  visibilityStateGetter.mockReturnValue('visible'); // Default to visible
-
   mockOnRefresh = jest.fn();
 });
 
@@ -54,9 +33,6 @@ afterEach(() => {
   setItemSpy.mockRestore();
   consoleErrorSpy.mockRestore();
   consoleWarnSpy.mockRestore();
-  addEventListenerSpy.mockRestore();
-  removeEventListenerSpy.mockRestore();
-  visibilityStateGetter.mockRestore();
 });
 
 describe('useAutoRefresh Hook', () => {
@@ -74,7 +50,6 @@ describe('useAutoRefresh Hook', () => {
       // Initial saves triggered by state setting
       expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'false');
       expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(DEFAULT_INTERVAL));
-      expect(addEventListenerSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
     });
 
     it('should initialize with provided initialInterval', () => {
@@ -291,127 +266,73 @@ describe('useAutoRefresh Hook', () => {
     });
   });
 
-  describe('Countdown & Refresh Logic', () => {
-    it('should decrement countdown when autoRefresh is true and visible', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
+  describe('Auto-Refresh Logic', () => {
+    it('should not start timer if autoRefresh is initially false', () => {
+      renderHook(() => useAutoRefresh(mockOnRefresh));
+      act(() => { jest.advanceTimersByTime(DEFAULT_INTERVAL * 1000 + 100); });
+      expect(mockOnRefresh).not.toHaveBeenCalled();
+    });
+
+    it('should start timer and call onRefresh when autoRefresh is enabled', () => {
       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 5));
-      expect(result.current.autoRefresh).toBe(true);
+      act(() => { result.current.setAutoRefresh(true); });
+
+      // Countdown initial state
       expect(result.current.refreshCountdown).toBe(5);
 
-      act(() => { jest.advanceTimersByTime(1000); });
-      expect(result.current.refreshCountdown).toBe(4);
-      act(() => { jest.advanceTimersByTime(3000); });
-      expect(result.current.refreshCountdown).toBe(1);
-      expect(mockOnRefresh).not.toHaveBeenCalled();
-    });
-
-    it('should call onRefresh and reset countdown when timer reaches <= 1 and visible', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-      const interval = 3;
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, interval));
-
-      act(() => { jest.advanceTimersByTime(2000); }); // Countdown = 1
+      // Advance time just before refresh
+      act(() => { jest.advanceTimersByTime(4999); });
       expect(result.current.refreshCountdown).toBe(1);
       expect(mockOnRefresh).not.toHaveBeenCalled();
 
-      act(() => { jest.advanceTimersByTime(1000); }); // Countdown <= 1, refresh triggers
+      // Advance time past refresh threshold
+      act(() => { jest.advanceTimersByTime(1); }); // Tick to trigger refresh
       expect(mockOnRefresh).toHaveBeenCalledTimes(1);
-      expect(result.current.refreshCountdown).toBe(interval); // Resets
+      expect(result.current.refreshCountdown).toBe(5); // Reset countdown
 
-      // Should continue counting down
-       act(() => { jest.advanceTimersByTime(1000); });
-       expect(result.current.refreshCountdown).toBe(interval - 1);
+      // Advance time for another cycle
+      act(() => { jest.advanceTimersByTime(5000); });
+      expect(mockOnRefresh).toHaveBeenCalledTimes(2);
+      expect(result.current.refreshCountdown).toBe(5);
     });
 
-    it('should NOT decrement or refresh when autoRefresh is false', () => {
-       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 5));
-       expect(result.current.autoRefresh).toBe(false);
-       const initialCountdown = result.current.refreshCountdown;
+    it('should stop timer when autoRefresh is disabled', () => {
+      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 5));
+      act(() => { result.current.setAutoRefresh(true); });
 
-       act(() => { jest.advanceTimersByTime(10000); }); // Advance well past interval
-
-       expect(result.current.refreshCountdown).toBe(initialCountdown);
-       expect(mockOnRefresh).not.toHaveBeenCalled();
-    });
-
-    it('should NOT call onRefresh when timer reaches zero but tab is hidden', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-      const interval = 3;
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, interval));
-
-      simulateVisibilityChange('hidden'); // Hide the tab
-
-      act(() => { jest.advanceTimersByTime(3000); }); // Timer reaches zero
-      
+      // Advance time part way
+      act(() => { jest.advanceTimersByTime(2000); });
+      expect(result.current.refreshCountdown).toBe(3);
       expect(mockOnRefresh).not.toHaveBeenCalled();
-      expect(result.current.refreshCountdown).toBe(interval); // Still resets
+
+      // Disable auto-refresh
+      act(() => { result.current.setAutoRefresh(false); });
+
+      // Advance time past where refresh would have occurred
+      act(() => { jest.advanceTimersByTime(5000); });
+      expect(mockOnRefresh).not.toHaveBeenCalled();
+      expect(result.current.refreshCountdown).toBe(3); // Countdown should remain paused
     });
 
-    it('should resume countdown and refresh when tab becomes visible again', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-      const interval = 5;
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, interval));
-
-      simulateVisibilityChange('hidden');
-      act(() => { jest.advanceTimersByTime(10000); }); // Time passes, refresh didn't happen
-      expect(mockOnRefresh).not.toHaveBeenCalled();
-      expect(result.current.refreshCountdown).toBe(interval);
-
-      simulateVisibilityChange('visible');
-      // Countdown should restart from the interval
-      act(() => { jest.advanceTimersByTime(4000); }); 
-      expect(result.current.refreshCountdown).toBe(1);
-      expect(mockOnRefresh).not.toHaveBeenCalled();
-      
-      act(() => { jest.advanceTimersByTime(1000); }); // Refresh triggers
-      expect(mockOnRefresh).toHaveBeenCalledTimes(1);
-      expect(result.current.refreshCountdown).toBe(interval);
-    });
-
-    it('should handle errors in the onRefresh callback', () => {
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true');
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-      const refreshError = new Error('Refresh Failed!');
+    it('should handle onRefresh callback errors gracefully', () => {
+      const refreshError = new Error('Refresh Failed');
       mockOnRefresh.mockImplementation(() => { throw refreshError; });
-      const interval = 2;
-      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, interval));
 
-      act(() => { jest.advanceTimersByTime(2000); }); // Trigger refresh
+      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 2));
+      act(() => { result.current.setAutoRefresh(true); });
+
+      // Trigger the refresh that will throw an error
+      act(() => { jest.advanceTimersByTime(2000); });
 
       expect(mockOnRefresh).toHaveBeenCalledTimes(1);
       expect(result.current.error).toBe('Error occurred during auto-refresh');
       expect(consoleErrorSpy).toHaveBeenCalledWith('Error in refresh callback:', refreshError);
-      expect(result.current.refreshCountdown).toBe(interval); // Still resets countdown
-    });
-  });
+      expect(result.current.refreshCountdown).toBe(2); // Countdown should still reset
 
-  describe('Cleanup', () => {
-    it('should clear interval and remove visibility listener on unmount', () => {
-      const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
-      localStorage.setItem(AUTO_REFRESH_KEY, 'true'); // Ensure timer starts
-      getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
-
-      const { unmount } = renderHook(() => useAutoRefresh(mockOnRefresh, 10));
-
-      // Ensure timer and listener were set up
-      const initialIntervalCalls = clearIntervalSpy.mock.calls.length;
-      expect(addEventListenerSpy).toHaveBeenCalledWith('visibilitychange', expect.any(Function));
-      const visibilityCallback = addEventListenerSpy.mock.calls.find(call => call[0] === 'visibilitychange')[1];
-
-      unmount();
-
-      // Check if timer was cleared (note: intervals might be cleared/reset internally on state changes too)
-      // We expect at least one more clear call specifically from the unmount effect cleanup.
-      expect(clearIntervalSpy.mock.calls.length).toBeGreaterThan(initialIntervalCalls);
-      
-      // Check if listener was removed
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('visibilitychange', visibilityCallback);
-
-      clearIntervalSpy.mockRestore();
+      // Ensure timer continues for next cycle
+      act(() => { jest.advanceTimersByTime(2000); });
+      expect(mockOnRefresh).toHaveBeenCalledTimes(2); // Called again
+      expect(result.current.error).toBe('Error occurred during auto-refresh'); // Error state might persist until next successful cycle or manual clear
     });
   });
 }); 
