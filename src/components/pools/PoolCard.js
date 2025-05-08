@@ -36,7 +36,7 @@ export default function PoolCard({ pool, timeframe = '24h', sortBy, sortOrder })
   const formattedVolume = '$' + formatNumber(stats.volume || 0, true);
   const formattedFees = formatFee(stats.fees || 0);
   const formattedYield = formatPercentage(stats.yield_over_tvl || 0);
-  const formattedFeeRate = formatPercentage(pool.fee_rate / 10000);
+  const formattedFeeRate = formatPercentage(pool.fee_rate / 1000000);
   
   // Format derived metrics
   const formattedFeeAPR = metricsLoading ? '...' : `${feeAPR.toFixed(2)}%`;

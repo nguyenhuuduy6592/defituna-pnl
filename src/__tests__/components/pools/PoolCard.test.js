@@ -102,7 +102,7 @@ describe('PoolCard Component', () => {
     const feeSection = screen.getByText('Fee').closest('.metric');
     
     // Within that container, find the value
-    expect(within(feeSection).getByText('5.00%')).toBeInTheDocument();
+    expect(within(feeSection).getByText('0.05%')).toBeInTheDocument();
   });
 
   it('renders derived metrics from usePoolData', () => {
