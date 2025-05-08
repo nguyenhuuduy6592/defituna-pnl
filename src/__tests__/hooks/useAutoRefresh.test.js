@@ -8,7 +8,7 @@ let consoleErrorSpy;
 let consoleWarnSpy;
 let mockOnRefresh;
 
-const DEFAULT_INTERVAL = 30;
+const DEFAULT_INTERVAL = 15;
 const AUTO_REFRESH_KEY = 'autoRefresh';
 const REFRESH_INTERVAL_KEY = 'refreshInterval';
 

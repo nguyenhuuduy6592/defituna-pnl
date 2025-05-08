@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 // Constants
-const DEFAULT_INTERVAL = 30;
+const DEFAULT_INTERVAL = 15;
 const AUTO_REFRESH_KEY = 'autoRefresh';
 const REFRESH_INTERVAL_KEY = 'refreshInterval';
 
@@ -11,7 +11,7 @@ const REFRESH_INTERVAL_KEY = 'refreshInterval';
  * Only refreshes when the browser tab is visible
  * 
  * @param {Function} onRefresh - Callback function to execute when refresh is triggered
- * @param {number} [initialInterval=30] - Initial refresh interval in seconds
+ * @param {number} [initialInterval=15] - Initial refresh interval in seconds
  * @returns {Object} Auto-refresh configuration and state
  * @returns {boolean} returns.autoRefresh - Whether auto-refresh is enabled
  * @returns {Function} returns.setAutoRefresh - Function to toggle auto-refresh

@@ -31,7 +31,7 @@ describe('AutoRefresh Component', () => {
     setAutoRefresh: jest.fn(),
     refreshInterval: 60,
     onIntervalChange: jest.fn(),
-    autoRefreshCountdown: 30,
+    autoRefreshCountdown: 15,
     loading: false,
     historyEnabled: false,
     onHistoryToggle: jest.fn()
@@ -63,7 +63,7 @@ describe('AutoRefresh Component', () => {
     
     // Interval selector and refresh status should be visible
     expect(screen.getByRole('combobox')).toBeInTheDocument();
-    expect(screen.getByText(/Next refresh in 30 seconds/)).toBeInTheDocument();
+    expect(screen.getByText(/Next refresh in 15 seconds/)).toBeInTheDocument();
   });
 
   it('calls setAutoRefresh when checkbox is toggled', () => {
@@ -129,7 +129,7 @@ describe('AutoRefresh Component', () => {
       
       const selectProd = screen.getByRole('combobox');
       const optionsProd = Array.from(selectProd.children).map(option => option.value);
-      expect(optionsProd).toEqual(['30', '60', '300']);
+      expect(optionsProd).toEqual(['15', '30', '60', '300']);
       expect(optionsProd).not.toContain('5');
       
       // Cleanup
@@ -145,7 +145,7 @@ describe('AutoRefresh Component', () => {
       
       const selectDev = screen.getByRole('combobox');
       const optionsDev = Array.from(selectDev.children).map(option => option.value);
-      expect(optionsDev).toEqual(['5', '30', '60', '300']);
+      expect(optionsDev).toEqual(['5', '15', '30', '60', '300']);
       
       // Cleanup
       process.env.NODE_ENV = originalNodeEnv;

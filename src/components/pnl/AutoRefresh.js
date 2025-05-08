@@ -28,6 +28,7 @@ const IntervalSelector = ({ value, onChange }) => (
       {process.env.NODE_ENV === 'development' && (
         <option value="5">5 seconds</option>
       )}
+      <option value="15">15 seconds</option>
       <option value="30">30 seconds</option>
       <option value="60">1 minute</option>
       <option value="300">5 minutes</option>
