@@ -1,5 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { VaultData, API_ENDPOINTS, CACHE_TTL, getCachedData, setCachedData, fetchWithValidation, vaultDataSchema } from '@/utils/api/lending';
+import { 
+  VaultData, 
+  API_ENDPOINTS, 
+  CACHE_TTL, 
+  getCachedData, 
+  setCachedData, 
+  vaultsResponseSchema,
+  transformVaultData
+} from '@/utils/api/lending';
 
 export default async function handler(
   req: NextApiRequest,
@@ -17,10 +25,18 @@ export default async function handler(
     }
 
     // Fetch fresh data
-    const vaults = await fetchWithValidation<VaultData[]>(
-      API_ENDPOINTS.VAULTS,
-      vaultDataSchema.array()
-    );
+    const response = await fetch(API_ENDPOINTS.VAULTS);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const rawData = await response.json();
+
+    // Validate the response
+    const validatedResponse = vaultsResponseSchema.parse(rawData);
+    
+    // Transform the data to our internal format
+    const vaults = validatedResponse.data.map(transformVaultData);
 
     // Cache the results
     setCachedData('vaults', vaults);

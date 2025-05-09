@@ -45,25 +45,25 @@ Based on the network logs, we'll need to retrieve and display:
 
 ### Phase 2: Data Management Hooks
 
-1. **Create Core Data Hooks** (Priority: HIGH) (Status: NOT STARTED)
+1. **Create Core Data Hooks** (Priority: HIGH) (Status: COMPLETED)
    - Implement `useLendingPools` hook with proper caching
    - Add sorting and filtering capabilities (matching pools page implementation)
    - Include token metadata enrichment
    - Implement automatic refresh logic
 
-2. **Implement Token Metadata System** (Priority: HIGH) (Status: NOT STARTED)
+2. **Implement Token Metadata System** (Priority: HIGH) (Status: COMPLETED)
    - Create token metadata resolution system
    - Add fallbacks for unknown tokens
    - Implement icon/logo display logic
 
-3. **Create Price Data Integration** (Priority: HIGH) (Status: NOT STARTED)
+3. **Create Price Data Integration** (Priority: HIGH) (Status: COMPLETED)
    - Implement price fetching and updating
    - Add calculation utilities for USD values
    - Create APY calculation helpers
 
 ### Phase 3: Core UI Components
 
-1. **Create Lending Page Layout** (Priority: HIGH) (Status: NOT STARTED)
+1. **Create Lending Page Layout** (Priority: HIGH) (Status: COMPLETED)
    - Implement base page structure
    - Add to main navigation with "Lending" link
    - Create responsive container with proper spacing
@@ -187,10 +187,10 @@ Returns current price data for a token:
 2. **Implement Data Transformation Layer** (Priority: HIGHEST) (Status: COMPLETED)
 3. **Create Data Caching Strategy** (Priority: HIGHEST) (Status: COMPLETED)
 4. **Add Lending Page to Navigation** (Priority: HIGHEST) (Status: NOT STARTED)
-5. **Create Core Data Hooks** (Priority: HIGH) (Status: NOT STARTED)
-6. **Implement Token Metadata System** (Priority: HIGH) (Status: NOT STARTED)
-7. **Create Price Data Integration** (Priority: HIGH) (Status: NOT STARTED)
-8. **Create Lending Page Layout** (Priority: HIGH) (Status: NOT STARTED)
+5. **Create Core Data Hooks** (Priority: HIGH) (Status: COMPLETED)
+6. **Implement Token Metadata System** (Priority: HIGH) (Status: COMPLETED)
+7. **Create Price Data Integration** (Priority: HIGH) (Status: COMPLETED)
+8. **Create Lending Page Layout** (Priority: HIGH) (Status: COMPLETED)
 9. **Implement Pool Card Component** (Priority: HIGH) (Status: NOT STARTED)
 10. **Build Pool List Component** (Priority: HIGH) (Status: NOT STARTED)
 11. **Add Sorting and Filtering** (Priority: MEDIUM) (Status: NOT STARTED)

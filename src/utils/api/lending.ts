@@ -19,6 +19,10 @@ export interface VaultData {
   utilization: number;
   supplyApy: number;
   borrowApy: number;
+  borrowedShares: string;
+  depositedShares: string;
+  pythOracleFeedId: string;
+  pythOraclePriceUpdate: string;
 }
 
 export interface TokenInfo {
@@ -39,21 +43,29 @@ export interface PriceData {
 export const vaultDataSchema = z.object({
   address: z.string(),
   mint: z.string(),
-  depositedFunds: z.object({
+  deposited_funds: z.object({
     amount: z.string(),
-    usdValue: z.number()
+    usd: z.number()
   }),
-  borrowedFunds: z.object({
+  borrowed_funds: z.object({
     amount: z.string(),
-    usdValue: z.number()
+    usd: z.number()
   }),
-  supplyLimit: z.object({
+  supply_limit: z.object({
     amount: z.string(),
-    usdValue: z.number()
+    usd: z.number()
   }),
   utilization: z.number(),
-  supplyApy: z.number(),
-  borrowApy: z.number()
+  supply_apy: z.number(),
+  borrow_apy: z.number(),
+  borrowed_shares: z.string(),
+  deposited_shares: z.string(),
+  pyth_oracle_feed_id: z.string(),
+  pyth_oracle_price_update: z.string()
+});
+
+export const vaultsResponseSchema = z.object({
+  data: z.array(vaultDataSchema)
 });
 
 export const tokenInfoSchema = z.object({
@@ -128,4 +140,31 @@ export function setCachedData(key: string, data: any): void {
     data,
     timestamp: Date.now()
   });
+}
+
+// Transform API response to our internal format
+export function transformVaultData(apiVault: z.infer<typeof vaultDataSchema>): VaultData {
+  return {
+    address: apiVault.address,
+    mint: apiVault.mint,
+    depositedFunds: {
+      amount: apiVault.deposited_funds.amount,
+      usdValue: apiVault.deposited_funds.usd
+    },
+    borrowedFunds: {
+      amount: apiVault.borrowed_funds.amount,
+      usdValue: apiVault.borrowed_funds.usd
+    },
+    supplyLimit: {
+      amount: apiVault.supply_limit.amount,
+      usdValue: apiVault.supply_limit.usd
+    },
+    utilization: apiVault.utilization,
+    supplyApy: apiVault.supply_apy,
+    borrowApy: apiVault.borrow_apy,
+    borrowedShares: apiVault.borrowed_shares,
+    depositedShares: apiVault.deposited_shares,
+    pythOracleFeedId: apiVault.pyth_oracle_feed_id,
+    pythOraclePriceUpdate: apiVault.pyth_oracle_price_update
+  };
 } 

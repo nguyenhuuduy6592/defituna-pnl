@@ -1,0 +1,126 @@
+@use "sass:map";
+@use '../../styles/variables.module.scss' as variables;
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 variables.spacing(md);
+}
+
+.main {
+  padding: variables.spacing(lg) 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: variables.spacing(xl);
+  
+  @include variables.responsive(sm) {
+    flex-direction: row;
+    gap: 0;
+    align-items: center;
+  }
+}
+
+.navigationLinks {
+  display: flex;
+  gap: variables.spacing(md);
+}
+
+.linkWithoutUnderline {
+  text-decoration: none;
+  color: inherit;
+}
+
+.backButton {
+  background: variables.bg-color(white);
+  color: variables.text-color(secondary);
+  border: 1px solid variables.color(border);
+  border-radius: map.get(variables.$border-radius, sm);
+  padding: variables.spacing(sm) variables.spacing(md);
+  font-size: variables.font-size(base);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: rgba(variables.color(primary), 0.1);
+    border-color: variables.color(primary);
+    color: variables.color(primary);
+  }
+}
+
+.heading {
+  font-size: calc(variables.font-size(xl) * 1.3);
+  font-weight: 700;
+  color: variables.text-color(primary);
+  margin: 0;
+}
+
+.tvlDisplay {
+  font-size: variables.font-size(lg);
+  color: variables.text-color(primary);
+  font-weight: 600;
+}
+
+.loadingContainer,
+.errorContainer,
+.emptyContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: variables.spacing(xl) 0;
+  text-align: center;
+}
+
+.loader {
+  border: 3px solid rgba(variables.color(border), 0.2);
+  border-radius: 50%;
+  border-top: 3px solid variables.color(primary);
+  width: 30px;
+  height: 30px;
+  animation: spin 1s linear infinite;
+  margin-bottom: variables.spacing(md);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorMessage {
+  color: variables.color(negative);
+  margin-bottom: variables.spacing(md);
+}
+
+.retryButton {
+  background: variables.color(primary);
+  color: white;
+  border: none;
+  border-radius: map.get(variables.$border-radius, sm);
+  padding: variables.spacing(sm) variables.spacing(md);
+  font-size: variables.font-size(base);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: darken(variables.color(primary), 10%);
+  }
+}
+
+.poolsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: variables.spacing(md);
+  
+  @include variables.responsive(sm) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include variables.responsive(lg) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+} 
