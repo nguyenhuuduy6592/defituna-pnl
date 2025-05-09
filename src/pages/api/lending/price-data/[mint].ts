@@ -24,10 +24,10 @@ export default async function handler(
     }
 
     // Fetch fresh data
-    const priceData = await fetchWithValidation<PriceData>(
+    const priceData = await fetchWithValidation(
       API_ENDPOINTS.PRICE_DATA(mint),
       priceDataSchema
-    );
+    ) as PriceData;
 
     // Cache the results
     setCachedData(cacheKey, priceData);

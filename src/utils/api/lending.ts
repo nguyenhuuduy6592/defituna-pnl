@@ -110,7 +110,7 @@ export const API_ENDPOINTS = {
 // Helper functions
 export async function fetchWithValidation<T>(
   url: string,
-  schema: z.ZodSchema<T>,
+  schema: z.ZodType<T>,
   options?: RequestInit
 ): Promise<T> {
   try {
