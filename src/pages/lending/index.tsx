@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useLendingPools } from '@/hooks/useLendingPools';
 import LendingPoolList from '@/components/lending/LendingPoolList';
 import LendingPoolFilters from '@/components/lending/LendingPoolFilters';
+import InfoIcon from '@/components/common/InfoIcon';
 import styles from './index.module.scss';
 
 export default function LendingPage() {
@@ -30,20 +31,27 @@ export default function LendingPage() {
 
       <main>
         <div className={styles.header}>
-          <div className={styles.navigationLinks}>
-            <Link href="/" className={styles.linkWithoutUnderline}>
-              <button className={styles.backButton}>
-                Home
-              </button>
-            </Link>
+          <div className={styles.headerLeft}>
+            <h1 className={styles.heading}>
+              Lending Pools
+            </h1>
+            <div className={styles.navigationLinks}>
+              <Link href="/" className={styles.linkWithoutUnderline}>
+                <button className={styles.backButton}>
+                  Home
+                </button>
+              </Link>
+            </div>
           </div>
-
-          <h1 className={styles.heading}>
-            Lending Pools
-          </h1>
-
-          <div className={styles.tvlDisplay}>
-            Total Value Locked: ${totalTvl.toLocaleString()}
+          
+          <div className={styles.headerRight}>
+            <div className={styles.tvlDisplay}>
+              <InfoIcon 
+                content="Total Value Locked (TVL) represents the total amount of assets deposited in all lending pools" 
+                position="left"
+              />
+              <span>Total Value Locked: ${totalTvl.toLocaleString()}</span>
+            </div>
           </div>
         </div>
 
