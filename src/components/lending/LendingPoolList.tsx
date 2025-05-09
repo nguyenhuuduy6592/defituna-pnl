@@ -49,12 +49,13 @@ export default function LendingPoolList({ vaults, loading, error, filters, onRet
   return (
     <div className={styles.poolsGrid}>
       {vaults.map((vault) => (
-        <LendingPoolCard
-          key={vault.address}
-          vault={vault}
-          sortBy={filters.sortBy}
-          sortOrder={filters.sortOrder}
-        />
+        <div key={vault.address} role="article" aria-label="lending pool card">
+          <LendingPoolCard
+            vault={vault}
+            sortBy={filters.sortBy}
+            sortOrder={filters.sortOrder}
+          />
+        </div>
       ))}
     </div>
   );

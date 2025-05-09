@@ -223,6 +223,7 @@ export default function LendingPoolFilters({ filters, onFilterChange, filterOpti
             className={styles.filterSelect}
             value={`${filters.sortBy}:${filters.sortOrder}`}
             onChange={handleSortChange}
+            aria-label="Sort By"
           >
             <option value="tvl:desc">TVL (High to Low)</option>
             <option value="tvl:asc">TVL (Low to High)</option>
@@ -250,6 +251,7 @@ export default function LendingPoolFilters({ filters, onFilterChange, filterOpti
             className={styles.filterSelect}
             value={filters.minTvl}
             onChange={handleTvlChange}
+            aria-label="Min TVL"
           >
             {filterOptions.tvlRanges.map(range => (
               <option key={range.value} value={range.value}>
@@ -265,6 +267,7 @@ export default function LendingPoolFilters({ filters, onFilterChange, filterOpti
             className={styles.filterSelect}
             value={filters.minSupplyApy}
             onChange={handleSupplyApyChange}
+            aria-label="Min Supply APY"
           >
             {filterOptions.supplyApyRanges.map(range => (
               <option key={range.value} value={range.value}>
@@ -280,6 +283,7 @@ export default function LendingPoolFilters({ filters, onFilterChange, filterOpti
             className={styles.filterSelect}
             value={filters.minBorrowApy}
             onChange={handleBorrowApyChange}
+            aria-label="Min Borrow APY"
           >
             {filterOptions.borrowApyRanges.map(range => (
               <option key={range.value} value={range.value}>
@@ -295,6 +299,7 @@ export default function LendingPoolFilters({ filters, onFilterChange, filterOpti
             className={styles.filterSelect}
             value={filters.minUtilization}
             onChange={handleUtilizationChange}
+            aria-label="Min Utilization"
           >
             {filterOptions.utilizationRanges.map(range => (
               <option key={range.value} value={range.value}>
