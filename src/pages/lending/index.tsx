@@ -36,22 +36,22 @@ export default function LendingPage() {
               Lending Pools
             </h1>
             <div className={styles.navigationLinks}>
+              <div className={styles.tvlDisplay}>
+                <InfoIcon 
+                  content="Total Value Locked (TVL) represents the total amount of assets deposited in all lending pools" 
+                  position="left"
+                />
+                <span>Total Value Locked: ${totalTvl.toLocaleString()}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className={styles.headerRight}>
               <Link href="/" className={styles.linkWithoutUnderline}>
                 <button className={styles.backButton}>
                   Back to PnL Viewer
                 </button>
               </Link>
-            </div>
-          </div>
-          
-          <div className={styles.headerRight}>
-            <div className={styles.tvlDisplay}>
-              <InfoIcon 
-                content="Total Value Locked (TVL) represents the total amount of assets deposited in all lending pools" 
-                position="left"
-              />
-              <span>Total Value Locked: ${totalTvl.toLocaleString()}</span>
-            </div>
           </div>
         </div>
 
