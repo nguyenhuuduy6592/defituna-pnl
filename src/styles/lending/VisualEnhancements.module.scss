@@ -1,0 +1,129 @@
+@use "sass:map";
+@use '../variables.module.scss' as variables;
+
+// APY Value Styling
+.apyValue {
+  font-weight: 600;
+  transition: color 0.2s ease;
+  
+  &.positive {
+    color: variables.color(success);
+    background: rgba(variables.color(success), 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  
+  &.negative {
+    color: variables.color(negative);
+    background: rgba(variables.color(negative), 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  
+  &.neutral {
+    color: variables.color(info);
+    background: rgba(variables.color(info), 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+}
+
+// Loading Animations
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.1)
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+// Mobile Optimizations
+@include variables.breakpoint-down('sm') {
+  .metricValue {
+    font-size: variables.font-size(lg);
+  }
+  
+  .metricLabel {
+    font-size: variables.font-size(sm);
+  }
+  
+  .apyValue {
+    font-size: variables.font-size(base);
+    padding: 1px 6px;
+  }
+}
+
+// Hover Effects
+.hoverEffect {
+  transition: all 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Micro-interactions
+.pulseOnUpdate {
+  animation: pulse 0.5s ease-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+// State Transitions
+.fadeIn {
+  opacity: 0;
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.slideIn {
+  transform: translateY(20px);
+  opacity: 0;
+  animation: slideIn 0.4s ease-out forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Touch Targets for Mobile
+.touchTarget {
+  @include variables.breakpoint-down('sm') {
+    min-height: 44px;
+    min-width: 44px;
+    padding: variables.spacing(sm);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+    }
+  }
+}

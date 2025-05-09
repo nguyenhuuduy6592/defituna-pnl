@@ -99,6 +99,18 @@ $font-sizes: (
   }
 }
 
+@mixin breakpoint-down($size) {
+  @media (max-width: map.get($breakpoints, $size)) {
+    @content;
+  }
+}
+
+@mixin breakpoint-up($size) {
+  @media (min-width: map.get($breakpoints, $size)) {
+    @content;
+  }
+}
+
 // Functions
 @function color($key) {
   @return map.get($colors, $key);

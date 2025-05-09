@@ -1,15 +1,17 @@
-import React from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import styles from '../../styles/LendingPoolCard.module.scss';
-import { formatNumber, formatWalletAddress, formatPercentage } from '../../utils/formatters';
+import styles from './LendingPoolCard.module.scss';
+import visualStyles from '../../styles/lending/VisualEnhancements.module.scss';
 import InfoIcon from '../common/InfoIcon';
+import { formatNumber, formatWalletAddress, formatPercentage } from '../../utils/formatters';
 import { VaultData } from '@/utils/api/lending';
-import { useTokenMetadata } from '@/hooks/useTokenMetadata';
+import { useTokenMetadata } from '../../hooks/useTokenMetadata';
+import classNames from 'classnames';
 
 interface LendingPoolCardProps {
   vault: VaultData;
-  sortBy?: 'tvl' | 'supplyApy' | 'borrowApy' | 'utilization';
+  sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
 
@@ -32,78 +34,103 @@ export default function LendingPoolCard({ vault, sortBy, sortOrder }: LendingPoo
     return sortOrder === 'asc' ? styles.sortAsc : styles.sortDesc;
   };
 
+  // Determine APY value styling
+  const getApyValueClass = (apy: number) => {
+    if (apy > 0) return visualStyles.positive;
+    if (apy < 0) return visualStyles.negative;
+    return visualStyles.neutral;
+  };
+
+  // Memoize the card classes to prevent unnecessary recalculations
+  const cardClasses = useMemo(() => 
+    classNames(
+      styles.card,
+      visualStyles.hoverEffect,
+      visualStyles.fadeIn
+    ), []
+  );
+
   return (
-    <div className={styles.cardContainer}>
-      <div className={styles.cardWrapper}>
-        <Link href={`/lending/${vault.address}`} className={styles.card}>
-          <div className={styles.cardHeader}>
-            <div className={styles.tokenInfo}>
-              {tokenMetadata?.logo && (
-                <div className={styles.tokenLogo}>
-                  <Image
-                    src={tokenMetadata.logo}
-                    alt={`${tokenMetadata.symbol} logo`}
-                    width={24}
-                    height={24}
-                  />
-                </div>
-              )}
-              <span className={styles.tokenSymbol}>
-                {tokenMetadata?.symbol || formatWalletAddress(vault.mint)}
-              </span>
-            </div>
+    <div className={cardClasses}>
+      <div className={styles.header}>
+        <div className={styles.tokenInfo}>
+          {tokenMetadata?.logo && (
+            <img 
+              src={tokenMetadata.logo} 
+              alt={tokenMetadata.symbol} 
+              className={styles.tokenLogo}
+            />
+          )}
+          <h3 className={styles.tokenName}>
+            {tokenMetadata?.symbol || 'Unknown Token'}
+          </h3>
+        </div>
+      </div>
+
+      <div className={styles.metrics}>
+        <div className={classNames(styles.metric, getSortIndicatorClass('tvl'), visualStyles.slideIn)}>
+          <div className={classNames(styles.metricLabel, visualStyles.touchTarget)}>
+            TVL
+            <InfoIcon content="Total Value Locked in the lending pool" position="top" />
           </div>
+          <div className={styles.metricValue}>{formattedTVL}</div>
+        </div>
 
-          <div className={styles.metrics}>
-            <div className={`${styles.metric} ${getSortIndicatorClass('tvl')}`}>
-              <div className={styles.metricLabel}>
-                TVL
-                <InfoIcon content="Total Value Locked in the lending pool" position="top" />
-              </div>
-              <div className={styles.metricValue}>{formattedTVL}</div>
-            </div>
-
-            <div className={`${styles.metric} ${getSortIndicatorClass('borrowed')}`}>
-              <div className={styles.metricLabel}>
-                Borrowed
-                <InfoIcon content="Total amount borrowed from the pool" position="top" />
-              </div>
-              <div className={styles.metricValue}>{formattedBorrowed}</div>
-            </div>
-
-            <div className={`${styles.metric} ${getSortIndicatorClass('utilization')}`}>
-              <div className={styles.metricLabel}>
-                Utilization
-                <InfoIcon content="Percentage of TVL that is currently borrowed" position="top" />
-              </div>
-              <div className={styles.metricValue}>{formattedUtilization}</div>
-            </div>
-
-            <div className={`${styles.metric} ${getSortIndicatorClass('supplyApy')}`}>
-              <div className={styles.metricLabel}>
-                Supply APY
-                <InfoIcon content="Annual Percentage Yield for lenders" position="top" />
-              </div>
-              <div className={styles.metricValue}>{formattedSupplyApy}</div>
-            </div>
-
-            <div className={`${styles.metric} ${getSortIndicatorClass('borrowApy')}`}>
-              <div className={styles.metricLabel}>
-                Borrow APY
-                <InfoIcon content="Annual Percentage Yield for borrowers" position="top" />
-              </div>
-              <div className={styles.metricValue}>{formattedBorrowApy}</div>
-            </div>
-
-            <div className={styles.metric}>
-              <div className={styles.metricLabel}>
-                Supply Limit
-                <InfoIcon content="Maximum amount that can be supplied to the pool" position="top" />
-              </div>
-              <div className={styles.metricValue}>{formattedSupplyLimit}</div>
-            </div>
+        <div className={classNames(styles.metric, getSortIndicatorClass('borrowed'), visualStyles.slideIn)}>
+          <div className={classNames(styles.metricLabel, visualStyles.touchTarget)}>
+            Borrowed
+            <InfoIcon content="Total amount borrowed from the pool" position="top" />
           </div>
-        </Link>
+          <div className={styles.metricValue}>{formattedBorrowed}</div>
+        </div>
+
+        <div className={classNames(styles.metric, getSortIndicatorClass('utilization'), visualStyles.slideIn)}>
+          <div className={classNames(styles.metricLabel, visualStyles.touchTarget)}>
+            Utilization
+            <InfoIcon content="Percentage of TVL that is currently borrowed" position="top" />
+          </div>
+          <div className={classNames(styles.metricValue, visualStyles.pulseOnUpdate)}>
+            {formattedUtilization}
+          </div>
+        </div>
+
+        <div className={classNames(styles.metric, getSortIndicatorClass('supplyApy'), visualStyles.slideIn)}>
+          <div className={classNames(styles.metricLabel, visualStyles.touchTarget)}>
+            Supply APY
+            <InfoIcon content="Annual Percentage Yield for lenders" position="top" />
+          </div>
+          <div className={classNames(
+            styles.metricValue,
+            visualStyles.apyValue,
+            getApyValueClass(vault.supplyApy),
+            visualStyles.pulseOnUpdate
+          )}>
+            {formattedSupplyApy}
+          </div>
+        </div>
+
+        <div className={classNames(styles.metric, getSortIndicatorClass('borrowApy'), visualStyles.slideIn)}>
+          <div className={classNames(styles.metricLabel, visualStyles.touchTarget)}>
+            Borrow APY
+            <InfoIcon content="Annual Percentage Yield for borrowers" position="top" />
+          </div>
+          <div className={classNames(
+            styles.metricValue,
+            visualStyles.apyValue,
+            getApyValueClass(vault.borrowApy),
+            visualStyles.pulseOnUpdate
+          )}>
+            {formattedBorrowApy}
+          </div>
+        </div>
+
+        <div className={classNames(styles.metric, visualStyles.slideIn)}>
+          <div className={classNames(styles.metricLabel, visualStyles.touchTarget)}>
+            Supply Limit
+            <InfoIcon content="Maximum amount that can be supplied to this pool" position="top" />
+          </div>
+          <div className={styles.metricValue}>{formattedSupplyLimit}</div>
+        </div>
       </div>
     </div>
   );
