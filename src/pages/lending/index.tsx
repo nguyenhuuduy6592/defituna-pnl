@@ -2,8 +2,7 @@ import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useLendingPools } from '@/hooks/useLendingPools';
-import { VaultData } from '@/utils/api/lending';
-import LendingPoolCard from '@/components/lending/LendingPoolCard';
+import LendingPoolList from '@/components/lending/LendingPoolList';
 import styles from './index.module.scss';
 
 export default function LendingPage() {
@@ -17,7 +16,7 @@ export default function LendingPage() {
     refresh
   } = useLendingPools();
 
-  const totalTvl = vaults?.reduce((sum: number, vault: VaultData) => 
+  const totalTvl = vaults?.reduce((sum, vault) => 
     sum + (vault.depositedFunds.usdValue || 0), 0
   ) || 0;
 
@@ -28,7 +27,7 @@ export default function LendingPage() {
         <meta name="description" content="Explore lending opportunities on DeFiTuna" />
       </Head>
 
-      <main className={styles.main}>
+      <main>
         <div className={styles.header}>
           <div className={styles.navigationLinks}>
             <Link href="/" className={styles.linkWithoutUnderline}>
@@ -47,43 +46,13 @@ export default function LendingPage() {
           </div>
         </div>
 
-        {loading && (
-          <div className={styles.loadingContainer}>
-            <div className={styles.loader}></div>
-            <p>Loading lending pools...</p>
-          </div>
-        )}
-
-        {error && (
-          <div className={styles.errorContainer}>
-            <p className={styles.errorMessage}>Error: {error}</p>
-            <button 
-              className={styles.retryButton}
-              onClick={refresh}
-            >
-              Retry
-            </button>
-          </div>
-        )}
-
-        {!loading && !error && vaults?.length === 0 && (
-          <div className={styles.emptyContainer}>
-            <p>No lending pools available at the moment.</p>
-          </div>
-        )}
-
-        {!loading && !error && vaults?.length > 0 && (
-          <div className={styles.poolsGrid}>
-            {vaults.map((vault) => (
-              <LendingPoolCard
-                key={vault.address}
-                vault={vault}
-                sortBy={filters.sortBy}
-                sortOrder={filters.sortOrder}
-              />
-            ))}
-          </div>
-        )}
+        <LendingPoolList
+          vaults={vaults}
+          loading={loading}
+          error={error}
+          filters={filters}
+          onRetry={refresh}
+        />
       </main>
     </div>
   );
