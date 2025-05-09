@@ -38,7 +38,7 @@ export default function LendingPage() {
             <div className={styles.navigationLinks}>
               <Link href="/" className={styles.linkWithoutUnderline}>
                 <button className={styles.backButton}>
-                  Home
+                  Back to PnL Viewer
                 </button>
               </Link>
             </div>
