@@ -80,10 +80,15 @@ Based on the network logs, we'll need to retrieve and display:
    - Add empty state for when no pools are available ✅
    - Implement responsive design for all screen sizes ✅
 
-4. **Add Sorting and Filtering** (Priority: MEDIUM) (Status: NOT STARTED)
-   - Implement sorting by APY, TVL, utilization
-   - Add token filtering capabilities (match existing pools page implementation)
-   - Create UI controls for sort/filter options
+4. **Add Sorting and Filtering** (Priority: MEDIUM) (Status: COMPLETED)
+   - Implement sorting by APY, TVL, utilization ✅
+   - Add token filtering capabilities (match existing pools page implementation) ✅
+   - Create UI controls for sort/filter options ✅
+   - Add filter persistence with localStorage ✅
+   - Implement saved filters functionality ✅
+   - Add filtering by Supply APY ranges ✅
+   - Add filtering by Borrow APY ranges ✅
+   - Add filtering by Utilization ranges ✅
 
 5. **Implement Column Customization** (Priority: MEDIUM) (Status: NOT STARTED)
    - Create a column configuration modal with up/down controls
@@ -194,7 +199,7 @@ Returns current price data for a token:
 8. **Create Lending Page Layout** (Priority: HIGH) (Status: COMPLETED)
 9. **Implement Pool Card Component** (Priority: HIGH) (Status: COMPLETED)
 10. **Build Pool List Component** (Priority: HIGH) (Status: COMPLETED)
-11. **Add Sorting and Filtering** (Priority: MEDIUM) (Status: NOT STARTED)
+11. **Add Sorting and Filtering** (Priority: MEDIUM) (Status: COMPLETED)
 12. **Implement Column Reordering Modal** (Priority: MEDIUM) (Status: NOT STARTED)
 13. **Setup localStorage Persistence for Column Order** (Priority: MEDIUM) (Status: NOT STARTED)
 14. **Add Column Color Customization** (Priority: MEDIUM) (Status: NOT STARTED)

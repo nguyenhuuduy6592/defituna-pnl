@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useLendingPools } from '@/hooks/useLendingPools';
 import LendingPoolList from '@/components/lending/LendingPoolList';
+import LendingPoolFilters from '@/components/lending/LendingPoolFilters';
 import styles from './index.module.scss';
 
 export default function LendingPage() {
@@ -45,6 +46,12 @@ export default function LendingPage() {
             Total Value Locked: ${totalTvl.toLocaleString()}
           </div>
         </div>
+
+        <LendingPoolFilters
+          filters={filters}
+          onFilterChange={applyFilters}
+          filterOptions={filterOptions}
+        />
 
         <LendingPoolList
           vaults={vaults}
