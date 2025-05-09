@@ -320,7 +320,7 @@
 }
 
 /* Responsive adjustments */
-@media (min-width: map-get(variables.$breakpoints, sm)) {
+@media (min-width: map.get(variables.$breakpoints, sm)) {
   .statsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -339,7 +339,7 @@
   }
 }
 
-@media (min-width: map-get(variables.$breakpoints, lg)) {
+@media (min-width: map.get(variables.$breakpoints, lg)) {
   .statsGrid {
     grid-template-columns: repeat(3, 1fr);
   }

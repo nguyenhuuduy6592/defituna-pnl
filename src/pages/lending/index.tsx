@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useLendingPools } from '@/hooks/useLendingPools';
 import { VaultData } from '@/utils/api/lending';
+import LendingPoolCard from '@/components/lending/LendingPoolCard';
 import styles from './index.module.scss';
 
 export default function LendingPage() {
@@ -73,7 +74,14 @@ export default function LendingPage() {
 
         {!loading && !error && vaults?.length > 0 && (
           <div className={styles.poolsGrid}>
-            {/* Pool cards will be added here in the next phase */}
+            {vaults.map((vault) => (
+              <LendingPoolCard
+                key={vault.address}
+                vault={vault}
+                sortBy={filters.sortBy}
+                sortOrder={filters.sortOrder}
+              />
+            ))}
           </div>
         )}
       </main>

@@ -1,18 +1,5 @@
+@use 'sass:map';
 @use './variables.module.scss' as variables;
-
-.cardLink {
-  text-decoration: none;
-  color: variables.text-color('primary');
-  display: block;
-  width: 100%;
-}
-
-.cardWrapper {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-}
 
 .cardContainer {
   position: relative;
@@ -23,12 +10,11 @@
   flex-direction: column;
 }
 
-.cardActions {
+.cardWrapper {
   display: flex;
-  justify-content: center;
-  margin-top: variables.spacing('sm');
+  flex-direction: column;
+  height: 100%;
   width: 100%;
-  z-index: 2;
 }
 
 .card {
@@ -58,30 +44,24 @@
   margin-bottom: variables.spacing('sm');
 }
 
-.tokenPair {
+.tokenInfo {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-weight: 600;
   font-size: variables.font-size('base');
 }
 
-.tokenInfo {
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
 .tokenLogo {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
+  overflow: hidden;
   background: variables.bg-color('light');
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -94,21 +74,9 @@
   font-size: variables.font-size('sm');
 }
 
-.separator {
-  color: variables.text-color('secondary');
-}
-
-.price {
-  font-size: variables.font-size('xs');
-  color: variables.text-color('secondary');
-  background: variables.bg-color('light');
-  padding: 3px 6px;
-  border-radius: map.get(variables.$border-radius, 'sm');
-}
-
 .metrics {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: variables.spacing('sm');
 }
 
@@ -147,6 +115,9 @@
   font-size: variables.font-size('xs');
   color: variables.text-color('secondary');
   margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .metricValue {
@@ -155,60 +126,17 @@
   color: variables.text-color('primary');
 }
 
-.stats {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: variables.spacing('sm');
-}
-
-.stat {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.statLabel {
-  color: variables.text-color('secondary');
-  font-size: variables.font-size('xs');
-}
-
-.statValue {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 3px;
-  font-size: variables.font-size('sm');
-  font-weight: 500;
-  position: relative;
-  padding: 2px 5px;
-  border-radius: map.get(variables.$border-radius, 'sm');
-}
-
 /* Responsive adjustments */
-@media (min-width: map.get(variables.$breakpoints, sm)) {
-  .stats {
+@media (max-width: map.get(variables.$breakpoints, 'sm')) {
+  .metrics {
     grid-template-columns: repeat(2, 1fr);
   }
-}
-
-@media (min-width: map.get(variables.$breakpoints, md)) {
-  .stats {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .stats {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
+  
   .card {
     padding: 10px;
   }
 
-  .tokenPair {
+  .tokenInfo {
     font-size: variables.font-size('sm');
   }
 
@@ -224,3 +152,9 @@
     font-size: variables.font-size('xs');
   }
 }
+
+@media (max-width: map.get(variables.$breakpoints, 'xs')) {
+  .metrics {
+    grid-template-columns: 1fr;
+  }
+} 

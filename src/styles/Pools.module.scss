@@ -159,13 +159,13 @@
 }
 
 /* Responsive adjustments */
-@media (min-width: map-get(variables.$breakpoints, sm)) {
+@media (min-width: map.get(variables.$breakpoints, sm)) {
   .poolsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: map-get(variables.$breakpoints, lg)) {
+@media (min-width: map.get(variables.$breakpoints, lg)) {
   .poolsGrid {
     grid-template-columns: repeat(3, 1fr);
     gap: variables.spacing(md); /* Smaller gap for better fit */

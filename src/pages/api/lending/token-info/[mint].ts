@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { TokenInfo, API_ENDPOINTS, CACHE_TTL, getCachedData, setCachedData, fetchWithValidation, tokenInfoSchema } from '@/utils/api/lending';
+import { TokenInfo, API_ENDPOINTS, CACHE_TTL, getCachedData, setCachedData, fetchWithValidation, tokenInfoResponseSchema } from '@/utils/api/lending';
+import { z } from 'zod';
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,15 +25,15 @@ export default async function handler(
     }
 
     // Fetch fresh data
-    const tokenInfo = await fetchWithValidation<TokenInfo>(
+    const response = await fetchWithValidation<z.infer<typeof tokenInfoResponseSchema>>(
       API_ENDPOINTS.TOKEN_INFO(mint),
-      tokenInfoSchema
+      tokenInfoResponseSchema
     );
 
     // Cache the results
-    setCachedData(cacheKey, tokenInfo);
+    setCachedData(cacheKey, response.data);
 
-    return res.status(200).json(tokenInfo);
+    return res.status(200).json(response.data);
   } catch (error) {
     console.error('Token Info API Error:', error);
     return res.status(500).json({ error: 'Failed to fetch token info' });

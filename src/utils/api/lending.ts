@@ -73,7 +73,16 @@ export const tokenInfoSchema = z.object({
   symbol: z.string().min(1),
   logo: z.string().min(1),
   decimals: z.number().int().min(0)
-}).strict();
+}).required().strict();
+
+export const tokenInfoResponseSchema = z.object({
+  data: z.object({
+    mint: z.string().min(1),
+    symbol: z.string().min(1),
+    logo: z.string().min(1),
+    decimals: z.number().int().min(0)
+  }).required().strict()
+}).required().strict();
 
 export const priceDataSchema = z.object({
   mint: z.string().min(1),
@@ -90,12 +99,12 @@ export const CACHE_TTL = {
 };
 
 // API endpoints
-const API_BASE_URL = process.env.NEXT_PUBLIC_DEFITUNA_API_URL || 'https://api.defituna.com';
+const API_BASE_URL = process.env.DEFITUNA_API_URL || 'https://api.defituna.com/api/v1';
 
 export const API_ENDPOINTS = {
-  VAULTS: `${API_BASE_URL}/api/v1/vaults`,
-  TOKEN_INFO: (mint: string) => `${API_BASE_URL}/api/v1/mints/${mint}`,
-  PRICE_DATA: (mint: string) => `${API_BASE_URL}/api/v1/oracle-prices/${mint}`
+  VAULTS: `${API_BASE_URL}/vaults`,
+  TOKEN_INFO: (mint: string) => `${API_BASE_URL}/mints/${mint}`,
+  PRICE_DATA: (mint: string) => `${API_BASE_URL}/oracle-prices/${mint}`
 };
 
 // Helper functions
