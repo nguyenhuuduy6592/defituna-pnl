@@ -125,7 +125,7 @@ const PairCell = memo(({ pair, isInverted, leverage, onPairInversion }) => {
   const invertTooltip = `Click to ${isInverted ? 'restore' : 'invert'} token order`;
   
   return (
-    <td>
+    <td data-label="Pair">
       <span 
         className={`${styles.positionLabel} ${isInverted ? styles.invertedPair : ''}`}
         onClick={handleClick}
@@ -141,7 +141,7 @@ const PairCell = memo(({ pair, isInverted, leverage, onPairInversion }) => {
         {displayPair}
         {isInverted && <span className={styles.invertedIndicator}>↔</span>}
       </span>
-      <span className={styles.positionLeverage}>({formattedLeverage}x Leverage)</span>
+      <span className={styles.positionLeverage}>({formattedLeverage}x<span className={styles.hideOnMobile}>&nbsp;Leverage</span>)</span>
     </td>
   );
 });
@@ -169,7 +169,7 @@ const WalletCell = memo(({ walletAddress }) => {
   const formattedAddress = formatWalletAddress(walletAddress);
   
   return (
-    <td className={styles.walletCell}>
+    <td className={styles.walletCell} data-label="Wallet">
       <div 
         className={styles.walletCellContent}
         onClick={handleCopy}
@@ -204,7 +204,7 @@ const ActionsCell = memo(({ position, historyEnabled, onShare, onShowChart }) =>
   }, [position, onShowChart]);
   
   return (
-    <td>
+    <td data-label="Actions">
       <button 
         className={styles.shareButton}
         onClick={handleShare}
@@ -282,29 +282,23 @@ export const PositionsTable = memo(({
                 leverage={position.leverage}
                 onPairInversion={onPairInversion}
               />
-              
               {showWallet && (
                 <WalletCell walletAddress={position.walletAddress} />
               )}
-              
-              <td className={styles[getStateClass(position.displayStatus)]}>
+              <td data-label="Status" className={styles[getStateClass(position.displayStatus)]}>
                 {position.displayStatus}
               </td>
-              
-              <td>{formatDuration(position.age)}</td>
-              
-              <td className={styles[getValueClass(position.pnl.usd)]}>
+              <td data-label="Age">{formatDuration(position.age)}</td>
+              <td data-label="PnL" className={styles[getValueClass(position.pnl.usd)]}>
                 ${formatNumber(position.pnl.usd)} 
                 <span className={styles.positionPnlPercentage}> 
                   ({position.displayPnlPercentage}%)
                 </span>
               </td>
-              
-              <td className={styles[getValueClass(position.yield.usd)]}>
+              <td data-label="Yield" className={styles[getValueClass(position.yield.usd)]}>
                 ${formatNumber(position.yield.usd)}
               </td>
-              
-              <td>
+              <td data-label="Position Details" className={styles.hideOnMobile}>
                 <ClusterBar
                   size={position.size}
                   collateral={position.collateral}
@@ -313,8 +307,7 @@ export const PositionsTable = memo(({
                   formatValue={formatNumber}
                 />
               </td>
-              
-              <td>
+              <td data-label="Price Range" className={styles.hideOnMobile}>
                 <PriceBar
                   currentPrice={position.currentPrice}
                   entryPrice={position.entryPrice}
@@ -325,7 +318,6 @@ export const PositionsTable = memo(({
                   isInverted={isPairInverted}
                 />
               </td>
-              
               <ActionsCell 
                 position={position}
                 historyEnabled={historyEnabled}

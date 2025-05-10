@@ -67,6 +67,72 @@
       background-color: variables.bg-color(hover);
     }
   }
+
+  @include variables.breakpoint-down(md) {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    font-size: variables.font-size(xs);
+    th, td {
+      white-space: nowrap;
+      padding: variables.spacing(xs) variables.spacing(sm);
+    }
+  }
+
+  @include variables.breakpoint-down(sm) {
+    border: none;
+    thead {
+      display: none;
+    }
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: variables.spacing(sm);
+    }
+    tr {
+      display: block;
+      background: variables.bg-color(white);
+      border-radius: map.get(variables.$border-radius, sm);
+      box-shadow: 0 1px 3px variables.color(shadow);
+      margin-bottom: variables.spacing(sm);
+      border: 1px solid variables.color(border);
+      padding: variables.spacing(sm);
+      overflow: hidden;
+    }
+    td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: none;
+      padding: variables.spacing(xs) 0;
+      position: relative;
+      width: 100%;
+      font-size: variables.font-size(base);
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: variables.text-color(secondary);
+        flex: 0 0 40%;
+        text-align: left;
+        font-size: variables.font-size(base);
+        margin-right: variables.spacing(xs);
+      }
+      &:last-child {
+        justify-content: flex-end;
+      }
+    }
+    td[data-label='Actions']::before {
+      display: none;
+    }
+    .vaultInfo {
+      font-size: variables.font-size(base);
+    }
+    .actionButtons {
+      button {
+        font-size: variables.font-size(base);
+      }
+    }
+  }
 }
 
 .vaultInfo {

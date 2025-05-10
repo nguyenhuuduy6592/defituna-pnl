@@ -150,7 +150,7 @@ export const LendingPositionsDisplay = ({
                   
                   return (
                     <tr key={`${position.vault}-${position.authority || position.wallet}-${index}`}>
-                      <td>
+                      <td data-label="Vault">
                         <div className={styles.vaultInfo}>
                           {mintInfo.logo && (
                             <div className={styles.vaultIcon}>
@@ -164,7 +164,7 @@ export const LendingPositionsDisplay = ({
                           </Tooltip>
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Wallet">
                         <div 
                           className={styles.walletAddress}
                           onClick={() => utilCopyToClipboard(position.authority || position.wallet)}
@@ -185,12 +185,12 @@ export const LendingPositionsDisplay = ({
                           />
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Age">
                         {position.age !== null && position.age !== undefined 
                           ? formatDuration(position.age) 
                           : 'N/A'}
                       </td>
-                      <td>
+                      <td data-label="Funds">
                         <div>
                           <span className={styles.fundsAmount}>{formatNumber(position.funds_amount || 0, false)}</span>
                           <span className={styles.usdValueParentheses}>
@@ -198,10 +198,10 @@ export const LendingPositionsDisplay = ({
                           </span>
                         </div>
                       </td>
-                      <td className={styles.positive}>
+                      <td data-label="Supply APY" className={styles.positive}>
                         {vault.supply_apy ? formatNumber(vault.supply_apy * 100, false) : '0.00'}%
                       </td>
-                      <td className={styles.positive}>
+                      <td data-label="Earned" className={styles.positive}>
                         <div>
                           <span className={styles.earnedAmount}>{formatNumber(position.earned_amount || 0, false)}</span>
                           <span className={styles.usdValueParentheses}>
@@ -209,7 +209,7 @@ export const LendingPositionsDisplay = ({
                           </span>
                         </div>
                       </td>
-                      <td>
+                      <td data-label="Actions">
                         <div className={styles.actionButtons}>
                           <button 
                             className={styles.shareButton}

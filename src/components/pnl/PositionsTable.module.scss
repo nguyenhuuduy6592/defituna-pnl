@@ -84,6 +84,117 @@
       background-color: variables.bg-color(hover);
     }
   }
+
+  @include variables.breakpoint-down(md) {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    font-size: variables.font-size(xs);
+    th, td {
+      white-space: nowrap;
+      padding: variables.spacing(xs) variables.spacing(sm);
+    }
+  }
+  @include variables.breakpoint-down(sm) {
+    min-width: 0;
+    border: none;
+    thead {
+      display: none;
+    }
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: variables.spacing(sm);
+    }
+    tr {
+      display: block;
+      background: variables.bg-color(white);
+      border-radius: map.get(variables.$border-radius, sm);
+      box-shadow: 0 1px 3px variables.color(shadow);
+      margin-bottom: variables.spacing(sm);
+      border: 1px solid variables.color(border);
+      padding: variables.spacing(sm);
+      overflow: hidden;
+    }
+    td {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: none;
+      padding: variables.spacing(xs) 0;
+      position: relative;
+      width: 100%;
+      font-size: variables.font-size(base);
+      background: none;
+      margin-bottom: variables.spacing(xs);
+      &::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: variables.text-color(secondary);
+        flex: 0 0 40%;
+        text-align: left;
+        font-size: variables.font-size(base);
+        margin-right: variables.spacing(xs);
+      }
+      &:last-child {
+        justify-content: flex-end;
+        margin-bottom: 0;
+      }
+    }
+    td[data-label='Actions']::before {
+      display: none;
+    }
+    td[data-label='Status'] {
+      &.stateInRange {
+        background: variables.color(success) !important;
+        color: variables.bg-color(white) !important;
+      }
+      &.stateWarning {
+        background: variables.color(warning) !important;
+        color: variables.bg-color(white) !important;
+      }
+      &.stateClosed, .stateLiquidated {
+        background: variables.color(negative) !important;
+        color: variables.bg-color(white) !important;
+      }
+      &.stateOpen {
+        background: rgba(variables.color(success), 0.1) !important;
+        color: variables.color(success) !important;
+      }
+      &.stateBelow {
+        background: rgba(variables.color(info), 0.1) !important;
+        color: variables.color(info) !important;
+      }
+      &.stateAbove {
+        background: rgba(variables.color(primary), 0.1) !important;
+        color: variables.color(primary) !important;
+      }
+      .stateInRange,
+      .stateWarning,
+      .stateClosed,
+      .stateLiquidated,
+      .stateOpen,
+      .stateBelow,
+      .stateAbove {
+        display: inline-block;
+        min-width: 0;
+        width: auto;
+        border-radius: 999px;
+        padding: 2px 12px;
+        font-size: variables.font-size(base);
+        text-align: center;
+        margin: 0;
+        box-shadow: none;
+      }
+    }
+    .shareButton, .chartButton {
+      font-size: variables.font-size(base);
+      width: 100%;
+      justify-content: center;
+      margin-bottom: variables.spacing(xs);
+      margin-top: variables.spacing(sm);
+    }
+  }
 }
 
 .walletCell {
@@ -230,5 +341,12 @@
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+// Utility class to hide elements on mobile
+.hideOnMobile {
+  @include variables.breakpoint-down(sm) {
+    display: none !important;
   }
 }
