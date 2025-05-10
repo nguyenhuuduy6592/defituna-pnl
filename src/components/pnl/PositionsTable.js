@@ -10,6 +10,7 @@ import {
   invertPairString,
   copyToClipboard
 } from '../../utils';
+import { FiShare2, FiCopy } from 'react-icons/fi';
 import styles from './PositionsTable.module.scss';
 
 /**
@@ -160,6 +161,7 @@ const WalletCell = memo(({ walletAddress }) => {
   
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
       copyToClipboard(walletAddress);
     }
   }, [walletAddress]);
@@ -167,16 +169,19 @@ const WalletCell = memo(({ walletAddress }) => {
   const formattedAddress = formatWalletAddress(walletAddress);
   
   return (
-    <td 
-      title="Copy to clipboard"
-      onClick={handleCopy}
-      className={styles.walletCell}
-      role="button"
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-      aria-label={`Copy wallet address ${formattedAddress}`}
-    >
-      {formattedAddress}
+    <td className={styles.walletCell}>
+      <div 
+        className={styles.walletCellContent}
+        onClick={handleCopy}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+        title="Copy wallet address"
+        aria-label={`Copy wallet address ${formattedAddress}`}
+      >
+        <span>{formattedAddress}</span>
+        <FiCopy className={styles.copyIcon} /> 
+      </div>
     </td>
   );
 });
@@ -206,7 +211,8 @@ const ActionsCell = memo(({ position, historyEnabled, onShare, onShowChart }) =>
         aria-label={`Share ${position.pair} position`}
         title="Share position details"
       >
-        Share
+        <FiShare2 size={14} />
+        <span>Share</span>
       </button>
       {historyEnabled && (
         <button 

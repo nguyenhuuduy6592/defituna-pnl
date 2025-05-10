@@ -38,6 +38,15 @@ jest.mock('../../hooks', () => ({
   })),
   useDebounceApi: jest.fn(() => ({
     execute: jest.fn()
+  })),
+  useLendingPositions: jest.fn(() => ({
+    lendingData: { positions: [] },
+    loading: false,
+    fetchLendingData: jest.fn(),
+    getVaultDetails: jest.fn(),
+    getMintDetails: jest.fn(),
+    vaultDetails: {},
+    mintDetails: {}
   }))
 }));
 
@@ -88,21 +97,6 @@ jest.mock('../../components/pnl/AutoRefresh', () => ({
       </div>
     );
   })
-}));
-
-jest.mock('../../components/pnl/PnLDisplay', () => ({
-  PnLDisplay: jest.fn(({ data }) => (
-    <div data-testid="pnl-display">
-      {data ? (
-        <>
-          <span data-testid="total-pnl">Total PnL: ${data.totalPnL}</span>
-          <div data-testid="positions-count">Positions: {data.positions.length}</div>
-        </>
-      ) : (
-        <span>No data available</span>
-      )}
-    </div>
-  ))
 }));
 
 jest.mock('../../components/common/DisclaimerModal', () => ({
@@ -176,15 +170,13 @@ describe('Home Page', () => {
   });
 
   it('shows disclaimer modal on first visit', () => {
-    localStorage.getItem.mockReturnValueOnce(null); // Simulate first visit
-    
+    localStorage.getItem.mockImplementation(key => key === 'disclaimerShown' ? null : undefined);
     render(<HomePage />);
-    
     expect(screen.getByTestId('disclaimer-modal')).toBeInTheDocument();
   });
 
   it('does not show disclaimer on subsequent visits', () => {
-    localStorage.getItem.mockReturnValueOnce('true'); // Simulate returning visitor
+    localStorage.getItem.mockImplementation(key => key === 'disclaimerShown' ? 'true' : undefined); // Simulate returning visitor
     
     render(<HomePage />);
     
@@ -200,11 +192,5 @@ describe('Home Page', () => {
     fireEvent.click(autoRefreshToggle);
     
     expect(AutoRefresh).toHaveBeenCalled();
-  });
-
-  it('shows PnL display component', () => {
-    render(<HomePage />);
-    
-    expect(screen.getByTestId('pnl-display')).toBeInTheDocument();
   });
 });

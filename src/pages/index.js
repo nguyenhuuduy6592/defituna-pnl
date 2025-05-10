@@ -3,21 +3,29 @@ import { BsInfoCircle } from 'react-icons/bs';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { Tooltip } from '../components/common/Tooltip';
 import { DisclaimerModal } from '../components/common/DisclaimerModal';
+import { CollapsibleSection } from '../components/common/CollapsibleSection';
+import { LendingPositionShareCard } from '../components/lending/LendingPositionShareCard'; 
 import { 
   useWallet, 
   useAutoRefresh, 
   useCountdown, 
   useHistoricalData, 
-  useDebounceApi 
+  useDebounceApi,
+  useLendingPositions
 } from '../hooks';
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
+import { LendingPositionsDisplay } from '../components/pnl/LendingPositionsDisplay';
 import { 
   fetchWalletPnL
 } from '../utils';
 import styles from './index.module.scss';
 import Link from 'next/link';
+
+// Storage keys for collapsible sections
+const TRADING_EXPANDED_KEY = 'tradingExpanded';
+const LENDING_EXPANDED_KEY = 'lendingExpanded';
 
 export default () => {
   const [loading, setLoading] = useState(false);
@@ -27,6 +35,12 @@ export default () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const [allPositionsHistory, setAllPositionsHistory] = useState([]);
+
+  // State for lending position share modal
+  const [lendingShareModalState, setLendingShareModalState] = useState({
+    isOpen: false,
+    positionData: null,
+  });
 
   const {
     wallet,
@@ -162,8 +176,17 @@ export default () => {
     setRefreshInterval,
     refreshCountdown
   } = useAutoRefresh(
-    useCallback(() => fetchPnLData(activeWallets), [fetchPnLData, activeWallets])
+    useCallback(() => {
+      fetchPnLData(activeWallets);
+      // Also fetch lending positions when auto-refresh runs
+      if (lendingPositionsHook && lendingPositionsHook.fetchLendingData) {
+        lendingPositionsHook.fetchLendingData(activeWallets);
+      }
+    }, [fetchPnLData, activeWallets])
   );
+
+  // Hook for lending positions
+  const lendingPositionsHook = useLendingPositions(activeWallets);
 
   // Auto fetch data if there are active wallets on page load
   useEffect(() => {
@@ -208,7 +231,11 @@ export default () => {
     e.preventDefault();
     const walletsToSubmit = wallet ? [wallet] : activeWallets; 
     if (walletsToSubmit.length > 0) {
-      await fetchPnLData(walletsToSubmit, true); 
+      await fetchPnLData(walletsToSubmit, true);
+      // Also fetch lending positions data
+      if (lendingPositionsHook && lendingPositionsHook.fetchLendingData) {
+        lendingPositionsHook.fetchLendingData(walletsToSubmit, true);
+      }
     } else {
       setErrorMessage("Please enter a wallet address or select a saved wallet.");
       setAggregatedData(null);
@@ -224,6 +251,29 @@ export default () => {
     setDisclaimerOpen(false);
     localStorage.setItem('disclaimerShown', 'true');
   };
+
+  // Handler to open the lending position share modal
+  const handleLendingPositionShare = useCallback((positionToShare) => {
+    const vaultDetails = lendingPositionsHook.vaultDetails[positionToShare.vault];
+    const mintDetails = vaultDetails ? lendingPositionsHook.mintDetails[vaultDetails.mint] : {};
+
+    const preparedPositionData = {
+      ...positionToShare,
+      vaultSymbol: mintDetails?.symbol || 'N/A',
+      supplyApy: vaultDetails?.supply_apy ? vaultDetails.supply_apy * 100 : 0, // Convert to percentage
+      // ensure all other necessary fields from positionToShare are included
+    };
+
+    setLendingShareModalState({ isOpen: true, positionData: preparedPositionData });
+  }, [lendingPositionsHook.vaultDetails, lendingPositionsHook.mintDetails]);
+
+  // Handler to close the lending position share modal
+  const handleCloseLendingShareModal = useCallback(() => {
+    setLendingShareModalState({ isOpen: false, positionData: null });
+  }, []);
+
+  // Determine if we should show lending positions
+  const shouldShowLendingSection = activeWallets.length > 0 && lendingPositionsHook && lendingPositionsHook.lendingData && lendingPositionsHook.lendingData.positions.length > 0;
 
   const title = 'Defituna PnL Viewer';
   return (
@@ -293,12 +343,36 @@ export default () => {
       )}
 
       {activeWallets.length > 0 && (
-        <PnLDisplay
-          data={aggregatedData}
-          historyEnabled={historyEnabled}
-          loading={loading}
-          positionsHistory={allPositionsHistory}
-        />
+        <>
+          <CollapsibleSection 
+            title="Trading Positions" 
+            storageKey={TRADING_EXPANDED_KEY}
+            defaultExpanded={true}
+            visible={aggregatedData !== null}
+          >
+            <PnLDisplay
+              data={aggregatedData}
+              historyEnabled={historyEnabled}
+              loading={loading}
+              positionsHistory={allPositionsHistory}
+            />
+          </CollapsibleSection>
+          
+          <CollapsibleSection
+            title="Lending Positions"
+            storageKey={LENDING_EXPANDED_KEY}
+            defaultExpanded={true}
+            visible={shouldShowLendingSection}
+          >
+            <LendingPositionsDisplay
+              data={lendingPositionsHook.lendingData}
+              loading={lendingPositionsHook.loading}
+              getVaultDetails={lendingPositionsHook.getVaultDetails}
+              getMintDetails={lendingPositionsHook.getMintDetails}
+              onShare={handleLendingPositionShare}
+            />
+          </CollapsibleSection>
+        </>
       )}
 
       {!loading && !errorMessage && !aggregatedData && activeWallets.length > 0 && (
@@ -309,6 +383,13 @@ export default () => {
         isOpen={disclaimerOpen}
         onClose={handleCloseDisclaimer}
       />
+
+      {lendingShareModalState.isOpen && (
+        <LendingPositionShareCard 
+          position={lendingShareModalState.positionData} 
+          onClose={handleCloseLendingShareModal} 
+        />
+      )}
     </div>
   );
 };

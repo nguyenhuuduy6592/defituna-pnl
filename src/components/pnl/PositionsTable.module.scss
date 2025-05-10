@@ -87,11 +87,17 @@
 }
 
 .walletCell {
-  cursor: pointer;
-  transition: all 0.2s ease;
   user-select: none;
-  padding: variables.spacing(xs) variables.spacing(sm);
+}
+
+.walletCellContent {
+  display: flex;
+  align-items: center;
+  gap: variables.spacing(xs);
+  cursor: pointer;
+  padding: variables.spacing(xs);
   border-radius: map.get(variables.$border-radius, sm);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
     background: variables.bg-color(light);
@@ -103,7 +109,17 @@
   }
 
   &:active {
-    transform: translateY(1px);
+    background: variables.bg-color(dark);
+  }
+}
+
+.copyIcon {
+  color: variables.text-color(secondary);
+  transition: color 0.2s ease;
+  
+  .walletCellContent:hover &,
+  .walletCellContent:focus & {
+    color: variables.color(primary);
   }
 }
 
@@ -182,6 +198,10 @@
   color: variables.bg-color(white);
   border: none;
   min-width: 60px;
+
+  display: flex;
+  align-items: center;
+  gap: calc(#{variables.spacing(xs)} / 2);
 
   &:hover {
     background: variables.color(hover);

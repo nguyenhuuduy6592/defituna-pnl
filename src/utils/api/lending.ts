@@ -1,5 +1,14 @@
 import { z } from 'zod';
 
+// Added TokenMetadata interface
+export interface TokenMetadata {
+  mint: string;
+  symbol: string;
+  name: string;
+  icon?: string;
+  decimals?: number; // Optional, but good to have
+}
+
 // Types
 export interface VaultData {
   address: string;
@@ -23,6 +32,8 @@ export interface VaultData {
   depositedShares: string;
   pythOracleFeedId: string;
   pythOraclePriceUpdate: string;
+  tokenMeta?: TokenMetadata; // Added tokenMeta
+  age?: number | null;      // Added age
 }
 
 export interface TokenInfo {
@@ -151,8 +162,8 @@ export function setCachedData(key: string, data: any): void {
   });
 }
 
-// Transform API response to our internal format
-export function transformVaultData(apiVault: z.infer<typeof vaultDataSchema>): VaultData {
+// Helper to transform API data to VaultData
+export function transformApiVaultData(apiVault: z.infer<typeof vaultDataSchema>): VaultData {
   return {
     address: apiVault.address,
     mint: apiVault.mint,
@@ -175,5 +186,6 @@ export function transformVaultData(apiVault: z.infer<typeof vaultDataSchema>): V
     depositedShares: apiVault.deposited_shares,
     pythOracleFeedId: apiVault.pyth_oracle_feed_id,
     pythOraclePriceUpdate: apiVault.pyth_oracle_price_update
+    // tokenMeta and age are added later by hooks, not part of initial transform
   };
 } 
