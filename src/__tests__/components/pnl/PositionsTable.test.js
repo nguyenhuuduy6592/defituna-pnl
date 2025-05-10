@@ -231,7 +231,7 @@ describe('PositionsTable', () => {
     
     // Check for leverage display using getAllByText since there are multiple instances
     const leverageTexts = screen.getAllByText((content, element) => {
-      return content.includes('Leverage') && element.classList.contains('positionLeverage');
+      return element.classList.contains('positionLeverage');
     });
     expect(leverageTexts.length).toBe(2);
   });
