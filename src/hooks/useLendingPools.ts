@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { VaultData, TokenInfo, PriceData } from '@/utils/api/lending';
+import { VaultData, TokenInfo, PriceData, transformApiVaultData } from '@/utils/api/lending';
 
 interface TokenMetadata {
   mint: string;
@@ -120,10 +120,25 @@ export function useLendingPools(): LendingPoolsState {
         throw new Error('Failed to fetch vaults');
       }
 
-      const data = await response.json();
+      const responseData = await response.json();
+      let rawVaultsArray: any[] = [];
+
+      if (Array.isArray(responseData)) {
+        rawVaultsArray = responseData;
+      } else if (responseData && Array.isArray(responseData.data)) {
+        // Common pattern: API returns { data: [...] }
+        rawVaultsArray = responseData.data;
+      } else {
+        // Log the unexpected structure for debugging
+        console.error('Unexpected data structure from /api/lending/vaults:', responseData);
+        throw new Error('Unexpected data structure for vaults. Expected an array.');
+      }
+
+      // Transform the raw API data to match the VaultData interface
+      const transformedVaultsData = rawVaultsArray.map(transformApiVaultData);
 
       // Update vaults
-      setVaults(data);
+      setVaults(transformedVaultsData);
 
       // Update filter options from the total vault list
       const tokenMints = new Set<string>();
@@ -132,7 +147,7 @@ export function useLendingPools(): LendingPoolsState {
       const borrowApyValues: number[] = [];
       const utilizationValues: number[] = [];
 
-      data.forEach((vault: VaultData) => {
+      transformedVaultsData.forEach((vault: VaultData) => {
         tokenMints.add(vault.mint);
         tvlValues.push(vault.depositedFunds.usdValue);
         // Convert APY values from decimal to percentage
@@ -216,6 +231,7 @@ export function useLendingPools(): LendingPoolsState {
     } catch (err) {
       console.error('Error fetching vaults:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch vaults');
+      setVaults([]); // Ensure vaults is an empty array on error
     } finally {
       setLoading(false);
     }
