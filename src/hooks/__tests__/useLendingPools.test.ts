@@ -4,21 +4,35 @@ import { useLendingPools } from '../useLendingPools';
 // Mock fetch globally
 global.fetch = jest.fn();
 
-// Mock data
-const mockVaults = [
+// Mock data for API response (snake_case)
+const mockApiVaults = [
   {
+    address: 'address1',
     mint: 'token1',
-    depositedFunds: { usdValue: 100000 },
-    supplyApy: 0.05, // 5%
-    borrowApy: 0.08, // 8%
+    deposited_funds: { amount: '100000', usd: 100000 },
+    borrowed_funds: { amount: '50000', usd: 50000 },
+    supply_limit: { amount: '200000', usd: 200000 },
+    supply_apy: 0.05, // 5%
+    borrow_apy: 0.08, // 8%
     utilization: 0.6, // 60%
+    borrowed_shares: '500',
+    deposited_shares: '1000',
+    pyth_oracle_feed_id: 'pyth_id_1',
+    pyth_oracle_price_update: 'pyth_update_1',
   },
   {
+    address: 'address2',
     mint: 'token2',
-    depositedFunds: { usdValue: 500000 },
-    supplyApy: 0.03, // 3%
-    borrowApy: 0.06, // 6%
+    deposited_funds: { amount: '500000', usd: 500000 },
+    borrowed_funds: { amount: '100000', usd: 100000 },
+    supply_limit: { amount: '1000000', usd: 1000000 },
+    supply_apy: 0.03, // 3%
+    borrow_apy: 0.06, // 6%
     utilization: 0.4, // 40%
+    borrowed_shares: '1000',
+    deposited_shares: '5000',
+    pyth_oracle_feed_id: 'pyth_id_2',
+    pyth_oracle_price_update: 'pyth_update_2',
   },
 ];
 
@@ -36,7 +50,7 @@ describe('useLendingPools', () => {
       if (url === '/api/lending/vaults') {
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve(mockVaults),
+          json: () => Promise.resolve({ data: mockApiVaults }), // Return data wrapped in 'data' property
         });
       }
       if (url.includes('/api/lending/token-info/')) {
