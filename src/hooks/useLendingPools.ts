@@ -240,13 +240,6 @@ export function useLendingPools(): LendingPoolsState {
   // Initial fetch and refresh interval
   useEffect(() => {
     fetchVaults();
-    
-    // Refresh every 30 seconds as specified in the caching strategy
-    const intervalId = setInterval(() => {
-      fetchVaults();
-    }, 30000);
-    
-    return () => clearInterval(intervalId);
   }, [fetchVaults]);
 
   // Apply filters and sorting
