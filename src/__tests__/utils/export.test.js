@@ -32,6 +32,13 @@ global.File = jest.fn((blob, fileName, options) => ({
   type: options?.type,
 }));
 
+// Mock fetch for blob conversion
+global.fetch = jest.fn(() => 
+  Promise.resolve({
+    blob: () => Promise.resolve(new Blob(['mock blob content'], { type: 'image/png' }))
+  })
+);
+
 // Mock console
 let consoleErrorSpy;
 let consoleWarnSpy;
@@ -71,7 +78,7 @@ describe('Export Utilities', () => {
 
   // --- Test Cases ---
   describe('exportChartAsImage (using html2canvas)', () => {
-    const mockElement = { current: document.createElement('div') }; // Simple mock element
+    const mockElement = { current: document.createElement('div') };
     const defaultFileName = `export-${new Date().toISOString().slice(0, 10)}.png`;
 
     it('should export element successfully with given filename', async () => {
@@ -84,6 +91,17 @@ describe('Export Utilities', () => {
       expect(mockLink.download).toBe(fileName);
       expect(mockLink.href).toBe('mock-data-url-from-canvas');
       expect(mockLink.click).toHaveBeenCalledTimes(1);
+    });
+
+    it('should use default filename if none provided', async () => {
+      const result = await exportChartAsImage(mockElement);
+      
+      expect(result).toBe(true);
+      expect(mockLink.download).toMatch(/^export-\d{4}-\d{2}-\d{2}\.png$/);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[exportCardAsImage] No file name provided, using default:',
+        expect.stringMatching(/^export-\d{4}-\d{2}-\d{2}\.png$/)
+      );
     });
 
     it('should return false and log error if elementRef is invalid', async () => {
@@ -111,7 +129,7 @@ describe('Export Utilities', () => {
   });
   
   describe('exportCardAsImage (using html-to-image)', () => {
-    const mockElement = { current: document.createElement('div') }; // Simple mock element
+    const mockElement = { current: document.createElement('div') };
     const defaultFileName = `export-${new Date().toISOString().slice(0, 10)}.png`;
 
     it('should export element successfully with given filename', async () => {
@@ -119,11 +137,26 @@ describe('Export Utilities', () => {
       const result = await exportCardAsImage(mockElement, fileName);
       
       expect(result).toBe(true);
-      expect(toPng).toHaveBeenCalledWith(mockElement.current, expect.objectContaining({ quality: 1.0 }));
+      expect(toPng).toHaveBeenCalledWith(mockElement.current, expect.objectContaining({ 
+        quality: 1.0,
+        pixelRatio: 2,
+        skipAutoScale: true
+      }));
       expect(document.createElement).toHaveBeenCalledWith('a');
       expect(mockLink.download).toBe(fileName);
       expect(mockLink.href).toBe('mock-data-url-from-toPng');
       expect(mockLink.click).toHaveBeenCalledTimes(1);
+    });
+
+    it('should use default filename if none provided', async () => {
+      const result = await exportCardAsImage(mockElement);
+      
+      expect(result).toBe(true);
+      expect(mockLink.download).toMatch(/^export-\d{4}-\d{2}-\d{2}\.png$/);
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[exportCardAsImage] No file name provided, using default:',
+        expect.stringMatching(/^export-\d{4}-\d{2}-\d{2}\.png$/)
+      );
     });
 
     it('should return false and log error if contentRef is invalid', async () => {
@@ -150,8 +183,13 @@ describe('Export Utilities', () => {
     });
   });
 
-  describe('shareCard (using html2canvas and navigator.share)', () => {
-    const mockElement = { current: document.createElement('div') };
+  describe('shareCard (using html-to-image)', () => {
+    const mockContentElement = document.createElement('div');
+    const mockElement = { 
+      current: document.createElement('div')
+    };
+    mockElement.current.querySelector = jest.fn().mockReturnValue(mockContentElement);
+    
     const defaultFileName = `share-${new Date().toISOString().slice(0, 10)}.png`;
     const shareTitle = 'Test Share Title';
     const shareText = 'Test Share Text';
@@ -161,11 +199,15 @@ describe('Export Utilities', () => {
       const result = await shareCard(mockElement, fileName, shareTitle, shareText);
 
       expect(result).toBe(true);
-      expect(html2canvas).toHaveBeenCalledWith(mockElement.current, expect.objectContaining({ backgroundColor: '#1a1a1a' }));
+      expect(toPng).toHaveBeenCalledWith(mockContentElement, expect.objectContaining({ 
+        quality: 1.0,
+        pixelRatio: 2,
+        skipAutoScale: true
+      }));
       expect(File).toHaveBeenCalledTimes(1);
       expect(navigator.share).toHaveBeenCalledTimes(1);
       expect(navigator.share).toHaveBeenCalledWith({
-        files: [expect.any(Object)], // Check that a file object was created
+        files: [expect.any(Object)],
         title: shareTitle,
         text: shareText,
       });
@@ -179,9 +221,9 @@ describe('Export Utilities', () => {
       const result = await shareCard(mockElement, fileName, shareTitle, shareText);
 
       expect(result).toBe(true);
-      expect(html2canvas).toHaveBeenCalled();
-      expect(File).toHaveBeenCalledTimes(1); // File still created
-      expect(mockNavigatorShare).not.toHaveBeenCalled(); // Share API not called
+      expect(toPng).toHaveBeenCalled();
+      expect(File).toHaveBeenCalledTimes(1);
+      expect(mockNavigatorShare).not.toHaveBeenCalled();
       expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Web Share API not supported'));
       
       // Check download fallback
@@ -190,61 +232,64 @@ describe('Export Utilities', () => {
       expect(mockLink.href).toBe('mock-blob-url');
       expect(mockLink.click).toHaveBeenCalledTimes(1);
       expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
-      // Cannot easily test revokeObjectURL timeout with standard timers
       
       // Restore share API for other tests
       global.navigator.share = mockNavigatorShare; 
     });
 
-    it('should return false and log error if elementRef is invalid', async () => {
-       const result1 = await shareCard(null, 'test.png');
-       const result2 = await shareCard({ current: null }, 'test.png');
-       
-       expect(result1).toBe(false);
-       expect(result2).toBe(false);
-       expect(html2canvas).not.toHaveBeenCalled();
-       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid element reference'));
-       expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+    it('should return false if content element is not found', async () => {
+      mockElement.current.querySelector.mockReturnValueOnce(null);
+      const result = await shareCard(mockElement, 'test.png');
+      
+      expect(result).toBe(false);
+      expect(toPng).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Could not find content element'));
     });
 
-    it('should return false and log error if html2canvas fails', async () => {
-      const error = new Error('Canvas generation failed');
-      html2canvas.mockRejectedValueOnce(error);
+    it('should return false and log error if elementRef is invalid', async () => {
+      const result1 = await shareCard(null, 'test.png');
+      const result2 = await shareCard({ current: null }, 'test.png');
+      
+      expect(result1).toBe(false);
+      expect(result2).toBe(false);
+      expect(toPng).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid element reference'));
+      expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should return false and log error if toPng fails', async () => {
+      const error = new Error('Image generation failed');
+      toPng.mockRejectedValueOnce(error);
 
       const result = await shareCard(mockElement, 'test.png');
 
       expect(result).toBe(false);
-      expect(html2canvas).toHaveBeenCalled();
+      expect(toPng).toHaveBeenCalled();
       expect(navigator.share).not.toHaveBeenCalled();
       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error sharing card'), error);
     });
 
-    it('should return false and log error if toBlob fails', async () => {
-       html2canvas.mockResolvedValueOnce({ 
-          // Simulate toBlob calling callback with null
-          toBlob: jest.fn((callback) => callback(null))
-       });
+    it('should return false and log error if blob creation fails', async () => {
+      global.fetch.mockRejectedValueOnce(new Error('Blob creation failed'));
+      
+      const result = await shareCard(mockElement, 'test.png');
 
-       const result = await shareCard(mockElement, 'test.png');
-
-       expect(result).toBe(false);
-       expect(html2canvas).toHaveBeenCalled();
-       expect(navigator.share).not.toHaveBeenCalled();
-       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error sharing card'), expect.any(Error));
-       expect(consoleErrorSpy.mock.calls[0][1].message).toContain('Failed to create image blob');
+      expect(result).toBe(false);
+      expect(toPng).toHaveBeenCalled();
+      expect(navigator.share).not.toHaveBeenCalled();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error sharing card'), expect.any(Error));
     });
 
     it('should return false and log error if navigator.share rejects', async () => {
-        const shareError = new Error('Share cancelled by user');
-        mockNavigatorShare.mockRejectedValueOnce(shareError);
+      const shareError = new Error('Share cancelled by user');
+      mockNavigatorShare.mockRejectedValueOnce(shareError);
 
-        const result = await shareCard(mockElement, 'test.png');
+      const result = await shareCard(mockElement, 'test.png');
 
-        expect(result).toBe(false);
-        expect(html2canvas).toHaveBeenCalled();
-        expect(navigator.share).toHaveBeenCalledTimes(1);
-        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error sharing card'), shareError);
+      expect(result).toBe(false);
+      expect(toPng).toHaveBeenCalled();
+      expect(navigator.share).toHaveBeenCalledTimes(1);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error sharing card'), shareError);
     });
-
   });
 }); 
