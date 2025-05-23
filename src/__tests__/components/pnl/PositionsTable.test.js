@@ -528,412 +528,408 @@ describe('PositionsTable', () => {
       expect(screen.getByText(/\( *N\/A *x/)).toBeInTheDocument();
     });
   });
-});
 
-describe('TableHeader Component', () => {
-  it('calls onSort with correct field when sortable header is clicked', () => {
-    const mockOnSort = jest.fn();
-    const sortState = { field: 'pnl', direction: 'desc' };
-    
-    render(
-      <table>
-        <TableHeader 
-          showWallet={true}
-          positionsCount={5}
-          sortState={sortState}
-          onSort={mockOnSort}
-        />
-      </table>
-    );
-    
-    // Click on the Age header
-    fireEvent.click(screen.getByText('Age ↕'));
-    
-    // Check that onSort was called with 'age'
-    expect(mockOnSort).toHaveBeenCalledWith('age');
-  });
-  
-  it('renders correct sort icons based on current sort state', () => {
-    const sortState = { field: 'pair', direction: 'asc' };
-    
-    render(
-      <table>
-        <TableHeader 
-          showWallet={true}
-          positionsCount={5}
-          sortState={sortState}
-          onSort={jest.fn()}
-        />
-      </table>
-    );
-    
-    // Check that pair header has ascending arrow
-    expect(screen.getByText('Pair ↑')).toBeInTheDocument();
-    
-    // Check that other headers have neutral arrow
-    expect(screen.getByText('Age ↕')).toBeInTheDocument();
-    expect(screen.getByText('PnL ↕')).toBeInTheDocument();
-  });
-  
-  it('renders no sort icons when only one position exists', () => {
-    const sortState = { field: 'pair', direction: 'asc' };
-    
-    render(
-      <table>
-        <TableHeader 
-          showWallet={true}
-          positionsCount={1} // Only one position
-          sortState={sortState}
-          onSort={jest.fn()}
-        />
-      </table>
-    );
-    
-    // Check that headers don't have arrows
-    expect(screen.getByText('Pair')).toBeInTheDocument();
-    expect(screen.getByText('Age')).toBeInTheDocument();
-    expect(screen.getByText('PnL')).toBeInTheDocument();
-  });
-});
-
-describe('PairCell Component', () => {
-  it('displays correct pair text based on inversion state', () => {
-    const pair = 'ETH/USDC';
-    const invertedPair = 'USDC/ETH'; // This is what invertPairString would return
-    invertPairString.mockReturnValue(invertedPair);
-    
-    const { rerender } = render(
-      <table>
-        <tbody>
-          <tr>
-            <PairCell 
-              pair={pair}
-              isInverted={false}
-              leverage={2}
-              onPairInversion={jest.fn()}
-            />
-          </tr>
-        </tbody>
-      </table>
-    );
-    
-    // Check that original pair is displayed when not inverted
-    expect(screen.getByText('ETH/USDC', { exact: false })).toBeInTheDocument();
-    expect(screen.queryByText('USDC/ETH', { exact: false })).not.toBeInTheDocument();
-    
-    // Rerender with inverted=true
-    rerender(
-      <table>
-        <tbody>
-          <tr>
-            <PairCell 
-              pair={pair}
-              isInverted={true}
-              leverage={2}
-              onPairInversion={jest.fn()}
-            />
-          </tr>
-        </tbody>
-      </table>
-    );
-    
-    // Check that inverted pair is displayed when inverted
-    expect(screen.getByText('USDC/ETH', { exact: false })).toBeInTheDocument();
-  });
-  
-  it('calls onPairInversion with the correct pair when clicked', () => {
-    const pair = 'ETH/USDC';
-    const onPairInversion = jest.fn();
-    
-    render(
-      <table>
-        <tbody>
-          <tr>
-            <PairCell 
-              pair={pair}
-              isInverted={false}
-              leverage={2}
-              onPairInversion={onPairInversion}
-            />
-          </tr>
-        </tbody>
-      </table>
-    );
-    
-    // Click on the pair cell
-    fireEvent.click(screen.getByText('ETH/USDC', { exact: false }));
-    
-    // Check that onPairInversion was called with the correct pair
-    expect(onPairInversion).toHaveBeenCalledWith(pair);
-  });
-});
-
-describe('WalletCell Component', () => {
-  it('formats and displays wallet address correctly', () => {
-    const walletAddress = '0x1234567890abcdef1234567890abcdef12345678';
-    const formattedAddress = '0x1234...5678'; // Mocked in formatWalletAddress
-    
-    render(
-      <table>
-        <tbody>
-          <tr>
-            <WalletCell walletAddress={walletAddress} />
-          </tr>
-        </tbody>
-      </table>
-    );
-    
-    // Check that formatted address is displayed
-    expect(screen.getByText(formattedAddress)).toBeInTheDocument();
-  });
-  
-  it('calls copyToClipboard with wallet address when clicked', () => {
-    const walletAddress = '0x1234567890abcdef1234567890abcdef12345678';
-    
-    render(
-      <table>
-        <tbody>
-          <tr>
-            <WalletCell walletAddress={walletAddress} />
-          </tr>
-        </tbody>
-      </table>
-    );
-    
-    // Click on the wallet cell
-    fireEvent.click(screen.getByRole('button'));
-    
-    // Check that copyToClipboard was called with the correct address
-    expect(copyToClipboard).toHaveBeenCalledWith(walletAddress);
-  });
-});
-
-describe('ActionsCell Component', () => {
-  const position = mockPositions[0];
-  
-  it('renders share button', () => {
-    const onShare = jest.fn();
-    
-    render(
-      <table>
-        <tbody>
-          <tr>
-            <ActionsCell 
-              position={position}
-              historyEnabled={false} // No chart button
-              onShare={onShare}
-              onShowChart={jest.fn()}
-            />
-          </tr>
-        </tbody>
-      </table>
-    );
-    
-    // Check that share button is rendered
-    expect(screen.getByText('Share')).toBeInTheDocument();
-    expect(screen.queryByText('Chart')).not.toBeInTheDocument();
-  });
-  
-  it('renders chart button when history is enabled', () => {
-    render(
-      <table>
-        <tbody>
-          <tr>
-            <ActionsCell 
-              position={position}
-              historyEnabled={true}
-              onShare={jest.fn()}
-              onShowChart={jest.fn()}
-            />
-          </tr>
-        </tbody>
-      </table>
-    );
-    
-    // Check that both buttons are rendered
-    expect(screen.getByText('Share')).toBeInTheDocument();
-    expect(screen.getByText('Chart')).toBeInTheDocument();
-  });
-  
-  it('calls onShare with position when share button is clicked', () => {
-    const onShare = jest.fn();
-    
-    render(
-      <table>
-        <tbody>
-          <tr>
-            <ActionsCell 
-              position={position}
-              historyEnabled={true}
-              onShare={onShare}
-              onShowChart={jest.fn()}
-            />
-          </tr>
-        </tbody>
-      </table>
-    );
-    
-    // Click on the share button
-    fireEvent.click(screen.getByText('Share'));
-    
-    // Check that onShare was called with the correct position
-    expect(onShare).toHaveBeenCalledWith(position);
-  });
-  
-  it('calls onShowChart with position when chart button is clicked', () => {
-    const onShowChart = jest.fn();
-    
-    render(
-      <table>
-        <tbody>
-          <tr>
-            <ActionsCell 
-              position={position}
-              historyEnabled={true}
-              onShare={jest.fn()}
-              onShowChart={onShowChart}
-            />
-          </tr>
-        </tbody>
-      </table>
-    );
-    
-    // Click on the chart button
-    fireEvent.click(screen.getByText('Chart'));
-    
-    // Check that onShowChart was called with the correct position
-    expect(onShowChart).toHaveBeenCalledWith(position);
-  });
-});
-
-// Additional tests for TableHeader to improve function coverage
-describe('TableHeader Additional Tests', () => {
-  it('handles each column sort click', () => {
-    const mockOnSort = jest.fn();
-    const sortState = { field: 'pnl', direction: 'desc' };
-    
-    render(
-      <table>
-        <TableHeader 
-          showWallet={true}
-          positionsCount={5}
-          sortState={sortState}
-          onSort={mockOnSort}
-        />
-      </table>
-    );
-    
-    // Define headers and their corresponding field names
-    const headerFieldMap = {
-      'Pair': 'pair',
-      'Wallet': 'walletAddress', // Special case, not just lowercase
-      'Status': 'status',
-      'Age': 'age',
-      'PnL': 'pnl',
-      'Yield': 'yield',
-      'Position Details': 'size' // Special case, not just lowercase
-    };
-    
-    // Test each header
-    Object.entries(headerFieldMap).forEach(([headerText, fieldName]) => {
-      // Reset mock between clicks
-      mockOnSort.mockClear();
+  describe('PairCell Component', () => {
+    it('displays correct pair text based on inversion state', () => {
+      const pair = 'ETH/USDC';
+      const invertedPair = 'USDC/ETH'; // This is what invertPairString would return
+      invertPairString.mockReturnValue(invertedPair);
       
-      // Find and click header
-      const header = screen.getByText(new RegExp(`^${headerText}`)); // Use regex to match with/without sort icon
-      fireEvent.click(header);
+      const { rerender } = render(
+        <table>
+          <tbody>
+            <tr>
+              <PairCell 
+                pair={pair}
+                isInverted={false}
+                leverage={2}
+                onPairInversion={jest.fn()}
+              />
+            </tr>
+          </tbody>
+        </table>
+      );
       
-      // Check correct field was passed
-      expect(mockOnSort).toHaveBeenCalledWith(fieldName);
+      // Check that original pair is displayed when not inverted
+      expect(screen.getByText('ETH/USDC', { exact: false })).toBeInTheDocument();
+      expect(screen.queryByText('USDC/ETH', { exact: false })).not.toBeInTheDocument();
+      
+      // Rerender with inverted=true
+      rerender(
+        <table>
+          <tbody>
+            <tr>
+              <PairCell 
+                pair={pair}
+                isInverted={true}
+                leverage={2}
+                onPairInversion={jest.fn()}
+              />
+            </tr>
+          </tbody>
+        </table>
+      );
+      
+      // Check that inverted pair is displayed when inverted
+      expect(screen.getByText('USDC/ETH', { exact: false })).toBeInTheDocument();
+    });
+    
+    it('calls onPairInversion with the correct pair when clicked', () => {
+      const pair = 'ETH/USDC';
+      const onPairInversion = jest.fn();
+      
+      render(
+        <table>
+          <tbody>
+            <tr>
+              <PairCell 
+                pair={pair}
+                isInverted={false}
+                leverage={2}
+                onPairInversion={onPairInversion}
+              />
+            </tr>
+          </tbody>
+        </table>
+      );
+      
+      // Click on the pair cell
+      fireEvent.click(screen.getByText('ETH/USDC', { exact: false }));
+      
+      // Check that onPairInversion was called with the correct pair
+      expect(onPairInversion).toHaveBeenCalledWith(pair);
     });
   });
-  
-  it('adds aria-sort attributes only to the sorted column', () => {
-    const sortState = { field: 'pnl', direction: 'desc' };
+
+  describe('WalletCell Component', () => {
+    it('formats and displays wallet address correctly', () => {
+      const walletAddress = '0x1234567890abcdef1234567890abcdef12345678';
+      const formattedAddress = '0x1234...5678'; // Mocked in formatWalletAddress
+      
+      render(
+        <table>
+          <tbody>
+            <tr>
+              <WalletCell walletAddress={walletAddress} />
+            </tr>
+          </tbody>
+        </table>
+      );
+      
+      // Check that formatted address is displayed
+      expect(screen.getByText(formattedAddress)).toBeInTheDocument();
+    });
     
-    render(
-      <table>
-        <TableHeader 
-          showWallet={true}
-          positionsCount={5}
-          sortState={sortState}
-          onSort={jest.fn()}
-        />
-      </table>
-    );
-    
-    // Check PnL header has aria-sort="desc"
-    const pnlHeader = screen.getByText(/^PnL/).closest('th');
-    expect(pnlHeader).toHaveAttribute('aria-sort', 'desc');
-    
-    // Other headers should not have aria-sort
-    const pairHeader = screen.getByText(/^Pair/).closest('th');
-    expect(pairHeader).not.toHaveAttribute('aria-sort', 'desc');
-    expect(pairHeader).not.toHaveAttribute('aria-sort', 'asc');
-    
-    // Non-sortable headers should not have aria-sort at all
-    const priceRangeHeader = screen.getByText('Price Range');
-    expect(priceRangeHeader).not.toHaveAttribute('aria-sort');
+    it('calls copyToClipboard with wallet address when clicked', () => {
+      const walletAddress = '0x1234567890abcdef1234567890abcdef12345678';
+      
+      render(
+        <table>
+          <tbody>
+            <tr>
+              <WalletCell walletAddress={walletAddress} />
+            </tr>
+          </tbody>
+        </table>
+      );
+      
+      // Click on the wallet cell
+      fireEvent.click(screen.getByRole('button'));
+      
+      // Check that copyToClipboard was called with the correct address
+      expect(copyToClipboard).toHaveBeenCalledWith(walletAddress);
+    });
   });
-  
-  it('conditionally renders wallet header based on showWallet prop', () => {
-    // First with showWallet=true
-    const { rerender } = render(
-      <table>
-        <TableHeader 
-          showWallet={true}
-          positionsCount={5}
-          sortState={{ field: 'pnl', direction: 'desc' }}
-          onSort={jest.fn()}
-        />
-      </table>
-    );
+
+  describe('ActionsCell Component', () => {
+    const position = mockPositions[0];
     
-    // Wallet header should be present
-    expect(screen.getByText(/^Wallet/)).toBeInTheDocument();
+    it('renders share button', () => {
+      const onShare = jest.fn();
+      
+      render(
+        <table>
+          <tbody>
+            <tr>
+              <ActionsCell 
+                position={position}
+                historyEnabled={false} // No chart button
+                onShare={onShare}
+                onShowChart={jest.fn()}
+              />
+            </tr>
+          </tbody>
+        </table>
+      );
+      
+      // Check that share button is rendered
+      expect(screen.getByText('Share')).toBeInTheDocument();
+      expect(screen.queryByText('Chart')).not.toBeInTheDocument();
+    });
     
-    // Rerender with showWallet=false
-    rerender(
-      <table>
-        <TableHeader 
-          showWallet={false}
-          positionsCount={5}
-          sortState={{ field: 'pnl', direction: 'desc' }}
-          onSort={jest.fn()}
-        />
-      </table>
-    );
+    it('renders chart button when history is enabled', () => {
+      render(
+        <table>
+          <tbody>
+            <tr>
+              <ActionsCell 
+                position={position}
+                historyEnabled={true}
+                onShare={jest.fn()}
+                onShowChart={jest.fn()}
+              />
+            </tr>
+          </tbody>
+        </table>
+      );
+      
+      // Check that both buttons are rendered
+      expect(screen.getByText('Share')).toBeInTheDocument();
+      expect(screen.getByText('Chart')).toBeInTheDocument();
+    });
     
-    // Wallet header should not be present
-    expect(screen.queryByText(/^Wallet/)).not.toBeInTheDocument();
+    it('calls onShare with position when share button is clicked', () => {
+      const onShare = jest.fn();
+      
+      render(
+        <table>
+          <tbody>
+            <tr>
+              <ActionsCell 
+                position={position}
+                historyEnabled={true}
+                onShare={onShare}
+                onShowChart={jest.fn()}
+              />
+            </tr>
+          </tbody>
+        </table>
+      );
+      
+      // Click on the share button
+      fireEvent.click(screen.getByText('Share'));
+      
+      // Check that onShare was called with the correct position
+      expect(onShare).toHaveBeenCalledWith(position);
+    });
+    
+    it('calls onShowChart with position when chart button is clicked', () => {
+      const onShowChart = jest.fn();
+      
+      render(
+        <table>
+          <tbody>
+            <tr>
+              <ActionsCell 
+                position={position}
+                historyEnabled={true}
+                onShare={jest.fn()}
+                onShowChart={onShowChart}
+              />
+            </tr>
+          </tbody>
+        </table>
+      );
+      
+      // Click on the chart button
+      fireEvent.click(screen.getByText('Chart'));
+      
+      // Check that onShowChart was called with the correct position
+      expect(onShowChart).toHaveBeenCalledWith(position);
+    });
   });
-  
-  it('handles onClick with multiple sort fields correctly', () => {
-    const mockOnSort = jest.fn();
+
+  describe('TableHeader Component', () => {
+    it('calls onSort with correct field when sortable header is clicked', () => {
+      const mockOnSort = jest.fn();
+      const sortState = { field: 'pnl', direction: 'desc' };
+      
+      render(
+        <table>
+          <TableHeader 
+            showWallet={true}
+            positionsCount={5}
+            sortState={sortState}
+            onSort={mockOnSort}
+          />
+        </table>
+      );
+      
+      // Click on the Age header
+      fireEvent.click(screen.getByText('Age ↕'));
+      
+      // Check that onSort was called with 'age'
+      expect(mockOnSort).toHaveBeenCalledWith('age');
+    });
     
-    render(
-      <table>
-        <TableHeader 
-          showWallet={true}
-          positionsCount={5}
-          sortState={{ field: 'pnl', direction: 'desc' }}
-          onSort={mockOnSort}
-        />
-      </table>
-    );
+    it('renders correct sort icons based on current sort state', () => {
+      const sortState = { field: 'pair', direction: 'asc' };
+      
+      render(
+        <table>
+          <TableHeader 
+            showWallet={true}
+            positionsCount={5}
+            sortState={sortState}
+            onSort={jest.fn()}
+          />
+        </table>
+      );
+      
+      // Check that pair header has ascending arrow
+      expect(screen.getByText('Pair ↑')).toBeInTheDocument();
+      
+      // Check that other headers have neutral arrow
+      expect(screen.getByText('Age ↕')).toBeInTheDocument();
+      expect(screen.getByText('PnL ↕')).toBeInTheDocument();
+    });
     
-    // Click on PnL header (already sorted field)
-    fireEvent.click(screen.getByText(/^PnL/));
-    expect(mockOnSort).toHaveBeenCalledWith('pnl');
+    it('renders no sort icons when only one position exists', () => {
+      const sortState = { field: 'pair', direction: 'asc' };
+      
+      render(
+        <table>
+          <TableHeader 
+            showWallet={true}
+            positionsCount={1} // Only one position
+            sortState={sortState}
+            onSort={jest.fn()}
+          />
+        </table>
+      );
+      
+      // Check that headers don't have arrows
+      expect(screen.getByText('Pair')).toBeInTheDocument();
+      expect(screen.getByText('Age')).toBeInTheDocument();
+      expect(screen.getByText('PnL')).toBeInTheDocument();
+    });
+    it('handles each column sort click', () => {
+      const mockOnSort = jest.fn();
+      const sortState = { field: 'pnl', direction: 'desc' };
+      
+      render(
+        <table>
+          <TableHeader 
+            showWallet={true}
+            positionsCount={5}
+            sortState={sortState}
+            onSort={mockOnSort}
+          />
+        </table>
+      );
+      
+      // Define headers and their corresponding field names
+      const headerFieldMap = {
+        'Pair': 'pair',
+        'Wallet': 'walletAddress', // Special case, not just lowercase
+        'Status': 'status',
+        'Age': 'age',
+        'PnL': 'pnl',
+        'Yield': 'yield',
+        'Position Details': 'size' // Special case, not just lowercase
+      };
+      
+      // Test each header
+      Object.entries(headerFieldMap).forEach(([headerText, fieldName]) => {
+        // Reset mock between clicks
+        mockOnSort.mockClear();
+        
+        // Find and click header
+        const header = screen.getByText(new RegExp(`^${headerText}`)); // Use regex to match with/without sort icon
+        fireEvent.click(header);
+        
+        // Check correct field was passed
+        expect(mockOnSort).toHaveBeenCalledWith(fieldName);
+      });
+    });
     
-    // Click on Yield header (different field)
-    mockOnSort.mockClear();
-    fireEvent.click(screen.getByText(/^Yield/));
-    expect(mockOnSort).toHaveBeenCalledWith('yield');
+    it('adds aria-sort attributes only to the sorted column', () => {
+      const sortState = { field: 'pnl', direction: 'desc' };
+      
+      render(
+        <table>
+          <TableHeader 
+            showWallet={true}
+            positionsCount={5}
+            sortState={sortState}
+            onSort={jest.fn()}
+          />
+        </table>
+      );
+      
+      // Check PnL header has aria-sort="desc"
+      const pnlHeader = screen.getByText(/^PnL/).closest('th');
+      expect(pnlHeader).toHaveAttribute('aria-sort', 'desc');
+      
+      // Other headers should not have aria-sort
+      const pairHeader = screen.getByText(/^Pair/).closest('th');
+      expect(pairHeader).not.toHaveAttribute('aria-sort', 'desc');
+      expect(pairHeader).not.toHaveAttribute('aria-sort', 'asc');
+      
+      // Non-sortable headers should not have aria-sort at all
+      const priceRangeHeader = screen.getByText('Price Range');
+      expect(priceRangeHeader).not.toHaveAttribute('aria-sort');
+    });
     
-    // Click on wallet header
-    mockOnSort.mockClear();
-    fireEvent.click(screen.getByText(/^Wallet/));
-    expect(mockOnSort).toHaveBeenCalledWith('walletAddress');
+    it('conditionally renders wallet header based on showWallet prop', () => {
+      // First with showWallet=true
+      const { rerender } = render(
+        <table>
+          <TableHeader 
+            showWallet={true}
+            positionsCount={5}
+            sortState={{ field: 'pnl', direction: 'desc' }}
+            onSort={jest.fn()}
+          />
+        </table>
+      );
+      
+      // Wallet header should be present
+      expect(screen.getByText(/^Wallet/)).toBeInTheDocument();
+      
+      // Rerender with showWallet=false
+      rerender(
+        <table>
+          <TableHeader 
+            showWallet={false}
+            positionsCount={5}
+            sortState={{ field: 'pnl', direction: 'desc' }}
+            onSort={jest.fn()}
+          />
+        </table>
+      );
+      
+      // Wallet header should not be present
+      expect(screen.queryByText(/^Wallet/)).not.toBeInTheDocument();
+    });
+    
+    it('handles onClick with multiple sort fields correctly', () => {
+      const mockOnSort = jest.fn();
+      
+      render(
+        <table>
+          <TableHeader 
+            showWallet={true}
+            positionsCount={5}
+            sortState={{ field: 'pnl', direction: 'desc' }}
+            onSort={mockOnSort}
+          />
+        </table>
+      );
+      
+      // Click on PnL header (already sorted field)
+      fireEvent.click(screen.getByText(/^PnL/));
+      expect(mockOnSort).toHaveBeenCalledWith('pnl');
+      
+      // Click on Yield header (different field)
+      mockOnSort.mockClear();
+      fireEvent.click(screen.getByText(/^Yield/));
+      expect(mockOnSort).toHaveBeenCalledWith('yield');
+      
+      // Click on wallet header
+      mockOnSort.mockClear();
+      fireEvent.click(screen.getByText(/^Wallet/));
+      expect(mockOnSort).toHaveBeenCalledWith('walletAddress');
+    });
   });
-}); 
+});

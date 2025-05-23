@@ -357,7 +357,7 @@ export const PositionsTable = memo(({
                 size={position.collateral.usd}
                 label="Yield"
               />
-              <td data-label="Position Details" className={styles.hideOnMobile}>
+              <td data-label="Position Details">
                 <ClusterBar
                   size={position.size}
                   collateral={position.collateral}
@@ -368,7 +368,7 @@ export const PositionsTable = memo(({
                   showInSol={showInSol}
                 />
               </td>
-              <td data-label="Price Range" className={styles.hideOnMobile}>
+              <td data-label="Price Range">
                 <PriceBar
                   currentPrice={position.currentPrice}
                   entryPrice={position.entryPrice}
