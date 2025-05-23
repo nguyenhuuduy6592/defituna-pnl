@@ -214,6 +214,8 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
         const yieldB = Number(position.yield_b?.amount || 0) / 10 ** tokenBDecimals;
         const compoundedA = Number(position.compounded_yield_a?.amount || 0) / 10 ** tokenADecimals;
         const compoundedB = Number(position.compounded_yield_b?.amount || 0) / 10 ** tokenBDecimals;
+        const pnlA = Number(position.pnl_a?.amount || 0) / 10 ** tokenADecimals;
+        const pnlB = Number(position.pnl_b?.amount || 0) / 10 ** tokenBDecimals;
 
         // Calculate prices and ticks
         const currentPrice = tickToPrice(pool.tick_current_index, tokenADecimals, tokenBDecimals);
@@ -278,7 +280,15 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
         // Calculate PnL
         const pnl = {
             usd: Number(position.pnl_usd?.amount || 0),
-            bps: Number(position.pnl_usd?.bps || 0)
+            bps: Number(position.pnl_usd?.bps || 0),
+            a: {
+                amount: pnlA,
+                bps: Number(position.pnl_a?.bps || 0)
+            },
+            b: {
+                amount: pnlB,
+                bps: Number(position.pnl_b?.bps || 0)
+            }
         };
 
         return {

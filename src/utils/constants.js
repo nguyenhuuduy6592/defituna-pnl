@@ -40,3 +40,26 @@ export const CHART_STYLES = {
     padding: { left: 10, right: 10 }
   }
 };
+
+export const KNOWN_TOKENS = {
+  USDC: {
+    address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    symbol: 'USDC',
+    decimals: 6,
+    logo: '/images/tokens/usdc.png'
+  },
+  USDT: {
+    address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
+    symbol: 'USDT',
+    decimals: 6,
+    logo: '/images/tokens/usdt.png'
+  },
+  SOL: {
+    address: 'So11111111111111111111111111111111111111112',
+    symbol: 'SOL',
+    decimals: 9,
+    logo: '/images/tokens/sol.png'
+  }
+};
+
+export const STABLE_TOKENS = [KNOWN_TOKENS.USDC, KNOWN_TOKENS.USDT];

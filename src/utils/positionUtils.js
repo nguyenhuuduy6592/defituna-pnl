@@ -159,7 +159,10 @@ export const decodePosition = (position) => {
     },
     
     // Include opened_at if available in the position data
-    opened_at: position.opened_at
+    opened_at: position.opened_at,
+    
+    pnlData: position.pnlData,
+    symbol: position.symbol,
   };
   
   // Add derived/calculated properties (optional, can be done later)

@@ -15,6 +15,7 @@ import { FiShare2, FiCopy } from 'react-icons/fi';
 import styles from './PositionsTable.module.scss';
 import { usePriceContext } from '../../contexts/PriceContext';
 import { useDisplayCurrency } from '../../contexts/DisplayCurrencyContext';
+import { KNOWN_TOKENS } from '../../utils/constants';
 
 /**
  * Table header with sort functionality
@@ -239,7 +240,7 @@ export { ActionsCell };
 /**
  * The value cell with USD/SOL equivalent and percentage
  */
-const ValueCell = memo(({ value, size, label }) => {
+const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
   const { solPrice } = usePriceContext();
   const { showInSol } = useDisplayCurrency();
   const pnlClass = getValueClass(value); // Class based on USD value for consistent coloring
@@ -250,6 +251,16 @@ const ValueCell = memo(({ value, size, label }) => {
     }
 
     if (showInSol) {
+       if (pnlData && symbol) {
+         const tokenASymbol = symbol.a;
+         const tokenBSymbol = symbol.b;
+        if (tokenASymbol === KNOWN_TOKENS.SOL.symbol) {
+           return `${formatNumber(pnlData.pnl_a.amount)} SOL`;
+        } else if (tokenBSymbol === KNOWN_TOKENS.SOL.symbol) {
+           return `${formatNumber(pnlData.pnl_b.amount)} SOL`;
+         }
+       }
+
       if (value === 0) { // Explicitly check for zero USD value
         return `${formatNumber(0)} SOL`; // Or formatNumber(0, 2, true).trim()
       }
@@ -262,22 +273,34 @@ const ValueCell = memo(({ value, size, label }) => {
     } else {
       return `$${formatNumber(value)}`;
     }
-  }, [value, solPrice, showInSol]);
+  }, [value, solPrice, showInSol, pnlData, symbol]);
 
   // Percentage is always based on USD value relative to size
   const percentageString = useMemo(() => {
+     if (showInSol && pnlData && symbol) {
+       const tokenASymbol = symbol.a;
+       const tokenBSymbol = symbol.b;
+      if (tokenASymbol === KNOWN_TOKENS.SOL.symbol) {
+         return `(${formatPercentage(pnlData.pnl_a.bps / 10000)})`;
+      } else if (tokenBSymbol === KNOWN_TOKENS.SOL.symbol) {
+         return `(${formatPercentage(pnlData.pnl_b.bps / 10000)})`;
+       }
+
+       return `(${formatPercentage(pnlData.pnl_usd.bps / 10000)})`;
+     }
+
     if (value != null && size != null && size !== 0) {
       return `(${formatPercentage(value / size)})`;
     }
     return null;
-  }, [value, size]);
+  }, [value, size, showInSol, pnlData, symbol]);
   
   return (
     <td className={`${styles.valueCell} ${styles[pnlClass]}`} data-label={label}>
       <div className={styles.primaryValue}>
         {displayedValue}
         {percentageString && (
-          <span className={styles.percentage}> 
+          <span className={styles.positionPnlPercentage}> 
             {percentageString}
           </span>
         )}
@@ -351,6 +374,8 @@ export const PositionsTable = memo(({
                 value={position.pnl.usd}
                 size={position.collateral.usd}
                 label="PnL"
+                pnlData={position.pnlData}
+                symbol={position.symbol}
               />
               <ValueCell
                 value={position.yield.usd}

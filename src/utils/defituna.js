@@ -332,6 +332,18 @@ export async function processPositionsData(positionsData) {
         },
         int: { // interest
           u: encodeValue(processedPosition.interest.usd, USD_MULTIPLIER) // usd
+        },
+        pnlData: { // new field for pnl data
+          pnl_usd: {
+            amount: processedPosition.pnl.usd,
+            bps: processedPosition.pnl.bps
+          },
+          pnl_a: processedPosition.pnl.a,
+          pnl_b: processedPosition.pnl.b,
+        },
+        symbol: {
+          a: tokenA.symbol,
+          b: tokenB.symbol
         }
       };
     }).filter(Boolean); 
