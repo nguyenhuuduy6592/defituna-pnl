@@ -224,6 +224,9 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
   const chartContentRef = useRef(null);
   const exportWrapperRef = useRef(null);
 
+  // Use position.pairDisplay if available, otherwise fall back to position.pair
+  const displayPair = (position.pairDisplay || position.pair).trim();
+
   useEffect(() => {
     if (!positionHistory || positionHistory.length === 0) {
       setChartData([]);
@@ -268,18 +271,14 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
   
   // Handle export button click
   const handleExport = useCallback(() => {
-    // Use position.pairDisplay if available, otherwise fall back to position.pair
-    const displayPair = position?.pairDisplay || position?.pair || "position";
     exportChartAsImage(exportWrapperRef, `${displayPair}-chart-${Date.now()}.png`);
   }, [position]);
 
   // Handle share button click
   const handleShare = useCallback(() => {
-    // Use position.pairDisplay if available, otherwise fall back to position.pair
-    const displayPair = position?.pairDisplay || position?.pair || "position";
     shareCard(
       chartContainerRef,
-      `${displayPair}-chart.png`,
+      `${displayPair}-chart-${Date.now()}.png`,
       `${displayPair} Performance Chart`,
       `Check out my ${displayPair} position performance on DeFiTuna!`
     );

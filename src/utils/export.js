@@ -16,6 +16,19 @@ const DEFAULT_CANVAS_OPTIONS = {
 };
 
 /**
+ * Generates a PNG image from a DOM element
+ * @param {HTMLElement} element - DOM element to capture
+ * @returns {Promise<string>} Data URL of the generated image
+ */
+const generateImage = async (element) => {
+  return await toPng(element, {
+    quality: 1.0,
+    pixelRatio: 2,
+    skipAutoScale: true
+  });
+};
+
+/**
  * Exports a DOM element as an image file
  * @param {React.RefObject} elementRef - React ref to the DOM element to capture (e.g., the modal container)
  * @param {string} fileName - Name for the downloaded file
@@ -68,11 +81,7 @@ export const exportCardAsImage = async (contentRef, fileName) => {
       console.warn('[exportCardAsImage] No file name provided, using default:', fileName);
     }
 
-    const dataUrl = await toPng(contentRef.current, {
-      quality: 1.0,
-      pixelRatio: 2,
-      skipAutoScale: true
-    });
+    const dataUrl = await generateImage(contentRef.current);
 
     const link = document.createElement('a');
     link.download = fileName;
@@ -107,12 +116,18 @@ export const shareCard = async (elementRef, fileName, title, text) => {
       console.warn('[shareCard] No file name provided, using default:', fileName);
     }
 
-    const canvas = await html2canvas(elementRef.current, {
-      ...DEFAULT_CANVAS_OPTIONS,
-      backgroundColor: '#1a1a1a'
-    });
+    // Find the content element that has the data-export-content attribute
+    const contentElement = elementRef.current.querySelector('[data-export-content]');
+    if (!contentElement) {
+      console.error('[shareCard] Could not find content element with data-export-content attribute');
+      return false;
+    }
+
+    const dataUrl = await generateImage(contentElement);
     
-    const blob = await new Promise(resolve => canvas.toBlob(resolve));
+    // Convert data URL to blob
+    const response = await fetch(dataUrl);
+    const blob = await response.blob();
     
     if (!blob) {
       throw new Error('Failed to create image blob');

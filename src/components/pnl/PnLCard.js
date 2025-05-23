@@ -108,7 +108,7 @@ export const PnLCard = ({ position, onClose }) => {
   const { showInSol } = useDisplayCurrency();
 
   // Use position.pairDisplay if available, otherwise fall back to position.pair
-  const displayPair = position.pairDisplay || position.pair;
+  const displayPair = (position.pairDisplay || position.pair).trim();
 
   // Handle escape key press
   useEffect(() => {
@@ -137,7 +137,7 @@ export const PnLCard = ({ position, onClose }) => {
   const handleShare = useCallback(() => {
     shareCard(
       cardRef,
-      `${displayPair}-pnl.png`,
+      `${displayPair}-pnl-${Date.now()}.png`,
       `${displayPair} PnL Card`,
       `Check out my ${displayPair} position on DeFiTuna!`
     );
