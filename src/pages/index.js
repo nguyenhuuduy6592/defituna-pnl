@@ -145,7 +145,7 @@ export default () => {
 
         // Start cooldown if this was triggered by a form submission
         if (isSubmission) {
-          startFetchCooldown(30); 
+          startFetchCooldown(process.env.NODE_ENV === 'development' ? 3 : 30); 
         }
 
         await updateSolPrice();

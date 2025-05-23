@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, within, fireEvent } from '@testing-library/react';
 import { PriceBar } from '../../../components/pnl/PriceBar';
 
 // Mock the TooltipPortal component
@@ -26,152 +26,144 @@ describe('PriceBar', () => {
       lower: 35000,
       upper: 65000
     },
-    formatValue: (value) => value.toLocaleString()
+    formatValue: (value) => value?.toLocaleString() ?? 'N/A'
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders the price bar with all valid price points', () => {
+  it('renders the price bar with range labels and current price indicator', () => {
     render(<PriceBar {...defaultProps} />);
     
-    // Check that the container is rendered
-    const container = screen.getByLabelText('Price bar showing current, entry, and key price levels');
+    const container = screen.getByLabelText('Price range bar with current price indicator');
     expect(container).toBeInTheDocument();
     
-    // Check that all price markers are rendered
-    // We have 8 price points in total
-    const priceMarkers = container.querySelectorAll('div[aria-label]');
-    expect(priceMarkers.length).toBe(8);
+    // Check that range labels are rendered
+    const labels = screen.getAllByText(/^\$[0-9,]+$/);
+    expect(labels).toHaveLength(2);
+    expect(labels[0].textContent).toBe('$40,000');
+    expect(labels[1].textContent).toBe('$60,000');
     
-    // Verify specific price points
-    expect(screen.getByLabelText('Current: 50000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Entry: 45000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Liq. Lower: 30000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Liq. Upper: 70000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Range Lower: 40000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Range Upper: 60000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Stop Loss: 35000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Take Profit: 65000')).toBeInTheDocument();
+    const priceIndicator = screen.getByLabelText('Current price: 50000');
+    expect(priceIndicator).toBeInTheDocument();
+    expect(priceIndicator).toHaveClass('priceIndicator');
   });
 
-  it('shows tooltip when hovering over the price bar', () => {
+  it('shows tooltip with all price points when hovering', () => {
     render(<PriceBar {...defaultProps} />);
     
-    // Initially, tooltip should not be visible
     expect(screen.queryByTestId('tooltip-portal')).not.toBeInTheDocument();
     
-    // Hover over the price bar
-    const priceBar = screen.getByLabelText('Price bar showing current, entry, and key price levels');
+    const priceBar = screen.getByLabelText('Price range bar with current price indicator');
     fireEvent.mouseEnter(priceBar);
     
-    // Tooltip should now be visible
-    expect(screen.getByTestId('tooltip-portal')).toBeInTheDocument();
+    const tooltip = screen.getByTestId('tooltip-portal');
+    expect(tooltip).toBeInTheDocument();
     
-    // Check tooltip content for all price points
-    expect(screen.getByText('Current:')).toBeInTheDocument();
-    expect(screen.getByText('Entry:')).toBeInTheDocument();
-    expect(screen.getByText('Liq. Lower:')).toBeInTheDocument();
-    expect(screen.getByText('Liq. Upper:')).toBeInTheDocument();
-    expect(screen.getByText('Range Lower:')).toBeInTheDocument();
-    expect(screen.getByText('Range Upper:')).toBeInTheDocument();
-    expect(screen.getByText('Stop Loss:')).toBeInTheDocument();
-    expect(screen.getByText('Take Profit:')).toBeInTheDocument();
+    const expectedPrices = [
+      { label: 'Liq. Upper:', value: '$70,000' },
+      { label: 'Take Profit:', value: '$65,000' },
+      { label: 'Range Upper:', value: '$60,000' },
+      { label: 'Current:', value: '$50,000' },
+      { label: 'Entry:', value: '$45,000' },
+      { label: 'Range Lower:', value: '$40,000' },
+      { label: 'Stop Loss:', value: '$35,000' },
+      { label: 'Liq. Lower:', value: '$30,000' }
+    ];
+
+    expectedPrices.forEach(({ label, value }) => {
+      const row = within(tooltip).getByText(label).closest('.tooltipRow');
+      expect(within(row).getByText((content, element) => {
+        return element.className === 'tooltipValue' && element.textContent === value;
+      })).toBeInTheDocument();
+    });
     
-    // Price values should be formatted
-    expect(screen.getByText('$50,000')).toBeInTheDocument();
-    expect(screen.getByText('$45,000')).toBeInTheDocument();
-    
-    // Tooltip should hide when mouse leaves
     fireEvent.mouseLeave(priceBar);
     expect(screen.queryByTestId('tooltip-portal')).not.toBeInTheDocument();
   });
 
-  it('filters out invalid price points', () => {
+  it('filters out invalid price points in tooltip', () => {
     const propsWithInvalidPrices = {
       ...defaultProps,
       liquidationPrice: {
-        lower: 0, // Invalid
-        upper: Infinity // Invalid
+        lower: 0,
+        upper: Infinity
       },
       rangePrices: {
-        lower: null, // Invalid
+        lower: null,
         upper: 60000
       }
     };
     
     render(<PriceBar {...propsWithInvalidPrices} />);
     
-    // Should only render valid price points
-    const container = screen.getByLabelText('Price bar showing current, entry, and key price levels');
-    const priceMarkers = container.querySelectorAll('div[aria-label]');
-    expect(priceMarkers.length).toBe(5); // 8 original - 3 invalid = 5
+    const priceBar = screen.getByLabelText('Price range bar with current price indicator');
+    fireEvent.mouseEnter(priceBar);
     
-    // Invalid price points should not be rendered
-    expect(screen.queryByLabelText('Liq. Lower: 0')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Liq. Upper: Infinity')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Range Lower: null')).not.toBeInTheDocument();
+    const tooltip = screen.getByTestId('tooltip-portal');
     
-    // Valid price points should still be rendered
-    expect(screen.getByLabelText('Current: 50000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Entry: 45000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Range Upper: 60000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Stop Loss: 35000')).toBeInTheDocument();
-    expect(screen.getByLabelText('Take Profit: 65000')).toBeInTheDocument();
+    // Invalid price points should not be in tooltip
+    expect(within(tooltip).queryByText('0')).not.toBeInTheDocument();
+    expect(within(tooltip).queryByText('Infinity')).not.toBeInTheDocument();
+    expect(within(tooltip).queryByText('null')).not.toBeInTheDocument();
+    
+    // Valid price points should still be in tooltip
+    const validPrices = ['$50,000', '$45,000', '$60,000', '$35,000', '$65,000'];
+    validPrices.forEach(price => {
+      expect(within(tooltip).getByText((content, element) => {
+        return element.className === 'tooltipValue' && element.textContent === price;
+      })).toBeInTheDocument();
+    });
   });
 
-  it('positions price markers correctly based on their values', () => {
+  it('positions current price indicator correctly based on range', () => {
     render(<PriceBar {...defaultProps} />);
     
-    // Get all price markers
-    const container = screen.getByLabelText('Price bar showing current, entry, and key price levels');
-    const priceMarkers = Array.from(container.querySelectorAll('div[aria-label]'));
+    const priceIndicator = screen.getByLabelText('Current price: 50000');
     
-    // Extract positions from style attribute
-    const positions = priceMarkers.map(marker => {
-      const style = window.getComputedStyle(marker);
-      return parseFloat(style.left);
-    });
+    const leftPosition = parseFloat(priceIndicator.style.left);
+    expect(leftPosition).toBeCloseTo(50, 1);
     
-    // Remove the position order check since PriceBar sorts markers from highest to lowest
-    // Instead, check specific positions for certain price points
-    
-    // Specific test: lowest price (30000) should be at 0%
-    const liqLowerMarker = screen.getByLabelText('Liq. Lower: 30000');
-    expect(liqLowerMarker).toHaveStyle('left: 0%');
-    
-    // Specific test: highest price (70000) should be at 100%
-    const liqUpperMarker = screen.getByLabelText('Liq. Upper: 70000');
-    expect(liqUpperMarker).toHaveStyle('left: 100%');
-    
-    // Current price (50000) should be at 50% (exactly in the middle between 30000 and 70000)
-    const currentPriceMarker = screen.getByLabelText('Current: 50000');
-    expect(currentPriceMarker).toHaveStyle('left: 50%');
+    // Check indicator color based on range
+    expect(priceIndicator.style.backgroundColor).toBe('rgb(255, 204, 0)'); // In range = yellow
   });
 
-  it('uses custom formatValue function for tooltip values', () => {
+  it('shows red indicator when price is out of range', () => {
+    const outOfRangeProps = {
+      ...defaultProps,
+      currentPrice: 65000
+    };
+    
+    render(<PriceBar {...outOfRangeProps} />);
+    
+    const priceIndicator = screen.getByLabelText('Current price: 65000');
+    expect(priceIndicator.style.backgroundColor).toBe('rgb(255, 45, 85)'); // Out of range = red
+  });
+
+  it('uses custom formatValue function for price labels and tooltip', () => {
     const customProps = {
       ...defaultProps,
-      formatValue: (value) => `$${value / 1000}K`
+      formatValue: (value) => `${value / 1000}K`
     };
     
     render(<PriceBar {...customProps} />);
     
-    // Hover over the price bar to show tooltip
-    const priceBar = screen.getByLabelText('Price bar showing current, entry, and key price levels');
-    fireEvent.mouseEnter(priceBar);
+    // Check range labels
+    const labels = screen.getAllByText(/^\$\d+K$/);
+    expect(labels).toHaveLength(2);
+    expect(labels[0].textContent).toBe('$40K');
+    expect(labels[1].textContent).toBe('$60K');
     
-    // Check that values are formatted with the custom function using more specific selectors
-    // The actual structure in the DOM is <span class="tooltipValue">$<value></span>
-    const tooltipRows = screen.getAllByTestId('tooltip-portal')[0].querySelectorAll('.tooltipValue');
+    // Check tooltip formatting
+    fireEvent.mouseEnter(screen.getByLabelText('Price range bar with current price indicator'));
+    const tooltip = screen.getByTestId('tooltip-portal');
     
-    // Just verify we have the expected number of tooltip rows
-    expect(tooltipRows.length).toBe(8); // One for each price point
-    
-    // Check a few sample values using a more flexible approach
-    expect(screen.getByText(/\$50K/)).toBeInTheDocument();
-    expect(screen.getByText(/\$45K/)).toBeInTheDocument();
-    expect(screen.getByText(/\$30K/)).toBeInTheDocument();
+    expect(within(tooltip).getByText((content, element) => {
+      return element.className === 'tooltipValue' && element.textContent === '$50K';
+    })).toBeInTheDocument();
+    expect(within(tooltip).getByText((content, element) => {
+      return element.className === 'tooltipValue' && element.textContent === '$45K';
+    })).toBeInTheDocument();
   });
 }); 
