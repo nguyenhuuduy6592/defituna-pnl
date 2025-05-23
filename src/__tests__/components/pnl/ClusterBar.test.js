@@ -35,7 +35,7 @@ describe('ClusterBar', () => {
     expect(screen.getByLabelText('Interest: 10.0%')).toBeInTheDocument();
     
     // Check the total value is displayed correctly
-    expect(screen.getByLabelText('Total: 1,000')).toBeInTheDocument();
+    expect(screen.getByLabelText('Total: $1,000')).toBeInTheDocument();
     expect(screen.getByText('$1,000')).toBeInTheDocument();
   });
 
@@ -57,10 +57,10 @@ describe('ClusterBar', () => {
     expect(screen.getByText('Interest:')).toBeInTheDocument();
     
     // Values should be formatted
-    expect(screen.getByText('1,000')).toBeInTheDocument();
-    expect(screen.getByText('600')).toBeInTheDocument();
-    expect(screen.getByText('300')).toBeInTheDocument();
-    expect(screen.getByText('100')).toBeInTheDocument();
+    expect(screen.getAllByText('$1,000').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('$600').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('$300').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('$100').length).toBeGreaterThan(0);
     
     // Hide tooltip on mouse leave
     fireEvent.mouseLeave(barContainer);
@@ -76,7 +76,7 @@ describe('ClusterBar', () => {
     expect(screen.getByLabelText('Interest: 0.0%')).toBeInTheDocument();
     
     // Total should be 0
-    expect(screen.getByLabelText('Total: 0')).toBeInTheDocument();
+    expect(screen.getByLabelText('Total: $0')).toBeInTheDocument();
     expect(screen.getByText('$0')).toBeInTheDocument();
   });
   
@@ -96,7 +96,7 @@ describe('ClusterBar', () => {
     expect(screen.getByLabelText('Interest: 10.0%')).toBeInTheDocument();
     
     // Total value should show the negative value
-    expect(screen.getByLabelText('Total: -1,000')).toBeInTheDocument();
+    expect(screen.getByLabelText('Total: $-1,000')).toBeInTheDocument();
     expect(screen.getByText('$-1,000')).toBeInTheDocument();
   });
 
@@ -113,22 +113,22 @@ describe('ClusterBar', () => {
   it('uses custom formatValue function', () => {
     const customFormatProps = {
       ...defaultProps,
-      formatValue: (val) => `$${val / 1000}K`
+      formatValue: (val) => `${val / 1000}K`
     };
     
     render(<ClusterBar {...customFormatProps} />);
     
     // Total value should use the custom format
-    expect(screen.getByText('$$1K')).toBeInTheDocument();
+    expect(screen.getAllByText('$1K').length).toBeGreaterThan(0);
     
     // Show tooltip to check formatted values
     const barContainer = screen.getByLabelText('Position composition breakdown').querySelector('div');
     fireEvent.mouseEnter(barContainer);
     
     // Check for custom formatted values in tooltip
-    expect(screen.getByText('$1K')).toBeInTheDocument();
-    expect(screen.getByText('$0.6K')).toBeInTheDocument();
-    expect(screen.getByText('$0.3K')).toBeInTheDocument();
-    expect(screen.getByText('$0.1K')).toBeInTheDocument();
+    expect(screen.getAllByText('$1K').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('$0.6K').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('$0.3K').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('$0.1K').length).toBeGreaterThan(0);
   });
 }); 

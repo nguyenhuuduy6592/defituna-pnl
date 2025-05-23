@@ -2,6 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { PositionsTable, TableHeader, PairCell, WalletCell, ActionsCell } from '../../../components/pnl/PositionsTable';
 import { getValueClass, getStateClass, invertPairString, copyToClipboard } from '../../../utils';
+import { PriceProvider } from '../../../contexts/PriceContext';
+import { DisplayCurrencyProvider } from '../../../contexts/DisplayCurrencyContext';
 
 // Mock dependencies
 jest.mock('../../../components/pnl/ClusterBar', () => ({
@@ -13,9 +15,13 @@ jest.mock('../../../components/pnl/ClusterBar', () => ({
 }));
 
 jest.mock('../../../components/pnl/PriceBar', () => ({
-  PriceBar: ({ currentPrice }) => (
+  PriceBar: (props) => (
     <div data-testid="price-bar">
-      Current Price: {currentPrice}
+      Current Price: {props.currentPrice}
+      {props.liquidationPrice?.lower && props.liquidationPrice?.upper && ` Liquidation: ${props.liquidationPrice.lower} / ${props.liquidationPrice.upper}`}
+      {props.entryPrice && ` Entry: ${props.entryPrice}`}
+      {props.rangePrices?.lower && props.rangePrices?.upper && ` Range: ${props.rangePrices.lower} - ${props.rangePrices.upper}`}
+      {props.limitOrderPrices?.lower && props.limitOrderPrices?.upper && ` Limit: ${props.limitOrderPrices.lower} - ${props.limitOrderPrices.upper}`}
     </div>
   )
 }));
@@ -27,7 +33,8 @@ jest.mock('../../../utils', () => ({
   getValueClass: jest.fn((value) => value > 0 ? 'positive' : value < 0 ? 'negative' : 'neutral'),
   getStateClass: jest.fn((status) => status?.toLowerCase() || 'unknown'),
   invertPairString: jest.fn((pair) => pair?.split('/').reverse().join('/') || pair),
-  copyToClipboard: jest.fn()
+  copyToClipboard: jest.fn(),
+  formatPercentage: jest.fn((value) => (value !== undefined && value !== null && !isNaN(value) ? `${value.toFixed(2)}%` : 'N/A')),
 }));
 
 // Mock data for all tests
@@ -38,7 +45,6 @@ const mockPositions = [
     displayStatus: 'Active',
     age: 30,
     pnl: { usd: 1000 },
-    displayPnlPercentage: 5.25,
     yield: { usd: 200 },
     size: { usd: 10000 },
     collateral: { usd: 5000 },
@@ -67,7 +73,6 @@ const mockPositions = [
     displayStatus: 'Closed',
     age: 60,
     pnl: { usd: -500 },
-    displayPnlPercentage: -2.5,
     yield: { usd: 100 },
     size: { usd: 20000 },
     collateral: { usd: 10000 },
@@ -113,12 +118,20 @@ describe('PositionsTable', () => {
     onShowChart
   };
 
+  const renderTable = (props) => render(
+    <DisplayCurrencyProvider>
+      <PriceProvider>
+        <PositionsTable {...defaultProps} {...props} />
+      </PriceProvider>
+    </DisplayCurrencyProvider>
+  );
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it('renders the table with correct headers and position data', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Check headers
     expect(screen.getByText('Pair ↕')).toBeInTheDocument();
@@ -143,20 +156,10 @@ describe('PositionsTable', () => {
     expect(screen.getByText('60 days')).toBeInTheDocument();
     
     expect(screen.getByText('$1,000', { exact: false })).toBeInTheDocument();
-    expect(screen.getByText('5.25', { exact: false })).toBeInTheDocument();
     expect(screen.getByText('$-500', { exact: false })).toBeInTheDocument();
-    expect(screen.getByText('-2.5', { exact: false })).toBeInTheDocument();
     
-    // Use getAllByText for yield values since they appear multiple times
-    const yieldValues = screen.getAllByText((content, element) => {
-      return element.tagName.toLowerCase() === 'td' && content.includes('$200');
-    });
-    expect(yieldValues.length).toBeGreaterThan(0);
-    
-    const yieldValues2 = screen.getAllByText((content, element) => {
-      return element.tagName.toLowerCase() === 'td' && content.includes('$100');
-    });
-    expect(yieldValues2.length).toBeGreaterThan(0);
+    expect(screen.getByText('$200', { exact: false })).toBeInTheDocument();
+    expect(screen.getByText('$100', { exact: false })).toBeInTheDocument();
     
     // Check cluster and price bars
     expect(screen.getAllByTestId('cluster-bar')).toHaveLength(2);
@@ -168,7 +171,7 @@ describe('PositionsTable', () => {
   });
 
   it('displays wallet addresses if showWallet is true', () => {
-    render(<PositionsTable {...defaultProps} showWallet={true} />);
+    renderTable({ showWallet: true });
     
     const firstWalletAddress = mockPositions[0].walletAddress;
     const formattedAddress = firstWalletAddress.substring(0, 6) + '...' + firstWalletAddress.substring(firstWalletAddress.length - 4);
@@ -177,7 +180,7 @@ describe('PositionsTable', () => {
   });
 
   it('hides wallet addresses if showWallet is false', () => {
-    render(<PositionsTable {...defaultProps} showWallet={false} />);
+    renderTable({ showWallet: false });
     
     const firstWalletAddress = mockPositions[0].walletAddress;
     const formattedAddress = firstWalletAddress.substring(0, 6) + '...' + firstWalletAddress.substring(firstWalletAddress.length - 4);
@@ -186,7 +189,7 @@ describe('PositionsTable', () => {
   });
 
   it('triggers sort callback when header is clicked', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Click on a sortable header
     fireEvent.click(screen.getByText('Pair ↕'));
@@ -196,7 +199,7 @@ describe('PositionsTable', () => {
   });
 
   it('triggers pair inversion when pair cell is clicked', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Find and click on the first pair cell
     const pairCells = screen.getAllByRole('button').filter(el => 
@@ -209,7 +212,7 @@ describe('PositionsTable', () => {
   });
 
   it('supports keyboard navigation for pair inversion', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Find pair cell and trigger keyboard event
     const pairCells = screen.getAllByRole('button').filter(el => 
@@ -227,7 +230,7 @@ describe('PositionsTable', () => {
   });
 
   it('displays correct leverage for each position', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Check for leverage display using getAllByText since there are multiple instances
     const leverageTexts = screen.getAllByText((content, element) => {
@@ -237,7 +240,7 @@ describe('PositionsTable', () => {
   });
 
   it('copies wallet address when wallet cell is clicked', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Find and click on a wallet cell
     const walletCells = screen.getAllByRole('button').filter(el => 
@@ -250,7 +253,7 @@ describe('PositionsTable', () => {
   });
 
   it('supports keyboard navigation for copying wallet address', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Find wallet cell and trigger keyboard event
     const walletCells = screen.getAllByRole('button').filter(el => 
@@ -268,7 +271,7 @@ describe('PositionsTable', () => {
   });
 
   it('applies correct CSS classes based on PnL values', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Check that getValueClass was called for PnL values
     expect(getValueClass).toHaveBeenCalledWith(1000);
@@ -280,7 +283,7 @@ describe('PositionsTable', () => {
   });
 
   it('applies correct CSS classes based on position status', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Check that getStateClass was called with position statuses
     expect(getStateClass).toHaveBeenCalledWith('Active');
@@ -288,7 +291,7 @@ describe('PositionsTable', () => {
   });
 
   it('triggers share callback when share button is clicked', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Find and click on the first share button
     const shareButtons = screen.getAllByText('Share');
@@ -299,7 +302,7 @@ describe('PositionsTable', () => {
   });
 
   it('triggers chart callback when chart button is clicked', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Find and click on the first chart button
     const chartButtons = screen.getAllByText('Chart');
@@ -310,14 +313,14 @@ describe('PositionsTable', () => {
   });
 
   it('hides chart buttons if history is disabled', () => {
-    render(<PositionsTable {...defaultProps} historyEnabled={false} />);
+    renderTable({ historyEnabled: false });
     
     // Check that chart buttons are not rendered
     expect(screen.queryByText('Chart')).not.toBeInTheDocument();
   });
 
   it('renders a table with appropriate accessibility attributes', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Check that the table has an accessible label
     const table = screen.getByRole('table');
@@ -335,12 +338,7 @@ describe('PositionsTable', () => {
   });
 
   it('renders non-sortable headers when only one position exists', () => {
-    const singlePositionProps = {
-      ...defaultProps,
-      positions: [mockPositions[0]]
-    };
-    
-    render(<PositionsTable {...singlePositionProps} />);
+    renderTable({ positions: [mockPositions[0]] });
     
     // Headers should be present but not sortable
     expect(screen.getByText('Pair')).toBeInTheDocument();
@@ -361,12 +359,7 @@ describe('PositionsTable', () => {
   });
 
   it('does not trigger sort callback when non-sortable header is clicked', () => {
-    const singlePositionProps = {
-      ...defaultProps,
-      positions: [mockPositions[0]]
-    };
-    
-    render(<PositionsTable {...singlePositionProps} />);
+    renderTable({ positions: [mockPositions[0]] });
     
     // Click on a header that should not trigger sort
     fireEvent.click(screen.getByText('Pair'));
@@ -376,12 +369,7 @@ describe('PositionsTable', () => {
   });
 
   it('renders appropriate sort indicators for ascending sort', () => {
-    const ascSortProps = {
-      ...defaultProps,
-      sortState: { field: 'yield', direction: 'asc' }
-    };
-    
-    render(<PositionsTable {...ascSortProps} />);
+    renderTable({ sortState: { field: 'yield', direction: 'asc' } });
     
     // Check yield header has ascending arrow
     expect(screen.getByText('Yield ↑')).toBeInTheDocument();
@@ -391,7 +379,7 @@ describe('PositionsTable', () => {
   });
 
   it('handles keyboard navigation for TableHeader sorting', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Get pair header and trigger keyboard event
     const pairHeader = screen.getByText('Pair ↕').closest('th');
@@ -410,7 +398,7 @@ describe('PositionsTable', () => {
   
   it('renders appropriate class names based on sortable state', () => {
     // Normal case with multiple positions (sortable)
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     const sortableHeaders = screen.getAllByRole('columnheader')
       .filter(header => header.textContent !== 'Price Range' && header.textContent !== 'Actions');
@@ -421,12 +409,14 @@ describe('PositionsTable', () => {
     });
     
     // Rerender with single position (non-sortable)
-    const { rerender } = render(<PositionsTable {...defaultProps} />);
-    
-    rerender(<PositionsTable 
-      {...defaultProps} 
-      positions={[mockPositions[0]]} 
-    />);
+    const { rerender } = renderTable();
+    rerender(
+      <DisplayCurrencyProvider>
+        <PriceProvider>
+          <PositionsTable {...defaultProps} positions={[mockPositions[0]]} />
+        </PriceProvider>
+      </DisplayCurrencyProvider>
+    );
     
     const nonSortableHeaders = screen.getAllByRole('columnheader')
       .filter(header => header.textContent !== 'Price Range' && header.textContent !== 'Actions');
@@ -438,7 +428,7 @@ describe('PositionsTable', () => {
   });
   
   it('handles other keyboard keys correctly in PairCell', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Find pair cell
     const pairCells = screen.getAllByRole('button').filter(el => 
@@ -453,7 +443,7 @@ describe('PositionsTable', () => {
   });
   
   it('handles other keyboard keys correctly in WalletCell', () => {
-    render(<PositionsTable {...defaultProps} />);
+    renderTable();
     
     // Find wallet cell
     const walletCells = screen.getAllByRole('button').filter(el => 
@@ -468,7 +458,8 @@ describe('PositionsTable', () => {
   });
   
   it('correctly renders inverted pair indicators', () => {
-    render(<PositionsTable {...defaultProps} />);
+    const localIsInverted = jest.fn().mockImplementation(pair => pair === 'ETH/USDC');
+    renderTable({ isInverted: localIsInverted });
     
     // Find all rendered position cells
     const rows = screen.getAllByRole('row').slice(1); // Skip header row
@@ -480,6 +471,62 @@ describe('PositionsTable', () => {
     // Second position should not be inverted (BTC/USDT with isInverted = false)
     const secondRowPairCell = rows[1].querySelector('td');
     expect(secondRowPairCell.querySelector('.invertedIndicator')).not.toBeInTheDocument();
+  });
+
+  // Test for PriceRangeCell
+  describe('PriceRangeCell', () => {
+    it('renders correctly when rangePrices are available', () => {
+      renderTable({ positions: [mockPositions[0]] });
+      // Use a flexible matcher to find the range text
+      expect(screen.getByTestId('price-bar')).toHaveTextContent(/Range:\s*1600\s*-\s*2000/);
+    });
+
+    it('renders limit order prices if available', () => {
+      renderTable({ positions: [mockPositions[0]] });
+      // Use a flexible matcher to find the limit order price text
+      expect(screen.getByTestId('price-bar')).toHaveTextContent(/Limit:\s*1500\s*-\s*2100/);
+    });
+
+    it('does not render limit order prices if not available', () => {
+      const positionWithoutLimit = { ...mockPositions[0], limitOrderPrices: null };
+      // This test renders PriceRangeCell directly (implicitly by rendering PositionsTable)
+      renderTable({ positions: [positionWithoutLimit] });
+      expect(screen.queryByText(/Limit:/)).not.toBeInTheDocument();
+    });
+  });
+
+  // Test for LiquidationPriceCell
+  describe('LiquidationPriceCell', () => {
+    it('renders "N/A" when liquidationPrice is not available', () => {
+      const positionWithoutLiquidation = { ...mockPositions[0], liquidationPrice: null };
+      renderTable({ positions: [positionWithoutLiquidation] });
+      // Check that the PriceBar mock does not contain the Liquidation text
+      const priceBar = screen.getByTestId('price-bar');
+      expect(priceBar).not.toHaveTextContent(/Liquidation:/);
+    });
+
+    it('renders correctly when liquidationPrice is available', () => {
+      renderTable({ positions: [mockPositions[0]] });
+      // Check that the PriceBar mock now contains the Liquidation text
+      const priceBar = screen.getByTestId('price-bar');
+      expect(priceBar).toHaveTextContent('Liquidation: 1400 / 2200');
+    });
+  });
+
+  // Test for LeverageCell
+  describe('LeverageCell', () => {
+    it('renders correctly with leverage value', () => {
+      renderTable({ positions: [mockPositions[0]] });
+      // Regex to find '2x' potentially surrounded by other characters like parentheses and spaces
+      expect(screen.getByText(/\( *2 *x/)).toBeInTheDocument();
+    });
+
+    it('renders "N/A" if leverage is not available', () => {
+      const positionWithoutLeverage = { ...mockPositions[0], leverage: null };
+      renderTable({ positions: [positionWithoutLeverage] });
+      // Regex to find 'N/A' within the leverage display context
+      expect(screen.getByText(/\( *N\/A *x/)).toBeInTheDocument();
+    });
   });
 });
 

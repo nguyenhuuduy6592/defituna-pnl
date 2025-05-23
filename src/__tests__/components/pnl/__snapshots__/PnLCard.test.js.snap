@@ -67,17 +67,12 @@ exports[`PnLCard adds snapshot test for visual regression 1`] = `
               <span
                 class="value"
               >
-                <span
-                  data-testid="currency-icon"
-                >
-                  $
-                </span>
-                1.00K
+                $1.00K
                 <span
                   class="percentage"
                 >
                   (
-                  5.25
+                  20.00%
                   %)
                 </span>
               </span>

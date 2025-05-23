@@ -1,6 +1,8 @@
 import '@/styles/globals.scss'
 import { useEffect } from 'react'
 import { ComparisonProvider } from '../contexts/ComparisonContext'
+import { PriceProvider } from '../contexts/PriceContext'
+import { DisplayCurrencyProvider } from '../contexts/DisplayCurrencyContext'
 
 export default function App({ Component, pageProps }) {
   useEffect(() => {
@@ -8,9 +10,6 @@ export default function App({ Component, pageProps }) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/service-worker.js')
-          .then(registration => {
-            console.log('Service Worker registered:', registration)
-          })
           .catch(error => {
             console.error('Service Worker registration failed:', error)
           })
@@ -19,8 +18,12 @@ export default function App({ Component, pageProps }) {
   }, [])
 
   return (
-    <ComparisonProvider>
-      <Component {...pageProps} />
-    </ComparisonProvider>
+    <PriceProvider>
+      <DisplayCurrencyProvider>
+        <ComparisonProvider>
+          <Component {...pageProps} />
+        </ComparisonProvider>
+      </DisplayCurrencyProvider>
+    </PriceProvider>
   )
 }

@@ -8,10 +8,13 @@ import {
   getValueClass,
   getStateClass,
   invertPairString,
-  copyToClipboard
+  copyToClipboard,
+  formatPercentage
 } from '../../utils';
 import { FiShare2, FiCopy } from 'react-icons/fi';
 import styles from './PositionsTable.module.scss';
+import { usePriceContext } from '../../contexts/PriceContext';
+import { useDisplayCurrency } from '../../contexts/DisplayCurrencyContext';
 
 /**
  * Table header with sort functionality
@@ -234,6 +237,58 @@ ActionsCell.displayName = 'ActionsCell';
 export { ActionsCell };
 
 /**
+ * The value cell with USD/SOL equivalent and percentage
+ */
+const ValueCell = memo(({ value, size, label }) => {
+  const { solPrice } = usePriceContext();
+  const { showInSol } = useDisplayCurrency();
+  const pnlClass = getValueClass(value); // Class based on USD value for consistent coloring
+
+  const displayedValue = useMemo(() => {
+    if (value == null) { // Handle null or undefined USD value first
+      return showInSol ? 'N/A SOL' : 'N/A USD';
+    }
+
+    if (showInSol) {
+      if (value === 0) { // Explicitly check for zero USD value
+        return `${formatNumber(0)} SOL`; // Or formatNumber(0, 2, true).trim()
+      }
+      // For non-zero USD values, solPrice is required
+      if (solPrice != null) { 
+        const solAmount = value / solPrice;
+        return `${formatNumber(solAmount)} SOL`; // Assuming formatNumber handles precision for SOL
+      }
+      return 'N/A SOL'; // Fallback if non-zero and solPrice is missing
+    } else {
+      return `$${formatNumber(value)}`;
+    }
+  }, [value, solPrice, showInSol]);
+
+  // Percentage is always based on USD value relative to size
+  const percentageString = useMemo(() => {
+    if (value != null && size != null && size !== 0) {
+      return `(${formatPercentage(value / size)})`;
+    }
+    return null;
+  }, [value, size]);
+  
+  return (
+    <td className={`${styles.valueCell} ${styles[pnlClass]}`} data-label={label}>
+      <div className={styles.primaryValue}>
+        {displayedValue}
+        {percentageString && (
+          <span className={styles.percentage}> 
+            {percentageString}
+          </span>
+        )}
+      </div>
+    </td>
+  );
+});
+
+ValueCell.displayName = 'ValueCell';
+
+/**
  * A table component that displays position data with sorting and interactive features
  * 
  * @param {Object} props Component props
@@ -258,6 +313,9 @@ export const PositionsTable = memo(({
   onShare,
   onShowChart
 }) => {
+  const { solPrice } = usePriceContext();
+  const { showInSol } = useDisplayCurrency();
+
   return (
     <table 
       className={styles.positionsTable}
@@ -289,15 +347,16 @@ export const PositionsTable = memo(({
                 {position.displayStatus}
               </td>
               <td data-label="Age">{formatDuration(position.age)}</td>
-              <td data-label="PnL" className={styles[getValueClass(position.pnl.usd)]}>
-                ${formatNumber(position.pnl.usd)} 
-                <span className={styles.positionPnlPercentage}> 
-                  ({position.displayPnlPercentage}%)
-                </span>
-              </td>
-              <td data-label="Yield" className={styles[getValueClass(position.yield.usd)]}>
-                ${formatNumber(position.yield.usd)}
-              </td>
+              <ValueCell
+                value={position.pnl.usd}
+                size={position.collateral.usd}
+                label="PnL"
+              />
+              <ValueCell
+                value={position.yield.usd}
+                size={position.collateral.usd}
+                label="Yield"
+              />
               <td data-label="Position Details" className={styles.hideOnMobile}>
                 <ClusterBar
                   size={position.size}
@@ -305,6 +364,8 @@ export const PositionsTable = memo(({
                   debt={position.debt}
                   interest={position.interest}
                   formatValue={formatNumber}
+                  solPrice={solPrice}
+                  showInSol={showInSol}
                 />
               </td>
               <td data-label="Price Range" className={styles.hideOnMobile}>

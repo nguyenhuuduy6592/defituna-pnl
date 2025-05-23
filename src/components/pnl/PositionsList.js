@@ -9,7 +9,6 @@ import {
   useInvertedPairs 
 } from '../../hooks';
 import { 
-  calculatePnlPercentage, 
   calculateStatus, 
   getAdjustedPosition, 
   sortPositions,
@@ -70,8 +69,6 @@ export const PositionsList = memo(({
       ...position,
       // If we don't preserve the display format, the PnL card will show a different order
       pairDisplay: isPairInverted ? invertPairString(position.pair) : position.pair,
-      // Make sure the displayPnlPercentage is passed correctly
-      displayPnlPercentage: position.displayPnlPercentage
     };
     
     setSelectedState(prev => ({ ...prev, position: adjustedPosition }));
@@ -105,7 +102,6 @@ export const PositionsList = memo(({
       return {
         ...adjusted,
         displayStatus: calculateStatus(position),
-        displayPnlPercentage: calculatePnlPercentage(position.pnl?.bps)
       };
     });
   }, [positions, sortState.field, sortState.direction, invertedPairs]);

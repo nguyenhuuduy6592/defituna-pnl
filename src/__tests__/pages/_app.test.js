@@ -72,11 +72,6 @@ describe('App Component (_app.js)', () => {
     });
 
     expect(navigator.serviceWorker.register).toHaveBeenCalledWith('/service-worker.js');
-    // We expect the console log upon successful registration (async)
-    // Need to await the promise resolution
-    return Promise.resolve().then(() => {
-      expect(console.log).toHaveBeenCalledWith('Service Worker registered:', { scope: '/' });
-    });
   });
 
   it('does not attempt to register service worker if not in production', () => {

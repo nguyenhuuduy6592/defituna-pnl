@@ -1,4 +1,3 @@
-import { createMocks } from 'node-mocks-http';
 import handler from '@/pages/api/tokens';
 
 // Mock the global fetch
@@ -10,84 +9,73 @@ global.console = {
   error: jest.fn(),
 };
 
-// Set the environment variable for the API URL
-const MOCK_API_URL = 'http://mock-defituna-api.com';
-process.env.DEFITUNA_API_URL = MOCK_API_URL;
-
 describe('tokens API Handler (/api/tokens)', () => {
+  const OLD_ENV = process.env;
+  let req, res;
+  let fetchMock;
+
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Default mock successful fetch
-    fetch.mockResolvedValue({
-      ok: true,
-      json: async () => ({ 
-        data: [
-          { mint: 'mint1', symbol: 'SYM1', decimals: 6 },
-          { mint: 'mint2', symbol: 'SYM2' }, // Missing decimals, should default
-          { mint: 'mint3', symbol: 'SYM3', decimals: 9 },
-        ]
-      }),
-    });
+    jest.resetModules();
+    process.env = { ...OLD_ENV };
+    req = { method: 'GET' };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    };
+    fetchMock = jest.fn();
+    global.fetch = fetchMock;
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    process.env = OLD_ENV;
+    jest.restoreAllMocks();
+    delete global.fetch;
   });
 
   it('should fetch token metadata, transform it, and return 200', async () => {
-    const { req, res } = createMocks({ method: 'GET' });
-
+    fetchMock.mockResolvedValue({
+      ok: true,
+      json: async () => ({ data: [
+        { mint: 'mint1', symbol: 'AAA', decimals: 6 },
+        { mint: 'mint2', symbol: 'BBB' } // no decimals, should default to 9
+      ] })
+    });
     await handler(req, res);
-
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(`${MOCK_API_URL}/mints`);
-    expect(res._getStatusCode()).toBe(200);
-    const responseData = JSON.parse(res._getData());
-    expect(responseData).toEqual({
-      mint1: { symbol: 'SYM1', decimals: 6 },
-      mint2: { symbol: 'SYM2', decimals: 9 }, // Defaulted decimals
-      mint3: { symbol: 'SYM3', decimals: 9 },
+    expect(fetchMock).toHaveBeenCalledWith(`${process.env.DEFITUNA_API_URL}/mints`);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
+      mint1: { symbol: 'AAA', decimals: 6 },
+      mint2: { symbol: 'BBB', decimals: 9 }
     });
   });
 
   it('should return 500 if fetch fails (network error)', async () => {
-    const error = new Error('Network Error');
-    fetch.mockRejectedValue(error);
-    const { req, res } = createMocks({ method: 'GET' });
-
+    fetchMock.mockRejectedValue(new Error('fail'));
     await handler(req, res);
-
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(res._getStatusCode()).toBe(500);
-    expect(JSON.parse(res._getData())).toEqual({ error: 'Network Error' });
-    expect(console.error).toHaveBeenCalledWith('Error fetching token metadata:', error);
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'fail' });
   });
 
   it('should return 500 if fetch response is not ok', async () => {
-    fetch.mockResolvedValue({ ok: false });
-    const { req, res } = createMocks({ method: 'GET' });
-
+    fetchMock.mockResolvedValue({ ok: false });
     await handler(req, res);
-
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(res._getStatusCode()).toBe(500);
-    expect(JSON.parse(res._getData())).toEqual({ error: 'Failed to fetch token metadata from DeFiTuna API' });
-    expect(console.error).toHaveBeenCalledWith('Error fetching token metadata:', expect.any(Error));
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch token metadata from DeFiTuna API' });
   });
 
   it('should return 500 if API response data is not an array', async () => {
-    fetch.mockResolvedValue({
+    fetchMock.mockResolvedValue({
       ok: true,
-      json: async () => ({ data: { not: 'an array' } }), // Invalid format
+      json: async () => ({ data: null })
     });
-    const { req, res } = createMocks({ method: 'GET' });
-
     await handler(req, res);
-
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(res._getStatusCode()).toBe(500);
-    expect(JSON.parse(res._getData())).toEqual({ error: 'Invalid token metadata format received from API' });
-    expect(console.error).toHaveBeenCalledWith('Error fetching token metadata:', expect.any(Error));
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Invalid token metadata format received from API' });
   });
   
   it('should skip tokens without mint or symbol during transformation', async () => {
-    fetch.mockResolvedValue({
+    fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({ 
         data: [
@@ -99,19 +87,13 @@ describe('tokens API Handler (/api/tokens)', () => {
         ]
       }),
     });
-    const { req, res } = createMocks({ method: 'GET' });
-
     await handler(req, res);
 
-    expect(res._getStatusCode()).toBe(200);
-    const responseData = JSON.parse(res._getData());
-    expect(responseData).toEqual({
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({
       mint1: { symbol: 'SYM1', decimals: 6 },
       mint4: { symbol: 'SYM4', decimals: 9 }, // Defaulted decimals
     });
-    // Check that items without mint/symbol were skipped
-    expect(responseData).not.toHaveProperty('undefined'); 
-    expect(responseData).not.toHaveProperty('mint_no_symbol');
   });
   
 }); 

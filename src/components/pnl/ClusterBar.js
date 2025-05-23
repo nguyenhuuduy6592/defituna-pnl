@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo, useCallback } from 'react';
 import styles from './ClusterBar.module.scss';
 import { TooltipPortal } from '../common/TooltipPortal';
+import { formatNumber } from '../../utils';
 
 /**
  * Renders a bar segment with a specific width
@@ -14,12 +15,12 @@ const BarSegment = ({ percentage, index, label }) => (
 );
 
 /**
- * Renders a tooltip row with label and value
+ * Renders a tooltip row with label and value, using the new display formatter
  */
-const TooltipRow = ({ label, value, formatValue }) => (
+const TooltipRow = ({ label, value, formatDisplayValue }) => (
   <div className={styles.tooltipRow}>
     <span className={styles.tooltipLabel}>{label}:</span>
-    <span className={styles.tooltipValue}>{formatValue(value)}</span>
+    <span className={styles.tooltipValue}>{formatDisplayValue(value)}</span>
   </div>
 );
 
@@ -32,18 +33,41 @@ const TooltipRow = ({ label, value, formatValue }) => (
  * @param {{usd: number}} props.collateral - Object containing the collateral value.
  * @param {{usd: number}} props.debt - Object containing the debt value.
  * @param {{usd: number}} props.interest - Object containing the interest value.
- * @param {function(number): string} props.formatValue - Function to format currency values.
+ * @param {function(number): string} props.formatValue - Function to format USD currency values (e.g., adding commas).
+ * @param {boolean} props.showInSol - Whether to display values in SOL.
+ * @param {number | null} props.solPrice - The current price of SOL in USD.
  */
 export const ClusterBar = ({ 
   size = 0,
   collateral = { usd: 0 },
   debt = { usd: 0 },
   interest = { usd: 0 },
-  formatValue = (val) => val.toLocaleString()
+  formatValue = (val) => val.toLocaleString(),
+  showInSol = false,
+  solPrice = null
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const containerRef = useRef(null);
   
+  // Internal formatting function based on currency preference
+  const formatDisplayValue = useCallback((usdValue) => {
+    if (usdValue == null) {
+      return showInSol ? 'N/A SOL' : 'N/A USD';
+    }
+    if (showInSol) {
+      if (usdValue === 0) {
+        return `${formatNumber(0)} SOL`;
+      }
+      if (solPrice != null && solPrice > 0) {
+        const solAmount = usdValue / solPrice;
+        return `${formatNumber(solAmount)} SOL`;
+      }
+      return 'N/A SOL';
+    } else {
+      return `$${formatValue(usdValue)}`;
+    }
+  }, [showInSol, solPrice, formatValue]);
+
   // Memoize calculations for composition percentages
   const { 
     total, 
@@ -90,7 +114,7 @@ export const ClusterBar = ({
     { percentage: interestPercentage, label: 'Interest' }
   ], [collateralPercentage, debtPercentage, interestPercentage]);
   
-  // Memoize tooltip data
+  // Tooltip data now just holds the USD values; formatting happens in TooltipRow
   const tooltipData = useMemo(() => [
     { label: 'Total Size', value: size },
     { label: 'Collateral', value: collateral?.usd ?? 0 },
@@ -98,7 +122,7 @@ export const ClusterBar = ({
     { label: 'Interest', value: interest?.usd ?? 0 }
   ], [size, collateral, debt, interest]);
 
-  // Memoize tooltip content
+  // Tooltip content now passes formatDisplayValue to TooltipRow
   const tooltipContent = useMemo(() => (
     <div className={styles.tooltipContent}>
       {tooltipData.map((item, index) => (
@@ -106,11 +130,11 @@ export const ClusterBar = ({
           key={index}
           label={item.label}
           value={item.value}
-          formatValue={formatValue}
+          formatDisplayValue={formatDisplayValue}
         />
       ))}
     </div>
-  ), [tooltipData, formatValue]);
+  ), [tooltipData, formatDisplayValue]);
 
   return (
     <div 
@@ -132,8 +156,8 @@ export const ClusterBar = ({
           />
         ))}
       </div>
-      <div className={styles.totalValue} aria-label={`Total: ${formatValue(size)}`}>
-        ${formatValue(size)}
+      <div className={styles.totalValue} aria-label={`Total: ${formatDisplayValue(size)}`}>
+        {formatDisplayValue(size)}
       </div>
       {showTooltip && containerRef.current && (
         <TooltipPortal

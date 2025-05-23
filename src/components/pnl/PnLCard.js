@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { HiX } from 'react-icons/hi';
 import { HiDownload, HiShare } from 'react-icons/hi';
 import { BsCurrencyDollar, BsClock } from 'react-icons/bs';
@@ -13,6 +13,8 @@ import { formatNumber, formatDuration, formatPercentage } from '../../utils/form
 import { getValueClass } from '../../utils/styles';
 import { getStateClass } from '../../utils/positionUtils';
 import { exportCardAsImage, shareCard } from '../../utils/export';
+import { usePriceContext } from '../../contexts/PriceContext';
+import { useDisplayCurrency } from '../../contexts/DisplayCurrencyContext';
 
 /**
  * Renders a stat row with label and value
@@ -46,8 +48,7 @@ const PnLDisplay = ({ value, valueClass, displayPnlPercentage }) => {
       aria-live="polite"
     >
       <span className={styles.value}>
-        <BsCurrencyDollar className={styles.currencyIcon} />
-        {formatNumber(value)}
+        {value}
         {percentageDisplay}
       </span>
     </div>
@@ -103,6 +104,8 @@ export const PnLCard = ({ position, onClose }) => {
   const cardRef = useRef(null);
   const closeButtonRef = useRef(null);
   const exportContentRef = useRef(null);
+  const { solPrice } = usePriceContext();
+  const { showInSol } = useDisplayCurrency();
 
   // Use position.pairDisplay if available, otherwise fall back to position.pair
   const displayPair = position.pairDisplay || position.pair;
@@ -175,6 +178,31 @@ export const PnLCard = ({ position, onClose }) => {
   const limitUpper = formatLimitPrice(position.limitOrderPrices?.upper);
   const showLimits = position.limitOrderPrices?.lower != null || position.limitOrderPrices?.upper != null;
   
+  // Updated helper to format value based on current currency preference
+  const formatDisplayValue = useCallback((usdValue) => {
+    if (usdValue == null) return 'N/A';
+
+    if (showInSol) {
+      if (usdValue === 0) {
+        return `${formatNumber(0, 2, true).trim()} SOL`;
+      }
+      if (solPrice != null) {
+        const valueInSol = usdValue / solPrice;
+        return `${formatNumber(valueInSol, 2, true).trim()} SOL`;
+      }
+      return 'N/A SOL';
+    } else {
+      return `$${formatNumber(usdValue)}`;
+    }
+  }, [solPrice, showInSol]);
+
+  // Memoized display values
+  const pnlForDisplay = useMemo(() => formatDisplayValue(position.pnl.usd), [position.pnl.usd, formatDisplayValue]);
+  const pnlPercentageForDisplay = useMemo(() => formatPercentage(position.pnl.usd / position.collateral?.usd), [position.pnl.usd, position.collateral?.usd, formatPercentage]);
+  const collateralForDisplay = useMemo(() => formatDisplayValue(position.collateral?.usd), [position.collateral?.usd, formatDisplayValue]);
+  const feesEarnedForDisplay = useMemo(() => formatDisplayValue(position.yield?.usd), [position.yield?.usd, formatDisplayValue]);
+  const compoundedForDisplay = useMemo(() => formatDisplayValue(position.compounded?.usd), [position.compounded?.usd, formatDisplayValue]);
+
   return (
     <Portal>
       <div 
@@ -210,9 +238,9 @@ export const PnLCard = ({ position, onClose }) => {
             {/* Performance Metrics Section - Combined PnL and Duration */}
             <div className={styles.performanceSection}>
               <PnLDisplay 
-                value={position.pnl.usd} 
+                value={pnlForDisplay}
                 valueClass={pnlValueClass} 
-                displayPnlPercentage={position.displayPnlPercentage}
+                displayPnlPercentage={pnlPercentageForDisplay}
               />
             </div>
             
@@ -224,7 +252,7 @@ export const PnLCard = ({ position, onClose }) => {
                   <StatRow 
                     icon={BsCurrencyDollar}
                     label="Collateral"
-                    value={position.collateral?.usd ? `$${formatNumber(position.collateral.usd)}` : 'N/A'}
+                    value={collateralForDisplay}
                   />
                   <StatRow 
                     icon={FaBalanceScale}
@@ -234,13 +262,13 @@ export const PnLCard = ({ position, onClose }) => {
                   <StatRow 
                     icon={FaCoins}
                     label="Fees Earned"
-                    value={`$${formatNumber(position.yield.usd)}`}
+                    value={feesEarnedForDisplay}
                     valueClass={yieldValueClass}
                   />
                   <StatRow 
                     icon={FaSyncAlt}
                     label="Compounded"
-                    value={`$${formatNumber(position.compounded.usd)}`}
+                    value={compoundedForDisplay}
                     valueClass={compoundedValueClass}
                   />
                 </dl>

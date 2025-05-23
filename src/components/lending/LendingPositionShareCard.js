@@ -1,9 +1,11 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
 import { FiX, FiCopy } from 'react-icons/fi';
 import { HiDownload, HiShare } from 'react-icons/hi'; // Icons for new buttons
 import styles from './LendingPositionShareCard.module.scss';
 import { copyToClipboard, formatWalletAddress, formatFee, formatNumber, exportCardAsImage, shareCard } from '../../utils'; 
 import { Portal } from '../common/Portal'; // Import Portal
+import { usePriceContext } from '../../contexts/PriceContext'; // Added import
+import { useDisplayCurrency } from '../../contexts/DisplayCurrencyContext'; // Added import
 
 // Helper for stat rows, similar to PnLCard
 const StatRow = ({ label, value, valueClass }) => (
@@ -19,6 +21,8 @@ export const LendingPositionShareCard = ({ position, onClose }) => {
   const cardRef = useRef(null);
   const closeButtonRef = useRef(null);
   const exportContentRef = useRef(null);
+  const { solPrice } = usePriceContext(); // Added hook
+  const { showInSol } = useDisplayCurrency(); // Added hook
 
   // Destructure for convenience
   const { 
@@ -26,9 +30,9 @@ export const LendingPositionShareCard = ({ position, onClose }) => {
     authority, 
     wallet, 
     funds_amount,
-    funds_usd_value,
+    funds_usd_value, // USD value for Funds
     earned_amount,
-    earned_usd_value,
+    earned_usd_value, // USD value for Earned
     vaultSymbol,
     supplyApy
   } = position;
@@ -67,13 +71,30 @@ export const LendingPositionShareCard = ({ position, onClose }) => {
     shareCard(cardRef, shareDetails.fileName, shareDetails.title, shareDetails.text);
   }, [vaultSymbol, cardRef, cardTitle]);
 
+  // Helper to format financial values based on currency preference
+  const formatFinancialValue = useCallback((amount, usdValue) => {
+    if (showInSol) {
+      if (usdValue != null && solPrice != null) {
+        const solAmount = usdValue / solPrice;
+        return `${formatNumber(solAmount)} SOL`; // Display as X.XX SOL
+      }
+      return 'N/A SOL';
+    } else {
+      const usdValueStr = formatFee(usdValue || 0, false);
+      return usdValueStr;
+    }
+  }, [solPrice, showInSol]);
+
+  const fundsDisplayValue = useMemo(() => formatFinancialValue(position.funds.amount, position.funds.usd), [position.funds.amount, position.funds.usd, formatFinancialValue]);
+  const earnedDisplayValue = useMemo(() => formatFinancialValue(position.earned.amount, position.earned.usd), [position.earned.amount, position.earned.usd, formatFinancialValue]);
+
   // Text for simple copy (if still needed, or remove if card is purely visual)
   const shareTextForClipboard = `DeFiTuna Lending Position:\n` +
                                 `Vault: ${vaultSymbol || 'N/A'} (${formatWalletAddress(vault || 'N/A')})\n` +
                                 `Wallet: ${formatWalletAddress(effectiveWallet || 'N/A')}\n` +
-                                `Funds: ${formatNumber(funds_amount || 0, false)} (${formatFee(funds_usd_value || 0, false)})\n` +
+                                `Funds: ${fundsDisplayValue}\n` + // Use formatted value
                                 `Supply APY: ${supplyApy ? supplyApy.toFixed(2) : '0.00'}%\n` +
-                                `Earned: ${formatNumber(earned_amount || 0, false)} (${formatFee(earned_usd_value || 0, false)})`;
+                                `Earned: ${earnedDisplayValue}`; // Use formatted value
 
   const handleSimpleCopy = () => {
     copyToClipboard(shareTextForClipboard);
@@ -107,11 +128,11 @@ export const LendingPositionShareCard = ({ position, onClose }) => {
             <div className={styles.detailsGrid}> {/* Adapting for lending data */}
               <StatRow label="Vault" value={`${vaultSymbol || 'N/A'} (${formatWalletAddress(vault || 'N/A')})`} />
               <StatRow label="Wallet" value={formatWalletAddress(effectiveWallet || 'N/A')} />
-              <StatRow label="Funds" value={`${formatNumber(funds_amount || 0, false)} (${formatFee(funds_usd_value || 0, false)})`} />
+              <StatRow label="Funds" value={fundsDisplayValue} />
               <StatRow label="Supply APY" value={`${supplyApy ? supplyApy.toFixed(2) : '0.00'}%`} valueClass={styles.positiveValue} />
               <StatRow 
                 label="Earned" 
-                value={`${formatNumber(earned_amount || 0, false)} (${formatFee(earned_usd_value || 0, false)})`} 
+                value={earnedDisplayValue} 
                 valueClass={styles.positiveValue}
               />
             </div>

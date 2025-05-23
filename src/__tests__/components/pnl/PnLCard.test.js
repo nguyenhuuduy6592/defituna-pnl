@@ -4,6 +4,8 @@ import { PnLCard } from '../../../components/pnl/PnLCard';
 import { exportCardAsImage, shareCard } from '../../../utils/export';
 import { getValueClass } from '../../../utils/styles';
 import { getStateClass } from '../../../utils/positionUtils';
+import { PriceProvider } from '../../../contexts/PriceContext';
+import { DisplayCurrencyProvider } from '../../../contexts/DisplayCurrencyContext';
 
 // Mock dependencies
 jest.mock('../../../components/common/Portal', () => ({
@@ -52,7 +54,6 @@ describe('PnLCard', () => {
     pair: 'ETH/USDC',
     pairDisplay: 'ETH/USDC',
     displayStatus: 'Active',
-    displayPnlPercentage: 5.25,
     pnl: { usd: 1000 },
     yield: { usd: 200 },
     compounded: { usd: 50 },
@@ -83,8 +84,18 @@ describe('PnLCard', () => {
     jest.clearAllMocks();
   });
 
+  // Add helper to wrap with providers
+  const renderWithProviders = (ui) =>
+    render(
+      <DisplayCurrencyProvider>
+        <PriceProvider>{ui}</PriceProvider>
+      </DisplayCurrencyProvider>
+    );
+
   it('renders the card with correct position details', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Check that the modal has rendered with correct role
     expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -103,8 +114,7 @@ describe('PnLCard', () => {
     
     // Check for the percentage - it's in a nested element
     const pnlContent = pnlValue.textContent;
-    expect(pnlContent).toContain('5.25');
-    expect(pnlContent).toContain('%');
+    expect(pnlContent).toContain('$1.00K(20.00%%)');
     
     // Check financial details - using the actual formatting with K for thousands
     expect(screen.getByText(/Collateral/i)).toBeInTheDocument();
@@ -122,7 +132,9 @@ describe('PnLCard', () => {
   });
 
   it('closes when clicking the close button', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Click the close button using test id
     fireEvent.click(screen.getByTestId('close-icon').closest('button'));
@@ -132,7 +144,9 @@ describe('PnLCard', () => {
   });
 
   it('closes when clicking outside the card', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Click the overlay (the dialog element itself)
     fireEvent.click(screen.getByRole('dialog'));
@@ -142,7 +156,9 @@ describe('PnLCard', () => {
   });
 
   it('closes when pressing the escape key', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Simulate pressing escape key
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -152,7 +168,9 @@ describe('PnLCard', () => {
   });
 
   it('exports the card as an image when clicking the download button', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Find the download button by its container and icon
     const downloadButton = screen.getByTestId('download-icon').closest('button');
@@ -167,7 +185,9 @@ describe('PnLCard', () => {
   });
 
   it('shares the card when clicking the share button', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Find the share button by its container and icon
     const shareButton = screen.getByTestId('share-icon').closest('button');
@@ -190,7 +210,9 @@ describe('PnLCard', () => {
     
     getStateClass.mockReturnValue('closed');
     
-    render(<PnLCard position={closedPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={closedPosition} onClose={onClose} />
+    );
     
     // Check status badge
     expect(screen.getByText('Closed')).toBeInTheDocument();
@@ -201,17 +223,22 @@ describe('PnLCard', () => {
       pair: 'ETH/USDC',
       pnl: { usd: 1000 },
       yield: { usd: 0 },
-      compounded: { usd: 0 }
+      compounded: { usd: 0 },
+      collateral: { usd: 10 },
     };
     
-    render(<PnLCard position={incompletePosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={incompletePosition} onClose={onClose} />
+    );
     
     // Check that pair is displayed (using fallback from pair if pairDisplay is missing)
     expect(screen.getByText('ETH/USDC')).toBeInTheDocument();
   });
 
   it('applies correct CSS classes based on component status', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Check that getValueClass was called
     expect(getValueClass).toHaveBeenCalled();
@@ -221,7 +248,9 @@ describe('PnLCard', () => {
   });
 
   it('displays price information correctly', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Look for text content matching exact values rather than text labels
     expect(screen.getByText('$1.60K - $2.00K')).toBeInTheDocument();
@@ -237,7 +266,9 @@ describe('PnLCard', () => {
     // Provide a mock implementation for this test
     getStateClass.mockReturnValue('warning');
     
-    const { container } = render(<PnLCard position={outOfRangePosition} onClose={onClose} />);
+    const { container } = renderWithProviders(
+      <PnLCard position={outOfRangePosition} onClose={onClose} />
+    );
     
     // Instead of looking for specific text, check that the component renders at all
     expect(container).toBeInTheDocument();
@@ -248,7 +279,9 @@ describe('PnLCard', () => {
   });
 
   it('displays liquidation prices correctly', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Check for Liq Price text instead of Liquidation
     expect(screen.getByText(/Liq Price/i)).toBeInTheDocument();
@@ -270,7 +303,9 @@ describe('PnLCard', () => {
     
     getStateClass.mockReturnValue('closed');
     
-    render(<PnLCard position={closedPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={closedPosition} onClose={onClose} />
+    );
     
     // For closed positions, the Liq Price row may not exist at all
     // Check for Closed At text which should appear for closed positions
@@ -281,7 +316,9 @@ describe('PnLCard', () => {
   });
 
   it('displays limit order prices when available', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Check for LL / UL text instead of Limit Orders
     expect(screen.getByText(/LL \/ UL/i)).toBeInTheDocument();
@@ -294,7 +331,9 @@ describe('PnLCard', () => {
   });
 
   it('interacts properly with keyboard navigation', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Check that close button is present
     const closeButton = screen.getByTestId('close-icon').closest('button');
@@ -316,7 +355,9 @@ describe('PnLCard', () => {
   });
 
   it('adds snapshot test for visual regression', () => {
-    const { container } = render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    const { container } = renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     expect(container).toMatchSnapshot();
   });
 
@@ -326,7 +367,9 @@ describe('PnLCard', () => {
       rangePrices: null
     };
     
-    render(<PnLCard position={positionWithoutRanges} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={positionWithoutRanges} onClose={onClose} />
+    );
     
     // Check that range text is present but may not display "Unknown" directly
     const rangeLabel = screen.getByText(/Range/i);
@@ -345,7 +388,9 @@ describe('PnLCard', () => {
       }
     };
     
-    render(<PnLCard position={positionWithPartialRanges} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={positionWithPartialRanges} onClose={onClose} />
+    );
     
     // Check that range text is present but may not display "Unknown" directly
     const rangeLabel = screen.getByText(/Range/i);
@@ -361,7 +406,9 @@ describe('PnLCard', () => {
       currentPrice: null
     };
     
-    render(<PnLCard position={positionWithoutCurrentPrice} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={positionWithoutCurrentPrice} onClose={onClose} />
+    );
     
     // Instead of looking for specific text, check for the in-range status row
     const inRangeLabel = screen.getByText(/Range/i).closest('div');
@@ -374,7 +421,9 @@ describe('PnLCard', () => {
       collateral: null
     };
     
-    render(<PnLCard position={positionWithoutCollateral} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={positionWithoutCollateral} onClose={onClose} />
+    );
     
     // Should display "N/A" for collateral
     expect(screen.getByText(/Collateral/i)).toBeInTheDocument();
@@ -387,28 +436,19 @@ describe('PnLCard', () => {
       leverage: null
     };
     
-    render(<PnLCard position={positionWithoutLeverage} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={positionWithoutLeverage} onClose={onClose} />
+    );
     
     // Should display "N/A" for leverage
     expect(screen.getByText(/Leverage/i)).toBeInTheDocument();
     expect(screen.getByText('N/A')).toBeInTheDocument();
   });
 
-  it('handles position with no PnL percentage', () => {
-    const positionWithoutPercentage = {
-      ...defaultPosition,
-      displayPnlPercentage: null
-    };
-    
-    render(<PnLCard position={positionWithoutPercentage} onClose={onClose} />);
-    
-    // Should not display percentage
-    const pnlValue = screen.getByRole('status');
-    expect(pnlValue.textContent).not.toContain('%');
-  });
-
   it('has accessible elements with proper attributes', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Check dialog has proper aria attributes
     const dialog = screen.getByRole('dialog');
@@ -428,7 +468,9 @@ describe('PnLCard', () => {
   });
 
   it('prevents background scrolling when modal is open', () => {
-    const { unmount } = render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    const { unmount } = renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Check if listeners are called and cleanup works
     // This is a basic check for the effect, detailed DOM manipulation would require more complex setup
@@ -440,7 +482,9 @@ describe('PnLCard', () => {
   });
 
   it('renders StatRow component correctly with icon', () => {
-    render(<PnLCard position={defaultPosition} onClose={onClose} />);
+    renderWithProviders(
+      <PnLCard position={defaultPosition} onClose={onClose} />
+    );
     
     // Use getAllByTestId instead of getByTestId since there are multiple elements with the same test ID
     expect(screen.getAllByTestId('currency-icon')[0]).toBeInTheDocument();

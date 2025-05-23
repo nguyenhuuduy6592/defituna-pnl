@@ -22,6 +22,7 @@ import {
 } from '../utils';
 import styles from './index.module.scss';
 import Link from 'next/link';
+import { usePriceContext } from '../contexts/PriceContext';
 
 // Storage keys for collapsible sections
 const TRADING_EXPANDED_KEY = 'tradingExpanded';
@@ -60,6 +61,8 @@ export default () => {
     savePositionSnapshot,
     getPositionHistory
   } = useHistoricalData();
+
+  const { updateSolPrice } = usePriceContext();
 
   // Check if this is the first visit
   useEffect(() => {
@@ -145,6 +148,8 @@ export default () => {
           startFetchCooldown(30); 
         }
 
+        await updateSolPrice();
+
       } else if (fetchErrors.length === 0) {
         setErrorMessage('No position data found for the provided wallet(s).');
       }
@@ -166,7 +171,8 @@ export default () => {
     wallet, 
     addWallet, 
     setWallet, 
-    debouncedExecuteFetchWalletPnL
+    debouncedExecuteFetchWalletPnL,
+    updateSolPrice
   ]);
 
   const {

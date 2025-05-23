@@ -76,6 +76,20 @@
       .positionLeverage, .positionPnlPercentage {
         font-size: variables.font-size(xs);
       }
+
+      &.valueCell {
+        .primaryValue {
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: variables.spacing(xs);
+
+          .positionPnlPercentage {
+            font-size: variables.font-size(xs);
+            opacity: 0.8;
+          }
+        }
+      }
     }
   }
 
@@ -139,6 +153,14 @@
       &:last-child {
         justify-content: flex-end;
         margin-bottom: 0;
+      }
+
+      &.valueCell {
+        .primaryValue {
+          flex-direction: row;
+          justify-content: flex-end;
+          gap: variables.spacing(xs);
+        }
       }
     }
     td[data-label='Actions']::before {
@@ -349,4 +371,10 @@
   @include variables.breakpoint-down(sm) {
     display: none !important;
   }
+}
+
+.solEquivalent {
+  margin-left: 4px;
+  font-size: 0.85em;
+  opacity: 0.8;
 }

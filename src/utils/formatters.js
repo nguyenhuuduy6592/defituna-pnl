@@ -4,11 +4,9 @@
 
 // --- Constants ---
 const DEFAULT_LOCALE = undefined; // Use browser default locale
-const SMALL_NUMBER_THRESHOLD = 0.01;
-const MIN_FRACTION_DIGITS_SMALL = 6;
-const MAX_FRACTION_DIGITS_SMALL = 6;
-const MIN_FRACTION_DIGITS_DEFAULT = 2;
-const MAX_FRACTION_DIGITS_DEFAULT = 2;
+const SMALL_NUMBER_THRESHOLD = 0.1;
+const FRACTION_DIGITS_SMALL = 4;
+const FRACTION_DIGITS_DEFAULT = 2;
 
 // --- Formatting Functions ---
 
@@ -37,13 +35,13 @@ export const formatNumber = (num, abbreviate = true) => {
   
   // Handle small numbers with more precision
   const options = {
-    minimumFractionDigits: MIN_FRACTION_DIGITS_DEFAULT,
-    maximumFractionDigits: MAX_FRACTION_DIGITS_DEFAULT,
+    minimumFractionDigits: FRACTION_DIGITS_DEFAULT,
+    maximumFractionDigits: FRACTION_DIGITS_DEFAULT,
   };
 
   if (absNum < SMALL_NUMBER_THRESHOLD && number !== 0) {
-    options.minimumFractionDigits = MIN_FRACTION_DIGITS_SMALL;
-    options.maximumFractionDigits = MAX_FRACTION_DIGITS_SMALL;
+    options.minimumFractionDigits = FRACTION_DIGITS_SMALL;
+    options.maximumFractionDigits = FRACTION_DIGITS_SMALL;
   }
   
   return sign + absNum.toLocaleString(DEFAULT_LOCALE, options);
@@ -79,9 +77,9 @@ export const formatValue = (val) => {
   let formattedVal;
 
   if (absVal < SMALL_NUMBER_THRESHOLD && val !== 0) {
-    formattedVal = absVal.toFixed(MIN_FRACTION_DIGITS_SMALL);
+    formattedVal = absVal.toFixed(FRACTION_DIGITS_SMALL);
   } else {
-    formattedVal = absVal.toFixed(MIN_FRACTION_DIGITS_DEFAULT);
+    formattedVal = absVal.toFixed(FRACTION_DIGITS_DEFAULT);
   }
   
   return `${sign}${formattedVal}    `; // Add consistent padding with 4 spaces

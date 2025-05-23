@@ -13,6 +13,13 @@
   @include variables.responsive(md) {
     padding: variables.spacing(lg);
   }
+
+  .controlsHeader {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: variables.spacing(md);
+  }
+
   .cardRow {
     display: grid;
     grid-template-columns: 1fr;

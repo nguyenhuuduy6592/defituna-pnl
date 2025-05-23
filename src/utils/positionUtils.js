@@ -52,16 +52,6 @@ export const getStateClass = (state) => {
 };
 
 /**
- * Calculates the percentage value from Basis Points (BPS).
- * @param {number|null|undefined} bps - The value in basis points.
- * @returns {number} The percentage value (defaults to 0 if bps is null/undefined).
- */
-export const calculatePnlPercentage = (bps) => {
-  if (bps == null) return 0;
-  return bps / 100;
-};
-
-/**
  * Calculates the display status of a position based on its state and prices.
  * @param {object} position - The position object containing state, currentPrice, and rangePrices.
  * @returns {string} The display status string ('In range', 'Out of range', 'Closed', etc.).
@@ -174,7 +164,6 @@ export const decodePosition = (position) => {
   
   // Add derived/calculated properties (optional, can be done later)
   decoded.displayStatus = calculateStatus(decoded); 
-  decoded.displayPnlPercentage = calculatePnlPercentage(decoded.pnl?.bps);
   
   return decoded;
 };

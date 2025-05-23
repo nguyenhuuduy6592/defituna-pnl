@@ -49,5 +49,12 @@
       &.negative { color: variables.color(negative); }
       &.zero { color: variables.color(zero); }
     }
+
+    .solValue {
+      font-size: variables.font-size(sm);
+      font-weight: font-weight(normal);
+      color: variables.text-color(secondary);
+      margin-left: variables.spacing(xs);
+    }
   }
   

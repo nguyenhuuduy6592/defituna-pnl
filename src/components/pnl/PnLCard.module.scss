@@ -17,7 +17,8 @@
 .modalContainer {
   background: rgba(30, 41, 59, 0.95);
   padding: variables.spacing(sm);
-  width: auto;
+  width: calc(100% - 80px);
+  max-width: 500px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 

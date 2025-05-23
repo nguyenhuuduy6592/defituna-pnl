@@ -20,9 +20,9 @@ describe('formatNumber', () => {
   });
 
   test('formats small numbers with 6 decimal places', () => {
-    expect(formatNumber(0.001234)).toBe('0.001234');
-    expect(formatNumber(-0.001234)).toBe('-0.001234');
-    expect(formatNumber(0.00000123)).toBe('0.000001');
+    expect(formatNumber(0.001234)).toBe('0.0012');
+    expect(formatNumber(-0.001234)).toBe('-0.0012');
+    expect(formatNumber(0.00000123)).toBe('0.0000');
   });
 
   test('abbreviates large numbers with K, M, B', () => {
@@ -75,8 +75,8 @@ describe('formatValue', () => {
   });
 
   test('formats small values with more precision', () => {
-    expect(formatValue(0.001234)).toBe(' 0.001234    ');
-    expect(formatValue(-0.001234)).toBe('-0.001234    ');
+    expect(formatValue(0.001234)).toBe(' 0.0012    ');
+    expect(formatValue(-0.001234)).toBe('-0.0012    ');
   });
 });
 

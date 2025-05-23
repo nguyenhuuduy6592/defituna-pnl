@@ -5,6 +5,7 @@ import { TotalPnLDisplay } from './TotalPnLDisplay';
 import styles from './PnLDisplay.module.scss';
 import { LoadingOverlay } from '../common/LoadingOverlay';
 import { usePositionAges } from './hooks/usePositionAges';
+import { CurrencyToggle } from '../common/CurrencyToggle';
 
 // Default structure when data is not yet available
 const defaultData = {
@@ -68,19 +69,24 @@ export const PnLDisplay = ({
   return (
     <LoadingOverlay loading={loading}>
       <div className={styles.pnlContainer}>
-        <div className={styles.cardRow}>
-          <TotalPnLDisplay
-            label="Total PnL"
-            totalValue={displayData.totalPnL} />
-          
-          <TotalPnLDisplay
-            label="Total Yield"
-            totalValue={totalYield} />
-        
-          <TotalPnLDisplay
-            label="Total Compounded"
-            totalValue={totalCompounded} />
+        <div className={styles.controlsHeader}>
+          <CurrencyToggle />
         </div>
+        {positionsWithAge.length > 1 && 
+          <div className={styles.cardRow}>
+            <TotalPnLDisplay
+              label="Total PnL"
+              totalValue={displayData.totalPnL} />
+            
+            <TotalPnLDisplay
+              label="Total Yield"
+              totalValue={totalYield} />
+          
+            <TotalPnLDisplay
+              label="Total Compounded"
+              totalValue={totalCompounded} />
+          </div>
+        }
 
         <PositionsList 
           positions={positionsWithAge}

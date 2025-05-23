@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import styles from './TotalPnLDisplay.module.scss';
 import { formatValue, getValueClass } from '../../utils';
+import { usePriceContext } from '../../contexts/PriceContext';
+import { useDisplayCurrency } from '../../contexts/DisplayCurrencyContext';
 
 /**
  * Component for displaying total PnL information across multiple wallets
@@ -10,14 +12,27 @@ import { formatValue, getValueClass } from '../../utils';
  * @returns {JSX.Element} Rendered component
  */
 export const TotalPnLDisplay = ({ label, totalValue }) => {
-  // Ensure we have numeric values
+  const { solPrice } = usePriceContext();
+  const { showInSol } = useDisplayCurrency();
   const safeTotalValue = typeof totalValue === 'number' ? totalValue : 0;
   
-  // Memoize the formatted value and class to prevent unnecessary recalculations
-  const { formattedValue, valueClass } = useMemo(() => ({
-    formattedValue: formatValue(safeTotalValue),
-    valueClass: getValueClass(safeTotalValue)
-  }), [safeTotalValue]);
+  const displayValue = useMemo(() => {
+    if (showInSol) {
+      if (safeTotalValue === 0) {
+        return `${formatValue(0, 2, true).trim()} SOL`;
+      }
+      if (solPrice) {
+        const valueInSol = safeTotalValue / solPrice;
+        return `${formatValue(valueInSol, 2, true).trim()} SOL`;
+      }
+      return 'N/A SOL';
+    } else {
+      return `$${formatValue(safeTotalValue)}`;
+    }
+  }, [safeTotalValue, solPrice, showInSol]);
+
+  // Memoize the class to prevent unnecessary recalculations
+  const valueClass = useMemo(() => getValueClass(safeTotalValue), [safeTotalValue]);
   
   return (
     <div className={styles.pnlHeader}>
@@ -28,9 +43,9 @@ export const TotalPnLDisplay = ({ label, totalValue }) => {
           </div>
           <div 
             className={`${styles.value} ${styles[valueClass]}`}
-            aria-label={`${label}: ${formattedValue} dollars`}
+            aria-label={`${label}: ${displayValue}`}
           >
-            ${formattedValue}
+            {displayValue}
           </div>
         </div>
       </div>

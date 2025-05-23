@@ -1,9 +1,11 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { FiCopy, FiShare2 } from 'react-icons/fi';
 import { LoadingOverlay } from '../common/LoadingOverlay';
 import { Tooltip } from '../common/Tooltip';
 import styles from './LendingPositionsDisplay.module.scss';
 import { formatFee, formatNumber, copyToClipboard as utilCopyToClipboard, formatWalletAddress as utilFormatWalletAddress, formatDuration } from '../../utils';
+import { usePriceContext } from '../../contexts/PriceContext';
+import { useDisplayCurrency } from '../../contexts/DisplayCurrencyContext';
 
 // Default structure when data is not yet available
 const defaultData = {
@@ -29,10 +31,8 @@ export const LendingPositionsDisplay = ({
   getMintDetails,
   onShare
 }) => {
-  // Use provided data or default data
-  const displayData = useMemo(() => {
+  const rawDisplayData = useMemo(() => {
     if (!data) return defaultData;
-    
     return {
       positions: Array.isArray(data.positions) ? data.positions : [],
       walletCount: typeof data.walletCount === 'number' ? data.walletCount : 0
@@ -41,51 +41,81 @@ export const LendingPositionsDisplay = ({
 
   const [vaultDetails, setVaultDetails] = useState({});
   const [mintDetails, setMintDetails] = useState({});
+  const { solPrice } = usePriceContext();
+  const { showInSol } = useDisplayCurrency();
   
-  // Fetch vault and mint details for all positions
   useEffect(() => {
     const fetchDetailsForPositions = async () => {
-      if (!displayData.positions.length) return;
+      if (!rawDisplayData.positions.length) return;
       
-      // Get unique vault addresses
-      const uniqueVaults = [...new Set(displayData.positions.map(pos => pos.vault))];
+      const uniqueVaults = [...new Set(rawDisplayData.positions.map(pos => pos.vault))];
       const uniqueMints = new Set();
       
-      // Fetch vault details and collect unique mints
-      const newVaultDetails = { ...vaultDetails };
-      
+      const newVaultDetails = {}; 
+      const currentVaultAddresses = Object.keys(vaultDetails);
+
       for (const vaultAddress of uniqueVaults) {
-        if (!newVaultDetails[vaultAddress]) {
+        if (!currentVaultAddresses.includes(vaultAddress)) {
           const details = await getVaultDetails(vaultAddress);
           if (details) {
             newVaultDetails[vaultAddress] = details;
             if (details.mint) uniqueMints.add(details.mint);
           }
-        } else if (newVaultDetails[vaultAddress].mint) {
-          uniqueMints.add(newVaultDetails[vaultAddress].mint);
+        } else {
+          newVaultDetails[vaultAddress] = vaultDetails[vaultAddress];
+          if (vaultDetails[vaultAddress]?.mint) uniqueMints.add(vaultDetails[vaultAddress].mint);
         }
       }
+      setVaultDetails(prevDetails => ({...prevDetails, ...newVaultDetails}));
       
-      setVaultDetails(newVaultDetails);
-      
-      // Fetch mint details
-      const newMintDetails = { ...mintDetails };
-      
+      const newMintDetails = {};
+      const currentMintAddresses = Object.keys(mintDetails);
+
       for (const mintAddress of uniqueMints) {
-        if (!newMintDetails[mintAddress]) {
+        if (!currentMintAddresses.includes(mintAddress)) {
           const details = await getMintDetails(mintAddress);
           if (details) {
             newMintDetails[mintAddress] = details;
           }
+        } else {
+          newMintDetails[mintAddress] = mintDetails[mintAddress];
         }
       }
-      
-      setMintDetails(newMintDetails);
+      setMintDetails(prevDetails => ({...prevDetails, ...newMintDetails}));
     };
     
     fetchDetailsForPositions();
-  }, [displayData.positions, getVaultDetails, getMintDetails]);
+  }, [rawDisplayData.positions, getVaultDetails, getMintDetails]);
   
+  const formatFinancialValueDisplay = useCallback((amount, usdValue) => {
+    if (showInSol) {
+      if (usdValue === 0) {
+        return `${formatNumber(0)} SOL`;
+      } 
+      else if (usdValue != null && solPrice != null) { 
+        const solAmount = usdValue / solPrice;
+        return `${formatNumber(solAmount)} SOL`;
+      }
+      return 'N/A SOL'; 
+    } else {
+      const usdValueDisplay = usdValue == null ? 'N/A USD' : formatFee(usdValue, false);
+      return (
+        <>
+          <span className={styles.usdValueParentheses}>{usdValueDisplay}</span>
+        </>
+      );
+    }
+  }, [solPrice, showInSol]);
+
+  // Pre-calculate display values for all positions
+  const processedPositions = useMemo(() => {
+    return rawDisplayData.positions.map(position => ({
+      ...position,
+      fundsDisplay: formatFinancialValueDisplay(position.funds?.amount, position.funds?.usd),
+      earnedDisplay: formatFinancialValueDisplay(position.earned?.amount, position.earned?.usd),
+    }));
+  }, [rawDisplayData.positions, formatFinancialValueDisplay]);
+
   // Render vault tooltip content - MODIFIED
   const renderVaultTooltip = (vaultAddress) => {
     const vault = vaultDetails[vaultAddress] || {};
@@ -130,7 +160,7 @@ export const LendingPositionsDisplay = ({
     <LoadingOverlay loading={loading}>
       <div className={styles.lendingContainer}>
         <div className={styles.contentWrapper}>
-          {displayData.positions.length > 0 ? (
+          {processedPositions.length > 0 ? (
             <table className={styles.lendingTable}>
               <thead>
                 <tr>
@@ -144,7 +174,7 @@ export const LendingPositionsDisplay = ({
                 </tr>
               </thead>
               <tbody>
-                {displayData.positions.map((position, index) => {
+                {processedPositions.map((position, index) => {
                   const vault = vaultDetails[position.vault] || {};
                   const mintInfo = vault.mint ? mintDetails[vault.mint] || {} : {};
                   
@@ -192,10 +222,7 @@ export const LendingPositionsDisplay = ({
                       </td>
                       <td data-label="Funds">
                         <div>
-                          <span className={styles.fundsAmount}>{formatNumber(position.funds_amount || 0, false)}</span>
-                          <span className={styles.usdValueParentheses}>
-                            ({formatFee(position.funds_usd_value || 0, false)})
-                          </span>
+                          {position.fundsDisplay}
                         </div>
                       </td>
                       <td data-label="Supply APY" className={styles.positive}>
@@ -203,10 +230,7 @@ export const LendingPositionsDisplay = ({
                       </td>
                       <td data-label="Earned" className={styles.positive}>
                         <div>
-                          <span className={styles.earnedAmount}>{formatNumber(position.earned_amount || 0, false)}</span>
-                          <span className={styles.usdValueParentheses}>
-                            ({formatFee(position.earned_usd_value || 0, false)})
-                          </span>
+                          {position.earnedDisplay}
                         </div>
                       </td>
                       <td data-label="Actions">

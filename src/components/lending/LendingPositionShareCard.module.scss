@@ -121,9 +121,8 @@
 .modalContainer {
   background: rgba(30, 41, 59, 0.95); // Dark background like PnLCard
   padding: variables.spacing(sm);
-  width: auto;
-  min-width: 360px; // Minimum width for better layout
-  max-width: 500px; // Max width like PnLCard example
+  width: calc(100% - 80px);
+  max-width: 350px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 

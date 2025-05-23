@@ -2,7 +2,6 @@ import {
   decodeValue,
   getValueClass,
   getStateClass,
-  calculatePnlPercentage,
   calculateStatus,
   addWalletAddressToPositions,
   decodePosition,
@@ -44,19 +43,6 @@ describe('getStateClass', () => {
     expect(getStateClass('Liquidated')).toBe('stateLiquidated');
     expect(getStateClass('Open (Unknown Range)')).toBe('stateOpenUnknown');
     expect(getStateClass('Unknown State')).toBe('');
-  });
-});
-
-describe('calculatePnlPercentage', () => {
-  it('handles null and undefined inputs', () => {
-    expect(calculatePnlPercentage(null)).toBe(0);
-    expect(calculatePnlPercentage(undefined)).toBe(0);
-  });
-
-  it('calculates percentage correctly', () => {
-    expect(calculatePnlPercentage(1000)).toBe(10); // 1000 bps = 10%
-    expect(calculatePnlPercentage(-500)).toBe(-5); // -500 bps = -5%
-    expect(calculatePnlPercentage(0)).toBe(0);
   });
 });
 
@@ -169,8 +155,7 @@ describe('decodePosition', () => {
       debt: { usd: 100 },
       interest: { usd: 5 },
       opened_at: '2023-01-01',
-      displayStatus: 'In range',
-      displayPnlPercentage: 10
+      displayStatus: 'In range'
     });
   });
 
@@ -187,7 +172,6 @@ describe('decodePosition', () => {
     expect(decoded.liquidationPrice).toEqual({ lower: null, upper: null });
     expect(decoded.limitOrderPrices).toEqual({ lower: null, upper: null });
     expect(decoded.displayStatus).toBe('Open (Unknown Range)');
-    expect(decoded.displayPnlPercentage).toBe(0);
   });
 });
 
