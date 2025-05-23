@@ -243,7 +243,28 @@ export { ActionsCell };
 const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
   const { solPrice } = usePriceContext();
   const { showInSol } = useDisplayCurrency();
-  const pnlClass = getValueClass(value); // Class based on USD value for consistent coloring
+  const pnlClass = useMemo(() => {
+    let numericValueForColoring = 0;
+
+    if (showInSol && pnlData && symbol) {
+      const tokenASymbol = symbol.a;
+      const tokenBSymbol = symbol.b;
+      if (tokenASymbol === KNOWN_TOKENS.SOL.symbol) {
+        numericValueForColoring = pnlData.pnl_a.amount;
+      }
+      else if (tokenBSymbol === KNOWN_TOKENS.SOL.symbol) {
+        numericValueForColoring = pnlData.pnl_b.amount;
+      }
+      else {
+        numericValueForColoring = value == null ? 0 : value; // USD display mode
+      }
+    }
+    else {
+      numericValueForColoring = value == null ? 0 : value; // USD display mode
+    }
+
+    return getValueClass(numericValueForColoring);
+  }, [value, solPrice, showInSol, pnlData, symbol]);
 
   const displayedValue = useMemo(() => {
     if (value == null) { // Handle null or undefined USD value first
