@@ -543,15 +543,28 @@ describe('DeFiTuna Utilities', () => {
       currentPrice: 10.5, entryPrice: 10,
       rangePrices: { lower: 9, upper: 11 },
       liquidationPrice: { lower: 8, upper: 12 },
-      limitOrderPrices: { lower: null, upper: null }, // Example with null
+      limitOrderPrices: { lower: null, upper: null },
       leverage: 2.5,
       size: 1000.50,
-      pnl: { usd: 50.256, bps: 502 },
-      yield: { usd: 5.1 },
-      compounded: { usd: 55.35 },
+      pnl: {
+        usd: 50.256,
+        bps: 502,
+        a: { amount: 25.128, bps: 251 },
+        b: { amount: 25.128, bps: 251 }
+      },
+      yield: {
+        usd: 5.1,
+        a: { amount: 2.55 },
+        b: { amount: 2.55 }
+      },
+      compounded: {
+        usd: 55.35,
+        a: { amount: 27.675 },
+        b: { amount: 27.675 }
+      },
       collateral: { usd: 400.12 },
       debt: { usd: 600.34 },
-      interest: { usd: 1.5 },
+      interest: { usd: 1.5 }
     };
     // Expected final encoded structure for a valid position
     const expectedEncodedPosition = {

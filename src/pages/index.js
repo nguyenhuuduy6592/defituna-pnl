@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { BsInfoCircle } from 'react-icons/bs';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { Tooltip } from '../components/common/Tooltip';
@@ -23,6 +23,8 @@ import {
 import styles from './index.module.scss';
 import Link from 'next/link';
 import { usePriceContext } from '../contexts/PriceContext';
+import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
+import { getValueClass, formatNumber } from '@/utils';
 
 // Storage keys for collapsible sections
 const TRADING_EXPANDED_KEY = 'tradingExpanded';
@@ -36,6 +38,7 @@ export default () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const [allPositionsHistory, setAllPositionsHistory] = useState([]);
+  const { showInSol } = useDisplayCurrency();
 
   // State for lending position share modal
   const [lendingShareModalState, setLendingShareModalState] = useState({
@@ -83,10 +86,88 @@ export default () => {
 
     const allPositions = validData.flatMap(d => d.positions || []);
     
-    const totalPnL = validData.reduce((sum, d) => sum + (d.totalPnL || 0), 0);
-    
+    const totalPnLInSol = (() => {
+      const tokenTotals = allPositions.reduce((acc, position) => {
+        position.pnlData.token_pnl.forEach(token => {
+          if (!acc[token.token]) {
+            acc[token.token] = 0;
+          }
+          acc[token.token] += token.amount;
+        });
+        return acc;
+      }, {});
+      
+      return Object.entries(tokenTotals)
+        .map(([token, amount]) => {
+          const valueClass = getValueClass(amount);
+          return `<span class="${valueClass}">${formatNumber(amount)} ${token}</span>`;
+        })
+        .join('<br />');
+    })();
+    const totalPnL = (() => {
+      const sumPnL = allPositions.reduce((acc, position) => {
+        return acc + position.pnlData.pnl_usd.amount;
+      }, 0);
+      return `<span class="${getValueClass(sumPnL)}">${formatNumber(sumPnL)} $</span>`;
+    })();
+
+    const totalYieldInSol = (() => {
+      const tokenTotals = allPositions.reduce((acc, position) => {
+        position.yieldData.tokens.forEach(token => {
+            if (!acc[token.token]) {
+              acc[token.token] = 0;
+            }
+            acc[token.token] += token.amount;
+          });
+          return acc;
+        }, {});
+        
+        return Object.entries(tokenTotals)
+          .map(([token, amount]) => {
+            const valueClass = getValueClass(amount);
+            return `<span class="${valueClass}">${formatNumber(amount)} ${token}</span>`;
+          })
+          .join('<br />');
+      })()
+    const totalYield = (() => {
+      const sumYield = allPositions.reduce((acc, position) => {
+        return acc + position.yieldData.usd.amount;
+      }, 0);
+      return `<span class="${getValueClass(sumYield)}">${formatNumber(sumYield)} $</span>`;
+    })();
+
+    const totalCompoundedInSol = (() => {
+      const tokenTotals = allPositions.reduce((acc, position) => {
+        position.compoundedData.tokens.forEach(token => {
+            if (!acc[token.token]) {
+              acc[token.token] = 0;
+            }
+            acc[token.token] += token.amount;
+          });
+          return acc;
+        }, {});
+        
+        return Object.entries(tokenTotals)
+          .map(([token, amount]) => {
+            const valueClass = getValueClass(amount);
+            return `<span class="${valueClass}">${formatNumber(amount)} ${token}</span>`;
+          })
+          .join('<br />');
+      })()
+    const totalCompounded = (() => {
+      const sumCompounded = allPositions.reduce((acc, position) => {
+        return acc + position.compoundedData.usd.amount;
+      }, 0);
+      return `<span class="${getValueClass(sumCompounded)}">${formatNumber(sumCompounded)} $</span>`;
+    })();
+
     return {
       totalPnL,
+      totalPnLInSol,
+      totalYield,
+      totalYieldInSol,
+      totalCompounded,
+      totalCompoundedInSol,
       positions: allPositions,
       walletCount: validData.length
     };

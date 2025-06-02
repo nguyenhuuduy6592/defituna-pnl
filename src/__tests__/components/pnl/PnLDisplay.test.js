@@ -48,6 +48,10 @@ jest.mock('../../../components/pnl/PnLDisplay.module.scss', () => ({
   cardRow: 'cardRow-mock'
 }));
 
+jest.mock('../../../components/common/CurrencyToggle', () => ({
+  CurrencyToggle: () => <div data-testid="currency-toggle">Currency Toggle Mock</div>
+}));
+
 // Clean up after each test
 afterEach(cleanup);
 
@@ -62,9 +66,33 @@ const renderWithProviders = (ui) =>
 describe('PnLDisplay Component', () => {
   const mockData = {
     totalPnL: 1000,
+    totalYield: 500,
+    totalCompounded: 150,
     positions: [
-      { id: '1', yield: { usd: 200 }, compounded: { usd: 50 } },
-      { id: '2', yield: { usd: 300 }, compounded: { usd: 100 } }
+      {
+        id: '1',
+        pnlData: {
+          token_pnl: [{ amount: 10, token: 'SOL', bps: 1000 }],
+          pnl_usd: { amount: 500, bps: 1000 },
+        },
+        yieldData: {
+          tokens: [{ amount: 2, token: 'SOL' }],
+          usd: { amount: 200 },
+        },
+        compounded: { usd: 50 }
+      },
+      {
+        id: '2',
+        pnlData: {
+          token_pnl: [{ amount: 5, token: 'SOL', bps: 500 }],
+          pnl_usd: { amount: 500, bps: 500 },
+        },
+        yieldData: {
+          tokens: [{ amount: 1, token: 'SOL' }],
+          usd: { amount: 300 },
+        },
+        compounded: { usd: 100 }
+      }
     ],
     walletCount: 2
   };
@@ -126,10 +154,43 @@ describe('PnLDisplay Component', () => {
   it('calculates total yield and compounded correctly when some positions have missing values', () => {
     const dataWithMissingValues = {
       totalPnL: 1000,
+      totalYield: 200,
+      totalCompounded: 100,
       positions: [
-        { id: '1', yield: { usd: 200 } }, // Missing compounded
-        { id: '2', compounded: { usd: 100 } }, // Missing yield
-        { id: '3' } // Missing both
+        {
+          id: '1',
+          pnlData: {
+            token_pnl: [],
+            pnl_usd: { amount: 0, bps: 0 }
+          },
+          yieldData: {
+            tokens: [],
+            usd: { amount: 200 }
+          }
+        },
+        {
+          id: '2',
+          pnlData: {
+            token_pnl: [],
+            pnl_usd: { amount: 0, bps: 0 }
+          },
+          yieldData: {
+            tokens: [],
+            usd: { amount: 0 }
+          },
+          compounded: { usd: 100 }
+        },
+        {
+          id: '3',
+          pnlData: {
+            token_pnl: [],
+            pnl_usd: { amount: 0, bps: 0 }
+          },
+          yieldData: {
+            tokens: [],
+            usd: { amount: 0 }
+          }
+        }
       ],
       walletCount: 3
     };
@@ -141,5 +202,10 @@ describe('PnLDisplay Component', () => {
     
     expect(totalYield).toHaveAttribute('data-totalvalue', '200');
     expect(totalCompounded).toHaveAttribute('data-totalvalue', '100');
+  });
+
+  it('renders CurrencyToggle in the controls header', () => {
+    renderWithProviders(<PnLDisplay data={mockData} />);
+    expect(screen.getByTestId('currency-toggle')).toBeInTheDocument();
   });
 }); 

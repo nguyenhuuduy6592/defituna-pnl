@@ -46,7 +46,7 @@ export function DisplayCurrencyProvider({ children }) {
     showInSol,
     toggleCurrency,
     // Derived value for convenience, can be 'USD' or 'SOL'
-    currentCurrency: showInSol ? 'SOL' : 'USD' 
+    currentCurrency: showInSol ? 'TOKENS' : 'USD' 
   };
 
   return (

@@ -162,6 +162,8 @@ export const decodePosition = (position) => {
     opened_at: position.opened_at,
     
     pnlData: position.pnlData,
+    yieldData: position.yieldData,
+    compoundedData: position.compoundedData,
     symbol: position.symbol,
   };
   

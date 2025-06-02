@@ -3,6 +3,7 @@
  * This module provides functions to fetch and process data from the DeFiTuna API.
  */
 
+import { KNOWN_TOKENS, STABLE_TOKENS } from './constants.js';
 import { processTunaPosition } from './formulas.js';
 
 // --- Simple In-Memory Cache with Different TTLs --- 
@@ -338,8 +339,73 @@ export async function processPositionsData(positionsData) {
             amount: processedPosition.pnl.usd,
             bps: processedPosition.pnl.bps
           },
-          pnl_a: processedPosition.pnl.a,
-          pnl_b: processedPosition.pnl.b,
+          token_pnl: (() => {
+            if (tokenA.symbol === KNOWN_TOKENS.SOL.symbol || tokenB.symbol === KNOWN_TOKENS.SOL.symbol) {
+              return [{
+                token: tokenA.symbol === KNOWN_TOKENS.SOL.symbol ? tokenA.symbol : tokenB.symbol,
+                amount: tokenA.symbol === KNOWN_TOKENS.SOL.symbol ? processedPosition.pnl.a.amount : processedPosition.pnl.b.amount,
+                bps: tokenA.symbol === KNOWN_TOKENS.SOL.symbol ? processedPosition.pnl.a.bps : processedPosition.pnl.b.bps
+              }];
+            }
+            else if (STABLE_TOKENS.includes(tokenA.symbol) && STABLE_TOKENS.includes(tokenB.symbol)) {
+              return [{
+                token: '$',
+                amount: processedPosition.pnl.usd,
+                bps: processedPosition.pnl.usd.bps
+              }];
+            }
+            else if (STABLE_TOKENS.includes(tokenA.symbol) || STABLE_TOKENS.includes(tokenB.symbol)) {
+              return [{
+                token: STABLE_TOKENS.includes(tokenA.symbol) ? tokenB.symbol : tokenA.symbol,
+                amount: STABLE_TOKENS.includes(tokenA.symbol) ? processedPosition.pnl.b.amount : processedPosition.pnl.a.amount,
+                bps: STABLE_TOKENS.includes(tokenA.symbol) ? processedPosition.pnl.b.bps : processedPosition.pnl.a.bps
+              }];
+            }
+            else {
+              return [
+                {
+                  token: tokenA.symbol,
+                  amount: processedPosition.pnl.a.amount,
+                  bps: processedPosition.pnl.a.bps
+                },
+                {
+                  token: tokenB.symbol,
+                  amount: processedPosition.pnl.b.amount,
+                  bps: processedPosition.pnl.b.bps
+                }
+              ];
+            }
+          })(),
+        },
+        yieldData: {
+          usd: {
+            amount: processedPosition.yield.usd
+          },
+          tokens: [
+            {
+              token: tokenA.symbol,
+              amount: processedPosition.yield.a.amount
+            },
+            {
+              token: tokenB.symbol,
+              amount: processedPosition.yield.b.amount
+            }
+          ],
+        },
+        compoundedData: {
+          usd: {
+            amount: processedPosition.compounded.usd
+          },
+          tokens: [
+            {
+              token: tokenA.symbol,
+              amount: processedPosition.compounded.a.amount
+            },
+            {
+              token: tokenB.symbol,
+              amount: processedPosition.compounded.b.amount
+            }
+          ],
         },
         symbol: {
           a: tokenA.symbol,

@@ -10,8 +10,8 @@ export const CurrencyToggle = () => {
       onClick={toggleCurrency} 
       className={styles.toggleButton}
       aria-live="polite"
-      title={`Switch to ${showInSol ? 'USD' : 'SOL'}`}
-      data-tooltip={`Click to switch to ${showInSol ? 'USD' : 'SOL'}`}
+      title={`Switch to ${showInSol ? 'USD' : 'TOKENS'}`}
+      data-tooltip={`Click to switch to ${showInSol ? 'USD' : 'TOKENS'}`}
     >
       Display: {currentCurrency}
     </button>

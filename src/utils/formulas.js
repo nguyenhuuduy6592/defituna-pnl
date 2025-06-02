@@ -266,15 +266,23 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
 
         // Calculate yield values
         const yieldValue = {
-            tokenA: yieldA,
-            tokenB: yieldB,
-            usd: Number(position.yield_a?.usd || 0) + Number(position.yield_b?.usd || 0)
+            usd: Number(position.yield_a?.usd || 0) + Number(position.yield_b?.usd || 0),
+            a: {
+                amount: yieldA,
+            },
+            b: {
+                amount: yieldB,
+            }
         };
 
         const compounded = {
-            tokenA: compoundedA,
-            tokenB: compoundedB,
-            usd: Number(position.compounded_yield_a?.usd || 0) + Number(position.compounded_yield_b?.usd || 0)
+            usd: Number(position.compounded_yield_a?.usd || 0) + Number(position.compounded_yield_b?.usd || 0),
+            a: {
+                amount: compoundedA,
+            },
+            b: {
+                amount: compoundedB,
+            }
         };
 
         // Calculate PnL

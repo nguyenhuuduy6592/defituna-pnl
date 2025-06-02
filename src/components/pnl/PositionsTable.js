@@ -333,6 +333,50 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
 ValueCell.displayName = 'ValueCell';
 
 /**
+ * The pnl cell with USD/SOL equivalent and percentage
+ */
+const PnlCell = memo(({ pnlData }) => {
+  const { showInSol } = useDisplayCurrency();
+  const pnlClass = showInSol ? pnlData.pnlClassInSol : pnlData.pnlClass;
+  const displayedValue = showInSol ? pnlData.displayedValueInSol : pnlData.displayedValue;
+  const percentageString = showInSol ? pnlData.percentageStringInSol : pnlData.percentageString;
+
+  return (
+    <td className={`${styles.valueCell} ${styles[pnlClass]}`} data-label='PnL'>
+      <div className={styles.primaryValue}>
+        {displayedValue}
+        {percentageString && (
+          <span className={styles.positionPnlPercentage}> 
+            {percentageString}
+          </span>
+        )}
+      </div>
+    </td>
+  );
+});
+
+PnlCell.displayName = 'PnlCell';
+
+/**
+ * The pnl cell with USD/SOL equivalent and percentage
+ */
+const YieldCell = memo(({ yieldData }) => {
+  const { showInSol } = useDisplayCurrency();
+  const yieldClass = showInSol ? yieldData.yieldClassInSol : yieldData.yieldClass;
+  const displayedValue = showInSol ? yieldData.displayedValueInSol : yieldData.displayedValue;
+
+  return (
+    <td className={`${styles.valueCell} ${styles[yieldClass]}`} data-label='Yield'>
+      <div className={styles.primaryValue}>
+        <div dangerouslySetInnerHTML={{ __html: displayedValue }} />
+      </div>
+    </td>
+  );
+});
+
+YieldCell.displayName = 'YieldCell';
+
+/**
  * A table component that displays position data with sorting and interactive features
  * 
  * @param {Object} props Component props
@@ -391,18 +435,8 @@ export const PositionsTable = memo(({
                 {position.displayStatus}
               </td>
               <td data-label="Age">{formatDuration(position.age)}</td>
-              <ValueCell
-                value={position.pnl.usd}
-                size={position.collateral.usd}
-                label="PnL"
-                pnlData={position.pnlData}
-                symbol={position.symbol}
-              />
-              <ValueCell
-                value={position.yield.usd}
-                size={position.collateral.usd}
-                label="Yield"
-              />
+              <PnlCell pnlData={position.pnlData} />
+              <YieldCell yieldData={position.yieldData} />
               <td data-label="Position Details">
                 <ClusterBar
                   size={position.size}

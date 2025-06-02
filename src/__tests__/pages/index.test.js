@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import HomePage from '../../pages/index';
 import { PriceProvider } from '../../contexts/PriceContext';
+import { DisplayCurrencyProvider } from '../../contexts/DisplayCurrencyContext';
 
 // Mock hooks
 jest.mock('../../hooks', () => ({
@@ -161,25 +162,25 @@ describe('Home Page', () => {
   });
 
   it('renders the wallet form', () => {
-    render(<PriceProvider><HomePage /></PriceProvider>);
+    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
     expect(screen.getByTestId('wallet-form')).toBeInTheDocument();
   });
 
   it('renders the auto-refresh component', () => {
-    render(<PriceProvider><HomePage /></PriceProvider>);
+    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
     expect(screen.getByTestId('auto-refresh')).toBeInTheDocument();
   });
 
   it('shows disclaimer modal on first visit', () => {
     localStorage.getItem.mockImplementation(key => key === 'disclaimerShown' ? null : undefined);
-    render(<PriceProvider><HomePage /></PriceProvider>);
+    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
     expect(screen.getByTestId('disclaimer-modal')).toBeInTheDocument();
   });
 
   it('does not show disclaimer on subsequent visits', () => {
     localStorage.getItem.mockImplementation(key => key === 'disclaimerShown' ? 'true' : undefined); // Simulate returning visitor
     
-    render(<PriceProvider><HomePage /></PriceProvider>);
+    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
     
     expect(screen.queryByTestId('disclaimer-modal')).not.toBeInTheDocument();
   });
@@ -187,7 +188,7 @@ describe('Home Page', () => {
   it('toggles auto-refresh when button is clicked', () => {
     const { AutoRefresh } = require('../../components/pnl/AutoRefresh');
     
-    render(<PriceProvider><HomePage /></PriceProvider>);
+    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
     
     const autoRefreshToggle = screen.getByTestId('auto-refresh-toggle');
     fireEvent.click(autoRefreshToggle);

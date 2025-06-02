@@ -65,7 +65,25 @@ const mockPositions = [
       lower: 1500,
       upper: 2100
     },
-    positionAddress: '0x123456'
+    positionAddress: '0x123456',
+    pnlData: {
+      token_pnl: [{ amount: 10, token: 'SOL', bps: 1000 }],
+      pnl_usd: { amount: 1000, bps: 1000 },
+      pnlClass: 'positive',
+      pnlClassInSol: 'positive',
+      displayedValue: '$1,000',
+      displayedValueInSol: '10 SOL',
+      percentageString: '(10.00%)',
+      percentageStringInSol: '(10.00%)'
+    },
+    yieldData: {
+      tokens: [{ amount: 2, token: 'SOL' }],
+      usd: { amount: 200 },
+      yieldClass: 'positive',
+      yieldClassInSol: 'positive',
+      displayedValue: '$200',
+      displayedValueInSol: '2 SOL'
+    }
   },
   {
     pair: 'BTC/USDT',
@@ -93,7 +111,25 @@ const mockPositions = [
       lower: 29000,
       upper: 35000
     },
-    positionAddress: '0xabcdef'
+    positionAddress: '0xabcdef',
+    pnlData: {
+      token_pnl: [{ amount: -5, token: 'BTC', bps: -500 }],
+      pnl_usd: { amount: -500, bps: -500 },
+      pnlClass: 'negative',
+      pnlClassInSol: 'negative',
+      displayedValue: '$-500',
+      displayedValueInSol: '-5 BTC',
+      percentageString: '(-5.00%)',
+      percentageStringInSol: '(-5.00%)'
+    },
+    yieldData: {
+      tokens: [{ amount: 1, token: 'BTC' }],
+      usd: { amount: 100 },
+      yieldClass: 'positive',
+      yieldClassInSol: 'positive',
+      displayedValue: '$100',
+      displayedValueInSol: '1 BTC'
+    }
   }
 ];
 
@@ -268,18 +304,6 @@ describe('PositionsTable', () => {
     copyToClipboard.mockClear();
     fireEvent.keyDown(walletCells[0], { key: ' ' });
     expect(copyToClipboard).toHaveBeenCalledWith(mockPositions[0].walletAddress);
-  });
-
-  it('applies correct CSS classes based on PnL values', () => {
-    renderTable();
-    
-    // Check that getValueClass was called for PnL values
-    expect(getValueClass).toHaveBeenCalledWith(1000);
-    expect(getValueClass).toHaveBeenCalledWith(-500);
-    
-    // Check that getValueClass was called for Yield values
-    expect(getValueClass).toHaveBeenCalledWith(200);
-    expect(getValueClass).toHaveBeenCalledWith(100);
   });
 
   it('applies correct CSS classes based on position status', () => {

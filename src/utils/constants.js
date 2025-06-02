@@ -62,4 +62,4 @@ export const KNOWN_TOKENS = {
   }
 };
 
-export const STABLE_TOKENS = [KNOWN_TOKENS.USDC, KNOWN_TOKENS.USDT];
+export const STABLE_TOKENS = [KNOWN_TOKENS.USDC.symbol, KNOWN_TOKENS.USDT.symbol];
