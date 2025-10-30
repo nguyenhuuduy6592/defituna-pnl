@@ -1,3 +1,5 @@
+import { sqrtPriceToPrice } from "@orca-so/whirlpools-core";
+
 /**
  * Financial calculation utilities for DeFiTuna positions.
  * This module provides functions to calculate leverage, liquidation prices,
@@ -262,7 +264,7 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
         });
 
         // Calculate entry and limit order prices
-        const entryPrice = tickToPrice(position.tick_entry_index, tokenADecimals, tokenBDecimals);
+        const entryPrice = sqrtPriceToPrice(BigInt(position.entry_sqrt_price), tokenADecimals, tokenBDecimals);
 
         // Calculate yield values
         const yieldValue = {
