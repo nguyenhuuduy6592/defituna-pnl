@@ -232,6 +232,7 @@ describe('formula', () => {
           pnl_usd: { amount: '100', bps: '1000' },
           tick_current_index: 0,
           tick_entry_index: 0,
+          entry_sqrt_price: '18446744073709551616',
           tick_lower_index: -1000,
           tick_upper_index: 1000,
           tick_stop_loss_index: -2000,

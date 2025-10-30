@@ -264,7 +264,7 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
         });
 
         // Calculate entry and limit order prices
-        const entryPrice = sqrtPriceToPrice(BigInt(position.entry_sqrt_price), tokenADecimals, tokenBDecimals);
+        const entryPrice = position.entry_sqrt_price ? sqrtPriceToPrice(BigInt(position.entry_sqrt_price), tokenADecimals, tokenBDecimals) : 0;
 
         // Calculate yield values
         const yieldValue = {
