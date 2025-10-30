@@ -1,15 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import usePoolsData from '../../hooks/usePoolsData';
 
-// Mock the calculatePriceFromSqrtPrice function
-jest.mock('../../utils/tokens', () => ({
-  calculatePriceFromSqrtPrice: jest.fn((sqrtPrice, token0Decimals, token1Decimals) => {
-    // Default mock implementation
-    if (sqrtPrice === 'error') throw new Error('Price calculation error');
-    return 1.5; // A default value for tests
-  })
-}));
-
 // Mock localStorage
 const localStorageMock = (() => {
   let store = {};

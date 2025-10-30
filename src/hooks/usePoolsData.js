@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { calculatePriceFromSqrtPrice } from '../utils/tokens';
+import { sqrtPriceToPrice } from '@orca-so/whirlpools-core';
 
 // In-memory cache for token metadata
 let tokenMetadataCache = null;
@@ -135,7 +135,7 @@ export default function usePoolsData() {
             decimals: 9
           };
 
-          const currentPrice = calculatePriceFromSqrtPrice(
+          const currentPrice = sqrtPriceToPrice(
             pool.sqrt_price,
             tokenA.decimals,
             tokenB.decimals

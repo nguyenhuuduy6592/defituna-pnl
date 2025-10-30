@@ -2,6 +2,8 @@
  * Token metadata utilities for DeFiTuna
  */
 
+import { sqrtPriceToPrice } from "@orca-so/whirlpools-core";
+
 // In-memory cache for token metadata
 const tokenMetadataCache = new Map();
 
@@ -100,34 +102,6 @@ export async function batchGetTokenMetadata(tokenAddresses) {
 }
 
 /**
- * Calculate the current price from sqrt_price
- * @param {string} sqrtPrice - Square root price X64 as a string
- * @param {number} tokenADecimals - Decimals for token A
- * @param {number} tokenBDecimals - Decimals for token B
- * @returns {number} Current price of token B in terms of token A
- */
-export function calculatePriceFromSqrtPrice(sqrtPrice, tokenADecimals = 6, tokenBDecimals = 6) {
-  if (!sqrtPrice || typeof sqrtPrice !== 'string') {
-    return 0;
-  }
-
-  try {
-    // Convert the square root price to a number
-    const sqrtPriceNum = Number(sqrtPrice) / 1000000; // Scale down from 1M = 1.0
-    
-    // Square the sqrt price to get the actual price
-    const price = sqrtPriceNum * sqrtPriceNum;
-    
-    // Adjust for token decimals
-    const decimalAdjustment = Math.pow(10, tokenBDecimals - tokenADecimals);
-    return price * decimalAdjustment;
-  } catch (error) {
-    console.error('Error calculating price from sqrt_price:', error);
-    return 0;
-  }
-}
-
-/**
  * Enhances a pool object with token metadata
  * @param {Object} pool - The pool object
  * @returns {Promise<Object>} Enhanced pool with token metadata
@@ -141,7 +115,7 @@ export async function enhancePoolWithTokenMetadata(pool) {
     const tokenAMeta = await getTokenMetadata(pool.token_a_mint);
     const tokenBMeta = await getTokenMetadata(pool.token_b_mint);
     
-    const currentPrice = calculatePriceFromSqrtPrice(
+    const currentPrice = sqrtPriceToPrice(
       pool.sqrt_price,
       tokenAMeta.decimals,
       tokenBMeta.decimals

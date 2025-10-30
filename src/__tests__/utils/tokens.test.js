@@ -1,7 +1,6 @@
 import {
   getTokenMetadata,
   batchGetTokenMetadata,
-  calculatePriceFromSqrtPrice,
   enhancePoolWithTokenMetadata
 } from '../../utils/tokens';
 
@@ -74,26 +73,6 @@ describe('Token Metadata Utils', () => {
           decimals: 9
         }
       });
-    });
-  });
-
-  describe('calculatePriceFromSqrtPrice', () => {
-    it('returns 0 for invalid inputs', () => {
-      expect(calculatePriceFromSqrtPrice(null)).toBe(0);
-      expect(calculatePriceFromSqrtPrice(undefined)).toBe(0);
-      expect(calculatePriceFromSqrtPrice(123)).toBe(0);
-      expect(calculatePriceFromSqrtPrice({})).toBe(0);
-    });
-
-    it('calculates price correctly with default decimals', () => {
-      // sqrt_price = 1000000 (1.0 in X64 fixed point)
-      const result = calculatePriceFromSqrtPrice('1000000');
-      expect(result).toBeCloseTo(1.0, 6);
-    });
-
-    it('adjusts price for different token decimals', () => {
-      const result = calculatePriceFromSqrtPrice('1000000', 9, 6);
-      expect(result).toBeCloseTo(0.001, 6);
     });
   });
 
