@@ -1,4 +1,4 @@
-import { sqrtPriceToPrice } from "@orca-so/whirlpools-core";
+import { sqrtPriceToPrice, tickIndexToPrice} from "@orca-so/whirlpools-core";
 
 /**
  * Financial calculation utilities for DeFiTuna positions.
@@ -114,32 +114,6 @@ export function computeLiquidationPrices({ lowerPrice, upperPrice, debtA, debtB,
 }
 
 /**
- * Converts a tick value to a price based on token decimals
- * @param {number} tick - Tick index
- * @param {number} decimalsA - Decimals of token A
- * @param {number} decimalsB - Decimals of token B
- * @returns {number} Converted price
- */
-export function tickToPrice(tick, decimalsA = 0, decimalsB = 0) {
-    try {
-        if (tick === undefined || tick === null) {
-            console.warn('[tickToPrice] Tick is undefined or null');
-            return 0;
-        }
-        
-        if (tick === 2147483647) {
-            return Infinity;
-        }
-
-        const price = Math.pow(1.0001, tick);
-        return price * (10 ** (decimalsA - decimalsB));
-    } catch (error) {
-        console.error('[tickToPrice] Error converting tick to price:', error.message);
-        return 0;
-    }
-}
-
-/**
  * Creates an empty position template with default values
  * @returns {Object} Empty position template
  */
@@ -220,11 +194,11 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
         const pnlB = Number(position.pnl_b?.amount || 0) / 10 ** tokenBDecimals;
 
         // Calculate prices and ticks
-        const currentPrice = tickToPrice(pool.tick_current_index, tokenADecimals, tokenBDecimals);
-        const lowerRangePrice = tickToPrice(position.tick_lower_index, tokenADecimals, tokenBDecimals);
-        const upperRangePrice = tickToPrice(position.tick_upper_index, tokenADecimals, tokenBDecimals);
-        const lowerLimitOrderPrice = tickToPrice(position.tick_stop_loss_index, tokenADecimals, tokenBDecimals);
-        const upperLimitOrderPrice = tickToPrice(position.tick_take_profit_index, tokenADecimals, tokenBDecimals);
+        const currentPrice = tickIndexToPrice(pool.tick_current_index, tokenADecimals, tokenBDecimals);
+        const lowerRangePrice = tickIndexToPrice(position.tick_lower_index, tokenADecimals, tokenBDecimals);
+        const upperRangePrice = tickIndexToPrice(position.tick_upper_index, tokenADecimals, tokenBDecimals);
+        const lowerLimitOrderPrice = position.tick_stop_loss_index == -2147483648 ? 0 : tickIndexToPrice(position.tick_stop_loss_index, tokenADecimals, tokenBDecimals);
+        const upperLimitOrderPrice = position.tick_take_profit_index == 2147483647 ? 0 :tickIndexToPrice(position.tick_take_profit_index, tokenADecimals, tokenBDecimals);
 
         // Calculate leverage
         const leverage = calculateLeverage({ price: currentPrice, debtA, debtB, totalA, totalB });

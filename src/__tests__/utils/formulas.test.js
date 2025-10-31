@@ -2,7 +2,6 @@ import {
   processTunaPosition,
   calculateLeverage,
   computeLiquidationPrices,
-  tickToPrice,
   createEmptyPositionTemplate
 } from '../../utils/formulas';
 
@@ -113,32 +112,6 @@ describe('formula', () => {
       
       expect(result.lowerLiquidationPrice).toBeGreaterThan(0);
       expect(result.upperLiquidationPrice).toBeGreaterThan(result.lowerLiquidationPrice);
-    });
-  });
-
-  describe('tickToPrice', () => {
-    it('converts tick to price correctly', () => {
-      expect(tickToPrice(0, 18, 18)).toBe(1);
-      expect(tickToPrice(1, 18, 18)).toBeCloseTo(1.0001, 4);
-    });
-
-    it('handles decimal adjustments', () => {
-      expect(tickToPrice(0, 18, 6)).toBe(1000000000000);
-      expect(tickToPrice(0, 6, 18)).toBeCloseTo(0.000000000001, 12);
-    });
-
-    it('returns 0 for invalid inputs', () => {
-      expect(tickToPrice(undefined, 18, 18)).toBe(0);
-      expect(tickToPrice(null, 18, 18)).toBe(0);
-    });
-
-    it('returns Infinity for max tick', () => {
-      expect(tickToPrice(2147483647, 18, 18)).toBe(Infinity);
-    });
-
-    it('defaults to 0 decimals if not provided', () => {
-      expect(tickToPrice(0)).toBe(1);
-      expect(tickToPrice(0, 18)).toBe(Math.pow(10, 18)); // When only decimalsA is provided
     });
   });
 
