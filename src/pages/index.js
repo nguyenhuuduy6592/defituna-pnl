@@ -80,7 +80,7 @@ export default () => {
   const { execute: debouncedExecuteFetchWalletPnL } = useDebounceApi(fetchWalletPnL, 500);
 
   // Aggregate PnL data from multiple wallets, filtering out errors
-  const aggregatePnLData = useCallback((walletsData) => {
+  const aggregatePnLData = useCallback((walletsData, solPrice) => {
     const validData = walletsData.filter(d => d && !d.error); 
     if (validData.length === 0) return null;
 
@@ -161,6 +161,23 @@ export default () => {
       return `<span class="${getValueClass(sumCompounded)}">${formatNumber(sumCompounded)} $</span>`;
     })();
 
+    const totalSize = (() => {
+      const sumSize = allPositions.reduce((acc, position) => {
+        return acc + position.size;
+      }, 0);
+      return sumSize;
+    })();
+    const totalSizeInSol = (() => {
+      if (totalSize === 0) {
+        return `${formatNumber(0)} SOL`;
+      }
+      if (solPrice != null && solPrice > 0) {
+        const solAmount = totalSize / solPrice;
+        return `${formatNumber(solAmount)} SOL`;
+      }
+      return 'N/A SOL';
+    })();
+
     return {
       totalPnL,
       totalPnLInSol,
@@ -168,6 +185,8 @@ export default () => {
       totalYieldInSol,
       totalCompounded,
       totalCompoundedInSol,
+      totalSize,
+      totalSizeInSol,
       positions: allPositions,
       walletCount: validData.length
     };
@@ -185,6 +204,8 @@ export default () => {
     setErrorMessage('');
 
     try {
+      const solPrice = await updateSolPrice();
+
       // Select the appropriate fetch function
       const fetchFunc = isSubmission ? fetchWalletPnL : debouncedExecuteFetchWalletPnL;
 
@@ -199,7 +220,7 @@ export default () => {
         // Set error message but don't clear existing data immediately
         setErrorMessage(`Failed to fetch data for ${fetchErrors.length} wallet(s). Please wait for next refresh.`);
         // Attempt to aggregate still, maybe some wallets succeeded
-        combined = aggregatePnLData(results);
+        combined = aggregatePnLData(results, solPrice);
         if (!combined) {
           // If aggregation fails completely after errors, clear data
           setAggregatedData(null);
@@ -207,7 +228,7 @@ export default () => {
       } else {
          // Clear error message on successful fetch/refresh
          setErrorMessage('');
-         combined = aggregatePnLData(results);
+         combined = aggregatePnLData(results, solPrice);
       }
 
       if (combined) {
@@ -228,8 +249,6 @@ export default () => {
         if (isSubmission) {
           startFetchCooldown(process.env.NODE_ENV === 'development' ? 3 : 30); 
         }
-
-        await updateSolPrice();
 
       } else if (fetchErrors.length === 0) {
         setErrorMessage('No position data found for the provided wallet(s).');

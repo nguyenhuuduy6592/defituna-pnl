@@ -18,6 +18,7 @@ export function PriceProvider({ children }) {
       if (response.ok && data.price) {
         setSolPrice(data.price);
         setLastUpdate(data.timestamp);
+        return data.price;
       } else {
         throw new Error(data.error || 'Failed to fetch SOL price from context');
       }
@@ -25,6 +26,7 @@ export function PriceProvider({ children }) {
       console.error('[PriceContext] Failed to update SOL price:', err);
     }
     setIsLoading(false);
+    return null;
   }, []);
 
   // Optionally, fetch price on initial load or set up an interval

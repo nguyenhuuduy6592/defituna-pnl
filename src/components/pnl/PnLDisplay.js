@@ -73,6 +73,8 @@ export const PnLDisplay = ({
       totalYieldInSol: data.totalYieldInSol,
       totalCompounded: data.totalCompounded,
       totalCompoundedInSol: data.totalCompoundedInSol,
+      totalSize: data.totalSize,
+      totalSizeInSol: data.totalSizeInSol,
       positions,
       walletCount: typeof data.walletCount === 'number' ? data.walletCount : 0
     };
@@ -91,6 +93,10 @@ export const PnLDisplay = ({
         </div>
         {positionsWithAge.length > 1 && 
           <div className={styles.cardRow}>
+            <TotalPnLDisplay
+              label="Total Size"
+              totalValue={showInSol ? displayData.totalSizeInSol : `${formatNumber(displayData.totalSize, false)} $`} />
+
             <TotalPnLDisplay
               label="Total PnL"
               totalValue={showInSol ? displayData.totalPnLInSol : displayData.totalPnL} />
