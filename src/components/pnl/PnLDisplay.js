@@ -31,7 +31,6 @@ export const PnLDisplay = ({
   loading = false
 }) => {
   const { showInSol } = useDisplayCurrency();
-  let wallets = new Set();
 
   // Use provided data or default data
   const displayData = useMemo(() => {
@@ -63,7 +62,6 @@ export const PnLDisplay = ({
       position.yieldData.displayedValue = `$${formatNumber(position.yieldData.usd.amount)}`;
       position.yieldData.displayedValueInSol = position.yieldData.tokens.map(token => `${formatNumber(token.amount)} ${token.token}`).join('<br />');
       // ----- END: YIELD formatting -----
-      wallets.add(position.wallet);
     }
   
     return {
@@ -113,7 +111,7 @@ export const PnLDisplay = ({
 
         <PositionsList 
           positions={positionsWithAge}
-          showWallet={wallets.size > 1}
+          showWallet={displayData.walletCount > 1}
           historyEnabled={historyEnabled}
         />
 
