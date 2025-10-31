@@ -5,11 +5,6 @@ const nextConfig = {
   sassOptions: {
     modules: true,
   },
-  experimental: {
-    turbo: {
-      enabled: true // Enable Turbopack
-    }
-  },
   images: {
     remotePatterns: [
       { hostname: 'static.jup.ag', protocol: 'https' }, // Jupiter token logos
@@ -28,6 +23,19 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
+  webpack: (config) => {
+    // Enable async Wasm loading for all bundles (client + server)
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
+    };
+    // Flag .wasm files as async Wasm modules (prevents parse errors)
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: 'webassembly/async',
+    });
+    return config;
   },
   headers: async () => [
     {
