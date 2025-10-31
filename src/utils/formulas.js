@@ -227,15 +227,21 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
         };
 
         // Calculate liquidation prices
-        const liquidationThreshold = (market.liquidation_threshold || 0) / 1000000; // Convert from parts per million
-        const liquidationPrices = computeLiquidationPrices({
-            lowerPrice: lowerRangePrice,
-            upperPrice: upperRangePrice,
-            debtA,
-            debtB,
-            liquidity: BigInt(position.liquidity || 0),
-            liquidationThreshold
-        });
+        let liquidationPrices;
+        if (leverage == 1) {
+            liquidationPrices = { lowerLiquidationPrice: 0, upperLiquidationPrice: 0 };
+        }
+        else {
+            const liquidationThreshold = (market.liquidation_threshold || 0) / 1000000; // Convert from parts per million
+            liquidationPrices = computeLiquidationPrices({
+                lowerPrice: lowerRangePrice,
+                upperPrice: upperRangePrice,
+                debtA,
+                debtB,
+                liquidity: BigInt(position.liquidity || 0),
+                liquidationThreshold
+            });
+        }
 
         // Calculate entry and limit order prices
         const entryPrice = position.entry_sqrt_price ? sqrtPriceToPrice(BigInt(position.entry_sqrt_price), tokenADecimals, tokenBDecimals) : 0;
