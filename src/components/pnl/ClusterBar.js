@@ -64,7 +64,7 @@ export const ClusterBar = ({
       }
       return 'N/A SOL';
     } else {
-      return `$${formatValue(usdValue)}`;
+      return `$${formatValue(usdValue, false)}`;
     }
   }, [showInSol, solPrice, formatValue]);
 
