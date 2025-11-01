@@ -6,7 +6,7 @@
 
 // Constants for validation
 const MIN_ADDRESS_LENGTH = 32;
-const MAX_ADDRESS_LENGTH = 44;
+const MAX_ADDRESS_LENGTH = 45;
 const VALID_CHARS = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 const WALLET_ADDRESS_REGEX = new RegExp(`^[${VALID_CHARS}]{${MIN_ADDRESS_LENGTH},${MAX_ADDRESS_LENGTH}}$`);
 const INVALID_CHARS_REGEX = /[0IOl]/;
@@ -25,7 +25,7 @@ export const isValidWalletAddress = (address) => {
 
   // Check length before any other validation
   const length = trimmed.length;
-  if (length !== 44) {
+  if (length < 32 || length > 45) {
     return false;
   }
 

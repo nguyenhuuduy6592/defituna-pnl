@@ -48,8 +48,8 @@ describe('validation utilities', () => {
       it('rejects addresses with invalid length', () => {
         const invalidLengthAddresses = [
           'abc', // too short
-          'DfiGBi6GhpUvhkQDQxqfqFSxeGJJqHPg5K7zeqD4qV', // 31 chars
-          'DfiGBi6GhpUvhkQDQxqfqFSxeGJJqHPg5K7zeqD4qVjw1', // 45 chars
+          'DfiGBi6GhpUvhkQDQxqfqFSxeGJJqHP', // 31 chars
+          'DfiGBi6GhpUvhkQDQxqfqFSxeGJJqHPg5K7zeqD4qVjw12', // 46 chars
           'DfiGBi6GhpUvhkQDQxqfqFSxeGJJqHPg5K7zeqD4qVjw12345', // way too long
           'Dfi', // way too short
         ];
