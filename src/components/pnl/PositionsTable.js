@@ -93,7 +93,7 @@ const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => 
           role={isSortable ? 'button' : undefined}
           aria-sort={sortState.field === 'yield' ? sortState.direction : undefined}
         >
-          Yield {getSortIcon('yield')}
+          Yield (Compounded) {getSortIcon('yield')}
         </th>
         <th 
           className={isSortable ? styles.sortable : ''}
@@ -361,15 +361,16 @@ PnlCell.displayName = 'PnlCell';
 /**
  * The pnl cell with USD/SOL equivalent and percentage
  */
-const YieldCell = memo(({ yieldData }) => {
+const YieldCell = memo(({ yieldData, compoundedData }) => {
   const { showInSol } = useDisplayCurrency();
   const yieldClass = showInSol ? yieldData.yieldClassInSol : yieldData.yieldClass;
-  const displayedValue = showInSol ? yieldData.displayedValueInSol : yieldData.displayedValue;
-
+  const yieldValue = showInSol ? yieldData.displayedValueInSol : yieldData.displayedValue;
+  const compoundedValue = showInSol ? compoundedData.displayedValueInSol : compoundedData.displayedValue;
   return (
-    <td className={`${styles.valueCell} ${styles[yieldClass]}`} data-label='Yield'>
+    <td className={`${styles.valueCell} ${styles[yieldClass]}`} data-label='Yield (Compounded)'>
       <div className={styles.primaryValue}>
-        <div dangerouslySetInnerHTML={{ __html: displayedValue }} />
+        <div dangerouslySetInnerHTML={{ __html: yieldValue }} />
+        <div dangerouslySetInnerHTML={{ __html: `(${compoundedValue})` }} />
       </div>
     </td>
   );
@@ -437,7 +438,7 @@ export const PositionsTable = memo(({
               </td>
               <td data-label="Age">{formatDuration(position.age)}</td>
               <PnlCell pnlData={position.pnlData} />
-              <YieldCell yieldData={position.yieldData} />
+              <YieldCell yieldData={position.yieldData} compoundedData={position.compoundedData} />
               <td data-label="Position Details">
                 <ClusterBar
                   size={position.size}

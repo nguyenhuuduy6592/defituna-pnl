@@ -79,7 +79,14 @@ describe('PnLDisplay Component', () => {
           tokens: [{ amount: 2, token: 'SOL' }],
           usd: { amount: 200 },
         },
-        compounded: { usd: 50 }
+        compoundedData: {
+          tokens: [{ amount: 1, token: 'SOL' }],
+          usd: { amount: 50 },
+          compoundedClass: 'positive',
+          compoundedClassInSol: 'positive',
+          displayedValue: '$50',
+          displayedValueInSol: '1 SOL'
+        }
       },
       {
         id: '2',
@@ -91,7 +98,14 @@ describe('PnLDisplay Component', () => {
           tokens: [{ amount: 1, token: 'SOL' }],
           usd: { amount: 300 },
         },
-        compounded: { usd: 100 }
+        compoundedData: {
+          tokens: [{ amount: 2, token: 'SOL' }],
+          usd: { amount: 100 },
+          compoundedClass: 'positive',
+          compoundedClassInSol: 'positive',
+          displayedValue: '$100',
+          displayedValueInSol: '2 SOL'
+        }
       }
     ],
     walletCount: 2
@@ -166,6 +180,14 @@ describe('PnLDisplay Component', () => {
           yieldData: {
             tokens: [],
             usd: { amount: 200 }
+          },
+          compoundedData: {
+            tokens: [],
+            usd: { amount: 0 },
+            compoundedClass: 'neutral',
+            compoundedClassInSol: 'neutral',
+            displayedValue: '$0',
+            displayedValueInSol: ''
           }
         },
         {
@@ -178,7 +200,14 @@ describe('PnLDisplay Component', () => {
             tokens: [],
             usd: { amount: 0 }
           },
-          compounded: { usd: 100 }
+          compoundedData: {
+            tokens: [{ amount: 2, token: 'SOL' }],
+            usd: { amount: 100 },
+            compoundedClass: 'positive',
+            compoundedClassInSol: 'positive',
+            displayedValue: '$100',
+            displayedValueInSol: '2 SOL'
+          }
         },
         {
           id: '3',
@@ -189,6 +218,14 @@ describe('PnLDisplay Component', () => {
           yieldData: {
             tokens: [],
             usd: { amount: 0 }
+          },
+          compoundedData: {
+            tokens: [],
+            usd: { amount: 0 },
+            compoundedClass: 'neutral',
+            compoundedClassInSol: 'neutral',
+            displayedValue: '$0',
+            displayedValueInSol: ''
           }
         }
       ],

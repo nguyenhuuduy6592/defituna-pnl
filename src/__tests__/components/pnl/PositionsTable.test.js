@@ -83,6 +83,14 @@ const mockPositions = [
       yieldClassInSol: 'positive',
       displayedValue: '$200',
       displayedValueInSol: '2 SOL'
+    },
+    compoundedData: {
+      tokens: [{ amount: 3, token: 'SOL' }],
+      usd: { amount: 300 },
+      compoundedClass: 'positive',
+      compoundedClassInSol: 'positive',
+      displayedValue: '$300',
+      displayedValueInSol: '3 SOL'
     }
   },
   {
@@ -129,6 +137,14 @@ const mockPositions = [
       yieldClassInSol: 'positive',
       displayedValue: '$100',
       displayedValueInSol: '1 BTC'
+    },
+    compoundedData: {
+      tokens: [{ amount: 1.5, token: 'BTC' }],
+      usd: { amount: 150 },
+      compoundedClass: 'positive',
+      compoundedClassInSol: 'positive',
+      displayedValue: '$150',
+      displayedValueInSol: '1.5 BTC'
     }
   }
 ];
@@ -175,7 +191,7 @@ describe('PositionsTable', () => {
     expect(screen.getByText('Status ↕')).toBeInTheDocument();
     expect(screen.getByText('Age ↕')).toBeInTheDocument();
     expect(screen.getByText('PnL ↓')).toBeInTheDocument(); // Current sort field with direction
-    expect(screen.getByText('Yield ↕')).toBeInTheDocument();
+    expect(screen.getByText('Yield (Compounded) ↕')).toBeInTheDocument();
     expect(screen.getByText('Position Details ↕')).toBeInTheDocument();
     expect(screen.getByText('Price Range')).toBeInTheDocument();
     expect(screen.getByText('Actions')).toBeInTheDocument();
@@ -396,7 +412,7 @@ describe('PositionsTable', () => {
     renderTable({ sortState: { field: 'yield', direction: 'asc' } });
     
     // Check yield header has ascending arrow
-    expect(screen.getByText('Yield ↑')).toBeInTheDocument();
+    expect(screen.getByText('Yield (Compounded) ↑')).toBeInTheDocument();
     
     // Other headers should have neutral arrow
     expect(screen.getByText('PnL ↕')).toBeInTheDocument();

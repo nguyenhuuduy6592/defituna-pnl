@@ -62,6 +62,16 @@ export const PnLDisplay = ({
       position.yieldData.displayedValue = `$${formatNumber(position.yieldData.usd.amount)}`;
       position.yieldData.displayedValueInSol = position.yieldData.tokens.map(token => `${formatNumber(token.amount)} ${token.token}`).join('<br />');
       // ----- END: YIELD formatting -----
+
+      // ----- START: COMPOUNDED formatting -----
+      const compoundedTokenValue = position.compoundedData.tokens.reduce((sum, token) => sum + token.amount, 0);
+      const compoundedUsdValue = position.compoundedData.usd.amount;
+      position.compoundedData.compoundedClass = getValueClass(compoundedUsdValue);
+      position.compoundedData.compoundedClassInSol = getValueClass(compoundedTokenValue);
+
+      position.compoundedData.displayedValue = `$${formatNumber(position.compoundedData.usd.amount)}`;
+      position.compoundedData.displayedValueInSol = position.compoundedData.tokens.map(token => `${formatNumber(token.amount)} ${token.token}`).join('<br />');
+      // ----- END: COMPOUNDED formatting -----
     }
   
     return {
