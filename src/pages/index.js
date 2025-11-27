@@ -1,14 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { BsInfoCircle } from 'react-icons/bs';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { Tooltip } from '../components/common/Tooltip';
 import { DisclaimerModal } from '../components/common/DisclaimerModal';
 import { CollapsibleSection } from '../components/common/CollapsibleSection';
-import { LendingPositionShareCard } from '../components/lending/LendingPositionShareCard'; 
-import { 
-  useWallet, 
-  useAutoRefresh, 
-  useHistoricalData, 
+import { LendingPositionShareCard } from '../components/lending/LendingPositionShareCard';
+import {
+  useWallet,
+  useAutoRefresh,
+  useHistoricalData,
   useDebounceApi,
   useLendingPositions
 } from '../hooks';
@@ -16,11 +16,12 @@ import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
 import { LendingPositionsDisplay } from '../components/pnl/LendingPositionsDisplay';
-import { 
+import {
   fetchWalletPnL
 } from '../utils';
 import styles from './index.module.scss';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { usePriceContext } from '../contexts/PriceContext';
 import { getValueClass, formatNumber } from '@/utils';
 
@@ -29,12 +30,15 @@ const TRADING_EXPANDED_KEY = 'tradingExpanded';
 const LENDING_EXPANDED_KEY = 'lendingExpanded';
 
 export default () => {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [aggregatedData, setAggregatedData] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const [allPositionsHistory, setAllPositionsHistory] = useState([]);
+  const initialFetched = useRef(false);
+  const [lendingEnabled, setLendingEnabled] = useState(false);
 
   // State for lending position share modal
   const [lendingShareModalState, setLendingShareModalState] = useState({
@@ -281,20 +285,35 @@ export default () => {
   );
 
   // Hook for lending positions
-  const lendingPositionsHook = useLendingPositions(activeWallets);
+  const lendingPositionsHook = useLendingPositions(lendingEnabled ? activeWallets : []);
 
-  // Auto fetch data if there are active wallets on page load
+  // Handle initial load and wallet query parameter
   useEffect(() => {
-    // Initial load logic: Fetch only if wallets are active, no data yet, not already loading, and no error shown
-    if (activeWallets.length > 0 && !aggregatedData && !loading && !errorMessage) {
-      fetchPnLData(activeWallets, false);
+    if (router.isReady && !initialFetched.current) {
+      const walletParam = router.query.wallet;
+      if (walletParam) {
+        const wallets = walletParam.split(',').map(w => w.trim()).filter(w => w);
+        if (wallets.length > 0) {
+          console.log(`Handle wallet query parameter: ${wallets}`);
+          setActiveWallets(wallets);
+          fetchPnLData(wallets, false);
+        }
+      } else
+        // Initial load logic: Fetch only if wallets are active, no data yet, not already loading, and no error shown
+        if (activeWallets.length > 0 && !aggregatedData && !loading && !errorMessage) {
+        console.log(`Auto fetch data if there are active wallets on page load 1: ${activeWallets}`);
+        fetchPnLData(activeWallets, false);
+      }
+      // Clear data/error if no wallets are active
+      if (activeWallets.length === 0) {
+        console.log('Auto fetch data if there are active wallets on page load 2');
+        setAggregatedData(null);
+        setErrorMessage('');
+      }
+      initialFetched.current = true;
+      setLendingEnabled(true);
     }
-    // Clear data/error if no wallets are active
-    if (activeWallets.length === 0) {
-      setAggregatedData(null);
-      setErrorMessage('');
-    }
-  }, [JSON.stringify(activeWallets), fetchPnLData, aggregatedData, loading, errorMessage]);
+  }, [router.isReady, router.query.wallet, activeWallets, aggregatedData, loading, errorMessage, fetchPnLData, setActiveWallets]);
 
   // Load all historical data
   useEffect(() => {
