@@ -8,15 +8,15 @@ import ActiveWalletsDisplay from './ActiveWalletsDisplay';
 /**
  * Submit button component that shows different states based on loading and countdown
  */
-const SubmitButton = memo(({ loading, countdown }) => (
+const SubmitButton = memo(({ loading }) => (
   <button 
     type="submit" 
     className={styles.button} 
-    disabled={loading || countdown > 0}
-    aria-label={loading ? "Loading..." : countdown > 0 ? `Wait ${countdown} seconds` : "Fetch Data"}
-    title={loading ? "Loading data..." : countdown > 0 ? `Wait ${countdown} seconds before next fetch` : "Fetch position data"}
+    disabled={loading}
+    aria-label={loading ? "Loading..." : "Fetch Data"}
+    title={loading ? "Loading data..." : "Fetch position data"}
   >
-    {loading ? 'Loading...' : countdown > 0 ? `Wait ${countdown}s` : 'Fetch Data'}
+    {loading ? 'Loading...' : 'Fetch Data'}
   </button>
 ));
 
@@ -96,7 +96,6 @@ const WalletForm = memo(function WalletForm({
   toggleWalletActive,
   onSubmit,
   loading,
-  countdown,
   savedWallets,
   showDropdown,
   setShowDropdown,
@@ -175,7 +174,7 @@ const WalletForm = memo(function WalletForm({
           onClearWallets={onClearWallets}
         />
         
-        <SubmitButton loading={loading} countdown={countdown} />
+        <SubmitButton loading={loading} />
       </form>
       
       <ActiveWalletsDisplay 

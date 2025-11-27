@@ -90,7 +90,6 @@ describe('WalletForm', () => {
     toggleWalletActive: jest.fn(),
     onSubmit: jest.fn(),
     loading: false,
-    countdown: 0,
     savedWallets: [],
     showDropdown: false,
     setShowDropdown: jest.fn(),
@@ -121,11 +120,6 @@ describe('WalletForm', () => {
     render(<WalletForm {...defaultProps} loading={true} />);
     expect(screen.getByRole('button', { name: /loading/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /loading/i })).toBeDisabled();
-    
-    // Countdown state
-    render(<WalletForm {...defaultProps} countdown={5} />);
-    expect(screen.getByRole('button', { name: /wait 5 seconds/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /wait 5 seconds/i })).toBeDisabled();
     
     // Ready state
     render(<WalletForm {...defaultProps} />);
