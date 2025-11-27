@@ -119,7 +119,6 @@ describe('PnLCard', () => {
     // Check financial details - using the actual formatting with K for thousands
     expect(screen.getByText(/Collateral/i)).toBeInTheDocument();
     expect(screen.getByText('$5.00K')).toBeInTheDocument();
-    expect(screen.getByText(/Leverage/i)).toBeInTheDocument();
     expect(screen.getByText('2.00x')).toBeInTheDocument();
     
     // Check price information - using the actual formatting with K for thousands
@@ -441,7 +440,6 @@ describe('PnLCard', () => {
     );
     
     // Should display "N/A" for leverage
-    expect(screen.getByText(/Leverage/i)).toBeInTheDocument();
     expect(screen.getByText('N/A')).toBeInTheDocument();
   });
 

@@ -126,7 +126,7 @@ const PairCell = memo(({ pair, isInverted, leverage, onPairInversion }) => {
   
   const displayPair = isInverted ? invertPairString(pair) : pair;
   const formattedLeverage = leverage == 1 ? null : 
-    <>({formatNumber(leverage)}x<span className={styles.hideOnMobile}>&nbsp;Leverage</span>)</>;
+    <>({formatNumber(leverage)}x<span className={styles.hideOnMobile}></span>)</>;
   const invertTooltip = `Click to ${isInverted ? 'restore' : 'invert'} token order`;
   
   return (
