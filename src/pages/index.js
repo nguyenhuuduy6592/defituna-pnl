@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { BsInfoCircle } from 'react-icons/bs';
 import { FiAlertTriangle } from 'react-icons/fi';
 import { Tooltip } from '../components/common/Tooltip';
@@ -23,7 +23,6 @@ import {
 import styles from './index.module.scss';
 import Link from 'next/link';
 import { usePriceContext } from '../contexts/PriceContext';
-import { useDisplayCurrency } from '@/contexts/DisplayCurrencyContext';
 import { getValueClass, formatNumber } from '@/utils';
 
 // Storage keys for collapsible sections
@@ -38,7 +37,6 @@ export default () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const [allPositionsHistory, setAllPositionsHistory] = useState([]);
-  const { showInSol } = useDisplayCurrency();
 
   // State for lending position share modal
   const [lendingShareModalState, setLendingShareModalState] = useState({
