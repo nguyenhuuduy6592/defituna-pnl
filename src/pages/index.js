@@ -8,7 +8,6 @@ import { LendingPositionShareCard } from '../components/lending/LendingPositionS
 import { 
   useWallet, 
   useAutoRefresh, 
-  useCountdown, 
   useHistoricalData, 
   useDebounceApi,
   useLendingPositions
@@ -31,7 +30,6 @@ const LENDING_EXPANDED_KEY = 'lendingExpanded';
 
 export default () => {
   const [loading, setLoading] = useState(false);
-  const { countdown: fetchCooldown, startCountdown: startFetchCooldown } = useCountdown(0);
   const [aggregatedData, setAggregatedData] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
@@ -242,12 +240,6 @@ export default () => {
           addWallet(wallet);
           setWallet('');
         }
-
-        // Start cooldown if this was triggered by a form submission
-        if (isSubmission) {
-          startFetchCooldown(process.env.NODE_ENV === 'development' ? 3 : 30); 
-        }
-
       } else if (fetchErrors.length === 0) {
         setErrorMessage('No position data found for the provided wallet(s).');
       }
@@ -262,7 +254,6 @@ export default () => {
   }, [
     activeWallets, 
     aggregatePnLData, 
-    startFetchCooldown, 
     historyEnabled, 
     savePositionSnapshot, 
     fetchWalletPnL, 
@@ -423,7 +414,6 @@ export default () => {
         toggleWalletActive={toggleWalletActive}
         onSubmit={handleSubmit}
         loading={loading}
-        countdown={fetchCooldown}
         savedWallets={savedWallets}
         onRemoveWallet={removeWallet}
         onClearWallets={clearWallets}

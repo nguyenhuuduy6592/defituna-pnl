@@ -6,7 +6,7 @@ import SavedWalletsDropdown from './SavedWalletsDropdown';
 import ActiveWalletsDisplay from './ActiveWalletsDisplay';
 
 /**
- * Submit button component that shows different states based on loading and countdown
+ * Submit button component that shows different states based on loading
  */
 const SubmitButton = memo(({ loading }) => (
   <button 
@@ -81,7 +81,6 @@ WalletInput.displayName = 'WalletInput';
  * @param {function(string): void} props.toggleWalletActive - Callback to toggle the active state of a specific wallet.
  * @param {function(React.FormEvent<HTMLFormElement> | undefined): void} props.onSubmit - Callback triggered when the form is submitted with valid input.
  * @param {boolean} props.loading - Indicates if data is currently being fetched.
- * @param {number} props.countdown - Countdown timer until the next fetch is allowed.
  * @param {string[]} props.savedWallets - Array of saved wallet addresses for the dropdown.
  * @param {boolean} props.showDropdown - Controls the visibility of the saved wallets dropdown.
  * @param {function(boolean): void} props.setShowDropdown - Callback to set the dropdown visibility.
