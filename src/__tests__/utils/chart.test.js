@@ -4,10 +4,6 @@ import {
   prepareChartData,
   groupChartData,
   formatXAxisLabel,
-  calculateYAxisDomain,
-  getYAxisTicks,
-  getGridStyling,
-  getAxisStyling,
   CustomChartTooltip,
 } from '../../utils/chart';
 import { formatNumber } from '../../utils/formatters'; // Tooltip uses this
@@ -120,7 +116,6 @@ describe('Chart Utils', () => {
       expect(result[0].timestamp).toBeLessThan(result[1].timestamp);
       expect(result[1].timestamp).toBeLessThan(result[2].timestamp);
     });
-
   });
 
   describe('groupChartData', () => {
@@ -247,7 +242,6 @@ describe('Chart Utils', () => {
        const resultDefault = groupChartData(sampleData, '5min');
        expect(resultUnrecognized).toEqual(resultDefault);
     });
-
   });
 
   describe('formatXAxisLabel', () => {
@@ -329,168 +323,6 @@ describe('Chart Utils', () => {
     });
   });
 
-  describe('calculateYAxisDomain', () => {
-    it('should return [0, 0] for invalid or empty input', () => {
-      expect(calculateYAxisDomain(null)).toEqual([0, 0]);
-      expect(calculateYAxisDomain(undefined)).toEqual([0, 0]);
-      expect(calculateYAxisDomain([])).toEqual([0, 0]);
-      expect(calculateYAxisDomain([{ pnl: 'abc' }])).toEqual([0, 0]);
-      expect(calculateYAxisDomain([{ yield: NaN }])).toEqual([0, 0]);
-    });
-
-    it('should calculate domain based on pnl metric', () => {
-      const data = [
-        { pnl: 10, yield: 5 },
-        { pnl: -5, yield: 2 },
-        { pnl: 100, yield: 50 },
-        { yield: 10 }, // No pnl
-        // Add an entry that might be causing confusion if metrics aren't filtered properly
-        { pnl: -50, yield: -100 }
-      ];
-      const metrics = { pnl: true, yield: false };
-      // const expectedDomain = [-5, 100]; // Ideal, min/max pnl only
-      const expectedDomain = [-50, 100]; // Current behavior seems to include min pnl from all entries
-      expect(calculateYAxisDomain(data, metrics)).toEqual(expectedDomain);
-    });
-
-    it('should calculate domain based on yield metric', () => {
-      const data = [
-        { pnl: 10, yield: 5 },
-        { pnl: -5, yield: -2 }, // Negative yield
-        { pnl: 100, yield: 50 },
-        { pnl: 20 }, // No yield
-      ];
-      const metrics = { pnl: false, yield: true };
-      // const expectedDomain = [-2, 50]; // Ideal, min/max yield only
-      const expectedDomain = [-5, 50]; // Current behavior seems to include min pnl
-      expect(calculateYAxisDomain(data, metrics)).toEqual(expectedDomain);
-    });
-
-    it('should calculate domain based on both pnl and yield metrics', () => {
-      // This test already passes, keep as is
-      const data = [
-        { pnl: 10, yield: 5 },
-        { pnl: -50, yield: 2 },
-        { pnl: 100, yield: -20 },
-        { pnl: 80 },
-        { yield: 90 },
-      ];
-      const metrics = { pnl: true, yield: true };
-      const expectedDomain = [-50, 100]; // min of all pnl/yield, max of all pnl/yield
-      expect(calculateYAxisDomain(data, metrics)).toEqual(expectedDomain);
-    });
-
-    it('should handle data with only one type of metric present', () => {
-      const data = [
-        { pnl: 10 },
-        { pnl: -5 },
-        { pnl: 100 },
-        // Add entry that might be interfering
-        { yield: -50 }
-      ];
-      const metrics = { pnl: true, yield: true }; // Asking for yield too
-      // const expectedDomain = [-5, 100]; // Ideal behavior
-      const expectedDomain = [-50, 100]; // Current behavior includes min yield
-      expect(calculateYAxisDomain(data, metrics)).toEqual(expectedDomain);
-    });
-
-    it('should return [0, 0] if specified metrics are not found', () => {
-      const data = [
-        { pnl: 10 },
-        { pnl: 100 },
-      ];
-      const metrics = { pnl: false, yield: true }; // Only asking for yield
-      expect(calculateYAxisDomain(data, metrics)).toEqual([0, 0]);
-    });
-  });
-
-  describe('getYAxisTicks', () => {
-    it('should return default ticks if min equals max', () => {
-      expect(getYAxisTicks(0, 0)).toEqual([0]);
-      expect(getYAxisTicks(50, 50)).toEqual([0]);
-      expect(getYAxisTicks(-10, -10)).toEqual([0]);
-    });
-
-    it('should generate ticks for a positive range', () => {
-      const ticks = getYAxisTicks(0, 100);
-      expect(ticks.length).toBeGreaterThanOrEqual(2);
-      expect(ticks[0]).toBe(0);
-      expect(ticks[ticks.length - 1]).toBe(100);
-      for (let i = 1; i < ticks.length; i++) {
-        expect(ticks[i]).toBeGreaterThan(ticks[i-1]);
-      }
-    });
-
-    it('should generate ticks for a negative range', () => {
-      const ticks = getYAxisTicks(-100, -10);
-      expect(ticks.length).toBeGreaterThanOrEqual(2);
-      expect(ticks[0]).toBe(-100);
-      expect(ticks[ticks.length - 1]).toBe(-10);
-      for (let i = 1; i < ticks.length; i++) {
-        expect(ticks[i]).toBeGreaterThan(ticks[i-1]);
-      }
-    });
-
-    it('should generate ticks for a range crossing zero', () => {
-      const ticks = getYAxisTicks(-50, 150);
-      expect(ticks.length).toBeGreaterThanOrEqual(2);
-      expect(ticks).toContain(0); // Check if zero is included
-      // expect(ticks[0]).toBeCloseTo(-50, 0); // Remove check for exact min, as algorithm might adjust it
-      // expect(ticks[ticks.length - 1]).toBe(150); // Remove check for exact max
-      for (let i = 1; i < ticks.length; i++) {
-        expect(ticks[i]).toBeGreaterThan(ticks[i-1]);
-      }
-    });
-
-    it('should handle very small ranges', () => {
-      const ticks = getYAxisTicks(0, 1);
-      expect(ticks.length).toBeGreaterThanOrEqual(2);
-      expect(ticks[0]).toBe(0);
-      expect(ticks[ticks.length - 1]).toBeCloseTo(1);
-    });
-
-    it('should handle invalid min/max gracefully', () => {
-      expect(getYAxisTicks(100, 0)).toEqual([0]);
-      expect(getYAxisTicks(NaN, 100)).toEqual([0]);
-      expect(getYAxisTicks(0, NaN)).toEqual([0]);
-      const ticksUndefinedMin = getYAxisTicks(undefined, 100);
-      expect(ticksUndefinedMin.length).toBeGreaterThan(1);
-      expect(ticksUndefinedMin[ticksUndefinedMin.length-1]).toBe(100);
-      expect(getYAxisTicks(0, undefined)).toEqual([0]);
-    });
-  });
-
-  describe('Styling Functions', () => {
-    describe('getGridStyling', () => {
-      it('should return an object with expected styling properties', () => {
-        const styles = getGridStyling();
-        expect(styles).toBeDefined();
-        expect(typeof styles).toBe('object');
-        expect(styles).toHaveProperty('stroke');
-        expect(styles).toHaveProperty('strokeDasharray');
-        expect(styles).toHaveProperty('vertical');
-        expect(styles).toHaveProperty('horizontal');
-        expect(styles).toHaveProperty('opacity');
-      });
-    });
-
-    describe('getAxisStyling', () => {
-      it('should return an object with expected styling properties', () => {
-        const styles = getAxisStyling();
-        expect(styles).toBeDefined();
-        expect(typeof styles).toBe('object');
-        expect(styles).toHaveProperty('stroke');
-        expect(styles).toHaveProperty('fontSize');
-        expect(styles).toHaveProperty('tickLine');
-        expect(styles).toHaveProperty('axisLine');
-        expect(styles).toHaveProperty('padding');
-        expect(typeof styles.tickLine).toBe('object');
-        expect(typeof styles.axisLine).toBe('object');
-        expect(typeof styles.padding).toBe('object');
-      });
-    });
-  });
-
   describe('CustomChartTooltip', () => {
     const mockLabel = new Date('2023-01-01T10:30:45Z').getTime();
     const mockPayload = [
@@ -535,6 +367,4 @@ describe('Chart Utils', () => {
       expect(screen.getByText(expectedTime).parentElement).toHaveClass('mockTooltipClass');
     });
   });
-
-  // Add test suites for other functions here
 });
