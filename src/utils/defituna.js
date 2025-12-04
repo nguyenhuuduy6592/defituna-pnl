@@ -12,23 +12,6 @@ const MARKET_CACHE_TTL = 60 * 60 * 1000; // 1 hour for market data (changes infr
 const TOKEN_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours for token data (extremely static)
 const ALL_POOLS_CACHE_TTL = 60 * 1000;  // 1 minute for all pools data
 
-// --- Value Encoding Constants ---
-const USD_MULTIPLIER = 100;       // Convert dollars to cents (2 decimal places)
-const PRICE_MULTIPLIER = 1000000; // 6 decimal places for prices
-const LEVERAGE_MULTIPLIER = 100;  // 2 decimal places for leverage
-
-/**
- * Encodes decimal values as integers to reduce payload size
- * @param {number} value - The decimal value to encode
- * @param {number} multiplier - The multiplier to use (e.g., 100 for 2 decimal places)
- * @returns {number|null} - The encoded integer value or null for invalid inputs
- */
-function encodeValue(value, multiplier) {
-  if (value === Infinity || value === -Infinity || isNaN(value) || value === null || value === undefined) {
-    return null;
-  }
-  return Math.round(value * multiplier);
-}
 
 // --- Cache Functions ---
 // Map cache structure: <key, {data: any, timestamp: number}>
@@ -290,49 +273,49 @@ export async function processPositionsData(positionsData) {
         // Add opened_at if available
         opened_at: position.opened_at,
         
-        // Price data with numeric encoding
-        c_price: encodeValue(processedPosition.currentPrice, PRICE_MULTIPLIER), // currentPrice
-        e_price: encodeValue(processedPosition.entryPrice, PRICE_MULTIPLIER),   // entryPrice
+        // Price data (raw decimal values)
+        c_price: processedPosition.currentPrice, // currentPrice
+        e_price: processedPosition.entryPrice,   // entryPrice
         r_prices: { // rangePrices
-          l: encodeValue(processedPosition.rangePrices.lower, PRICE_MULTIPLIER),
-          u: encodeValue(processedPosition.rangePrices.upper, PRICE_MULTIPLIER)
+          l: processedPosition.rangePrices.lower,
+          u: processedPosition.rangePrices.upper
         },
-        
-        // Liquidation prices with numeric encoding
+
+        // Liquidation prices (raw decimal values)
         liq_price: { // liquidationPrice
-          l: encodeValue(processedPosition.liquidationPrice.lower, PRICE_MULTIPLIER),
-          u: encodeValue(processedPosition.liquidationPrice.upper, PRICE_MULTIPLIER)
+          l: processedPosition.liquidationPrice.lower,
+          u: processedPosition.liquidationPrice.upper
         },
         lim_prices: { // limitOrderPrices
-          l: encodeValue(processedPosition.limitOrderPrices.lower, PRICE_MULTIPLIER),
-          u: encodeValue(processedPosition.limitOrderPrices.upper, PRICE_MULTIPLIER)
+          l: processedPosition.limitOrderPrices.lower,
+          u: processedPosition.limitOrderPrices.upper
         },
-        
-        // Positional data with numeric encoding
-        lev: encodeValue(processedPosition.leverage, LEVERAGE_MULTIPLIER), // leverage
-        sz: encodeValue(processedPosition.size, USD_MULTIPLIER),           // size
-        
-        // Financial metrics with numeric encoding
+
+        // Positional data (raw decimal values)
+        lev: processedPosition.leverage, // leverage
+        sz: processedPosition.size,           // size
+
+        // Financial metrics (raw decimal values)
         pnl: {
-          u: encodeValue(processedPosition.pnl.usd, USD_MULTIPLIER), // usd
+          u: processedPosition.pnl.usd, // usd
           b: processedPosition.pnl.bps // bps is already an integer, no encoding needed
         },
         yld: { // yield
-          u: encodeValue(processedPosition.yield.usd, USD_MULTIPLIER) // usd
+          u: processedPosition.yield.usd // usd
         },
         cmp: { // compounded
-          u: encodeValue(processedPosition.compounded.usd, USD_MULTIPLIER) // usd
+          u: processedPosition.compounded.usd // usd
         },
-        
-        // Display amounts with numeric encoding
+
+        // Display amounts (raw decimal values)
         col: { // collateral
-          u: encodeValue(processedPosition.collateral.usd, USD_MULTIPLIER) // usd
+          u: processedPosition.collateral.usd // usd
         },
         dbt: { // debt
-          u: encodeValue(processedPosition.debt.usd, USD_MULTIPLIER) // usd
+          u: processedPosition.debt.usd // usd
         },
         int: { // interest
-          u: encodeValue(processedPosition.interest.usd, USD_MULTIPLIER) // usd
+          u: processedPosition.interest.usd // usd
         },
         pnlData: { // new field for pnl data
           pnl_usd: {

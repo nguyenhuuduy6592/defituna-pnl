@@ -1,22 +1,6 @@
 import { fetchPositions, processPositionsData } from '../../utils/defituna';
 import { isValidWalletAddress } from '../../utils/validation';
 
-// Use the same multiplier as in defituna.js
-const USD_MULTIPLIER = 100; // Convert dollars to cents (2 decimal places)
-
-// Function to encode decimal values as integers to reduce payload size
-function encodeValue(value, multiplier) {
-  if (value === null || value === undefined || value === Infinity || value === -Infinity || isNaN(value)) {
-    return null;
-  }
-  return Math.round(value * multiplier);
-}
-
-// Function to decode values (needed for calculating correct totalPnL)
-function decodeValue(value, multiplier) {
-  if (value === null || value === undefined) return null;
-  return value / multiplier;
-}
 
 async function fetchPnL(wallet) {
   if (!wallet) {
@@ -38,16 +22,15 @@ async function fetchPnL(wallet) {
   // Process positions data without ages
   const positions = await processPositionsData(positionsData);
 
-  // Calculate total PnL from the decoded values to avoid double encoding
-  // First decode each position's PnL, then sum them up, then encode the final result
+  // Calculate total PnL directly from raw decimal values
   const totalPnL = positions.reduce((sum, p) => {
-    // Decode the encoded p.pnl.u to get the actual value before summing
-    const decodedPnl = decodeValue(p.pnl?.u || 0, USD_MULTIPLIER);
-    return sum + decodedPnl;
+    // Use raw decimal values directly
+    const positionPnl = p.pnl?.u || 0;
+    return sum + positionPnl;
   }, 0);
-  
-  return { 
-    t_pnl: encodeValue(totalPnL, USD_MULTIPLIER), // Encode the totalPnL value correctly
+
+  return {
+    t_pnl: totalPnL, // Return raw decimal value
     positions,
   };
 }

@@ -1,17 +1,15 @@
 import { fetchWalletPnL } from '../../utils/pnlUtils';
-import { 
-  addWalletAddressToPositions, 
-  decodePositions, 
-  decodeValue 
+import {
+  addWalletAddressToPositions,
+  decodePositions
 } from '../../utils/positionUtils';
 
 // Mock the dependencies from positionUtils
 jest.mock('../../utils/positionUtils', () => ({
-  addWalletAddressToPositions: jest.fn((positions, walletAddress) => 
+  addWalletAddressToPositions: jest.fn((positions, walletAddress) =>
     positions.map(p => ({ ...p, walletAddress }))
   ),
   decodePositions: jest.fn(positions => positions), // Simple pass-through mock
-  decodeValue: jest.fn((value, multiplier) => value / multiplier), // Simple decoding mock
 }));
 
 // Mock global fetch
@@ -25,7 +23,6 @@ describe('fetchWalletPnL utility', () => {
     fetch.mockClear();
     addWalletAddressToPositions.mockClear();
     decodePositions.mockClear();
-    decodeValue.mockClear();
   });
 
   it('should return null if no wallet address is provided', async () => {
@@ -36,10 +33,10 @@ describe('fetchWalletPnL utility', () => {
 
   it('should fetch, process, and return data on successful API call', async () => {
     const mockRawData = {
-        t_pnl: 123450, // Encoded total PnL (1234.50)
+        t_pnl: 1234.50, // Raw decimal total PnL
         positions: [
-            { id: 'pos1', /* other encoded fields */ },
-            { id: 'pos2', /* other encoded fields */ },
+            { id: 'pos1', /* other fields */ },
+            { id: 'pos2', /* other fields */ },
         ],
     };
     const expectedProcessedData = {
@@ -66,9 +63,6 @@ describe('fetchWalletPnL utility', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ walletAddress: mockWalletAddress }),
     });
-    expect(decodeValue).toHaveBeenCalledTimes(1);
-    expect(decodeValue.mock.calls[0][0]).toBe(mockRawData.t_pnl);
-    expect(decodeValue.mock.calls[0][1]).toBe(100);
     expect(decodePositions).toHaveBeenCalledTimes(1);
     expect(decodePositions).toHaveBeenCalledWith(mockRawData.positions);
     expect(addWalletAddressToPositions).toHaveBeenCalledTimes(1);
@@ -87,7 +81,6 @@ describe('fetchWalletPnL utility', () => {
 
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ error: mockError.error });
-    expect(decodeValue).not.toHaveBeenCalled();
     expect(decodePositions).not.toHaveBeenCalled();
     expect(addWalletAddressToPositions).not.toHaveBeenCalled();
   });
@@ -100,7 +93,6 @@ describe('fetchWalletPnL utility', () => {
 
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ error: mockNetworkError.message });
-    expect(decodeValue).not.toHaveBeenCalled();
     expect(decodePositions).not.toHaveBeenCalled();
     expect(addWalletAddressToPositions).not.toHaveBeenCalled();
   });
@@ -117,20 +109,18 @@ describe('fetchWalletPnL utility', () => {
     fetch.mockResolvedValueOnce({ ok: true, json: async () => mockRawData });
     const result = await fetchWalletPnL(mockWalletAddress);
 
-    expect(decodeValue).not.toHaveBeenCalled();
     expect(decodePositions).toHaveBeenCalledTimes(1);
     expect(addWalletAddressToPositions).toHaveBeenCalledTimes(1);
     expect(result).toEqual(expectedProcessedData);
   });
 
    it('should correctly handle data without positions field', async () => {
-    const mockRawData = { t_pnl: 5000 }; // No positions
+    const mockRawData = { t_pnl: 50.00 }; // No positions
     const expectedProcessedData = { totalPnL: 50.00 };
 
     fetch.mockResolvedValueOnce({ ok: true, json: async () => mockRawData });
     const result = await fetchWalletPnL(mockWalletAddress);
 
-    expect(decodeValue).toHaveBeenCalledTimes(1);
     expect(decodePositions).not.toHaveBeenCalled();
     expect(addWalletAddressToPositions).not.toHaveBeenCalled();
     expect(result).toEqual(expectedProcessedData);

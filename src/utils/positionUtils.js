@@ -2,23 +2,6 @@
  * Utilities for handling position data and formatting.
  */
 
-// --- Constants ---
-const USD_MULTIPLIER = 100;       // Convert cents back to dollars (2 decimal places)
-const PRICE_MULTIPLIER = 1000000; // 6 decimal places for prices
-const LEVERAGE_MULTIPLIER = 100;  // 2 decimal places for leverage
-
-// --- Helper Functions ---
-
-/**
- * Decodes an encoded numeric value back to its original decimal form
- * @param {number|null} value - The encoded integer value 
- * @param {number} multiplier - The multiplier used for encoding
- * @return {number|null} The decoded decimal value
- */
-export const decodeValue = (value, multiplier) => {
-  if (value === null || value === undefined) return null;
-  return value / multiplier;
-};
 
 // --- Exported Utility Functions ---
 
@@ -106,70 +89,70 @@ export const addWalletAddressToPositions = (positions, walletAddress) => {
 };
 
 /**
- * Decodes a position object with encoded values into a client-ready object.
- * Maps short API keys to more descriptive client-side keys.
- * 
- * @param {Object} position - The position object from the API with encoded values.
- * @return {Object|null} Position object with decoded values and descriptive keys, or null if input is invalid.
+ * Maps position object with raw decimal values to client-ready object with descriptive keys.
+ *
+ * @param {Object} position - The position object from the API with raw decimal values.
+ * @return {Object|null} Position object with descriptive keys, or null if input is invalid.
  */
 export const decodePosition = (position) => {
   if (!position) return null;
-  
+
   const decoded = {
     positionAddress: position.p_addr,
     state: position.state,
     pair: position.pair,
-    
-    currentPrice: decodeValue(position.c_price, PRICE_MULTIPLIER),
-    entryPrice: decodeValue(position.e_price, PRICE_MULTIPLIER),
-    leverage: decodeValue(position.lev, LEVERAGE_MULTIPLIER),
-    size: decodeValue(position.sz, USD_MULTIPLIER),
-    
+
+    // Raw decimal values - no decoding needed
+    currentPrice: position.c_price,
+    entryPrice: position.e_price,
+    leverage: position.lev,
+    size: position.sz,
+
     rangePrices: {
-      lower: decodeValue(position.r_prices?.l, PRICE_MULTIPLIER),
-      upper: decodeValue(position.r_prices?.u, PRICE_MULTIPLIER)
+      lower: position.r_prices?.l,
+      upper: position.r_prices?.u
     },
     liquidationPrice: {
-      lower: decodeValue(position.liq_price?.l, PRICE_MULTIPLIER),
-      upper: decodeValue(position.liq_price?.u, PRICE_MULTIPLIER)
+      lower: position.liq_price?.l,
+      upper: position.liq_price?.u
     },
     limitOrderPrices: {
-      lower: decodeValue(position.lim_prices?.l, PRICE_MULTIPLIER),
-      upper: decodeValue(position.lim_prices?.u, PRICE_MULTIPLIER)
+      lower: position.lim_prices?.l,
+      upper: position.lim_prices?.u
     },
-    
+
     pnl: {
-      usd: decodeValue(position.pnl?.u, USD_MULTIPLIER),
-      bps: position.pnl?.b // bps was not encoded
+      usd: position.pnl?.u,
+      bps: position.pnl?.b
     },
     yield: {
-      usd: decodeValue(position.yld?.u, USD_MULTIPLIER)
+      usd: position.yld?.u
     },
     compounded: {
-      usd: decodeValue(position.cmp?.u, USD_MULTIPLIER)
+      usd: position.cmp?.u
     },
     collateral: {
-      usd: decodeValue(position.col?.u, USD_MULTIPLIER)
+      usd: position.col?.u
     },
     debt: {
-      usd: decodeValue(position.dbt?.u, USD_MULTIPLIER)
+      usd: position.dbt?.u
     },
     interest: {
-      usd: decodeValue(position.int?.u, USD_MULTIPLIER)
+      usd: position.int?.u
     },
-    
+
     // Include opened_at if available in the position data
     opened_at: position.opened_at,
-    
+
     pnlData: position.pnlData,
     yieldData: position.yieldData,
     compoundedData: position.compoundedData,
     symbol: position.symbol,
   };
-  
+
   // Add derived/calculated properties (optional, can be done later)
-  decoded.displayStatus = calculateStatus(decoded); 
-  
+  decoded.displayStatus = calculateStatus(decoded);
+
   return decoded;
 };
 

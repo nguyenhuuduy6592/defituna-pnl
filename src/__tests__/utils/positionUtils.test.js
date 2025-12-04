@@ -1,5 +1,4 @@
 import {
-  decodeValue,
   getValueClass,
   getStateClass,
   calculateStatus,
@@ -9,18 +8,6 @@ import {
 } from '../../utils/positionUtils';
 
 describe('positionUtils', () => {
-  describe('decodeValue', () => {
-    it('handles null and undefined inputs', () => {
-      expect(decodeValue(null, 100)).toBeNull();
-      expect(decodeValue(undefined, 100)).toBeNull();
-    });
-
-    it('decodes values correctly', () => {
-      expect(decodeValue(1234, 100)).toBe(12.34);
-      expect(decodeValue(1000000, 1000000)).toBe(1);
-      expect(decodeValue(0, 100)).toBe(0);
-    });
-  });
 
   describe('getValueClass', () => {
     it('handles null and undefined inputs', () => {
@@ -120,19 +107,19 @@ describe('positionUtils', () => {
         p_addr: '0x123',
         state: 'open',
         pair: 'ETH/USD',
-        c_price: 1000000, // $1.00
-        e_price: 2000000, // $2.00
-        lev: 200, // 2x
-        sz: 10000, // $100.00
-        r_prices: { l: 900000, u: 1100000 },
-        liq_price: { l: 800000, u: 1200000 },
-        lim_prices: { l: 700000, u: 1300000 },
-        pnl: { u: 5000, b: 1000 },
-        yld: { u: 1000 },
-        cmp: { u: 2000 },
-        col: { u: 20000 },
-        dbt: { u: 10000 },
-        int: { u: 500 },
+        c_price: 1.00, // $1.00 (raw decimal)
+        e_price: 2.00, // $2.00 (raw decimal)
+        lev: 2, // 2x (raw decimal)
+        sz: 100.00, // $100.00 (raw decimal)
+        r_prices: { l: 0.9, u: 1.1 },
+        liq_price: { l: 0.8, u: 1.2 },
+        lim_prices: { l: 0.7, u: 1.3 },
+        pnl: { u: 50, b: 1000 },
+        yld: { u: 10 },
+        cmp: { u: 20 },
+        col: { u: 200 },
+        dbt: { u: 100 },
+        int: { u: 5 },
         opened_at: '2023-01-01'
       };
 
@@ -142,10 +129,10 @@ describe('positionUtils', () => {
         positionAddress: '0x123',
         state: 'open',
         pair: 'ETH/USD',
-        currentPrice: 1,
-        entryPrice: 2,
+        currentPrice: 1.00,
+        entryPrice: 2.00,
         leverage: 2,
-        size: 100,
+        size: 100.00,
         rangePrices: { lower: 0.9, upper: 1.1 },
         liquidationPrice: { lower: 0.8, upper: 1.2 },
         limitOrderPrices: { lower: 0.7, upper: 1.3 },
@@ -169,9 +156,9 @@ describe('positionUtils', () => {
 
       const decoded = decodePosition(position);
 
-      expect(decoded.rangePrices).toEqual({ lower: null, upper: null });
-      expect(decoded.liquidationPrice).toEqual({ lower: null, upper: null });
-      expect(decoded.limitOrderPrices).toEqual({ lower: null, upper: null });
+      expect(decoded.rangePrices).toEqual({ lower: undefined, upper: undefined });
+      expect(decoded.liquidationPrice).toEqual({ lower: undefined, upper: undefined });
+      expect(decoded.limitOrderPrices).toEqual({ lower: undefined, upper: undefined });
       expect(decoded.displayStatus).toBe('Open (Unknown Range)');
     });
   });
@@ -189,15 +176,15 @@ describe('positionUtils', () => {
           p_addr: '0x123',
           state: 'open',
           pair: 'ETH/USD',
-          c_price: 1000000,
-          pnl: { u: 5000, b: 1000 }
+          c_price: 1.00,
+          pnl: { u: 50, b: 1000 }
         },
         {
           p_addr: '0x456',
           state: 'closed',
           pair: 'BTC/USD',
-          c_price: 2000000,
-          pnl: { u: -3000, b: -500 }
+          c_price: 2.00,
+          pnl: { u: -30, b: -500 }
         }
       ];
 

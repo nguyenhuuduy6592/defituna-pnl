@@ -1,4 +1,4 @@
-import { addWalletAddressToPositions, decodePositions, decodeValue } from './positionUtils';
+import { addWalletAddressToPositions, decodePositions } from './positionUtils';
 
 export const fetchWalletPnL = async (walletAddress) => {
   if (!walletAddress) return null;
@@ -16,10 +16,10 @@ export const fetchWalletPnL = async (walletAddress) => {
     
     const data = await res.json();
     
-    // Decode the total PnL value (using same USD_MULTIPLIER = 100)
+    // No decoding needed - working with raw decimal values now
     if (data.t_pnl !== undefined) {
-      data.totalPnL = decodeValue(data.t_pnl, 100);
-      delete data.t_pnl; // Remove the encoded field
+      data.totalPnL = data.t_pnl;
+      delete data.t_pnl; // Remove the field
     }
     
     // First decode the numeric encoded values in positions

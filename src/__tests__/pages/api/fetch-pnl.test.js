@@ -9,11 +9,6 @@ jest.mock('@/utils/validation');
 
 const USD_MULTIPLIER = 100;
 
-// Helper to decode values for assertion
-function decodeValue(value, multiplier) {
-  if (value === null || value === undefined) return null;
-  return value / multiplier;
-}
 
 describe('fetch-pnl API Handler', () => {
   beforeEach(() => {
@@ -22,11 +17,11 @@ describe('fetch-pnl API Handler', () => {
     // Default mock implementations
     isValidWalletAddress.mockReturnValue(true);
     fetchPositions.mockResolvedValue([]); // Default to empty positions
-    processPositionsData.mockImplementation(async (positions) => 
+    processPositionsData.mockImplementation(async (positions) =>
       positions.map(p => ({ ...p, // Simulate processing
         tka_s: p.tokenA?.symbol || '', // Encoded field: tokenA symbol
         tkb_s: p.tokenB?.symbol || '', // Encoded field: tokenB symbol
-        pnl: { u: Math.round((p.pnl_usd || 0) * USD_MULTIPLIER) } // Simulate pnl encoding
+        pnl: { u: p.pnl_usd || 0 } // Raw decimal value
       }))
     );
     global.console.error = jest.fn(); // Mock console.error
@@ -86,10 +81,10 @@ describe('fetch-pnl API Handler', () => {
       { id: '4', pnl_usd: undefined, tokenA: {symbol: 'RAY'}, tokenB: {symbol: 'SOL'} }, // Undefined PnL
     ];
     const expectedProcessedPositions = [
-      { id: '1', tka_s: 'SOL', tkb_s: 'USDC', pnl_usd: 10.50, pnl: { u: 1050 } },
-      { id: '2', tka_s: 'ETH', tkb_s: 'USDT', pnl_usd: -5.25, pnl: { u: -525 } },
+      { id: '1', tka_s: 'SOL', tkb_s: 'USDC', pnl_usd: 10.50, pnl: { u: 10.50 } },
+      { id: '2', tka_s: 'ETH', tkb_s: 'USDT', pnl_usd: -5.25, pnl: { u: -5.25 } },
       { id: '3', tka_s: 'BTC', tkb_s: 'USDC', pnl_usd: 0, pnl: { u: 0 } },
-      { id: '4', tka_s: 'RAY', tkb_s: 'SOL', pnl_usd: undefined, pnl: { u: 0 } }, 
+      { id: '4', tka_s: 'RAY', tkb_s: 'SOL', pnl_usd: undefined, pnl: { u: 0 } },
     ];
     fetchPositions.mockResolvedValue(mockRawPositions);
     processPositionsData.mockResolvedValue(expectedProcessedPositions);
@@ -114,11 +109,8 @@ describe('fetch-pnl API Handler', () => {
 
     // Calculate expected total PnL: 10.50 + (-5.25) + 0 + 0 = 5.25
     const expectedTotalPnl = 5.25;
-    const expectedEncodedTotalPnl = Math.round(expectedTotalPnl * USD_MULTIPLIER); // 525
-    
-    expect(responseData.t_pnl).toBe(expectedEncodedTotalPnl);
-    // Double-check by decoding
-    expect(decodeValue(responseData.t_pnl, USD_MULTIPLIER)).toBeCloseTo(expectedTotalPnl);
+
+    expect(responseData.t_pnl).toBeCloseTo(expectedTotalPnl);
   });
 
   it('should handle errors during fetchPositions', async () => {
@@ -160,10 +152,10 @@ describe('fetch-pnl API Handler', () => {
       { id: '4', pnl_usd: -50, tokenA: {symbol: 'G'}, tokenB: {symbol: 'H'} },
     ];
      const expectedProcessedPositions = [
-      { id: '1', tka_s: 'A', tkb_s: 'B', pnl_usd: 100, pnl: { u: 10000 } },
-      { id: '2', tka_s: 'C', tkb_s: 'D', pnl_usd: null, pnl: { u: 0 } }, // Null PNL becomes 0 encoded
-      { id: '3', tka_s: 'E', tkb_s: 'F', pnl_usd: undefined, pnl: { u: 0 } }, // Undefined PNL becomes 0 encoded
-      { id: '4', tka_s: 'G', tkb_s: 'H', pnl_usd: -50, pnl: { u: -5000 } },
+      { id: '1', tka_s: 'A', tkb_s: 'B', pnl_usd: 100, pnl: { u: 100 } },
+      { id: '2', tka_s: 'C', tkb_s: 'D', pnl_usd: null, pnl: { u: 0 } }, // Null PNL becomes 0
+      { id: '3', tka_s: 'E', tkb_s: 'F', pnl_usd: undefined, pnl: { u: 0 } }, // Undefined PNL becomes 0
+      { id: '4', tka_s: 'G', tkb_s: 'H', pnl_usd: -50, pnl: { u: -50 } },
     ];
     fetchPositions.mockResolvedValue(mockRawPositions);
     processPositionsData.mockResolvedValue(expectedProcessedPositions);
@@ -180,10 +172,8 @@ describe('fetch-pnl API Handler', () => {
 
     // Expected total PnL: 100 + 0 + 0 + (-50) = 50
     const expectedTotalPnl = 50;
-    const expectedEncodedTotalPnl = Math.round(expectedTotalPnl * USD_MULTIPLIER); // 5000
 
-    expect(responseData.t_pnl).toBe(expectedEncodedTotalPnl);
-    expect(decodeValue(responseData.t_pnl, USD_MULTIPLIER)).toBeCloseTo(expectedTotalPnl);
+    expect(responseData.t_pnl).toBeCloseTo(expectedTotalPnl);
     expect(responseData.positions).toEqual(expectedProcessedPositions);
   });
 

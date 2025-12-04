@@ -566,25 +566,25 @@ describe('DeFiTuna Utilities', () => {
       debt: { usd: 600.34 },
       interest: { usd: 1.5 }
     };
-    // Expected final encoded structure for a valid position
+    // Expected final structure with raw decimal values
     const expectedEncodedPosition = {
       p_addr: expect.any(String),
       state: expect.any(String),
       pair: expect.any(String),
-      opened_at: expect.any(String), 
-      c_price: 10500000, // 10.5 * 1_000_000
-      e_price: 10000000, // 10 * 1_000_000
-      r_prices: { l: 9000000, u: 11000000 },
-      liq_price: { l: 8000000, u: 12000000 },
+      opened_at: expect.any(String),
+      c_price: 10.5, // raw decimal value
+      e_price: 10, // raw decimal value
+      r_prices: { l: 9, u: 11 },
+      liq_price: { l: 8, u: 12 },
       lim_prices: { l: null, u: null }, // Nulls remain null
-      lev: 250, // 2.5 * 100
-      sz: 100050, // 1000.50 * 100
-      pnl: { u: 5026, b: 502 }, // 50.256 * 100 rounded
-      yld: { u: 510 }, // 5.1 * 100
-      cmp: { u: 5535 }, // 55.35 * 100
-      col: { u: 40012 }, // 400.12 * 100
-      dbt: { u: 60034 }, // 600.34 * 100
-      int: { u: 150 }, // 1.5 * 100
+      lev: 2.5, // raw decimal value
+      sz: 1000.50, // raw decimal value
+      pnl: { u: 50.256, b: 502 }, // raw decimal value
+      yld: { u: 5.1 }, // raw decimal value
+      cmp: { u: 55.35 }, // raw decimal value
+      col: { u: 400.12 }, // raw decimal value
+      dbt: { u: 600.34 }, // raw decimal value
+      int: { u: 1.5 }, // raw decimal value
     };
 
     it('should return an empty array for null, undefined, or empty input', async () => {
