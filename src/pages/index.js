@@ -4,18 +4,15 @@ import { FiAlertTriangle } from 'react-icons/fi';
 import { Tooltip } from '../components/common/Tooltip';
 import { DisclaimerModal } from '../components/common/DisclaimerModal';
 import { CollapsibleSection } from '../components/common/CollapsibleSection';
-import { LendingPositionShareCard } from '../components/lending/LendingPositionShareCard';
 import {
   useWallet,
   useAutoRefresh,
   useHistoricalData,
   useDebounceApi,
-  useLendingPositions
 } from '../hooks';
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
-import { LendingPositionsDisplay } from '../components/pnl/LendingPositionsDisplay';
 import {
   fetchWalletPnL
 } from '../utils';
@@ -27,7 +24,6 @@ import { getValueClass, formatNumber } from '@/utils';
 
 // Storage keys for collapsible sections
 const TRADING_EXPANDED_KEY = 'tradingExpanded';
-const LENDING_EXPANDED_KEY = 'lendingExpanded';
 
 export default () => {
   const router = useRouter();
@@ -38,13 +34,6 @@ export default () => {
   const [disclaimerOpen, setDisclaimerOpen] = useState(false);
   const [allPositionsHistory, setAllPositionsHistory] = useState([]);
   const initialFetched = useRef(false);
-  const [lendingEnabled, setLendingEnabled] = useState(false);
-
-  // State for lending position share modal
-  const [lendingShareModalState, setLendingShareModalState] = useState({
-    isOpen: false,
-    positionData: null,
-  });
 
   const {
     wallet,
@@ -277,15 +266,9 @@ export default () => {
   } = useAutoRefresh(
     useCallback(() => {
       fetchPnLData(activeWallets);
-      // Also fetch lending positions when auto-refresh runs
-      if (lendingPositionsHook && lendingPositionsHook.fetchLendingData) {
-        lendingPositionsHook.fetchLendingData(activeWallets);
-      }
     }, [fetchPnLData, activeWallets])
   );
 
-  // Hook for lending positions
-  const lendingPositionsHook = useLendingPositions(lendingEnabled ? activeWallets : []);
 
   // Handle initial load and wallet query parameter
   useEffect(() => {
@@ -311,7 +294,6 @@ export default () => {
         setErrorMessage('');
       }
       initialFetched.current = true;
-      setLendingEnabled(true);
     }
   }, [router.isReady, router.query.wallet, activeWallets, aggregatedData, loading, errorMessage, fetchPnLData, setActiveWallets]);
 
@@ -346,10 +328,6 @@ export default () => {
     const walletsToSubmit = wallet ? [wallet] : activeWallets; 
     if (walletsToSubmit.length > 0) {
       await fetchPnLData(walletsToSubmit, true);
-      // Also fetch lending positions data
-      if (lendingPositionsHook && lendingPositionsHook.fetchLendingData) {
-        lendingPositionsHook.fetchLendingData(walletsToSubmit, true);
-      }
     } else {
       setErrorMessage("Please enter a wallet address or select a saved wallet.");
       setAggregatedData(null);
@@ -366,28 +344,7 @@ export default () => {
     localStorage.setItem('disclaimerShown', 'true');
   };
 
-  // Handler to open the lending position share modal
-  const handleLendingPositionShare = useCallback((positionToShare) => {
-    const vaultDetails = lendingPositionsHook.vaultDetails[positionToShare.vault];
-    const mintDetails = vaultDetails ? lendingPositionsHook.mintDetails[vaultDetails.mint] : {};
 
-    const preparedPositionData = {
-      ...positionToShare,
-      vaultSymbol: mintDetails?.symbol || 'N/A',
-      supplyApy: vaultDetails?.supply_apy ? vaultDetails.supply_apy * 100 : 0, // Convert to percentage
-      // ensure all other necessary fields from positionToShare are included
-    };
-
-    setLendingShareModalState({ isOpen: true, positionData: preparedPositionData });
-  }, [lendingPositionsHook.vaultDetails, lendingPositionsHook.mintDetails]);
-
-  // Handler to close the lending position share modal
-  const handleCloseLendingShareModal = useCallback(() => {
-    setLendingShareModalState({ isOpen: false, positionData: null });
-  }, []);
-
-  // Determine if we should show lending positions
-  const shouldShowLendingSection = activeWallets.length > 0 && lendingPositionsHook && lendingPositionsHook.lendingData && lendingPositionsHook.lendingData.positions.length > 0;
 
   const title = 'Defituna PnL Viewer';
   return (
@@ -407,9 +364,6 @@ export default () => {
           </div>
         </Tooltip>
         <div className={styles.titleActions}>
-          <Link href="/lending" className={styles.navButton}>
-            <span>Lending</span>
-          </Link>
           <button 
             className={styles.disclaimerButton} 
             onClick={() => setDisclaimerOpen(true)}
@@ -468,20 +422,6 @@ export default () => {
             />
           </CollapsibleSection>
           
-          <CollapsibleSection
-            title="Lending Positions"
-            storageKey={LENDING_EXPANDED_KEY}
-            defaultExpanded={true}
-            visible={shouldShowLendingSection}
-          >
-            <LendingPositionsDisplay
-              data={lendingPositionsHook.lendingData}
-              loading={lendingPositionsHook.loading}
-              getVaultDetails={lendingPositionsHook.getVaultDetails}
-              getMintDetails={lendingPositionsHook.getMintDetails}
-              onShare={handleLendingPositionShare}
-            />
-          </CollapsibleSection>
         </>
       )}
 
@@ -494,12 +434,6 @@ export default () => {
         onClose={handleCloseDisclaimer}
       />
 
-      {lendingShareModalState.isOpen && (
-        <LendingPositionShareCard 
-          position={lendingShareModalState.positionData} 
-          onClose={handleCloseLendingShareModal} 
-        />
-      )}
     </div>
   );
 };

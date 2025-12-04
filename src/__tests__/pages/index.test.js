@@ -41,15 +41,6 @@ jest.mock('../../hooks', () => ({
   useDebounceApi: jest.fn(() => ({
     execute: jest.fn()
   })),
-  useLendingPositions: jest.fn(() => ({
-    lendingData: { positions: [] },
-    loading: false,
-    fetchLendingData: jest.fn(),
-    getVaultDetails: jest.fn(),
-    getMintDetails: jest.fn(),
-    vaultDetails: {},
-    mintDetails: {}
-  }))
 }));
 
 // Mock components
