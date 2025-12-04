@@ -409,7 +409,7 @@ export default () => {
       {activeWallets.length > 0 && (
         <>
           <CollapsibleSection 
-            title="Trading Positions" 
+            title="Liquidity Positions" 
             storageKey={TRADING_EXPANDED_KEY}
             defaultExpanded={true}
             visible={aggregatedData !== null}
