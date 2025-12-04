@@ -1,12 +1,6 @@
 import React from 'react';
 import { render, act } from '@testing-library/react';
 import App from '../../pages/_app'; 
-import { ComparisonProvider } from '../../contexts/ComparisonContext';
-
-// Mock the ComparisonProvider as its internal logic isn't the focus here
-jest.mock('../../contexts/ComparisonContext', () => ({
-  ComparisonProvider: ({ children }) => <div data-testid="mock-comparison-provider">{children}</div>,
-}));
 
 // Mock navigator.serviceWorker
 global.navigator.serviceWorker = {
@@ -41,12 +35,6 @@ describe('App Component (_app.js)', () => {
     expect(getByTestId('mock-page-component')).toBeInTheDocument();
   });
 
-  it('wraps the Component with ComparisonProvider', () => {
-    const { getByTestId } = render(<App Component={MockComponent} pageProps={mockPageProps} />);
-    expect(getByTestId('mock-comparison-provider')).toBeInTheDocument();
-    // Check that the mock page component is inside the provider
-    expect(getByTestId('mock-comparison-provider')).toContainElement(getByTestId('mock-page-component'));
-  });
 
   it('passes pageProps to the Component', () => {
     // We can't directly check props of MockComponent easily in the rendered output.

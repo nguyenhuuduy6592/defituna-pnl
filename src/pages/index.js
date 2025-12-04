@@ -407,9 +407,6 @@ export default () => {
           </div>
         </Tooltip>
         <div className={styles.titleActions}>
-          <Link href="/pools" className={styles.navButton}>
-            <span>Pools</span>
-          </Link>
           <Link href="/lending" className={styles.navButton}>
             <span>Lending</span>
           </Link>

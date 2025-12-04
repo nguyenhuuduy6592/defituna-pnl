@@ -1,6 +1,5 @@
 import '@/styles/globals.scss'
 import { useEffect } from 'react'
-import { ComparisonProvider } from '../contexts/ComparisonContext'
 import { PriceProvider } from '../contexts/PriceContext'
 import { DisplayCurrencyProvider } from '../contexts/DisplayCurrencyContext'
 
@@ -20,9 +19,7 @@ export default function App({ Component, pageProps }) {
   return (
     <PriceProvider>
       <DisplayCurrencyProvider>
-        <ComparisonProvider>
-          <Component {...pageProps} />
-        </ComparisonProvider>
+        <Component {...pageProps} />
       </DisplayCurrencyProvider>
     </PriceProvider>
   )
