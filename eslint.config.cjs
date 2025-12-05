@@ -1,5 +1,6 @@
 const next = require('eslint-config-next');
 const react = require('eslint-plugin-react');
+const reactHooks = require('eslint-plugin-react-hooks');
 const prettier = require('eslint-plugin-prettier');
 const prettierConfig = require('eslint-config-prettier');
 
@@ -15,12 +16,13 @@ module.exports = [
       '**/public/manifest.json',
     ],
   },
-  // Extend Next.js configuration
+  // Extend Next.js configuration (includes core ESLint recommended rules)
   ...next,
   {
     files: ['**/*.js', '**/*.jsx'],
     plugins: {
       react: react,
+      'react-hooks': reactHooks,
     },
     languageOptions: {
       parserOptions: {
@@ -32,16 +34,25 @@ module.exports = [
       },
     },
     rules: {
-      semi: ['error', 'always'],
-      quotes: ['error', 'single'],
+      // Basic JavaScript best practices
+      'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+      'no-debugger': 'warn',
       'no-unused-vars': 'warn',
+      eqeqeq: ['error', 'always'],
+      curly: ['error', 'all'],
+
+      // React specific rules
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
-      'no-console': ['warn', { allow: ['warn', 'error', 'info', 'log'] }],
-      'no-debugger': 'warn',
-      eqeqeq: ['error', 'always'],
-      curly: ['error', 'all'],
+
+      // React Hooks rules
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+
+      // Code style (non-Prettier rules)
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
       'no-extra-semi': 'error',
       'no-mixed-spaces-and-tabs': 'error',
       'no-trailing-spaces': 'error',
@@ -58,16 +69,6 @@ module.exports = [
       'object-curly-spacing': ['error', 'always'],
       'array-bracket-spacing': ['error', 'never'],
       'jsx-quotes': ['error', 'prefer-double'],
-      'react/jsx-curly-spacing': ['error', { when: 'never', children: true }],
-      'react/jsx-tag-spacing': [
-        'error',
-        {
-          closingSlash: 'never',
-          beforeSelfClosing: 'always',
-          afterOpening: 'never',
-          beforeClosing: 'never',
-        },
-      ],
     },
     settings: {
       react: {
@@ -76,6 +77,7 @@ module.exports = [
     },
   },
   {
+    // Test files configuration
     files: [
       '**/__tests__/**',
       '**/*.test.js',
@@ -87,7 +89,8 @@ module.exports = [
       'no-unused-vars': 'off',
       'no-unused-expressions': 'off',
       'no-console': 'off',
-      'react/prop-types': 'off',
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'off',
     },
   },
   // Prettier configuration - should be last to override other configs
