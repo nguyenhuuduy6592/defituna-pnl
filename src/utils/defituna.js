@@ -10,7 +10,6 @@ import { processTunaPosition } from './formulas.js';
 const POOL_CACHE_TTL = 30 * 1000;       // 30 seconds for pool data (contains dynamic ticks)
 const MARKET_CACHE_TTL = 60 * 60 * 1000; // 1 hour for market data (changes infrequently)
 const TOKEN_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours for token data (extremely static)
-const ALL_POOLS_CACHE_TTL = 60 * 1000;  // 1 minute for all pools data
 
 
 // --- Cache Functions ---
@@ -18,7 +17,6 @@ const ALL_POOLS_CACHE_TTL = 60 * 1000;  // 1 minute for all pools data
 const marketCache = { data: null, timestamp: 0 };
 const poolCache = new Map();
 const tokenCache = new Map();
-const allPoolsCache = { data: null, timestamp: 0 };
 
 /**
  * Checks if a cached item is still valid based on its timestamp and TTL
@@ -400,47 +398,6 @@ export async function processPositionsData(positionsData) {
     return processed;
   } catch (error) {
     console.error('[processPositionsData] Error processing positions data:', error.message);
-    throw error;
-  }
-}
-
-/**
- * Fetches all available pools
- * @returns {Promise<Object>} - Pools data
- * @throws {Error} If the API request fails
- */
-export async function fetchAllPools() {
-  try {
-    // Pools data can be cached for a short period
-    if (allPoolsCache.data && isCacheValid(allPoolsCache.timestamp, ALL_POOLS_CACHE_TTL)) {
-      return allPoolsCache.data;
-    }
-
-    const response = await fetch(`${process.env.DEFITUNA_API_URL}/pools`);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch pools data: ${response.status} ${response.statusText}`);
-    }
-    
-    // Parse the response - handle both array response directly or data wrapper
-    const responseJson = await response.json();
-    
-    // API might return pools directly as an array now
-    let poolsData;
-    if (Array.isArray(responseJson)) {
-      poolsData = responseJson;
-    } else if (responseJson.data && Array.isArray(responseJson.data)) {
-      poolsData = responseJson.data;
-    } else {
-      console.error('[fetchAllPools] Unexpected response format:', responseJson);
-      poolsData = [];
-    }
-    
-    // Store in cache with consistent structure
-    allPoolsCache.data = poolsData;
-    allPoolsCache.timestamp = Date.now();
-    return poolsData;
-  } catch (error) {
-    console.error('[fetchAllPools] Error:', error.message);
     throw error;
   }
 }

@@ -3,7 +3,6 @@ import {
   fetchPoolData,
   fetchMarketData,
   fetchTokenData,
-  fetchAllPools,
   processPositionsData
 } from '../../utils/defituna';
 import { processTunaPosition } from '../../utils/formulas';
@@ -420,103 +419,6 @@ describe('DeFiTuna Utilities', () => {
     });
   });
 
-  describe('fetchAllPools', () => {
-    const mockPoolsData = [{ id: 'poolA' }, { id: 'poolB' }];
-    const cacheTTL = 60 * 1000;
-
-    it('should fetch all pools data when cache is empty (direct array)', async () => {
-      const { fetchAllPools } = require('../../utils/defituna');
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockPoolsData });
-
-      const poolsData = await fetchAllPools();
-
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(`http://mock-api.com/pools`);
-      expect(poolsData).toEqual(mockPoolsData);
-    });
-    
-    it('should fetch all pools data when cache is empty (wrapped in data)', async () => {
-      const { fetchAllPools } = require('../../utils/defituna');
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ data: mockPoolsData }) });
-
-      const poolsData = await fetchAllPools();
-
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(`http://mock-api.com/pools`);
-      expect(poolsData).toEqual(mockPoolsData);
-    });
-
-    it('should use cache if valid', async () => {
-      const { fetchAllPools } = require('../../utils/defituna');
-      // First call
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockPoolsData });
-      await fetchAllPools();
-      expect(fetch).toHaveBeenCalledTimes(1);
-      fetch.mockClear();
-
-      // Second call
-      const poolsData = await fetchAllPools();
-      expect(fetch).not.toHaveBeenCalled();
-      expect(poolsData).toEqual(mockPoolsData);
-    });
-
-    it('should fetch new data if cache is expired', async () => {
-      const { fetchAllPools } = require('../../utils/defituna');
-      // First call
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockPoolsData });
-      await fetchAllPools();
-      expect(fetch).toHaveBeenCalledTimes(1);
-
-      jest.advanceTimersByTime(cacheTTL + 1);
-
-      // Second call
-      const updatedMockData = [...mockPoolsData, { id: 'poolC' }];
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => updatedMockData });
-      const poolsData = await fetchAllPools();
-      
-      expect(fetch).toHaveBeenCalledTimes(2);
-      expect(poolsData).toEqual(updatedMockData);
-    });
-
-    it('should return empty array and log error for unexpected response format', async () => {
-      const { fetchAllPools } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      const badResponse = { wrong_key: [] };
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => badResponse });
-      
-      const poolsData = await fetchAllPools();
-
-      expect(poolsData).toEqual([]);
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchAllPools] Unexpected response format:', badResponse);
-      consoleSpy.mockRestore();
-    });
-
-    it('should throw an error if API fetch fails', async () => {
-      const { fetchAllPools } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      const errorMessage = 'Network Error';
-      fetch.mockRejectedValueOnce(new Error(errorMessage));
-      
-      await expect(fetchAllPools()).rejects.toThrow(errorMessage);
-      
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchAllPools] Error:', errorMessage);
-      consoleSpy.mockRestore();
-    });
-
-    it('should throw an error if API response is not ok', async () => {
-      const { fetchAllPools } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      fetch.mockResolvedValueOnce({ ok: false, status: 503, statusText: 'Service Unavailable' });
-      
-      await expect(fetchAllPools()).rejects.toThrow('Failed to fetch pools data: 503 Service Unavailable');
-      
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchAllPools] Error:', 'Failed to fetch pools data: 503 Service Unavailable');
-      consoleSpy.mockRestore();
-    });
-  });
 
   // --- Processing Function Tests ---
   describe('processPositionsData', () => {
