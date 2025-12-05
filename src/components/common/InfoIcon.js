@@ -13,7 +13,10 @@ const InfoIcon = ({ content, position = 'top', size = 'small' }) => {
 
   return (
     <EnhancedTooltip content={content} position={position}>
-      <span className={`${styles.infoIcon} ${sizeClass}`} aria-label="Information">
+      <span
+        className={`${styles.infoIcon} ${sizeClass}`}
+        aria-label="Information"
+      >
         i
       </span>
     </EnhancedTooltip>

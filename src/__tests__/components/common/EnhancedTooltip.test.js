@@ -304,7 +304,12 @@ describe('EnhancedTooltip Component', () => {
 
     render(
       <EnhancedTooltip
-        content={<div data-testid="complex-content"><h4>Title</h4><p>Description</p></div>}
+        content={
+          <div data-testid="complex-content">
+            <h4>Title</h4>
+            <p>Description</p>
+          </div>
+        }
       >
         <button>Hover me</button>
       </EnhancedTooltip>
@@ -432,7 +437,12 @@ describe('EnhancedTooltip Component', () => {
 
     render(
       <EnhancedTooltip
-        content={<div data-testid="complex-content"><h4>Title</h4><p>Description</p></div>}
+        content={
+          <div data-testid="complex-content">
+            <h4>Title</h4>
+            <p>Description</p>
+          </div>
+        }
       >
         <button>Hover me</button>
       </EnhancedTooltip>
@@ -560,7 +570,12 @@ describe('EnhancedTooltip Component', () => {
 
     render(
       <EnhancedTooltip
-        content={<div data-testid="complex-content"><h4>Title</h4><p>Description</p></div>}
+        content={
+          <div data-testid="complex-content">
+            <h4>Title</h4>
+            <p>Description</p>
+          </div>
+        }
       >
         <button>Hover me</button>
       </EnhancedTooltip>
@@ -688,7 +703,12 @@ describe('EnhancedTooltip Component', () => {
 
     render(
       <EnhancedTooltip
-        content={<div data-testid="complex-content"><h4>Title</h4><p>Description</p></div>}
+        content={
+          <div data-testid="complex-content">
+            <h4>Title</h4>
+            <p>Description</p>
+          </div>
+        }
       >
         <button>Hover me</button>
       </EnhancedTooltip>

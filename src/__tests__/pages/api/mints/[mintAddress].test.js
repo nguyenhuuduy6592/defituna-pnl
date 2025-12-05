@@ -29,7 +29,9 @@ describe('API Route: /api/mints/[mintAddress]', () => {
     });
     await handler(req, res);
     expect(res._getStatusCode()).toBe(400);
-    expect(JSON.parse(res._getData())).toMatchObject({ message: expect.any(String) });
+    expect(JSON.parse(res._getData())).toMatchObject({
+      message: expect.any(String),
+    });
   });
 
   it('returns 500 if DEFITUNA_API_URL is not set', async () => {
@@ -40,7 +42,9 @@ describe('API Route: /api/mints/[mintAddress]', () => {
     });
     await handler(req, res);
     expect(res._getStatusCode()).toBe(500);
-    expect(JSON.parse(res._getData())).toMatchObject({ message: expect.any(String) });
+    expect(JSON.parse(res._getData())).toMatchObject({
+      message: expect.any(String),
+    });
   });
 
   it('returns 200 and data on success', async () => {
@@ -71,7 +75,10 @@ describe('API Route: /api/mints/[mintAddress]', () => {
     });
     await handler(req, res);
     expect(res._getStatusCode()).toBe(404);
-    expect(JSON.parse(res._getData())).toMatchObject({ message: expect.any(String), error: 'Not found' });
+    expect(JSON.parse(res._getData())).toMatchObject({
+      message: expect.any(String),
+      error: 'Not found',
+    });
   });
 
   it('returns 500 on network or other error', async () => {
@@ -82,6 +89,9 @@ describe('API Route: /api/mints/[mintAddress]', () => {
     });
     await handler(req, res);
     expect(res._getStatusCode()).toBe(500);
-    expect(JSON.parse(res._getData())).toMatchObject({ message: expect.any(String), error: 'Network error' });
+    expect(JSON.parse(res._getData())).toMatchObject({
+      message: expect.any(String),
+      error: 'Network error',
+    });
   });
 });

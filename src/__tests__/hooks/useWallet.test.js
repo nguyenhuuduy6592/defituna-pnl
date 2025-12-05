@@ -8,7 +8,9 @@ beforeAll(() => {
   global.Storage.prototype.setItem = jest.fn((key, value) => {
     localStorageMock[key] = value;
   });
-  global.Storage.prototype.getItem = jest.fn((key) => localStorageMock[key] || null);
+  global.Storage.prototype.getItem = jest.fn(
+    (key) => localStorageMock[key] || null
+  );
   global.Storage.prototype.removeItem = jest.fn((key) => {
     delete localStorageMock[key];
   });
@@ -109,7 +111,10 @@ describe('useWallet Hook', () => {
       const { result } = renderHook(() => useWallet());
 
       expect(console.error).toHaveBeenCalledTimes(1);
-      expect(console.error).toHaveBeenCalledWith('Error loading wallet data from localStorage:', expect.any(Error));
+      expect(console.error).toHaveBeenCalledWith(
+        'Error loading wallet data from localStorage:',
+        expect.any(Error)
+      );
       expect(result.current.savedWallets).toEqual([]);
       expect(result.current.activeWallets).toEqual([]);
       expect(result.current.wallet).toBe('');
@@ -131,9 +136,18 @@ describe('useWallet Hook', () => {
       expect(result.current.wallet).toBe(newWallet);
       // Should save wallet, activeWallets, and savedWallets
       expect(localStorage.setItem).toHaveBeenCalledTimes(3);
-      expect(localStorage.setItem).toHaveBeenCalledWith('lastWallet', newWallet);
-      expect(localStorage.setItem).toHaveBeenCalledWith('activeWallets', JSON.stringify(result.current.activeWallets)); // Use current state from hook
-      expect(localStorage.setItem).toHaveBeenCalledWith('wallets', JSON.stringify(result.current.savedWallets)); // Use current state from hook
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'lastWallet',
+        newWallet
+      );
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'activeWallets',
+        JSON.stringify(result.current.activeWallets)
+      ); // Use current state from hook
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'wallets',
+        JSON.stringify(result.current.savedWallets)
+      ); // Use current state from hook
     });
 
     it('setActiveWallets should update state and save to localStorage', () => {
@@ -149,8 +163,14 @@ describe('useWallet Hook', () => {
       expect(result.current.activeWallets).toEqual(newActive);
       // Saves activeWallets, wallets. Removes lastWallet if wallet state is empty.
       expect(localStorage.setItem).toHaveBeenCalledTimes(2);
-      expect(localStorage.setItem).toHaveBeenCalledWith('activeWallets', JSON.stringify(newActive));
-      expect(localStorage.setItem).toHaveBeenCalledWith('wallets', JSON.stringify(result.current.savedWallets));
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'activeWallets',
+        JSON.stringify(newActive)
+      );
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'wallets',
+        JSON.stringify(result.current.savedWallets)
+      );
       expect(localStorage.removeItem).toHaveBeenCalledTimes(1);
       expect(localStorage.removeItem).toHaveBeenCalledWith('lastWallet');
     });
@@ -168,8 +188,14 @@ describe('useWallet Hook', () => {
       expect(result.current.savedWallets).toEqual([walletToAdd]);
       // Saves wallets, activeWallets. Removes lastWallet if wallet state is empty.
       expect(localStorage.setItem).toHaveBeenCalledTimes(2);
-      expect(localStorage.setItem).toHaveBeenCalledWith('wallets', JSON.stringify([walletToAdd]));
-      expect(localStorage.setItem).toHaveBeenCalledWith('activeWallets', JSON.stringify(result.current.activeWallets));
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'wallets',
+        JSON.stringify([walletToAdd])
+      );
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'activeWallets',
+        JSON.stringify(result.current.activeWallets)
+      );
       expect(localStorage.removeItem).toHaveBeenCalledTimes(1);
       expect(localStorage.removeItem).toHaveBeenCalledWith('lastWallet');
     });
@@ -203,10 +229,18 @@ describe('useWallet Hook', () => {
       const { result } = renderHook(() => useWallet());
 
       // Setup: Add and activate both wallets
-      act(() => { result.current.addWallet(wallet1); });
-      act(() => { result.current.addWallet(wallet2); });
-      act(() => { result.current.toggleWalletActive(wallet1); });
-      act(() => { result.current.toggleWalletActive(wallet2); }); // wallet2 is now primary
+      act(() => {
+        result.current.addWallet(wallet1);
+      });
+      act(() => {
+        result.current.addWallet(wallet2);
+      });
+      act(() => {
+        result.current.toggleWalletActive(wallet1);
+      });
+      act(() => {
+        result.current.toggleWalletActive(wallet2);
+      }); // wallet2 is now primary
 
       // Verify setup state before clearing mocks
       expect(result.current.wallet).toBe(wallet2);
@@ -227,8 +261,14 @@ describe('useWallet Hook', () => {
 
       // Assert save effect calls for this specific action
       expect(localStorage.setItem).toHaveBeenCalledTimes(3);
-      expect(localStorage.setItem).toHaveBeenCalledWith('wallets', JSON.stringify([wallet1]));
-      expect(localStorage.setItem).toHaveBeenCalledWith('activeWallets', JSON.stringify([wallet1]));
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'wallets',
+        JSON.stringify([wallet1])
+      );
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'activeWallets',
+        JSON.stringify([wallet1])
+      );
       expect(localStorage.setItem).toHaveBeenCalledWith('lastWallet', wallet1);
     });
 
@@ -238,9 +278,15 @@ describe('useWallet Hook', () => {
       const { result } = renderHook(() => useWallet());
 
       // Setup: Add both, activate only wallet1
-      act(() => { result.current.addWallet(wallet1); });
-      act(() => { result.current.addWallet(wallet2); });
-      act(() => { result.current.toggleWalletActive(wallet1); }); // wallet1 is primary
+      act(() => {
+        result.current.addWallet(wallet1);
+      });
+      act(() => {
+        result.current.addWallet(wallet2);
+      });
+      act(() => {
+        result.current.toggleWalletActive(wallet1);
+      }); // wallet1 is primary
 
       // Verify setup state
       expect(result.current.wallet).toBe(wallet1);
@@ -261,8 +307,14 @@ describe('useWallet Hook', () => {
 
       // Assert save effect calls for this action
       expect(localStorage.setItem).toHaveBeenCalledTimes(3);
-      expect(localStorage.setItem).toHaveBeenCalledWith('wallets', JSON.stringify([wallet1]));
-      expect(localStorage.setItem).toHaveBeenCalledWith('activeWallets', JSON.stringify([wallet1]));
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'wallets',
+        JSON.stringify([wallet1])
+      );
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'activeWallets',
+        JSON.stringify([wallet1])
+      );
       expect(localStorage.setItem).toHaveBeenCalledWith('lastWallet', wallet1);
     });
 
@@ -270,7 +322,9 @@ describe('useWallet Hook', () => {
       const wallet1 = '0xccc';
       const { result } = renderHook(() => useWallet());
       // Add but don't activate initially
-      act(() => { result.current.addWallet(wallet1); });
+      act(() => {
+        result.current.addWallet(wallet1);
+      });
       expect(result.current.activeWallets).toEqual([]);
       expect(result.current.wallet).toBe('');
 
@@ -285,9 +339,15 @@ describe('useWallet Hook', () => {
 
       // Assert save calls
       expect(localStorage.setItem).toHaveBeenCalledTimes(3);
-      expect(localStorage.setItem).toHaveBeenCalledWith('activeWallets', JSON.stringify([wallet1]));
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'activeWallets',
+        JSON.stringify([wallet1])
+      );
       expect(localStorage.setItem).toHaveBeenCalledWith('lastWallet', wallet1);
-      expect(localStorage.setItem).toHaveBeenCalledWith('wallets', JSON.stringify([wallet1])); // Saved wallets state
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'wallets',
+        JSON.stringify([wallet1])
+      ); // Saved wallets state
     });
 
     it('toggleWalletActive should deactivate an active wallet, update primary, and save', () => {
@@ -296,10 +356,18 @@ describe('useWallet Hook', () => {
       const { result } = renderHook(() => useWallet());
 
       // Setup: Add and activate both
-      act(() => { result.current.addWallet(wallet1); });
-      act(() => { result.current.addWallet(wallet2); });
-      act(() => { result.current.toggleWalletActive(wallet1); });
-      act(() => { result.current.toggleWalletActive(wallet2); }); // wallet2 is primary
+      act(() => {
+        result.current.addWallet(wallet1);
+      });
+      act(() => {
+        result.current.addWallet(wallet2);
+      });
+      act(() => {
+        result.current.toggleWalletActive(wallet1);
+      });
+      act(() => {
+        result.current.toggleWalletActive(wallet2);
+      }); // wallet2 is primary
       expect(result.current.wallet).toBe(wallet2);
 
       jest.clearAllMocks(); // Clear after setup
@@ -314,9 +382,15 @@ describe('useWallet Hook', () => {
 
       // Assert save calls
       expect(localStorage.setItem).toHaveBeenCalledTimes(3);
-      expect(localStorage.setItem).toHaveBeenCalledWith('activeWallets', JSON.stringify([wallet1]));
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'activeWallets',
+        JSON.stringify([wallet1])
+      );
       expect(localStorage.setItem).toHaveBeenCalledWith('lastWallet', wallet1);
-      expect(localStorage.setItem).toHaveBeenCalledWith('wallets', JSON.stringify([wallet1, wallet2])); // saved wallets remain
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'wallets',
+        JSON.stringify([wallet1, wallet2])
+      ); // saved wallets remain
     });
 
     it('toggleWalletActive should clear primary wallet if last active wallet is deactivated', () => {
@@ -324,8 +398,12 @@ describe('useWallet Hook', () => {
       const { result } = renderHook(() => useWallet());
 
       // Setup: Add and activate wallet1
-      act(() => { result.current.addWallet(wallet1); });
-      act(() => { result.current.toggleWalletActive(wallet1); });
+      act(() => {
+        result.current.addWallet(wallet1);
+      });
+      act(() => {
+        result.current.toggleWalletActive(wallet1);
+      });
       expect(result.current.wallet).toBe(wallet1);
 
       jest.clearAllMocks(); // Clear after setup
@@ -342,20 +420,31 @@ describe('useWallet Hook', () => {
       // The useEffect triggers setItem for wallets, activeWallets, and checks lastWallet
       // Since lastWallet becomes empty, removeItem is called instead of setItem for it.
       expect(localStorage.setItem).toHaveBeenCalledTimes(2); // Saves empty active, saved
-      expect(localStorage.setItem).toHaveBeenCalledWith('activeWallets', JSON.stringify([]));
-      expect(localStorage.setItem).toHaveBeenCalledWith('wallets', JSON.stringify([wallet1])); // Saved remains
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'activeWallets',
+        JSON.stringify([])
+      );
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'wallets',
+        JSON.stringify([wallet1])
+      ); // Saved remains
       expect(localStorage.removeItem).toHaveBeenCalledTimes(1);
       expect(localStorage.removeItem).toHaveBeenCalledWith('lastWallet');
     });
-
 
     it('clearWallets should clear all state and localStorage items', () => {
       const { result } = renderHook(() => useWallet());
 
       // Setup: Add some wallets
-      act(() => { result.current.addWallet('0x1'); });
-      act(() => { result.current.addWallet('0x2'); });
-      act(() => { result.current.toggleWalletActive('0x1'); });
+      act(() => {
+        result.current.addWallet('0x1');
+      });
+      act(() => {
+        result.current.addWallet('0x2');
+      });
+      act(() => {
+        result.current.toggleWalletActive('0x1');
+      });
       // Verify setup state is not empty
       expect(result.current.savedWallets).toEqual(['0x1', '0x2']);
       expect(result.current.activeWallets).toEqual(['0x1']);
@@ -376,8 +465,14 @@ describe('useWallet Hook', () => {
       // The useEffect triggers setItem for wallets, activeWallets, and checks lastWallet
       // Since lastWallet becomes empty, removeItem is called instead of setItem for it.
       expect(localStorage.setItem).toHaveBeenCalledTimes(2); // Saves empty wallets, activeWallets
-      expect(localStorage.setItem).toHaveBeenCalledWith('wallets', JSON.stringify([]));
-      expect(localStorage.setItem).toHaveBeenCalledWith('activeWallets', JSON.stringify([]));
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'wallets',
+        JSON.stringify([])
+      );
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        'activeWallets',
+        JSON.stringify([])
+      );
       expect(localStorage.removeItem).toHaveBeenCalledTimes(1);
       expect(localStorage.removeItem).toHaveBeenCalledWith('lastWallet');
     });

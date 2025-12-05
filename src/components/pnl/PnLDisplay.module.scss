@@ -1,4 +1,4 @@
-@use "sass:map";
+@use 'sass:map';
 @use '../../styles/variables.module.scss' as variables;
 
 .pnlContainer {
@@ -23,12 +23,12 @@
   .cardRow {
     display: grid;
     grid-template-columns: 1fr;
-    
+
     @include variables.responsive(md) {
       grid-template-columns: 1fr 1fr 1fr 1fr;
     }
   }
-  
+
   .valueCards {
     display: flex;
     flex-direction: column;

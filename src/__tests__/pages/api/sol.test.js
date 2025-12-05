@@ -43,7 +43,9 @@ describe('/api/price/sol', () => {
     process.env.DEFITUNA_API_URL = '';
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ message: 'API URL configuration error.' });
+    expect(res.json).toHaveBeenCalledWith({
+      message: 'API URL configuration error.',
+    });
   });
 
   it('returns cached price if within TTL', async () => {
@@ -68,24 +70,33 @@ describe('/api/price/sol', () => {
     });
     await handler(req, res);
     expect(fetchWithTimeout).toHaveBeenCalledWith(
-      expect.stringContaining('/oracle-prices/So11111111111111111111111111111111111111112'),
+      expect.stringContaining(
+        '/oracle-prices/So11111111111111111111111111111111111111112'
+      ),
       expect.any(Object)
     );
     expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({ price: 123.456, timestamp: 1000000 });
+    expect(res.json).toHaveBeenCalledWith({
+      price: 123.456,
+      timestamp: 1000000,
+    });
   });
 
   it('returns 500 if API returns invalid data', async () => {
     fetchWithTimeout.mockResolvedValue({ json: async () => ({}) });
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch SOL price from CoinGecko' });
+    expect(res.json).toHaveBeenCalledWith({
+      error: 'Failed to fetch SOL price from CoinGecko',
+    });
   });
 
   it('returns 500 if fetchWithTimeout throws', async () => {
     fetchWithTimeout.mockRejectedValue(new Error('fail'));
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch SOL price from CoinGecko' });
+    expect(res.json).toHaveBeenCalledWith({
+      error: 'Failed to fetch SOL price from CoinGecko',
+    });
   });
 });

@@ -7,8 +7,12 @@ import { HistoryToggle } from '../../../components/history/HistoryToggle';
 jest.mock('../../../components/history/HistoryConfirmationModal', () => ({
   HistoryConfirmationModal: ({ onConfirm, onCancel, isEnabling }) => (
     <div data-testid="confirmation-modal" data-is-enabling={isEnabling}>
-      <button data-testid="confirm-button" onClick={onConfirm}>Confirm</button>
-      <button data-testid="cancel-button" onClick={onCancel}>Cancel</button>
+      <button data-testid="confirm-button" onClick={onConfirm}>
+        Confirm
+      </button>
+      <button data-testid="cancel-button" onClick={onCancel}>
+        Cancel
+      </button>
     </div>
   ),
 }));
@@ -31,7 +35,9 @@ describe('HistoryToggle Component', () => {
       />
     );
 
-    const checkbox = screen.getByRole('checkbox', { name: /Enable historical data storage/i });
+    const checkbox = screen.getByRole('checkbox', {
+      name: /Enable historical data storage/i,
+    });
     expect(checkbox).not.toBeChecked();
     expect(screen.getByText('Store History')).toBeInTheDocument();
   });
@@ -45,7 +51,9 @@ describe('HistoryToggle Component', () => {
       />
     );
 
-    const checkbox = screen.getByRole('checkbox', { name: /Enable historical data storage/i });
+    const checkbox = screen.getByRole('checkbox', {
+      name: /Enable historical data storage/i,
+    });
     expect(checkbox).toBeChecked();
   });
 
@@ -62,7 +70,10 @@ describe('HistoryToggle Component', () => {
     fireEvent.click(checkbox);
 
     expect(screen.getByTestId('confirmation-modal')).toBeInTheDocument();
-    expect(screen.getByTestId('confirmation-modal')).toHaveAttribute('data-is-enabling', 'true');
+    expect(screen.getByTestId('confirmation-modal')).toHaveAttribute(
+      'data-is-enabling',
+      'true'
+    );
   });
 
   it('calls onToggle with true and enables auto-refresh when confirmed enable', () => {

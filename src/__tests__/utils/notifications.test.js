@@ -25,7 +25,10 @@ document.body.contains = jest.fn(() => true); // Assume element is always in bod
 // Mock Clipboard API
 const mockWriteText = jest.fn();
 global.navigator.clipboard = { writeText: mockWriteText };
-Object.defineProperty(window, 'isSecureContext', { value: true, configurable: true });
+Object.defineProperty(window, 'isSecureContext', {
+  value: true,
+  configurable: true,
+});
 
 // Mock document.execCommand
 document.execCommand = jest.fn(() => true); // Default to successful execCommand
@@ -36,7 +39,6 @@ let consoleWarnSpy;
 
 // --- Test Suite ---
 describe('Notification Utilities', () => {
-
   beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
@@ -52,7 +54,10 @@ describe('Notification Utilities', () => {
     // Default mock implementations
     mockWriteText.mockResolvedValue(undefined); // Successful clipboard write
     document.execCommand.mockReturnValue(true);
-    Object.defineProperty(window, 'isSecureContext', { value: true, configurable: true }); // Reset secure context
+    Object.defineProperty(window, 'isSecureContext', {
+      value: true,
+      configurable: true,
+    }); // Reset secure context
 
     // Spy on console
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -66,7 +71,10 @@ describe('Notification Utilities', () => {
     // Restore real timers
     jest.useRealTimers();
     // Restore secure context if modified
-    Object.defineProperty(window, 'isSecureContext', { value: window.isSecureContext, configurable: true });
+    Object.defineProperty(window, 'isSecureContext', {
+      value: window.isSecureContext,
+      configurable: true,
+    });
   });
 
   // --- showNotification Tests ---
@@ -83,12 +91,24 @@ describe('Notification Utilities', () => {
       notifications.showNotification(message, 'success');
 
       expect(document.createElement).toHaveBeenCalledWith('div');
-      expect(mockNotificationElement.style.cssText).toContain('background: rgba(16, 185, 129, 0.95)');
-      expect(mockNotificationElement.style.cssText).toContain('position: fixed');
+      expect(mockNotificationElement.style.cssText).toContain(
+        'background: rgba(16, 185, 129, 0.95)'
+      );
+      expect(mockNotificationElement.style.cssText).toContain(
+        'position: fixed'
+      );
       expect(mockNotificationElement.textContent).toBe(message);
-      expect(mockNotificationElement.setAttribute).toHaveBeenCalledWith('role', 'alert');
-      expect(mockNotificationElement.setAttribute).toHaveBeenCalledWith('aria-live', 'polite');
-      expect(document.body.appendChild).toHaveBeenCalledWith(mockNotificationElement);
+      expect(mockNotificationElement.setAttribute).toHaveBeenCalledWith(
+        'role',
+        'alert'
+      );
+      expect(mockNotificationElement.setAttribute).toHaveBeenCalledWith(
+        'aria-live',
+        'polite'
+      );
+      expect(document.body.appendChild).toHaveBeenCalledWith(
+        mockNotificationElement
+      );
     });
 
     it('should set opacity for fade-in animation', () => {
@@ -109,30 +129,45 @@ describe('Notification Utilities', () => {
 
       // Fast-forward past fade-out duration
       jest.advanceTimersByTime(300);
-      expect(document.body.contains).toHaveBeenCalledWith(mockNotificationElement);
-      expect(document.body.removeChild).toHaveBeenCalledWith(mockNotificationElement);
+      expect(document.body.contains).toHaveBeenCalledWith(
+        mockNotificationElement
+      );
+      expect(document.body.removeChild).toHaveBeenCalledWith(
+        mockNotificationElement
+      );
     });
 
     it('should use default message if none provided', () => {
       notifications.showNotification(null);
       expect(mockNotificationElement.textContent).toBe('Notification');
-      expect(consoleWarnSpy).toHaveBeenCalledWith('[showNotification] Empty message provided');
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[showNotification] Empty message provided'
+      );
     });
 
     it('should default to success type and warn if invalid type provided', () => {
       notifications.showNotification(message, 'invalidType');
-      expect(mockNotificationElement.style.cssText).toContain('background: rgba(16, 185, 129, 0.95)'); // Success color
-      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid notification type: invalidType'));
+      expect(mockNotificationElement.style.cssText).toContain(
+        'background: rgba(16, 185, 129, 0.95)'
+      ); // Success color
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Invalid notification type: invalidType')
+      );
     });
 
     it('should handle errors during creation/appending and return null', () => {
       const error = new Error('DOM manipulation failed');
-      document.body.appendChild.mockImplementationOnce(() => { throw error; });
+      document.body.appendChild.mockImplementationOnce(() => {
+        throw error;
+      });
 
       const result = notifications.showNotification(message);
 
       expect(result).toBeNull();
-      expect(consoleErrorSpy).toHaveBeenCalledWith('[showNotification] Error showing notification:', error);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[showNotification] Error showing notification:',
+        error
+      );
     });
   });
 
@@ -154,18 +189,31 @@ describe('Notification Utilities', () => {
       expect(mockWriteText).toHaveBeenCalledWith(textToCopy);
       expect(document.execCommand).not.toHaveBeenCalled();
       expect(document.createElement).toHaveBeenCalledTimes(1);
-      expect(document.body.appendChild).toHaveBeenCalledWith(mockNotificationElement);
+      expect(document.body.appendChild).toHaveBeenCalledWith(
+        mockNotificationElement
+      );
       expect(mockNotificationElement.textContent).toBe('Copied to clipboard!');
-      expect(mockNotificationElement.style.cssText).toContain('rgba(16, 185, 129, 0.95)');
+      expect(mockNotificationElement.style.cssText).toContain(
+        'rgba(16, 185, 129, 0.95)'
+      );
     });
 
     it('should use fallback (textarea + execCommand) in non-secure context', async () => {
       Object.defineProperty(window, 'isSecureContext', { value: false });
-      const mockTextArea = { value: '', style: {}, setAttribute: jest.fn(), focus: jest.fn(), select: jest.fn(), remove: jest.fn() };
+      const mockTextArea = {
+        value: '',
+        style: {},
+        setAttribute: jest.fn(),
+        focus: jest.fn(),
+        select: jest.fn(),
+        remove: jest.fn(),
+      };
       let createCallCount = 0;
       document.createElement.mockImplementation(() => {
         createCallCount++;
-        if (createCallCount === 1) {return mockTextArea;}
+        if (createCallCount === 1) {
+          return mockTextArea;
+        }
         return mockNotificationElement;
       });
       document.execCommand.mockReturnValueOnce(true);
@@ -181,18 +229,29 @@ describe('Notification Utilities', () => {
       expect(document.execCommand).toHaveBeenCalledWith('copy');
       expect(mockTextArea.remove).toHaveBeenCalled();
       expect(document.createElement).toHaveBeenCalledTimes(2);
-      expect(document.body.appendChild).toHaveBeenCalledWith(mockNotificationElement);
+      expect(document.body.appendChild).toHaveBeenCalledWith(
+        mockNotificationElement
+      );
       expect(mockNotificationElement.textContent).toBe('Copied to clipboard!');
     });
 
     it('should use fallback if clipboard API is not available', async () => {
       global.navigator.clipboard = undefined;
       Object.defineProperty(window, 'isSecureContext', { value: true });
-      const mockTextArea = { value: '', style: {}, setAttribute: jest.fn(), focus: jest.fn(), select: jest.fn(), remove: jest.fn() };
+      const mockTextArea = {
+        value: '',
+        style: {},
+        setAttribute: jest.fn(),
+        focus: jest.fn(),
+        select: jest.fn(),
+        remove: jest.fn(),
+      };
       let createCallCount = 0;
       document.createElement.mockImplementation(() => {
         createCallCount++;
-        if (createCallCount === 1) {return mockTextArea;}
+        if (createCallCount === 1) {
+          return mockTextArea;
+        }
         return mockNotificationElement;
       });
       document.execCommand.mockReturnValueOnce(true);
@@ -202,7 +261,9 @@ describe('Notification Utilities', () => {
       expect(result).toBe(true);
       expect(document.execCommand).toHaveBeenCalledWith('copy');
       expect(document.createElement).toHaveBeenCalledTimes(2);
-      expect(document.body.appendChild).toHaveBeenCalledWith(mockNotificationElement);
+      expect(document.body.appendChild).toHaveBeenCalledWith(
+        mockNotificationElement
+      );
       expect(mockNotificationElement.textContent).toBe('Copied to clipboard!');
 
       global.navigator.clipboard = { writeText: mockWriteText };
@@ -214,11 +275,17 @@ describe('Notification Utilities', () => {
       expect(result).toBe(false);
       expect(mockWriteText).not.toHaveBeenCalled();
       expect(document.execCommand).not.toHaveBeenCalled();
-      expect(consoleWarnSpy).toHaveBeenCalledWith('[copyToClipboard] Empty text provided');
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[copyToClipboard] Empty text provided'
+      );
       expect(document.createElement).toHaveBeenCalledTimes(1);
-      expect(document.body.appendChild).toHaveBeenCalledWith(mockNotificationElement);
+      expect(document.body.appendChild).toHaveBeenCalledWith(
+        mockNotificationElement
+      );
       expect(mockNotificationElement.textContent).toBe('Nothing to copy');
-      expect(mockNotificationElement.style.cssText).toContain('rgba(239, 68, 68, 0.95)');
+      expect(mockNotificationElement.style.cssText).toContain(
+        'rgba(239, 68, 68, 0.95)'
+      );
     });
 
     it('should return false and show error notification if writeText fails', async () => {
@@ -230,20 +297,38 @@ describe('Notification Utilities', () => {
 
       expect(result).toBe(false);
       expect(mockWriteText).toHaveBeenCalledWith(textToCopy);
-      expect(consoleErrorSpy).toHaveBeenCalledWith('[copyToClipboard] Failed to copy text:', error);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[copyToClipboard] Failed to copy text:',
+        error
+      );
       expect(document.createElement).toHaveBeenCalledTimes(1);
-      expect(document.body.appendChild).toHaveBeenCalledWith(mockNotificationElement);
-      expect(mockNotificationElement.textContent).toBe('Failed to copy to clipboard');
-      expect(mockNotificationElement.style.cssText).toContain('rgba(239, 68, 68, 0.95)');
+      expect(document.body.appendChild).toHaveBeenCalledWith(
+        mockNotificationElement
+      );
+      expect(mockNotificationElement.textContent).toBe(
+        'Failed to copy to clipboard'
+      );
+      expect(mockNotificationElement.style.cssText).toContain(
+        'rgba(239, 68, 68, 0.95)'
+      );
     });
 
     it('should return false and show error notification if execCommand fails', async () => {
       Object.defineProperty(window, 'isSecureContext', { value: false });
-      const mockTextArea = { value: '', style: {}, setAttribute: jest.fn(), focus: jest.fn(), select: jest.fn(), remove: jest.fn() };
+      const mockTextArea = {
+        value: '',
+        style: {},
+        setAttribute: jest.fn(),
+        focus: jest.fn(),
+        select: jest.fn(),
+        remove: jest.fn(),
+      };
       let createCallCount = 0;
       document.createElement.mockImplementation(() => {
         createCallCount++;
-        if (createCallCount === 1) {return mockTextArea;}
+        if (createCallCount === 1) {
+          return mockTextArea;
+        }
         return mockNotificationElement;
       });
       document.execCommand.mockReturnValueOnce(false);
@@ -253,11 +338,20 @@ describe('Notification Utilities', () => {
 
       expect(result).toBe(false);
       expect(document.execCommand).toHaveBeenCalledWith('copy');
-      expect(consoleErrorSpy).toHaveBeenCalledWith('[copyToClipboard] Failed to copy text:', expectedError);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[copyToClipboard] Failed to copy text:',
+        expectedError
+      );
       expect(document.createElement).toHaveBeenCalledTimes(2);
-      expect(document.body.appendChild).toHaveBeenCalledWith(mockNotificationElement);
-      expect(mockNotificationElement.textContent).toBe('Failed to copy to clipboard');
-      expect(mockNotificationElement.style.cssText).toContain('rgba(239, 68, 68, 0.95)');
+      expect(document.body.appendChild).toHaveBeenCalledWith(
+        mockNotificationElement
+      );
+      expect(mockNotificationElement.textContent).toBe(
+        'Failed to copy to clipboard'
+      );
+      expect(mockNotificationElement.style.cssText).toContain(
+        'rgba(239, 68, 68, 0.95)'
+      );
     });
   });
 });

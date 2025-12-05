@@ -1,16 +1,25 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { DisplayCurrencyProvider, useDisplayCurrency } from '../../contexts/DisplayCurrencyContext';
+import {
+  DisplayCurrencyProvider,
+  useDisplayCurrency,
+} from '../../contexts/DisplayCurrencyContext';
 
 // Mock localStorage
 const localStorageMock = (() => {
   let store = {};
   return {
     getItem: (key) => store[key] || null,
-    setItem: (key, value) => { store[key] = value.toString(); },
-    clear: () => { store = {}; },
-    removeItem: (key) => { delete store[key]; },
+    setItem: (key, value) => {
+      store[key] = value.toString();
+    },
+    clear: () => {
+      store = {};
+    },
+    removeItem: (key) => {
+      delete store[key];
+    },
   };
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
@@ -48,10 +57,14 @@ describe('DisplayCurrencyContext', () => {
       </DisplayCurrencyProvider>
     );
     const button = screen.getByText('Toggle');
-    act(() => { button.click(); });
+    act(() => {
+      button.click();
+    });
     expect(screen.getByTestId('currency')).toHaveTextContent('TOKENS');
     expect(screen.getByTestId('showInSol')).toHaveTextContent('true');
-    act(() => { button.click(); });
+    act(() => {
+      button.click();
+    });
     expect(screen.getByTestId('currency')).toHaveTextContent('USD');
     expect(screen.getByTestId('showInSol')).toHaveTextContent('false');
   });
@@ -63,9 +76,13 @@ describe('DisplayCurrencyContext', () => {
       </DisplayCurrencyProvider>
     );
     const button = screen.getByText('Toggle');
-    act(() => { button.click(); });
+    act(() => {
+      button.click();
+    });
     expect(window.localStorage.getItem('defituna-pnl-showInSol')).toBe('true');
-    act(() => { button.click(); });
+    act(() => {
+      button.click();
+    });
     expect(window.localStorage.getItem('defituna-pnl-showInSol')).toBe('false');
   });
 

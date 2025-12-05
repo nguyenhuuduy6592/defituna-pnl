@@ -7,9 +7,9 @@ import {
 // Mock the dependencies from positionUtils
 jest.mock('../../utils/positionUtils', () => ({
   addWalletAddressToPositions: jest.fn((positions, walletAddress) =>
-    positions.map(p => ({ ...p, walletAddress }))
+    positions.map((p) => ({ ...p, walletAddress }))
   ),
-  decodePositions: jest.fn(positions => positions), // Simple pass-through mock
+  decodePositions: jest.fn((positions) => positions), // Simple pass-through mock
 }));
 
 // Mock global fetch
@@ -33,14 +33,14 @@ describe('fetchWalletPnL utility', () => {
 
   it('should fetch, process, and return data on successful API call', async () => {
     const mockRawData = {
-      t_pnl: 1234.50, // Raw decimal total PnL
+      t_pnl: 1234.5, // Raw decimal total PnL
       positions: [
         { id: 'pos1' /* other fields */ },
         { id: 'pos2' /* other fields */ },
       ],
     };
     const expectedProcessedData = {
-      totalPnL: 1234.50,
+      totalPnL: 1234.5,
       positions: [
         { id: 'pos1', walletAddress: mockWalletAddress },
         { id: 'pos2', walletAddress: mockWalletAddress },
@@ -66,7 +66,10 @@ describe('fetchWalletPnL utility', () => {
     expect(decodePositions).toHaveBeenCalledTimes(1);
     expect(decodePositions).toHaveBeenCalledWith(mockRawData.positions);
     expect(addWalletAddressToPositions).toHaveBeenCalledTimes(1);
-    expect(addWalletAddressToPositions).toHaveBeenCalledWith(mockRawData.positions, mockWalletAddress);
+    expect(addWalletAddressToPositions).toHaveBeenCalledWith(
+      mockRawData.positions,
+      mockWalletAddress
+    );
     expect(result).toEqual(expectedProcessedData);
   });
 
@@ -115,8 +118,8 @@ describe('fetchWalletPnL utility', () => {
   });
 
   it('should correctly handle data without positions field', async () => {
-    const mockRawData = { t_pnl: 50.00 }; // No positions
-    const expectedProcessedData = { totalPnL: 50.00 };
+    const mockRawData = { t_pnl: 50.0 }; // No positions
+    const expectedProcessedData = { totalPnL: 50.0 };
 
     fetch.mockResolvedValueOnce({ ok: true, json: async () => mockRawData });
     const result = await fetchWalletPnL(mockWalletAddress);

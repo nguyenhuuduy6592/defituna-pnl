@@ -14,7 +14,9 @@ global.console = {
 
 describe('App Component (_app.js)', () => {
   // Mock Component and pageProps
-  const MockComponent = () => <div data-testid="mock-page-component">Mock Page</div>;
+  const MockComponent = () => (
+    <div data-testid="mock-page-component">Mock Page</div>
+  );
   const mockPageProps = { prop1: 'test' };
 
   beforeEach(() => {
@@ -30,17 +32,23 @@ describe('App Component (_app.js)', () => {
   });
 
   it('renders the Component passed via props', () => {
-    const { getByTestId } = render(<App Component={MockComponent} pageProps={mockPageProps} />);
+    const { getByTestId } = render(
+      <App Component={MockComponent} pageProps={mockPageProps} />
+    );
     expect(getByTestId('mock-page-component')).toBeInTheDocument();
   });
-
 
   it('passes pageProps to the Component', () => {
     // We can't directly check props of MockComponent easily in the rendered output.
     // This test is more conceptual or would require a more complex setup to verify.
     // For now, we trust React's rendering process.
     // A more involved test could involve MockComponent using the props.
-    const { getByText } = render(<App Component={({ prop1 }) => <div>{prop1}</div>} pageProps={mockPageProps} />);
+    const { getByText } = render(
+      <App
+        Component={({ prop1 }) => <div>{prop1}</div>}
+        pageProps={mockPageProps}
+      />
+    );
     expect(getByText('test')).toBeInTheDocument();
   });
 
@@ -58,7 +66,9 @@ describe('App Component (_app.js)', () => {
       map.load();
     });
 
-    expect(navigator.serviceWorker.register).toHaveBeenCalledWith('/service-worker.js');
+    expect(navigator.serviceWorker.register).toHaveBeenCalledWith(
+      '/service-worker.js'
+    );
   });
 
   it('does not attempt to register service worker if not in production', () => {
@@ -74,7 +84,9 @@ describe('App Component (_app.js)', () => {
 
     // Simulate window load event
     act(() => {
-      if (map.load) {map.load();}
+      if (map.load) {
+        map.load();
+      }
     });
 
     expect(navigator.serviceWorker.register).not.toHaveBeenCalled();
@@ -82,7 +94,9 @@ describe('App Component (_app.js)', () => {
 
   it('logs an error if service worker registration fails', async () => {
     const registrationError = new Error('Registration Failed');
-    navigator.serviceWorker.register.mockImplementationOnce(() => Promise.reject(registrationError));
+    navigator.serviceWorker.register.mockImplementationOnce(() =>
+      Promise.reject(registrationError)
+    );
 
     // Fake window.addEventListener
     const map = {};
@@ -102,6 +116,9 @@ describe('App Component (_app.js)', () => {
       await Promise.resolve(); // Allow microtasks to run
     });
 
-    expect(console.error).toHaveBeenCalledWith('Service Worker registration failed:', registrationError);
+    expect(console.error).toHaveBeenCalledWith(
+      'Service Worker registration failed:',
+      registrationError
+    );
   });
 });

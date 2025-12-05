@@ -20,7 +20,12 @@ describe('TotalPnLDisplay Component', () => {
   });
 
   it('renders the provided totalValue as HTML', () => {
-    renderWithProviders(<TotalPnLDisplay label="Total PnL" totalValue="<span id='test-value'>$123.45</span>" />);
+    renderWithProviders(
+      <TotalPnLDisplay
+        label="Total PnL"
+        totalValue="<span id='test-value'>$123.45</span>"
+      />
+    );
     const valueElement = screen.getByText('$123.45');
     expect(valueElement).toBeInTheDocument();
     expect(valueElement).toHaveAttribute('id', 'test-value');

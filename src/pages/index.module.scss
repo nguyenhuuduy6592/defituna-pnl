@@ -41,7 +41,7 @@
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s ease;
-  
+
   &:hover {
     background: rgba(77, 91, 236, 0.1);
     border-color: #4d5bec;
@@ -61,19 +61,19 @@
   color: variables.text-color(primary);
   cursor: pointer;
   transition: all 0.2s ease;
-  
+
   svg {
     color: variables.color(warning);
   }
-  
+
   &:hover {
     background: variables.bg-color(light);
     border-color: variables.color(primary);
   }
-  
+
   span {
     display: none;
-    
+
     @include variables.responsive(sm) {
       display: inline;
     }

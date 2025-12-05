@@ -2,7 +2,10 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { WalletForm } from '../../../components/pnl/WalletForm';
-import { copyToClipboard, showNotification } from '../../../utils/notifications';
+import {
+  copyToClipboard,
+  showNotification,
+} from '../../../utils/notifications';
 import { isValidWalletAddress } from '../../../utils/validation';
 
 // Mock dependencies
@@ -17,14 +20,22 @@ jest.mock('../../../utils/validation', () => ({
 
 // Mock formatWalletAddress since it's used in the component
 jest.mock('../../../utils', () => ({
-  formatWalletAddress: jest.fn(address => `${address.slice(0, 6)}...${address.slice(-4)}`),
+  formatWalletAddress: jest.fn(
+    (address) => `${address.slice(0, 6)}...${address.slice(-4)}`
+  ),
 }));
 
 // Mock the sub-components
 jest.mock('../../../components/pnl/SavedWalletsDropdown', () => {
-  const MockSavedWalletsDropdown = ({ uniqueSavedWallets, activeWallets, onWalletChange, toggleWalletActive, onRemoveWallet }) => (
+  const MockSavedWalletsDropdown = ({
+    uniqueSavedWallets,
+    activeWallets,
+    onWalletChange,
+    toggleWalletActive,
+    onRemoveWallet,
+  }) => (
     <div data-testid="saved-wallets-dropdown">
-      {uniqueSavedWallets.map(wallet => (
+      {uniqueSavedWallets.map((wallet) => (
         <div key={wallet} data-testid={`saved-wallet-${wallet}`}>
           <button
             onClick={() => onWalletChange(wallet)}
@@ -52,10 +63,14 @@ jest.mock('../../../components/pnl/SavedWalletsDropdown', () => {
 });
 
 jest.mock('../../../components/pnl/ActiveWalletsDisplay', () => {
-  const MockActiveWalletsDisplay = ({ activeWallets, toggleWalletActive, handleChipKeyDown }) => (
+  const MockActiveWalletsDisplay = ({
+    activeWallets,
+    toggleWalletActive,
+    handleChipKeyDown,
+  }) =>
     activeWallets && activeWallets.length > 0 ? (
       <div data-testid="active-wallets-display">
-        {activeWallets.map(wallet => (
+        {activeWallets.map((wallet) => (
           <div key={wallet} data-testid={`active-wallet-${wallet}`}>
             <span
               data-testid={`wallet-chip-${wallet}`}
@@ -75,8 +90,7 @@ jest.mock('../../../components/pnl/ActiveWalletsDisplay', () => {
           </div>
         ))}
       </div>
-    ) : null
-  );
+    ) : null;
   return MockActiveWalletsDisplay;
 });
 
@@ -99,8 +113,10 @@ describe('WalletForm', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    isValidWalletAddress.mockImplementation(address =>
-      /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{44}$/.test(address)
+    isValidWalletAddress.mockImplementation((address) =>
+      /^[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{44}$/.test(
+        address
+      )
     );
   });
 
@@ -109,22 +125,34 @@ describe('WalletForm', () => {
 
   it('renders without crashing', () => {
     render(<WalletForm {...defaultProps} />);
-    expect(screen.getByPlaceholderText('Enter wallet address')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /fetch data/i })).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText('Enter wallet address')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /fetch data/i })
+    ).toBeInTheDocument();
     // No active wallets, so ActiveWalletsDisplay should not render anything
-    expect(screen.queryByTestId('active-wallets-display')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('active-wallets-display')
+    ).not.toBeInTheDocument();
   });
 
   it('shows submit button in different states', () => {
     // Loading state
     render(<WalletForm {...defaultProps} loading={true} />);
-    expect(screen.getByRole('button', { name: /loading/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /loading/i })
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /loading/i })).toBeDisabled();
 
     // Ready state
     render(<WalletForm {...defaultProps} />);
-    expect(screen.getByRole('button', { name: /fetch data/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /fetch data/i })).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /fetch data/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /fetch data/i })
+    ).not.toBeDisabled();
   });
 
   it('handles wallet input change', () => {
@@ -137,7 +165,9 @@ describe('WalletForm', () => {
   });
 
   it('shows dropdown when input is focused', () => {
-    render(<WalletForm {...defaultProps} savedWallets={['wallet1', 'wallet2']} />);
+    render(
+      <WalletForm {...defaultProps} savedWallets={['wallet1', 'wallet2']} />
+    );
     const input = screen.getByPlaceholderText('Enter wallet address');
 
     fireEvent.focus(input);
@@ -178,19 +208,19 @@ describe('WalletForm', () => {
       />
     );
 
-    expect(screen.queryByTestId('saved-wallets-dropdown')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('saved-wallets-dropdown')
+    ).not.toBeInTheDocument();
   });
 
   it('does not render dropdown when no savedWallets exist', () => {
     render(
-      <WalletForm
-        {...defaultProps}
-        showDropdown={true}
-        savedWallets={[]}
-      />
+      <WalletForm {...defaultProps} showDropdown={true} savedWallets={[]} />
     );
 
-    expect(screen.queryByTestId('saved-wallets-dropdown')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('saved-wallets-dropdown')
+    ).not.toBeInTheDocument();
   });
 
   it('renders ActiveWalletsDisplay when activeWallets exist', () => {
@@ -202,8 +232,12 @@ describe('WalletForm', () => {
     );
 
     expect(screen.getByTestId('active-wallets-display')).toBeInTheDocument();
-    expect(screen.getByTestId('active-wallet-activeWallet1')).toBeInTheDocument();
-    expect(screen.getByTestId('active-wallet-activeWallet2')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('active-wallet-activeWallet1')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('active-wallet-activeWallet2')
+    ).toBeInTheDocument();
   });
 
   describe('form submission', () => {
@@ -216,16 +250,16 @@ describe('WalletForm', () => {
       // Submit the form
       fireEvent.submit(form);
 
-      expect(showNotification).toHaveBeenCalledWith('Please enter or select at least one wallet address', 'error');
+      expect(showNotification).toHaveBeenCalledWith(
+        'Please enter or select at least one wallet address',
+        'error'
+      );
       expect(defaultProps.onSubmit).not.toHaveBeenCalled();
     });
 
     it('validates wallet address if provided', () => {
       const { container } = render(
-        <WalletForm
-          {...defaultProps}
-          wallet="invalid-wallet"
-        />
+        <WalletForm {...defaultProps} wallet="invalid-wallet" />
       );
 
       // Ensure validation will fail
@@ -235,16 +269,16 @@ describe('WalletForm', () => {
       fireEvent.submit(form);
 
       expect(isValidWalletAddress).toHaveBeenCalledWith('invalid-wallet');
-      expect(showNotification).toHaveBeenCalledWith('Invalid Solana wallet address format', 'error');
+      expect(showNotification).toHaveBeenCalledWith(
+        'Invalid Solana wallet address format',
+        'error'
+      );
       expect(defaultProps.onSubmit).not.toHaveBeenCalled();
     });
 
     it('adds valid wallet to activeWallets and submits', () => {
       const { container } = render(
-        <WalletForm
-          {...defaultProps}
-          wallet={validWallet}
-        />
+        <WalletForm {...defaultProps} wallet={validWallet} />
       );
 
       // Ensure validation passes
@@ -279,10 +313,7 @@ describe('WalletForm', () => {
 
     it('submits if has active wallets even with no input', () => {
       const { container } = render(
-        <WalletForm
-          {...defaultProps}
-          activeWallets={[validWallet]}
-        />
+        <WalletForm {...defaultProps} activeWallets={[validWallet]} />
       );
 
       const form = container.querySelector('form');
@@ -295,12 +326,7 @@ describe('WalletForm', () => {
 
   describe('handling keyboard accessibility', () => {
     it('copies wallet address when pressing Enter on wallet chip', () => {
-      render(
-        <WalletForm
-          {...defaultProps}
-          activeWallets={['wallet1']}
-        />
-      );
+      render(<WalletForm {...defaultProps} activeWallets={['wallet1']} />);
 
       const walletChip = screen.getByTestId('wallet-chip-wallet1');
       fireEvent.keyDown(walletChip, { key: 'Enter' });
@@ -309,12 +335,7 @@ describe('WalletForm', () => {
     });
 
     it('copies wallet address when pressing Space on wallet chip', () => {
-      render(
-        <WalletForm
-          {...defaultProps}
-          activeWallets={['wallet1']}
-        />
-      );
+      render(<WalletForm {...defaultProps} activeWallets={['wallet1']} />);
 
       const walletChip = screen.getByTestId('wallet-chip-wallet1');
       fireEvent.keyDown(walletChip, { key: ' ' });
@@ -323,12 +344,7 @@ describe('WalletForm', () => {
     });
 
     it('does not copy when pressing other keys on wallet chip', () => {
-      render(
-        <WalletForm
-          {...defaultProps}
-          activeWallets={['wallet1']}
-        />
-      );
+      render(<WalletForm {...defaultProps} activeWallets={['wallet1']} />);
 
       const walletChip = screen.getByTestId('wallet-chip-wallet1');
       fireEvent.keyDown(walletChip, { key: 'Tab' });
@@ -339,12 +355,7 @@ describe('WalletForm', () => {
 
   describe('integration with sub-components', () => {
     it('calls toggleWalletActive when remove button is clicked in ActiveWalletsDisplay', () => {
-      render(
-        <WalletForm
-          {...defaultProps}
-          activeWallets={['wallet1']}
-        />
-      );
+      render(<WalletForm {...defaultProps} activeWallets={['wallet1']} />);
 
       const removeButton = screen.getByTestId('remove-active-wallet-wallet1');
       fireEvent.click(removeButton);

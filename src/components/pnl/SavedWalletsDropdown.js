@@ -5,74 +5,79 @@ import { formatWalletAddress } from '../../utils';
 /**
  * Individual saved wallet item with selection and actions
  */
-const SavedWalletItem = memo(({
-  wallet,
-  isActive,
-  onSelect,
-  onToggleActive,
-  onRemove,
-}) => {
-  const formattedAddress = formatWalletAddress(wallet);
+const SavedWalletItem = memo(
+  ({ wallet, isActive, onSelect, onToggleActive, onRemove }) => {
+    const formattedAddress = formatWalletAddress(wallet);
 
-  // Handlers with stopPropagation to prevent dropdown from closing
-  const handleToggle = useCallback((e) => {
-    e.stopPropagation();
-    onToggleActive(wallet);
-  }, [wallet, onToggleActive]);
+    // Handlers with stopPropagation to prevent dropdown from closing
+    const handleToggle = useCallback(
+      (e) => {
+        e.stopPropagation();
+        onToggleActive(wallet);
+      },
+      [wallet, onToggleActive]
+    );
 
-  const handleRemove = useCallback((e) => {
-    e.stopPropagation();
-    onRemove(wallet);
-  }, [wallet, onRemove]);
+    const handleRemove = useCallback(
+      (e) => {
+        e.stopPropagation();
+        onRemove(wallet);
+      },
+      [wallet, onRemove]
+    );
 
-  const handleSelect = useCallback(() => {
-    onSelect(wallet);
-  }, [wallet, onSelect]);
-
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
+    const handleSelect = useCallback(() => {
       onSelect(wallet);
-    }
-  }, [wallet, onSelect]);
+    }, [wallet, onSelect]);
 
-  return (
-    <div
-      className={`${styles.dropdownItem} ${isActive ? styles.activeWallet : ''}`}
-      role="option"
-      aria-selected={isActive}
-    >
-      <span
-        onClick={handleSelect}
-        onKeyDown={handleKeyDown}
-        tabIndex={0}
-        title="Click to select this wallet"
+    const handleKeyDown = useCallback(
+      (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect(wallet);
+        }
+      },
+      [wallet, onSelect]
+    );
+
+    return (
+      <div
+        className={`${styles.dropdownItem} ${isActive ? styles.activeWallet : ''}`}
+        role="option"
+        aria-selected={isActive}
       >
-        {formattedAddress}
-      </span>
-      <div className={styles.walletActions}>
-        <button
-          type="button"
-          className={styles.checkboxButton}
-          onClick={handleToggle}
-          aria-label={isActive ? 'Deactivate wallet' : 'Activate wallet'}
-          title={isActive ? 'Deactivate this wallet' : 'Activate this wallet'}
+        <span
+          onClick={handleSelect}
+          onKeyDown={handleKeyDown}
+          tabIndex={0}
+          title="Click to select this wallet"
         >
-          {isActive ? '✓' : '◯'}
-        </button>
-        <button
-          type="button"
-          className={styles.removeButton}
-          onClick={handleRemove}
-          aria-label="Remove wallet"
-          title="Remove this wallet from saved list"
-        >
-          ✕
-        </button>
+          {formattedAddress}
+        </span>
+        <div className={styles.walletActions}>
+          <button
+            type="button"
+            className={styles.checkboxButton}
+            onClick={handleToggle}
+            aria-label={isActive ? 'Deactivate wallet' : 'Activate wallet'}
+            title={isActive ? 'Deactivate this wallet' : 'Activate this wallet'}
+          >
+            {isActive ? '✓' : '◯'}
+          </button>
+          <button
+            type="button"
+            className={styles.removeButton}
+            onClick={handleRemove}
+            aria-label="Remove wallet"
+            title="Remove this wallet from saved list"
+          >
+            ✕
+          </button>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 SavedWalletItem.displayName = 'SavedWalletItem';
 
@@ -96,17 +101,16 @@ export function SavedWalletsDropdown({
   onRemoveWallet,
   onClearWallets,
 }) {
-  const handleClearList = useCallback((e) => {
-    e.stopPropagation(); // Prevent dropdown from closing
-    onClearWallets();
-  }, [onClearWallets]);
+  const handleClearList = useCallback(
+    (e) => {
+      e.stopPropagation(); // Prevent dropdown from closing
+      onClearWallets();
+    },
+    [onClearWallets]
+  );
 
   return (
-    <div
-      className={styles.dropdown}
-      role="listbox"
-      aria-label="Saved wallets"
-    >
+    <div className={styles.dropdown} role="listbox" aria-label="Saved wallets">
       <div className={styles.savedWallets}>
         {uniqueSavedWallets.map((wallet) => (
           <SavedWalletItem

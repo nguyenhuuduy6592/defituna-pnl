@@ -1,6 +1,10 @@
 import { toPng } from 'html-to-image';
 import html2canvas from 'html2canvas';
-import { exportChartAsImage, exportCardAsImage, shareCard } from '../../utils/export';
+import {
+  exportChartAsImage,
+  exportCardAsImage,
+  shareCard,
+} from '../../utils/export';
 
 // --- Mocks ---
 jest.mock('html-to-image', () => ({
@@ -35,7 +39,8 @@ global.File = jest.fn((blob, fileName, options) => ({
 // Mock fetch for blob conversion
 global.fetch = jest.fn(() =>
   Promise.resolve({
-    blob: () => Promise.resolve(new Blob(['mock blob content'], { type: 'image/png' })),
+    blob: () =>
+      Promise.resolve(new Blob(['mock blob content'], { type: 'image/png' })),
   })
 );
 
@@ -45,7 +50,6 @@ let consoleWarnSpy;
 
 // --- Test Suite ---
 describe('Export Utilities', () => {
-
   beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
@@ -86,7 +90,10 @@ describe('Export Utilities', () => {
       const result = await exportChartAsImage(mockElement, fileName);
 
       expect(result).toBe(true);
-      expect(html2canvas).toHaveBeenCalledWith(mockElement.current, expect.objectContaining({ scale: 2 }));
+      expect(html2canvas).toHaveBeenCalledWith(
+        mockElement.current,
+        expect.objectContaining({ scale: 2 })
+      );
       expect(document.createElement).toHaveBeenCalledWith('a');
       expect(mockLink.download).toBe(fileName);
       expect(mockLink.href).toBe('mock-data-url-from-canvas');
@@ -111,7 +118,9 @@ describe('Export Utilities', () => {
       expect(result1).toBe(false);
       expect(result2).toBe(false);
       expect(html2canvas).not.toHaveBeenCalled();
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid element reference'));
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Invalid element reference')
+      );
       expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
     });
 
@@ -124,7 +133,10 @@ describe('Export Utilities', () => {
       expect(result).toBe(false);
       expect(html2canvas).toHaveBeenCalled();
       expect(mockLink.click).not.toHaveBeenCalled();
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error exporting card'), error);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Error exporting card'),
+        error
+      );
     });
   });
 
@@ -137,11 +149,14 @@ describe('Export Utilities', () => {
       const result = await exportCardAsImage(mockElement, fileName);
 
       expect(result).toBe(true);
-      expect(toPng).toHaveBeenCalledWith(mockElement.current, expect.objectContaining({
-        quality: 1.0,
-        pixelRatio: 2,
-        skipAutoScale: true,
-      }));
+      expect(toPng).toHaveBeenCalledWith(
+        mockElement.current,
+        expect.objectContaining({
+          quality: 1.0,
+          pixelRatio: 2,
+          skipAutoScale: true,
+        })
+      );
       expect(document.createElement).toHaveBeenCalledWith('a');
       expect(mockLink.download).toBe(fileName);
       expect(mockLink.href).toBe('mock-data-url-from-toPng');
@@ -166,7 +181,9 @@ describe('Export Utilities', () => {
       expect(result1).toBe(false);
       expect(result2).toBe(false);
       expect(toPng).not.toHaveBeenCalled();
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid content element reference'));
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Invalid content element reference')
+      );
       expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
     });
 
@@ -179,7 +196,10 @@ describe('Export Utilities', () => {
       expect(result).toBe(false);
       expect(toPng).toHaveBeenCalled();
       expect(mockLink.click).not.toHaveBeenCalled();
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error exporting card'), error);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Error exporting card'),
+        error
+      );
     });
   });
 
@@ -188,7 +208,9 @@ describe('Export Utilities', () => {
     const mockElement = {
       current: document.createElement('div'),
     };
-    mockElement.current.querySelector = jest.fn().mockReturnValue(mockContentElement);
+    mockElement.current.querySelector = jest
+      .fn()
+      .mockReturnValue(mockContentElement);
 
     const defaultFileName = `share-${new Date().toISOString().slice(0, 10)}.png`;
     const shareTitle = 'Test Share Title';
@@ -196,14 +218,22 @@ describe('Export Utilities', () => {
 
     it('should share successfully using navigator.share', async () => {
       const fileName = 'share.png';
-      const result = await shareCard(mockElement, fileName, shareTitle, shareText);
+      const result = await shareCard(
+        mockElement,
+        fileName,
+        shareTitle,
+        shareText
+      );
 
       expect(result).toBe(true);
-      expect(toPng).toHaveBeenCalledWith(mockContentElement, expect.objectContaining({
-        quality: 1.0,
-        pixelRatio: 2,
-        skipAutoScale: true,
-      }));
+      expect(toPng).toHaveBeenCalledWith(
+        mockContentElement,
+        expect.objectContaining({
+          quality: 1.0,
+          pixelRatio: 2,
+          skipAutoScale: true,
+        })
+      );
       expect(File).toHaveBeenCalledTimes(1);
       expect(navigator.share).toHaveBeenCalledTimes(1);
       expect(navigator.share).toHaveBeenCalledWith({
@@ -218,13 +248,20 @@ describe('Export Utilities', () => {
       const fileName = 'share-fallback.png';
       global.navigator.share = undefined; // Simulate unsupported API
 
-      const result = await shareCard(mockElement, fileName, shareTitle, shareText);
+      const result = await shareCard(
+        mockElement,
+        fileName,
+        shareTitle,
+        shareText
+      );
 
       expect(result).toBe(true);
       expect(toPng).toHaveBeenCalled();
       expect(File).toHaveBeenCalledTimes(1);
       expect(mockNavigatorShare).not.toHaveBeenCalled();
-      expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Web Share API not supported'));
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Web Share API not supported')
+      );
 
       // Check download fallback
       expect(document.createElement).toHaveBeenCalledWith('a');
@@ -243,7 +280,9 @@ describe('Export Utilities', () => {
 
       expect(result).toBe(false);
       expect(toPng).not.toHaveBeenCalled();
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Could not find content element'));
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Could not find content element')
+      );
     });
 
     it('should return false and log error if elementRef is invalid', async () => {
@@ -253,7 +292,9 @@ describe('Export Utilities', () => {
       expect(result1).toBe(false);
       expect(result2).toBe(false);
       expect(toPng).not.toHaveBeenCalled();
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid element reference'));
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Invalid element reference')
+      );
       expect(consoleErrorSpy).toHaveBeenCalledTimes(2);
     });
 
@@ -266,7 +307,10 @@ describe('Export Utilities', () => {
       expect(result).toBe(false);
       expect(toPng).toHaveBeenCalled();
       expect(navigator.share).not.toHaveBeenCalled();
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error sharing card'), error);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Error sharing card'),
+        error
+      );
     });
 
     it('should return false and log error if blob creation fails', async () => {
@@ -277,7 +321,10 @@ describe('Export Utilities', () => {
       expect(result).toBe(false);
       expect(toPng).toHaveBeenCalled();
       expect(navigator.share).not.toHaveBeenCalled();
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error sharing card'), expect.any(Error));
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Error sharing card'),
+        expect.any(Error)
+      );
     });
 
     it('should return false and log error if navigator.share rejects', async () => {
@@ -289,7 +336,10 @@ describe('Export Utilities', () => {
       expect(result).toBe(false);
       expect(toPng).toHaveBeenCalled();
       expect(navigator.share).toHaveBeenCalledTimes(1);
-      expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error sharing card'), shareError);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Error sharing card'),
+        shareError
+      );
     });
   });
 });

@@ -15,7 +15,7 @@ jest.mock('../../utils/indexedDB', () => ({
 const localStorageMock = (() => {
   let store = {};
   return {
-    getItem: jest.fn(key => store[key]),
+    getItem: jest.fn((key) => store[key]),
     setItem: jest.fn((key, value) => {
       store[key] = value;
     }),
@@ -73,7 +73,9 @@ describe('useHistoricalData Hook', () => {
   });
 
   test('should handle initialization errors', async () => {
-    indexedDB.initializeDB.mockRejectedValueOnce(new Error('DB initialization error'));
+    indexedDB.initializeDB.mockRejectedValueOnce(
+      new Error('DB initialization error')
+    );
     localStorageMock.setItem('historicalDataEnabled', 'true');
 
     const { result } = renderHook(() => useHistoricalData());
@@ -83,7 +85,9 @@ describe('useHistoricalData Hook', () => {
       jest.runAllTimers();
     });
 
-    expect(result.current.error).toBe('Failed to initialize position history database');
+    expect(result.current.error).toBe(
+      'Failed to initialize position history database'
+    );
     expect(console.error).toHaveBeenCalled();
   });
 
@@ -100,7 +104,10 @@ describe('useHistoricalData Hook', () => {
 
     expect(result.current.enabled).toBe(true);
     expect(indexedDB.initializeDB).toHaveBeenCalled();
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('historicalDataEnabled', 'true');
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(
+      'historicalDataEnabled',
+      'true'
+    );
 
     await act(async () => {
       await result.current.toggleHistoryEnabled(false);
@@ -108,7 +115,10 @@ describe('useHistoricalData Hook', () => {
     });
 
     expect(result.current.enabled).toBe(false);
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('historicalDataEnabled', 'false');
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(
+      'historicalDataEnabled',
+      'false'
+    );
   });
 
   test('should save position snapshots when enabled', async () => {
@@ -202,6 +212,8 @@ describe('useHistoricalData Hook', () => {
     });
 
     expect(console.error).toHaveBeenCalled();
-    expect(result.current.error).toBe('Failed to clean up old position history data');
+    expect(result.current.error).toBe(
+      'Failed to clean up old position history data'
+    );
   });
 });

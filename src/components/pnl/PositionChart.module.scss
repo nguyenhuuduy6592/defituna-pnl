@@ -1,4 +1,4 @@
-@use "sass:map";
+@use 'sass:map';
 @use '../../styles/variables.module.scss';
 
 .chartOverlay {
@@ -36,29 +36,29 @@
 .chartHeader {
   @include variables.flex-between;
   padding: variables.spacing(md);
-  
+
   .title {
     display: flex;
     align-items: center;
     font-size: 1.1rem;
     margin: 0;
-    
+
     .infoIcon {
       margin-left: variables.spacing(xs);
       color: variables.color(secondary);
       cursor: help;
-      
+
       &:hover {
         color: variables.color(primary);
       }
     }
   }
-  
+
   .controls {
     display: flex;
     align-items: center;
     gap: variables.spacing(xs);
-    
+
     .periodSelect {
       padding: variables.spacing(xs) variables.spacing(sm);
       border-radius: map.get(variables.$border-radius, sm);
@@ -68,8 +68,10 @@
       font-size: variables.font-size(sm);
       margin-right: variables.spacing(xs);
     }
-    
-    .exportButton, .shareButton, .closeButton {
+
+    .exportButton,
+    .shareButton,
+    .closeButton {
       display: flex;
       align-items: center;
       justify-content: center;
@@ -80,18 +82,18 @@
       padding: variables.spacing(xs);
       cursor: pointer;
       transition: all 0.2s ease;
-      
+
       &:hover {
         background: variables.color(primary);
         color: variables.bg-color(white);
         border-color: variables.color(primary);
       }
     }
-    
+
     .buttonIcon {
       font-size: 1rem;
     }
-    
+
     .closeButton {
       font-size: 1rem;
       font-weight: bold;
@@ -127,7 +129,7 @@
       color: variables.bg-color(white);
     }
 
-    input[type="checkbox"] {
+    input[type='checkbox'] {
       cursor: pointer;
       width: 16px;
       height: 16px;
@@ -199,12 +201,12 @@
   width: 1000px; // Fixed width for export
   border-radius: map.get(variables.$border-radius, md);
   overflow: hidden;
-  
+
   .chartHeader {
     padding-bottom: variables.spacing(md);
     margin-bottom: variables.spacing(md);
     border-bottom: 1px solid variables.color(border);
-    
+
     .title {
       font-size: 1.5rem;
       font-weight: 600;

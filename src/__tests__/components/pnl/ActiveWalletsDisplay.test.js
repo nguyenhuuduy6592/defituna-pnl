@@ -6,7 +6,7 @@ import { formatWalletAddress, copyToClipboard } from '../../../utils';
 
 // Mock the utility functions
 jest.mock('../../../utils', () => ({
-  formatWalletAddress: jest.fn(address => `formatted-${address}`),
+  formatWalletAddress: jest.fn((address) => `formatted-${address}`),
   copyToClipboard: jest.fn(),
 }));
 
@@ -36,10 +36,7 @@ describe('ActiveWalletsDisplay Component', () => {
 
   it('renders nothing when no wallets are provided', () => {
     const { container } = render(
-      <ActiveWalletsDisplay
-        {...defaultProps}
-        activeWallets={[]}
-      />
+      <ActiveWalletsDisplay {...defaultProps} activeWallets={[]} />
     );
 
     expect(container).toBeEmptyDOMElement();
@@ -47,19 +44,13 @@ describe('ActiveWalletsDisplay Component', () => {
 
   it('renders nothing when activeWallets is null or undefined', () => {
     const { container: container1 } = render(
-      <ActiveWalletsDisplay
-        {...defaultProps}
-        activeWallets={null}
-      />
+      <ActiveWalletsDisplay {...defaultProps} activeWallets={null} />
     );
 
     expect(container1).toBeEmptyDOMElement();
 
     const { container: container2 } = render(
-      <ActiveWalletsDisplay
-        {...defaultProps}
-        activeWallets={undefined}
-      />
+      <ActiveWalletsDisplay {...defaultProps} activeWallets={undefined} />
     );
 
     expect(container2).toBeEmptyDOMElement();
@@ -80,8 +71,12 @@ describe('ActiveWalletsDisplay Component', () => {
     expect(wallets.length).toBe(4);
 
     // Check that the formatted addresses are displayed
-    expect(screen.getByText('formatted-0x1234567890abcdef1234567890abcdef12345678')).toBeInTheDocument();
-    expect(screen.getByText('formatted-0xabcdef1234567890abcdef1234567890abcdef12')).toBeInTheDocument();
+    expect(
+      screen.getByText('formatted-0x1234567890abcdef1234567890abcdef12345678')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('formatted-0xabcdef1234567890abcdef1234567890abcdef12')
+    ).toBeInTheDocument();
 
     // Verify formatWalletAddress was called
     expect(formatWalletAddress).toHaveBeenCalledTimes(2);
@@ -95,7 +90,9 @@ describe('ActiveWalletsDisplay Component', () => {
     const removeButtons = screen.getAllByText('✕');
     fireEvent.click(removeButtons[0]);
 
-    expect(defaultProps.toggleWalletActive).toHaveBeenCalledWith(mockWallets[0]);
+    expect(defaultProps.toggleWalletActive).toHaveBeenCalledWith(
+      mockWallets[0]
+    );
   });
 
   it('copies the wallet address when clicking on the address', () => {
@@ -116,7 +113,9 @@ describe('ActiveWalletsDisplay Component', () => {
   it('calls handleChipKeyDown when a keyboard event occurs on an address', () => {
     render(<ActiveWalletsDisplay {...defaultProps} />);
 
-    const address = screen.getByText('formatted-0x1234567890abcdef1234567890abcdef12345678');
+    const address = screen.getByText(
+      'formatted-0x1234567890abcdef1234567890abcdef12345678'
+    );
     const keyDownEvent = { key: 'Enter' };
 
     fireEvent.keyDown(address, keyDownEvent);
@@ -131,15 +130,23 @@ describe('ActiveWalletsDisplay Component', () => {
     render(<ActiveWalletsDisplay {...defaultProps} />);
 
     // Check address span accessibility
-    const address = screen.getByText('formatted-0x1234567890abcdef1234567890abcdef12345678');
+    const address = screen.getByText(
+      'formatted-0x1234567890abcdef1234567890abcdef12345678'
+    );
     expect(address).toHaveAttribute('role', 'button');
     expect(address).toHaveAttribute('tabIndex', '0');
     expect(address).toHaveAttribute('title', 'Copy to clipboard');
-    expect(address).toHaveAttribute('aria-label', 'Copy wallet formatted-0x1234567890abcdef1234567890abcdef12345678');
+    expect(address).toHaveAttribute(
+      'aria-label',
+      'Copy wallet formatted-0x1234567890abcdef1234567890abcdef12345678'
+    );
 
     // Check remove button accessibility
     const removeButton = screen.getAllByText('✕')[0];
-    expect(removeButton).toHaveAttribute('aria-label', 'Deactivate wallet formatted-0x1234567890abcdef1234567890abcdef12345678');
+    expect(removeButton).toHaveAttribute(
+      'aria-label',
+      'Deactivate wallet formatted-0x1234567890abcdef1234567890abcdef12345678'
+    );
     expect(removeButton).toHaveAttribute('title', 'Deactivate this wallet');
   });
 
@@ -151,11 +158,15 @@ describe('ActiveWalletsDisplay Component', () => {
     expect(container).toHaveClass('activeWallets-mock');
 
     // Check wallet chips container class
-    const walletChipsContainer = screen.getByText('formatted-0x1234567890abcdef1234567890abcdef12345678').parentElement.parentElement;
+    const walletChipsContainer = screen.getByText(
+      'formatted-0x1234567890abcdef1234567890abcdef12345678'
+    ).parentElement.parentElement;
     expect(walletChipsContainer).toHaveClass('walletChips-mock');
 
     // Check wallet chip class
-    const walletChip = screen.getByText('formatted-0x1234567890abcdef1234567890abcdef12345678').parentElement;
+    const walletChip = screen.getByText(
+      'formatted-0x1234567890abcdef1234567890abcdef12345678'
+    ).parentElement;
     expect(walletChip).toHaveClass('walletChip-mock');
 
     // Check remove button class

@@ -11,7 +11,12 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(150, 210, 250, 0.00000000001); /* Semi-transparent blue - Reduced opacity */
+  background-color: rgba(
+    150,
+    210,
+    250,
+    0.00000000001
+  ); /* Semi-transparent blue - Reduced opacity */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -21,7 +26,9 @@
   border-radius: inherit;
   backdrop-filter: blur(1px);
   -webkit-backdrop-filter: blur(1px);
-  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  transition:
+    opacity 0.2s ease-in-out,
+    visibility 0.2s ease-in-out;
   opacity: 1;
   visibility: visible;
 }
@@ -29,4 +36,4 @@
 .loadingOverlayHidden {
   opacity: 0;
   visibility: hidden;
-} 
+}

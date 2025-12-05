@@ -30,7 +30,7 @@
   width: 100%;
   box-sizing: border-box;
   margin-bottom: variables.spacing('sm');
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px variables.color('shadow');
@@ -131,7 +131,7 @@
   .metrics {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .card {
     padding: 10px;
   }
@@ -157,4 +157,4 @@
   .metrics {
     grid-template-columns: 1fr;
   }
-} 
+}

@@ -41,22 +41,24 @@ export const CollapsibleSection = ({
 
   // Toggle expanded state
   const toggleExpanded = () => {
-    setIsExpanded(prev => !prev);
+    setIsExpanded((prev) => !prev);
   };
 
-  if (!visible) {return null;}
+  if (!visible) {
+    return null;
+  }
 
   return (
     <div className={styles.sectionContainer}>
       <div className={styles.sectionHeader} onClick={toggleExpanded}>
-        <div className={styles.sectionTitle}>
-          {title}
-        </div>
+        <div className={styles.sectionTitle}>{title}</div>
         <FiChevronDown
           className={`${styles.collapseIcon} ${isExpanded ? styles.expanded : ''}`}
         />
       </div>
-      <div className={`${styles.sectionContent} ${isExpanded ? styles.expanded : ''}`}>
+      <div
+        className={`${styles.sectionContent} ${isExpanded ? styles.expanded : ''}`}
+      >
         {children}
       </div>
     </div>

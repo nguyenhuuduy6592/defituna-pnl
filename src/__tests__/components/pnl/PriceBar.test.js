@@ -4,9 +4,8 @@ import { PriceBar } from '../../../components/pnl/PriceBar';
 
 // Mock the TooltipPortal component
 jest.mock('../../../components/common/TooltipPortal', () => ({
-  TooltipPortal: ({ children, targetRef, show }) => (
-    show ? <div data-testid="tooltip-portal">{children}</div> : null
-  ),
+  TooltipPortal: ({ children, targetRef, show }) =>
+    show ? <div data-testid="tooltip-portal">{children}</div> : null,
 }));
 
 describe('PriceBar', () => {
@@ -36,7 +35,9 @@ describe('PriceBar', () => {
   it('renders the price bar with range labels and current price indicator', () => {
     render(<PriceBar {...defaultProps} />);
 
-    const container = screen.getByLabelText('Price range bar with current price indicator');
+    const container = screen.getByLabelText(
+      'Price range bar with current price indicator'
+    );
     expect(container).toBeInTheDocument();
 
     // Check that range labels are rendered
@@ -55,7 +56,9 @@ describe('PriceBar', () => {
 
     expect(screen.queryByTestId('tooltip-portal')).not.toBeInTheDocument();
 
-    const priceBar = screen.getByLabelText('Price range bar with current price indicator');
+    const priceBar = screen.getByLabelText(
+      'Price range bar with current price indicator'
+    );
     fireEvent.mouseEnter(priceBar);
 
     const tooltip = screen.getByTestId('tooltip-portal');
@@ -74,9 +77,14 @@ describe('PriceBar', () => {
 
     expectedPrices.forEach(({ label, value }) => {
       const row = within(tooltip).getByText(label).closest('.tooltipRow');
-      expect(within(row).getByText((content, element) => {
-        return element.className === 'tooltipValue' && element.textContent === value;
-      })).toBeInTheDocument();
+      expect(
+        within(row).getByText((content, element) => {
+          return (
+            element.className === 'tooltipValue' &&
+            element.textContent === value
+          );
+        })
+      ).toBeInTheDocument();
     });
 
     fireEvent.mouseLeave(priceBar);
@@ -98,7 +106,9 @@ describe('PriceBar', () => {
 
     render(<PriceBar {...propsWithInvalidPrices} />);
 
-    const priceBar = screen.getByLabelText('Price range bar with current price indicator');
+    const priceBar = screen.getByLabelText(
+      'Price range bar with current price indicator'
+    );
     fireEvent.mouseEnter(priceBar);
 
     const tooltip = screen.getByTestId('tooltip-portal');
@@ -110,10 +120,15 @@ describe('PriceBar', () => {
 
     // Valid price points should still be in tooltip
     const validPrices = ['$50,000', '$45,000', '$60,000', '$35,000', '$65,000'];
-    validPrices.forEach(price => {
-      expect(within(tooltip).getByText((content, element) => {
-        return element.className === 'tooltipValue' && element.textContent === price;
-      })).toBeInTheDocument();
+    validPrices.forEach((price) => {
+      expect(
+        within(tooltip).getByText((content, element) => {
+          return (
+            element.className === 'tooltipValue' &&
+            element.textContent === price
+          );
+        })
+      ).toBeInTheDocument();
     });
   });
 
@@ -156,14 +171,24 @@ describe('PriceBar', () => {
     expect(labels[1].textContent).toBe('$60K');
 
     // Check tooltip formatting
-    fireEvent.mouseEnter(screen.getByLabelText('Price range bar with current price indicator'));
+    fireEvent.mouseEnter(
+      screen.getByLabelText('Price range bar with current price indicator')
+    );
     const tooltip = screen.getByTestId('tooltip-portal');
 
-    expect(within(tooltip).getByText((content, element) => {
-      return element.className === 'tooltipValue' && element.textContent === '$50K';
-    })).toBeInTheDocument();
-    expect(within(tooltip).getByText((content, element) => {
-      return element.className === 'tooltipValue' && element.textContent === '$45K';
-    })).toBeInTheDocument();
+    expect(
+      within(tooltip).getByText((content, element) => {
+        return (
+          element.className === 'tooltipValue' && element.textContent === '$50K'
+        );
+      })
+    ).toBeInTheDocument();
+    expect(
+      within(tooltip).getByText((content, element) => {
+        return (
+          element.className === 'tooltipValue' && element.textContent === '$45K'
+        );
+      })
+    ).toBeInTheDocument();
   });
 });

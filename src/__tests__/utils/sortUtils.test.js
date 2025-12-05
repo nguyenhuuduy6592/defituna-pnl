@@ -3,7 +3,7 @@ import { calculateStatus } from '../../utils/positionUtils';
 
 // Mock positionUtils
 jest.mock('../../utils/positionUtils', () => ({
-  calculateStatus: jest.fn(position => position.status || 'active'),
+  calculateStatus: jest.fn((position) => position.status || 'active'),
 }));
 
 describe('SORT_FIELD_CONFIG', () => {
@@ -100,71 +100,105 @@ describe('sortPositions', () => {
   it('handles empty or single-item arrays', () => {
     expect(sortPositions(null, 'pnl', 'asc')).toBeNull();
     expect(sortPositions([], 'pnl', 'asc')).toEqual([]);
-    expect(sortPositions([mockPositions[0]], 'pnl', 'asc')).toEqual([mockPositions[0]]);
+    expect(sortPositions([mockPositions[0]], 'pnl', 'asc')).toEqual([
+      mockPositions[0],
+    ]);
   });
 
   it('sorts by pnl correctly', () => {
     const ascResult = sortPositions(mockPositions, 'pnl', 'asc');
-    expect(ascResult.map(p => p.pnl.usd)).toEqual([100, 150, 200]);
+    expect(ascResult.map((p) => p.pnl.usd)).toEqual([100, 150, 200]);
 
     const descResult = sortPositions(mockPositions, 'pnl', 'desc');
-    expect(descResult.map(p => p.pnl.usd)).toEqual([200, 150, 100]);
+    expect(descResult.map((p) => p.pnl.usd)).toEqual([200, 150, 100]);
   });
 
   it('sorts by yield correctly', () => {
     const ascResult = sortPositions(mockPositions, 'yield', 'asc');
-    expect(ascResult.map(p => p.yield.usd)).toEqual([25, 50, 75]);
+    expect(ascResult.map((p) => p.yield.usd)).toEqual([25, 50, 75]);
 
     const descResult = sortPositions(mockPositions, 'yield', 'desc');
-    expect(descResult.map(p => p.yield.usd)).toEqual([75, 50, 25]);
+    expect(descResult.map((p) => p.yield.usd)).toEqual([75, 50, 25]);
   });
 
   it('sorts by status correctly', () => {
     const ascResult = sortPositions(mockPositions, 'status', 'asc');
-    expect(ascResult.map(p => p.status)).toEqual(['active', 'closed', 'liquidated']);
+    expect(ascResult.map((p) => p.status)).toEqual([
+      'active',
+      'closed',
+      'liquidated',
+    ]);
 
     const descResult = sortPositions(mockPositions, 'status', 'desc');
-    expect(descResult.map(p => p.status)).toEqual(['liquidated', 'closed', 'active']);
+    expect(descResult.map((p) => p.status)).toEqual([
+      'liquidated',
+      'closed',
+      'active',
+    ]);
   });
 
   it('sorts by pair correctly', () => {
     const ascResult = sortPositions(mockPositions, 'pair', 'asc');
-    expect(ascResult.map(p => p.pair)).toEqual(['BTC/USDT', 'ETH/USDT', 'SOL/USDT']);
+    expect(ascResult.map((p) => p.pair)).toEqual([
+      'BTC/USDT',
+      'ETH/USDT',
+      'SOL/USDT',
+    ]);
 
     const descResult = sortPositions(mockPositions, 'pair', 'desc');
-    expect(descResult.map(p => p.pair)).toEqual(['SOL/USDT', 'ETH/USDT', 'BTC/USDT']);
+    expect(descResult.map((p) => p.pair)).toEqual([
+      'SOL/USDT',
+      'ETH/USDT',
+      'BTC/USDT',
+    ]);
   });
 
   it('sorts by state correctly', () => {
     const ascResult = sortPositions(mockPositions, 'state', 'asc');
-    expect(ascResult.map(p => p.state)).toEqual(['closed', 'liquidated', 'open']);
+    expect(ascResult.map((p) => p.state)).toEqual([
+      'closed',
+      'liquidated',
+      'open',
+    ]);
 
     const descResult = sortPositions(mockPositions, 'state', 'desc');
-    expect(descResult.map(p => p.state)).toEqual(['open', 'liquidated', 'closed']);
+    expect(descResult.map((p) => p.state)).toEqual([
+      'open',
+      'liquidated',
+      'closed',
+    ]);
   });
 
   it('sorts by walletAddress correctly', () => {
     const ascResult = sortPositions(mockPositions, 'walletAddress', 'asc');
-    expect(ascResult.map(p => p.walletAddress)).toEqual(['0x123', '0x456', '0x789']);
+    expect(ascResult.map((p) => p.walletAddress)).toEqual([
+      '0x123',
+      '0x456',
+      '0x789',
+    ]);
 
     const descResult = sortPositions(mockPositions, 'walletAddress', 'desc');
-    expect(descResult.map(p => p.walletAddress)).toEqual(['0x789', '0x456', '0x123']);
+    expect(descResult.map((p) => p.walletAddress)).toEqual([
+      '0x789',
+      '0x456',
+      '0x123',
+    ]);
   });
 
   it('sorts by age correctly', () => {
     const ascResult = sortPositions(mockPositions, 'age', 'asc');
-    expect(ascResult.map(p => p.age)).toEqual([3, 7, null]);
+    expect(ascResult.map((p) => p.age)).toEqual([3, 7, null]);
 
     const descResult = sortPositions(mockPositions, 'age', 'desc');
-    expect(descResult.map(p => p.age)).toEqual([7, 3, null]);
+    expect(descResult.map((p) => p.age)).toEqual([7, 3, null]);
   });
 
   it('sorts by size correctly', () => {
     const ascResult = sortPositions(mockPositions, 'size', 'asc');
-    expect(ascResult.map(p => p.size)).toEqual([1000, 1500, 2000]);
+    expect(ascResult.map((p) => p.size)).toEqual([1000, 1500, 2000]);
 
     const descResult = sortPositions(mockPositions, 'size', 'desc');
-    expect(descResult.map(p => p.size)).toEqual([2000, 1500, 1000]);
+    expect(descResult.map((p) => p.size)).toEqual([2000, 1500, 1000]);
   });
 
   it('handles invalid sort fields gracefully', () => {
@@ -187,16 +221,12 @@ describe('sortPositions', () => {
   });
 
   it('handles age sorting with null values in both ascending and descending order', () => {
-    const positionsWithNullAge = [
-      { age: 1 },
-      { age: null },
-      { age: 2 },
-    ];
+    const positionsWithNullAge = [{ age: 1 }, { age: null }, { age: 2 }];
 
     const ascResult = sortPositions(positionsWithNullAge, 'age', 'asc');
-    expect(ascResult.map(p => p.age)).toEqual([1, 2, null]);
+    expect(ascResult.map((p) => p.age)).toEqual([1, 2, null]);
 
     const descResult = sortPositions(positionsWithNullAge, 'age', 'desc');
-    expect(descResult.map(p => p.age)).toEqual([2, 1, null]);
+    expect(descResult.map((p) => p.age)).toEqual([2, 1, null]);
   });
 });

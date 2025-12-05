@@ -11,14 +11,22 @@ export default async function handler(req, res) {
 
     if (!apiResponse.ok) {
       const errorBody = await apiResponse.text();
-      console.error(`Upstream API Error for ${targetUrl} (${apiResponse.status}): ${errorBody}`);
-      return res.status(apiResponse.status).json({ message: `Failed to fetch mint data: ${apiResponse.statusText}`, error: errorBody });
+      console.error(
+        `Upstream API Error for ${targetUrl} (${apiResponse.status}): ${errorBody}`
+      );
+      return res.status(apiResponse.status).json({
+        message: `Failed to fetch mint data: ${apiResponse.statusText}`,
+        error: errorBody,
+      });
     }
 
     const data = await apiResponse.json();
     return res.status(200).json(data);
   } catch (error) {
     console.error(`Network or other error for ${targetUrl}:`, error);
-    return res.status(500).json({ message: 'Error fetching mint data from upstream API.', error: error.message });
+    return res.status(500).json({
+      message: 'Error fetching mint data from upstream API.',
+      error: error.message,
+    });
   }
 }

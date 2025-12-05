@@ -20,96 +20,126 @@ import { KNOWN_TOKENS } from '../../utils/constants';
 /**
  * Table header with sort functionality
  */
-const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => {
-  // Helper function to get the appropriate sort icon
-  const getSortIcon = useCallback((field) => {
-    if (positionsCount <= 1) {return null;}
-    if (field !== sortState.field) {return '↕';}
-    return sortState.direction === 'asc' ? '↑' : '↓';
-  }, [positionsCount, sortState]);
+const TableHeader = memo(
+  ({ showWallet, positionsCount, sortState, onSort }) => {
+    // Helper function to get the appropriate sort icon
+    const getSortIcon = useCallback(
+      (field) => {
+        if (positionsCount <= 1) {
+          return null;
+        }
+        if (field !== sortState.field) {
+          return '↕';
+        }
+        return sortState.direction === 'asc' ? '↑' : '↓';
+      },
+      [positionsCount, sortState]
+    );
 
-  // Determine if header is sortable
-  const isSortable = positionsCount > 1;
+    // Determine if header is sortable
+    const isSortable = positionsCount > 1;
 
-  // Handler for header click
-  const handleHeaderClick = useCallback((field) => {
-    if (isSortable) {onSort(field);}
-  }, [isSortable, onSort]);
+    // Handler for header click
+    const handleHeaderClick = useCallback(
+      (field) => {
+        if (isSortable) {
+          onSort(field);
+        }
+      },
+      [isSortable, onSort]
+    );
 
-  return (
-    <thead>
-      <tr>
-        <th
-          className={isSortable ? styles.sortable : ''}
-          onClick={() => handleHeaderClick('pair')}
-          tabIndex={isSortable ? 0 : -1}
-          role={isSortable ? 'button' : undefined}
-          aria-sort={sortState.field === 'pair' ? sortState.direction : undefined}
-        >
-          Pair {getSortIcon('pair')}
-        </th>
-        {showWallet && (
+    return (
+      <thead>
+        <tr>
           <th
             className={isSortable ? styles.sortable : ''}
-            onClick={() => handleHeaderClick('walletAddress')}
+            onClick={() => handleHeaderClick('pair')}
             tabIndex={isSortable ? 0 : -1}
             role={isSortable ? 'button' : undefined}
-            aria-sort={sortState.field === 'walletAddress' ? sortState.direction : undefined}
+            aria-sort={
+              sortState.field === 'pair' ? sortState.direction : undefined
+            }
           >
-            Wallet {getSortIcon('walletAddress')}
+            Pair {getSortIcon('pair')}
           </th>
-        )}
-        <th
-          className={isSortable ? styles.sortable : ''}
-          onClick={() => handleHeaderClick('status')}
-          tabIndex={isSortable ? 0 : -1}
-          role={isSortable ? 'button' : undefined}
-          aria-sort={sortState.field === 'status' ? sortState.direction : undefined}
-        >
-          Status {getSortIcon('status')}
-        </th>
-        <th
-          className={isSortable ? styles.sortable : ''}
-          onClick={() => handleHeaderClick('age')}
-          tabIndex={isSortable ? 0 : -1}
-          role={isSortable ? 'button' : undefined}
-          aria-sort={sortState.field === 'age' ? sortState.direction : undefined}
-        >
-          Age {getSortIcon('age')}
-        </th>
-        <th
-          className={isSortable ? styles.sortable : ''}
-          onClick={() => handleHeaderClick('pnl')}
-          tabIndex={isSortable ? 0 : -1}
-          role={isSortable ? 'button' : undefined}
-          aria-sort={sortState.field === 'pnl' ? sortState.direction : undefined}
-        >
-          PnL {getSortIcon('pnl')}
-        </th>
-        <th
-          className={isSortable ? styles.sortable : ''}
-          onClick={() => handleHeaderClick('yield')}
-          tabIndex={isSortable ? 0 : -1}
-          role={isSortable ? 'button' : undefined}
-          aria-sort={sortState.field === 'yield' ? sortState.direction : undefined}
-        >
-          Yield (Compounded) {getSortIcon('yield')}
-        </th>
-        <th
-          className={isSortable ? styles.sortable : ''}
-          onClick={() => handleHeaderClick('size')}
-          tabIndex={isSortable ? 0 : -1}
-          role={isSortable ? 'button' : undefined}
-          aria-sort={sortState.field === 'size' ? sortState.direction : undefined}
-        >
-          Position Details {getSortIcon('size')}
-        </th>
-        <th>Price Range</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-  );
-});
+          {showWallet && (
+            <th
+              className={isSortable ? styles.sortable : ''}
+              onClick={() => handleHeaderClick('walletAddress')}
+              tabIndex={isSortable ? 0 : -1}
+              role={isSortable ? 'button' : undefined}
+              aria-sort={
+                sortState.field === 'walletAddress'
+                  ? sortState.direction
+                  : undefined
+              }
+            >
+              Wallet {getSortIcon('walletAddress')}
+            </th>
+          )}
+          <th
+            className={isSortable ? styles.sortable : ''}
+            onClick={() => handleHeaderClick('status')}
+            tabIndex={isSortable ? 0 : -1}
+            role={isSortable ? 'button' : undefined}
+            aria-sort={
+              sortState.field === 'status' ? sortState.direction : undefined
+            }
+          >
+            Status {getSortIcon('status')}
+          </th>
+          <th
+            className={isSortable ? styles.sortable : ''}
+            onClick={() => handleHeaderClick('age')}
+            tabIndex={isSortable ? 0 : -1}
+            role={isSortable ? 'button' : undefined}
+            aria-sort={
+              sortState.field === 'age' ? sortState.direction : undefined
+            }
+          >
+            Age {getSortIcon('age')}
+          </th>
+          <th
+            className={isSortable ? styles.sortable : ''}
+            onClick={() => handleHeaderClick('pnl')}
+            tabIndex={isSortable ? 0 : -1}
+            role={isSortable ? 'button' : undefined}
+            aria-sort={
+              sortState.field === 'pnl' ? sortState.direction : undefined
+            }
+          >
+            PnL {getSortIcon('pnl')}
+          </th>
+          <th
+            className={isSortable ? styles.sortable : ''}
+            onClick={() => handleHeaderClick('yield')}
+            tabIndex={isSortable ? 0 : -1}
+            role={isSortable ? 'button' : undefined}
+            aria-sort={
+              sortState.field === 'yield' ? sortState.direction : undefined
+            }
+          >
+            Yield (Compounded) {getSortIcon('yield')}
+          </th>
+          <th
+            className={isSortable ? styles.sortable : ''}
+            onClick={() => handleHeaderClick('size')}
+            tabIndex={isSortable ? 0 : -1}
+            role={isSortable ? 'button' : undefined}
+            aria-sort={
+              sortState.field === 'size' ? sortState.direction : undefined
+            }
+          >
+            Position Details {getSortIcon('size')}
+          </th>
+          <th>Price Range</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+    );
+  }
+);
 
 TableHeader.displayName = 'TableHeader';
 
@@ -125,8 +155,12 @@ const PairCell = memo(({ pair, isInverted, leverage, onPairInversion }) => {
   }, [pair, onPairInversion]);
 
   const displayPair = isInverted ? invertPairString(pair) : pair;
-  const formattedLeverage = leverage == 1 ? null :
-    <>({formatNumber(leverage)}x<span className={styles.hideOnMobile}></span>)</>;
+  const formattedLeverage =
+    leverage == 1 ? null : (
+      <>
+        ({formatNumber(leverage)}x<span className={styles.hideOnMobile}></span>)
+      </>
+    );
   const invertTooltip = `Click to ${isInverted ? 'restore' : 'invert'} token order`;
 
   return (
@@ -164,12 +198,15 @@ const WalletCell = memo(({ walletAddress }) => {
     copyToClipboard(walletAddress);
   }, [walletAddress]);
 
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      copyToClipboard(walletAddress);
-    }
-  }, [walletAddress]);
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        copyToClipboard(walletAddress);
+      }
+    },
+    [walletAddress]
+  );
 
   const formattedAddress = formatWalletAddress(walletAddress);
 
@@ -199,39 +236,41 @@ export { WalletCell };
 /**
  * Action buttons cell
  */
-const ActionsCell = memo(({ position, historyEnabled, onShare, onShowChart }) => {
-  const handleShare = useCallback(() => {
-    onShare(position);
-  }, [position, onShare]);
+const ActionsCell = memo(
+  ({ position, historyEnabled, onShare, onShowChart }) => {
+    const handleShare = useCallback(() => {
+      onShare(position);
+    }, [position, onShare]);
 
-  const handleShowChart = useCallback(() => {
-    onShowChart(position);
-  }, [position, onShowChart]);
+    const handleShowChart = useCallback(() => {
+      onShowChart(position);
+    }, [position, onShowChart]);
 
-  return (
-    <td data-label="Actions">
-      <button
-        className={styles.shareButton}
-        onClick={handleShare}
-        aria-label={`Share ${position.pair} position`}
-        title="Share position details"
-      >
-        <FiShare2 size={14} />
-        <span>Share</span>
-      </button>
-      {historyEnabled && (
+    return (
+      <td data-label="Actions">
         <button
-          className={styles.chartButton}
-          onClick={handleShowChart}
-          aria-label={`View ${position.pair} position history chart`}
-          title="View position performance chart"
+          className={styles.shareButton}
+          onClick={handleShare}
+          aria-label={`Share ${position.pair} position`}
+          title="Share position details"
         >
-          Chart
+          <FiShare2 size={14} />
+          <span>Share</span>
         </button>
-      )}
-    </td>
-  );
-});
+        {historyEnabled && (
+          <button
+            className={styles.chartButton}
+            onClick={handleShowChart}
+            aria-label={`View ${position.pair} position history chart`}
+            title="View position performance chart"
+          >
+            Chart
+          </button>
+        )}
+      </td>
+    );
+  }
+);
 
 ActionsCell.displayName = 'ActionsCell';
 
@@ -252,15 +291,12 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
       const tokenBSymbol = symbol.b;
       if (tokenASymbol === KNOWN_TOKENS.SOL.symbol) {
         numericValueForColoring = pnlData.pnl_a.amount;
-      }
-      else if (tokenBSymbol === KNOWN_TOKENS.SOL.symbol) {
+      } else if (tokenBSymbol === KNOWN_TOKENS.SOL.symbol) {
         numericValueForColoring = pnlData.pnl_b.amount;
-      }
-      else {
+      } else {
         numericValueForColoring = value == null ? 0 : value; // USD display mode
       }
-    }
-    else {
+    } else {
       numericValueForColoring = value == null ? 0 : value; // USD display mode
     }
 
@@ -268,7 +304,8 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
   }, [value, solPrice, showInSol, pnlData, symbol]);
 
   const displayedValue = useMemo(() => {
-    if (value == null) { // Handle null or undefined USD value first
+    if (value == null) {
+      // Handle null or undefined USD value first
       return showInSol ? 'N/A SOL' : 'N/A USD';
     }
 
@@ -283,7 +320,8 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
         }
       }
 
-      if (value === 0) { // Explicitly check for zero USD value
+      if (value === 0) {
+        // Explicitly check for zero USD value
         return `${formatNumber(0)} SOL`; // Or formatNumber(0, 2, true).trim()
       }
       // For non-zero USD values, solPrice is required
@@ -318,7 +356,10 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
   }, [value, size, showInSol, pnlData, symbol]);
 
   return (
-    <td className={`${styles.valueCell} ${styles[pnlClass]}`} data-label={label}>
+    <td
+      className={`${styles.valueCell} ${styles[pnlClass]}`}
+      data-label={label}
+    >
       <div className={styles.primaryValue}>
         {displayedValue}
         {percentageString && (
@@ -339,8 +380,12 @@ ValueCell.displayName = 'ValueCell';
 const PnlCell = memo(({ pnlData }) => {
   const { showInSol } = useDisplayCurrency();
   const pnlClass = showInSol ? pnlData.pnlClassInSol : pnlData.pnlClass;
-  const displayedValue = showInSol ? pnlData.displayedValueInSol : pnlData.displayedValue;
-  const percentageString = showInSol ? pnlData.percentageStringInSol : pnlData.percentageString;
+  const displayedValue = showInSol
+    ? pnlData.displayedValueInSol
+    : pnlData.displayedValue;
+  const percentageString = showInSol
+    ? pnlData.percentageStringInSol
+    : pnlData.percentageString;
 
   return (
     <td className={`${styles.valueCell} ${styles[pnlClass]}`} data-label="PnL">
@@ -363,11 +408,20 @@ PnlCell.displayName = 'PnlCell';
  */
 const YieldCell = memo(({ yieldData, compoundedData }) => {
   const { showInSol } = useDisplayCurrency();
-  const yieldClass = showInSol ? yieldData.yieldClassInSol : yieldData.yieldClass;
-  const yieldValue = showInSol ? yieldData.displayedValueInSol : yieldData.displayedValue;
-  const compoundedValue = showInSol ? compoundedData.displayedValueInSol : compoundedData.displayedValue;
+  const yieldClass = showInSol
+    ? yieldData.yieldClassInSol
+    : yieldData.yieldClass;
+  const yieldValue = showInSol
+    ? yieldData.displayedValueInSol
+    : yieldData.displayedValue;
+  const compoundedValue = showInSol
+    ? compoundedData.displayedValueInSol
+    : compoundedData.displayedValue;
   return (
-    <td className={`${styles.valueCell} ${styles[yieldClass]}`} data-label="Yield (Compounded)">
+    <td
+      className={`${styles.valueCell} ${styles[yieldClass]}`}
+      data-label="Yield (Compounded)"
+    >
       <div className={styles.primaryValue}>
         <div dangerouslySetInnerHTML={{ __html: yieldValue }} />
         <div dangerouslySetInnerHTML={{ __html: `(${compoundedValue})` }} />
@@ -392,87 +446,92 @@ YieldCell.displayName = 'YieldCell';
  * @param {Function} props.onShare Callback to share a position
  * @param {Function} props.onShowChart Callback to show position history chart
  */
-export const PositionsTable = memo(({
-  positions,
-  showWallet,
-  historyEnabled,
-  sortState,
-  onSort,
-  isInverted,
-  onPairInversion,
-  onShare,
-  onShowChart,
-}) => {
-  const { solPrice } = usePriceContext();
-  const { showInSol } = useDisplayCurrency();
+export const PositionsTable = memo(
+  ({
+    positions,
+    showWallet,
+    historyEnabled,
+    sortState,
+    onSort,
+    isInverted,
+    onPairInversion,
+    onShare,
+    onShowChart,
+  }) => {
+    const { solPrice } = usePriceContext();
+    const { showInSol } = useDisplayCurrency();
 
-  return (
-    <table
-      className={styles.positionsTable}
-      aria-label="Position details"
-    >
-      <TableHeader
-        showWallet={showWallet}
-        positionsCount={positions.length}
-        sortState={sortState}
-        onSort={onSort}
-      />
-      <tbody>
-        {positions.map((position, index) => {
-          const key = `${position.pair}-${position.positionAddress}-${index}`;
-          const isPairInverted = isInverted(position.pair);
+    return (
+      <table className={styles.positionsTable} aria-label="Position details">
+        <TableHeader
+          showWallet={showWallet}
+          positionsCount={positions.length}
+          sortState={sortState}
+          onSort={onSort}
+        />
+        <tbody>
+          {positions.map((position, index) => {
+            const key = `${position.pair}-${position.positionAddress}-${index}`;
+            const isPairInverted = isInverted(position.pair);
 
-          return (
-            <tr key={key}>
-              <PairCell
-                pair={position.pair}
-                isInverted={isPairInverted}
-                leverage={position.leverage}
-                onPairInversion={onPairInversion}
-              />
-              {showWallet && (
-                <WalletCell walletAddress={position.walletAddress} />
-              )}
-              <td data-label="Status" className={styles[getStateClass(position.displayStatus)]}>
-                {position.displayStatus}
-              </td>
-              <td data-label="Age">{formatDuration(position.age)}</td>
-              <PnlCell pnlData={position.pnlData} />
-              <YieldCell yieldData={position.yieldData} compoundedData={position.compoundedData} />
-              <td data-label="Position Details">
-                <ClusterBar
-                  size={position.size}
-                  collateral={position.collateral}
-                  debt={position.debt}
-                  interest={position.interest}
-                  formatValue={formatNumber}
-                  solPrice={solPrice}
-                  showInSol={showInSol}
-                />
-              </td>
-              <td data-label="Price Range">
-                <PriceBar
-                  currentPrice={position.currentPrice}
-                  entryPrice={position.entryPrice}
-                  liquidationPrice={position.liquidationPrice}
-                  rangePrices={position.rangePrices}
-                  limitOrderPrices={position.limitOrderPrices}
-                  formatValue={formatNumber}
+            return (
+              <tr key={key}>
+                <PairCell
+                  pair={position.pair}
                   isInverted={isPairInverted}
+                  leverage={position.leverage}
+                  onPairInversion={onPairInversion}
                 />
-              </td>
-              <ActionsCell
-                position={position}
-                historyEnabled={historyEnabled}
-                onShare={onShare}
-                onShowChart={onShowChart}
-              />
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
-});
+                {showWallet && (
+                  <WalletCell walletAddress={position.walletAddress} />
+                )}
+                <td
+                  data-label="Status"
+                  className={styles[getStateClass(position.displayStatus)]}
+                >
+                  {position.displayStatus}
+                </td>
+                <td data-label="Age">{formatDuration(position.age)}</td>
+                <PnlCell pnlData={position.pnlData} />
+                <YieldCell
+                  yieldData={position.yieldData}
+                  compoundedData={position.compoundedData}
+                />
+                <td data-label="Position Details">
+                  <ClusterBar
+                    size={position.size}
+                    collateral={position.collateral}
+                    debt={position.debt}
+                    interest={position.interest}
+                    formatValue={formatNumber}
+                    solPrice={solPrice}
+                    showInSol={showInSol}
+                  />
+                </td>
+                <td data-label="Price Range">
+                  <PriceBar
+                    currentPrice={position.currentPrice}
+                    entryPrice={position.entryPrice}
+                    liquidationPrice={position.liquidationPrice}
+                    rangePrices={position.rangePrices}
+                    limitOrderPrices={position.limitOrderPrices}
+                    formatValue={formatNumber}
+                    isInverted={isPairInverted}
+                  />
+                </td>
+                <ActionsCell
+                  position={position}
+                  historyEnabled={historyEnabled}
+                  onShare={onShare}
+                  onShowChart={onShowChart}
+                />
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  }
+);
 
 PositionsTable.displayName = 'PositionsTable';

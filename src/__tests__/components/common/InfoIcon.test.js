@@ -7,7 +7,11 @@ import EnhancedTooltip from '../../../components/common/EnhancedTooltip';
 // Mock the EnhancedTooltip component
 jest.mock('../../../components/common/EnhancedTooltip', () => {
   return jest.fn(({ children, content, position }) => (
-    <div data-testid="mocked-enhanced-tooltip" data-content={content} data-position={position}>
+    <div
+      data-testid="mocked-enhanced-tooltip"
+      data-content={content}
+      data-position={position}
+    >
       {children}
     </div>
   ));

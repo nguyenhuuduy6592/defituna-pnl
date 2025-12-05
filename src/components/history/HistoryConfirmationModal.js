@@ -7,7 +7,9 @@ import styles from './HistoryConfirmationModal.module.scss';
  */
 const NoticeSection = ({ title, children }) => (
   <div className={styles.notice}>
-    <p><strong>{title}</strong></p>
+    <p>
+      <strong>{title}</strong>
+    </p>
     {children}
   </div>
 );
@@ -18,7 +20,8 @@ const NoticeSection = ({ title, children }) => (
 const EnableContent = () => (
   <>
     <p>
-      This feature will store your position data locally in your browser to enable:
+      This feature will store your position data locally in your browser to
+      enable:
     </p>
     <ul>
       <li>Historical performance chart</li>
@@ -42,9 +45,7 @@ const EnableContent = () => (
  */
 const DisableContent = () => (
   <>
-    <p>
-      Disabling historical data storage will:
-    </p>
+    <p>Disabling historical data storage will:</p>
     <ul>
       <li>Stop collecting new position data</li>
       <li>Remove access to historical performance charts</li>
@@ -69,18 +70,32 @@ const DisableContent = () => (
  * @param {Function} props.onCancel Callback for canceling the action
  * @param {boolean} props.isEnabling Whether enabling or disabling history
  */
-export const HistoryConfirmationModal = ({ onConfirm, onCancel, isEnabling }) => {
+export const HistoryConfirmationModal = ({
+  onConfirm,
+  onCancel,
+  isEnabling,
+}) => {
   const closeButtonRef = useRef(null);
 
   // Handle Escape key press
-  const handleEscape = useCallback((e) => {
-    if (e.key === 'Escape') {onCancel();}
-  }, [onCancel]);
+  const handleEscape = useCallback(
+    (e) => {
+      if (e.key === 'Escape') {
+        onCancel();
+      }
+    },
+    [onCancel]
+  );
 
   // Handle clicks outside the modal
-  const handleOverlayClick = useCallback((e) => {
-    if (e.target === e.currentTarget) {onCancel();}
-  }, [onCancel]);
+  const handleOverlayClick = useCallback(
+    (e) => {
+      if (e.target === e.currentTarget) {
+        onCancel();
+      }
+    },
+    [onCancel]
+  );
 
   useEffect(() => {
     closeButtonRef.current?.focus();
@@ -88,8 +103,12 @@ export const HistoryConfirmationModal = ({ onConfirm, onCancel, isEnabling }) =>
     return () => document.removeEventListener('keydown', handleEscape);
   }, [handleEscape]);
 
-  const modalTitle = isEnabling ? 'Enable Historical Data Storage' : 'Disable Historical Data Storage';
-  const confirmButtonText = isEnabling ? 'Enable Historical Data' : 'Disable Historical Data';
+  const modalTitle = isEnabling
+    ? 'Enable Historical Data Storage'
+    : 'Disable Historical Data Storage';
+  const confirmButtonText = isEnabling
+    ? 'Enable Historical Data'
+    : 'Disable Historical Data';
 
   return (
     <div

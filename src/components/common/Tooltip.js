@@ -16,7 +16,9 @@ export const Tooltip = ({ children, content, position = 'bottom' }) => {
 
   // Close tooltip when clicking outside
   useEffect(() => {
-    if (!isVisible) {return;}
+    if (!isVisible) {
+      return;
+    }
 
     const handleClickOutside = (event) => {
       if (tooltipRef.current && !tooltipRef.current.contains(event.target)) {
@@ -41,8 +43,14 @@ export const Tooltip = ({ children, content, position = 'bottom' }) => {
 
   // Validate position value and map to CSS class
   const validPositions = [
-    'top', 'right', 'bottom', 'left',
-    'bottom-center', 'top-center', 'right-center', 'left-center',
+    'top',
+    'right',
+    'bottom',
+    'left',
+    'bottom-center',
+    'top-center',
+    'right-center',
+    'left-center',
   ];
   const positionClass = validPositions.includes(position) ? position : 'bottom';
 

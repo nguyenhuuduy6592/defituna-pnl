@@ -2,7 +2,6 @@
  * Utilities for handling position data and formatting.
  */
 
-
 // --- Exported Utility Functions ---
 
 /**
@@ -11,9 +10,15 @@
  * @returns {string} The CSS class name ('positive', 'negative', or 'zero')
  */
 export const getValueClass = (value) => {
-  if (value === null || value === undefined) {return 'zero';} // Treat null/undefined as zero for styling
-  if (value > 0) {return 'positive';}
-  if (value < 0) {return 'negative';}
+  if (value === null || value === undefined) {
+    return 'zero';
+  } // Treat null/undefined as zero for styling
+  if (value > 0) {
+    return 'positive';
+  }
+  if (value < 0) {
+    return 'negative';
+  }
   return 'zero';
 };
 
@@ -24,13 +29,19 @@ export const getValueClass = (value) => {
  */
 export const getStateClass = (state) => {
   switch (state) {
-  case 'In range': return 'stateInRange';
-  case 'Out of range': return 'stateWarning';
-  case 'Closed':
-  case 'Limit Closed': return 'stateClosed';
-  case 'Liquidated': return 'stateLiquidated';
-  case 'Open (Unknown Range)': return 'stateOpenUnknown'; // Add class for unknown range
-  default: return ''; // Default class if state is unknown or not relevant for styling
+    case 'In range':
+      return 'stateInRange';
+    case 'Out of range':
+      return 'stateWarning';
+    case 'Closed':
+    case 'Limit Closed':
+      return 'stateClosed';
+    case 'Liquidated':
+      return 'stateLiquidated';
+    case 'Open (Unknown Range)':
+      return 'stateOpenUnknown'; // Add class for unknown range
+    default:
+      return ''; // Default class if state is unknown or not relevant for styling
   }
 };
 
@@ -40,17 +51,22 @@ export const getStateClass = (state) => {
  * @returns {string} The display status string ('In range', 'Out of range', 'Closed', etc.).
  */
 export const calculateStatus = (position) => {
-  if (!position || !position.state) {return 'Unknown';}
+  if (!position || !position.state) {
+    return 'Unknown';
+  }
 
   // Handle non-'open' states directly
   if (position.state !== 'open') {
     switch (position.state) {
-    case 'closed': return 'Closed';
-    case 'liquidated': return 'Liquidated';
-    case 'closed_by_limit_order': return 'Limit Closed';
-    default:
-      // Capitalize the first letter of unknown states
-      return position.state.charAt(0).toUpperCase() + position.state.slice(1);
+      case 'closed':
+        return 'Closed';
+      case 'liquidated':
+        return 'Liquidated';
+      case 'closed_by_limit_order':
+        return 'Limit Closed';
+      default:
+        // Capitalize the first letter of unknown states
+        return position.state.charAt(0).toUpperCase() + position.state.slice(1);
     }
   }
 
@@ -65,8 +81,9 @@ export const calculateStatus = (position) => {
   }
 
   // Check if current price is within the range prices
-  const isInRange = position.currentPrice >= position.rangePrices.lower &&
-                    position.currentPrice <= position.rangePrices.upper;
+  const isInRange =
+    position.currentPrice >= position.rangePrices.lower &&
+    position.currentPrice <= position.rangePrices.upper;
 
   return isInRange ? 'In range' : 'Out of range';
 };
@@ -80,9 +97,11 @@ export const calculateStatus = (position) => {
  * @return {Array} - Positions with wallet address added (or empty array if input is invalid).
  */
 export const addWalletAddressToPositions = (positions, walletAddress) => {
-  if (!positions || !Array.isArray(positions)) {return [];}
+  if (!positions || !Array.isArray(positions)) {
+    return [];
+  }
 
-  return positions.map(position => ({
+  return positions.map((position) => ({
     ...position,
     walletAddress,
   }));
@@ -95,7 +114,9 @@ export const addWalletAddressToPositions = (positions, walletAddress) => {
  * @return {Object|null} Position object with descriptive keys, or null if input is invalid.
  */
 export const decodePosition = (position) => {
-  if (!position) {return null;}
+  if (!position) {
+    return null;
+  }
 
   const decoded = {
     positionAddress: position.p_addr,
@@ -162,6 +183,8 @@ export const decodePosition = (position) => {
  * @return {Array} Array of positions with decoded values and descriptive keys.
  */
 export const decodePositions = (positions) => {
-  if (!positions || !Array.isArray(positions)) {return [];}
-  return positions.map(position => decodePosition(position)).filter(Boolean); // Filter out null results from decodePosition
+  if (!positions || !Array.isArray(positions)) {
+    return [];
+  }
+  return positions.map((position) => decodePosition(position)).filter(Boolean); // Filter out null results from decodePosition
 };

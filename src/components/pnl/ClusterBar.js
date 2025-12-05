@@ -50,53 +50,57 @@ export const ClusterBar = ({
   const containerRef = useRef(null);
 
   // Internal formatting function based on currency preference
-  const formatDisplayValue = useCallback((usdValue) => {
-    if (usdValue == null) {
-      return showInSol ? 'N/A SOL' : 'N/A USD';
-    }
-    if (showInSol) {
-      if (usdValue === 0) {
-        return `${formatNumber(0)} SOL`;
+  const formatDisplayValue = useCallback(
+    (usdValue) => {
+      if (usdValue == null) {
+        return showInSol ? 'N/A SOL' : 'N/A USD';
       }
-      if (solPrice != null && solPrice > 0) {
-        const solAmount = usdValue / solPrice;
-        return `${formatNumber(solAmount)} SOL`;
+      if (showInSol) {
+        if (usdValue === 0) {
+          return `${formatNumber(0)} SOL`;
+        }
+        if (solPrice != null && solPrice > 0) {
+          const solAmount = usdValue / solPrice;
+          return `${formatNumber(solAmount)} SOL`;
+        }
+        return 'N/A SOL';
+      } else {
+        return `$${formatValue(usdValue, false)}`;
       }
-      return 'N/A SOL';
-    } else {
-      return `$${formatValue(usdValue, false)}`;
-    }
-  }, [showInSol, solPrice, formatValue]);
+    },
+    [showInSol, solPrice, formatValue]
+  );
 
   // Memoize calculations for composition percentages
-  const {
-    total,
-    collateralPercentage,
-    debtPercentage,
-    interestPercentage,
-  } = useMemo(() => {
-    const totalSize = Math.abs(size);
-    const collUsd = Math.abs(collateral?.usd ?? 0);
-    const debtUsd = Math.abs(debt?.usd ?? 0);
-    const intUsd = Math.abs(interest?.usd ?? 0);
+  const { total, collateralPercentage, debtPercentage, interestPercentage } =
+    useMemo(() => {
+      const totalSize = Math.abs(size);
+      const collUsd = Math.abs(collateral?.usd ?? 0);
+      const debtUsd = Math.abs(debt?.usd ?? 0);
+      const intUsd = Math.abs(interest?.usd ?? 0);
 
-    // Prevent division by zero
-    if (totalSize === 0) {
-      return { total: 0, collateralPercentage: 0, debtPercentage: 0, interestPercentage: 0 };
-    }
+      // Prevent division by zero
+      if (totalSize === 0) {
+        return {
+          total: 0,
+          collateralPercentage: 0,
+          debtPercentage: 0,
+          interestPercentage: 0,
+        };
+      }
 
-    // Calculate percentages
-    const collPerc = (collUsd / totalSize) * 100;
-    const debtPerc = (debtUsd / totalSize) * 100;
-    const intPerc = (intUsd / totalSize) * 100;
+      // Calculate percentages
+      const collPerc = (collUsd / totalSize) * 100;
+      const debtPerc = (debtUsd / totalSize) * 100;
+      const intPerc = (intUsd / totalSize) * 100;
 
-    return {
-      total: totalSize,
-      collateralPercentage: collPerc,
-      debtPercentage: debtPerc,
-      interestPercentage: intPerc,
-    };
-  }, [size, collateral, debt, interest]);
+      return {
+        total: totalSize,
+        collateralPercentage: collPerc,
+        debtPercentage: debtPerc,
+        interestPercentage: intPerc,
+      };
+    }, [size, collateral, debt, interest]);
 
   // Event handlers
   const handleMouseEnter = useCallback(() => {
@@ -108,33 +112,42 @@ export const ClusterBar = ({
   }, []);
 
   // Memoize segment data
-  const segments = useMemo(() => [
-    { percentage: collateralPercentage, label: 'Collateral' },
-    { percentage: debtPercentage, label: 'Debt' },
-    { percentage: interestPercentage, label: 'Interest' },
-  ], [collateralPercentage, debtPercentage, interestPercentage]);
+  const segments = useMemo(
+    () => [
+      { percentage: collateralPercentage, label: 'Collateral' },
+      { percentage: debtPercentage, label: 'Debt' },
+      { percentage: interestPercentage, label: 'Interest' },
+    ],
+    [collateralPercentage, debtPercentage, interestPercentage]
+  );
 
   // Tooltip data now just holds the USD values; formatting happens in TooltipRow
-  const tooltipData = useMemo(() => [
-    { label: 'Total Size', value: size },
-    { label: 'Collateral', value: collateral?.usd ?? 0 },
-    { label: 'Debt', value: debt?.usd ?? 0 },
-    { label: 'Interest', value: interest?.usd ?? 0 },
-  ], [size, collateral, debt, interest]);
+  const tooltipData = useMemo(
+    () => [
+      { label: 'Total Size', value: size },
+      { label: 'Collateral', value: collateral?.usd ?? 0 },
+      { label: 'Debt', value: debt?.usd ?? 0 },
+      { label: 'Interest', value: interest?.usd ?? 0 },
+    ],
+    [size, collateral, debt, interest]
+  );
 
   // Tooltip content now passes formatDisplayValue to TooltipRow
-  const tooltipContent = useMemo(() => (
-    <div className={styles.tooltipContent}>
-      {tooltipData.map((item, index) => (
-        <TooltipRow
-          key={index}
-          label={item.label}
-          value={item.value}
-          formatDisplayValue={formatDisplayValue}
-        />
-      ))}
-    </div>
-  ), [tooltipData, formatDisplayValue]);
+  const tooltipContent = useMemo(
+    () => (
+      <div className={styles.tooltipContent}>
+        {tooltipData.map((item, index) => (
+          <TooltipRow
+            key={index}
+            label={item.label}
+            value={item.value}
+            formatDisplayValue={formatDisplayValue}
+          />
+        ))}
+      </div>
+    ),
+    [tooltipData, formatDisplayValue]
+  );
 
   return (
     <div
@@ -156,7 +169,10 @@ export const ClusterBar = ({
           />
         ))}
       </div>
-      <div className={styles.totalValue} aria-label={`Total: ${formatDisplayValue(size)}`}>
+      <div
+        className={styles.totalValue}
+        aria-label={`Total: ${formatDisplayValue(size)}`}
+      >
         {formatDisplayValue(size)}
       </div>
       {showTooltip && containerRef.current && (

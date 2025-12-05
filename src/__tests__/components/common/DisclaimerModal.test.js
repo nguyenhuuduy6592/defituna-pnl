@@ -26,7 +26,9 @@ describe('DisclaimerModal Component', () => {
   beforeEach(() => {
     mockOnClose.mockClear();
     // Mock focus method for ref
-    jest.spyOn(HTMLButtonElement.prototype, 'focus').mockImplementation(() => {});
+    jest
+      .spyOn(HTMLButtonElement.prototype, 'focus')
+      .mockImplementation(() => {});
     // Mock document event listeners
     jest.spyOn(document, 'addEventListener').mockImplementation(() => {});
     jest.spyOn(document, 'removeEventListener').mockImplementation(() => {});
@@ -87,7 +89,9 @@ describe('DisclaimerModal Component', () => {
   it('does not call onClose when clicking the modal content', () => {
     render(<DisclaimerModal isOpen={true} onClose={mockOnClose} />);
 
-    const modalContent = screen.getByText('Project Disclaimer').closest('.modal');
+    const modalContent = screen
+      .getByText('Project Disclaimer')
+      .closest('.modal');
     fireEvent.click(modalContent);
 
     expect(mockOnClose).not.toHaveBeenCalled();
@@ -97,11 +101,14 @@ describe('DisclaimerModal Component', () => {
     render(<DisclaimerModal isOpen={true} onClose={mockOnClose} />);
 
     // Verify that event listener was added
-    expect(document.addEventListener).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(document.addEventListener).toHaveBeenCalledWith(
+      'keydown',
+      expect.any(Function)
+    );
 
     // Get the event handler
     const keydownHandler = document.addEventListener.mock.calls.find(
-      call => call[0] === 'keydown'
+      (call) => call[0] === 'keydown'
     )[1];
 
     // Simulate Escape key press
@@ -118,13 +125,21 @@ describe('DisclaimerModal Component', () => {
   });
 
   it('removes keydown event listener when the modal closes', () => {
-    const { rerender } = render(<DisclaimerModal isOpen={true} onClose={mockOnClose} />);
+    const { rerender } = render(
+      <DisclaimerModal isOpen={true} onClose={mockOnClose} />
+    );
 
-    expect(document.addEventListener).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(document.addEventListener).toHaveBeenCalledWith(
+      'keydown',
+      expect.any(Function)
+    );
 
     rerender(<DisclaimerModal isOpen={false} onClose={mockOnClose} />);
 
-    expect(document.removeEventListener).toHaveBeenCalledWith('keydown', expect.any(Function));
+    expect(document.removeEventListener).toHaveBeenCalledWith(
+      'keydown',
+      expect.any(Function)
+    );
   });
 
   it('sets proper accessibility attributes', () => {
@@ -147,9 +162,15 @@ describe('DisclaimerModal Component', () => {
     render(<DisclaimerModal isOpen={true} onClose={mockOnClose} />);
 
     // Check that sections exist
-    const developmentSection = screen.getByText('Development Status').closest('.section');
-    const dataPrivacySection = screen.getByText('Data & Privacy').closest('.section');
-    const contactSection = screen.getByText('Contact & Support').closest('.section');
+    const developmentSection = screen
+      .getByText('Development Status')
+      .closest('.section');
+    const dataPrivacySection = screen
+      .getByText('Data & Privacy')
+      .closest('.section');
+    const contactSection = screen
+      .getByText('Contact & Support')
+      .closest('.section');
 
     expect(developmentSection).toBeInTheDocument();
     expect(dataPrivacySection).toBeInTheDocument();
@@ -157,7 +178,9 @@ describe('DisclaimerModal Component', () => {
 
     // Check content in sections
     expect(screen.getByText(/This is a personal project/)).toBeInTheDocument();
-    expect(screen.getByText(/I do not collect any user data/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/I do not collect any user data/)
+    ).toBeInTheDocument();
     expect(screen.getByText(/@DuyNguyenM2E/)).toBeInTheDocument();
   });
 });

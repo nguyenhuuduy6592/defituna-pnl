@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from 'react';
 
 const DisplayCurrencyContext = createContext();
 
@@ -39,7 +45,7 @@ export function DisplayCurrencyProvider({ children }) {
   }, [showInSol]);
 
   const toggleCurrency = useCallback(() => {
-    setShowInSol(prevShowInSol => !prevShowInSol);
+    setShowInSol((prevShowInSol) => !prevShowInSol);
   }, []);
 
   const value = {
@@ -59,7 +65,9 @@ export function DisplayCurrencyProvider({ children }) {
 export function useDisplayCurrency() {
   const context = useContext(DisplayCurrencyContext);
   if (!context) {
-    throw new Error('useDisplayCurrency must be used within a DisplayCurrencyProvider');
+    throw new Error(
+      'useDisplayCurrency must be used within a DisplayCurrencyProvider'
+    );
   }
   return context;
 }

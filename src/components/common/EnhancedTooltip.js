@@ -30,7 +30,9 @@ const EnhancedTooltip = ({
 
   // Close tooltip when clicking outside
   useEffect(() => {
-    if (!isVisible) {return;}
+    if (!isVisible) {
+      return;
+    }
 
     const handleClickOutside = (event) => {
       if (
@@ -54,7 +56,9 @@ const EnhancedTooltip = ({
 
   // Handle escape key to close tooltip
   useEffect(() => {
-    if (!isVisible) {return;}
+    if (!isVisible) {
+      return;
+    }
 
     const handleEscKey = (event) => {
       if (event.key === 'Escape') {
@@ -71,7 +75,9 @@ const EnhancedTooltip = ({
 
   // Position the tooltip
   useEffect(() => {
-    if (!isVisible || !triggerRef.current || !tooltipRef.current) {return;}
+    if (!isVisible || !triggerRef.current || !tooltipRef.current) {
+      return;
+    }
 
     const updatePosition = () => {
       const triggerRect = triggerRef.current.getBoundingClientRect();
@@ -86,47 +92,56 @@ const EnhancedTooltip = ({
       let arrowLeft, arrowTop;
 
       switch (position) {
-      case 'bottom':
-        top = triggerRect.bottom + margin;
-        left = triggerRect.left + (triggerRect.width / 2) - (tooltipRect.width / 2);
-        arrowLeft = '50%'; // Center the arrow
-        arrowTop = '0';
-        break;
-      case 'top':
-        top = triggerRect.top - tooltipRect.height - margin;
-        left = triggerRect.left + (triggerRect.width / 2) - (tooltipRect.width / 2);
-        arrowLeft = '50%';
-        arrowTop = 'auto';
-        break;
-      case 'left':
-        top = triggerRect.top + (triggerRect.height / 2) - (tooltipRect.height / 2);
-        left = triggerRect.left - tooltipRect.width - margin;
-        arrowLeft = 'auto';
-        arrowTop = '50%';
-        break;
-      case 'right':
-        top = triggerRect.top + (triggerRect.height / 2) - (tooltipRect.height / 2);
-        left = triggerRect.right + margin;
-        arrowLeft = '0';
-        arrowTop = '50%';
-        break;
-      default:
-        top = triggerRect.bottom + margin;
-        left = triggerRect.left + (triggerRect.width / 2) - (tooltipRect.width / 2);
-        arrowLeft = '50%';
-        arrowTop = '0';
+        case 'bottom':
+          top = triggerRect.bottom + margin;
+          left =
+            triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
+          arrowLeft = '50%'; // Center the arrow
+          arrowTop = '0';
+          break;
+        case 'top':
+          top = triggerRect.top - tooltipRect.height - margin;
+          left =
+            triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
+          arrowLeft = '50%';
+          arrowTop = 'auto';
+          break;
+        case 'left':
+          top =
+            triggerRect.top + triggerRect.height / 2 - tooltipRect.height / 2;
+          left = triggerRect.left - tooltipRect.width - margin;
+          arrowLeft = 'auto';
+          arrowTop = '50%';
+          break;
+        case 'right':
+          top =
+            triggerRect.top + triggerRect.height / 2 - tooltipRect.height / 2;
+          left = triggerRect.right + margin;
+          arrowLeft = '0';
+          arrowTop = '50%';
+          break;
+        default:
+          top = triggerRect.bottom + margin;
+          left =
+            triggerRect.left + triggerRect.width / 2 - tooltipRect.width / 2;
+          arrowLeft = '50%';
+          arrowTop = '0';
       }
 
       // Original left position before viewport adjustments
       const initialLeft = left;
 
       // Ensure tooltip stays within viewport
-      if (left < 10) {left = 10;}
+      if (left < 10) {
+        left = 10;
+      }
       if (left + tooltipRect.width > viewportWidth - 10) {
         left = viewportWidth - tooltipRect.width - 10;
       }
 
-      if (top < 10) {top = 10;}
+      if (top < 10) {
+        top = 10;
+      }
       if (top + tooltipRect.height > viewportHeight - 10) {
         top = viewportHeight - tooltipRect.height - 10;
       }
@@ -135,11 +150,14 @@ const EnhancedTooltip = ({
       if (position === 'top' || position === 'bottom') {
         // Calculate arrow percentage position if tooltip was shifted
         if (initialLeft !== left) {
-          const arrowLeftPx = triggerRect.left + (triggerRect.width / 2) - left;
+          const arrowLeftPx = triggerRect.left + triggerRect.width / 2 - left;
           // Convert to percentage of tooltip width
           const arrowLeftPercent = (arrowLeftPx / tooltipRect.width) * 100;
           // Clamp to keep arrow within tooltip (with 10px padding)
-          const clampedArrowPercent = Math.max(10, Math.min(90, arrowLeftPercent));
+          const clampedArrowPercent = Math.max(
+            10,
+            Math.min(90, arrowLeftPercent)
+          );
           arrowLeft = `${clampedArrowPercent}%`;
         }
       }
@@ -186,7 +204,9 @@ const EnhancedTooltip = ({
   };
 
   const handleMouseEnter = () => {
-    if (disableHover) {return;}
+    if (disableHover) {
+      return;
+    }
 
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
@@ -195,7 +215,9 @@ const EnhancedTooltip = ({
   };
 
   const handleMouseLeave = () => {
-    if (disableHover) {return;}
+    if (disableHover) {
+      return;
+    }
 
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
@@ -211,7 +233,8 @@ const EnhancedTooltip = ({
   };
 
   // Format tooltip content if it's a string
-  const formattedContent = typeof content === 'string' ? formatTooltipContent(content) : content;
+  const formattedContent =
+    typeof content === 'string' ? formatTooltipContent(content) : content;
 
   // Create tooltip portal element
   const tooltipElement = (
@@ -224,14 +247,8 @@ const EnhancedTooltip = ({
       onMouseEnter={interactive ? handleMouseEnter : undefined}
       onMouseLeave={interactive ? handleMouseLeave : undefined}
     >
-      <div
-        className={styles.tooltipArrow}
-        style={arrowStyle}
-        ref={arrowRef}
-      />
-      <div className={styles.tooltipContent}>
-        {formattedContent}
-      </div>
+      <div className={styles.tooltipArrow} style={arrowStyle} ref={arrowRef} />
+      <div className={styles.tooltipContent}>{formattedContent}</div>
     </div>
   );
 
@@ -251,7 +268,8 @@ const EnhancedTooltip = ({
       >
         {children}
       </div>
-      {isVisible && typeof document !== 'undefined' &&
+      {isVisible &&
+        typeof document !== 'undefined' &&
         createPortal(tooltipElement, document.body)}
     </div>
   );
@@ -259,7 +277,9 @@ const EnhancedTooltip = ({
 
 // Helper function to format string content
 function formatTooltipContent(content) {
-  if (typeof content !== 'string') {return content;}
+  if (typeof content !== 'string') {
+    return content;
+  }
 
   // Split by double newlines to find sections
   const sections = content.split(/\n\n+/);
@@ -274,7 +294,7 @@ function formatTooltipContent(content) {
         const isHeaderSection = sectionIndex === 0 && section.includes('\n');
 
         // Handle bullet points by splitting on newlines
-        const lines = section.split('\n').filter(line => line.trim());
+        const lines = section.split('\n').filter((line) => line.trim());
 
         if (isTitle) {
           return (
@@ -286,7 +306,14 @@ function formatTooltipContent(content) {
           return (
             <div key={sectionIndex} className={styles.tooltipHeader}>
               {lines.map((line, i) => (
-                <div key={i} className={i === 0 ? styles.tooltipHeaderTitle : styles.tooltipHeaderDescription}>
+                <div
+                  key={i}
+                  className={
+                    i === 0
+                      ? styles.tooltipHeaderTitle
+                      : styles.tooltipHeaderDescription
+                  }
+                >
                   {line}
                 </div>
               ))}
@@ -294,21 +321,18 @@ function formatTooltipContent(content) {
           );
         } else {
           // Check if section has a heading (first line not starting with bullet)
-          const hasHeading = lines.length > 0 && !lines[0].trim().startsWith('•');
+          const hasHeading =
+            lines.length > 0 && !lines[0].trim().startsWith('•');
 
           return (
             <div key={sectionIndex} className={styles.tooltipSection}>
               {hasHeading && (
-                <div className={styles.tooltipSectionTitle}>
-                  {lines[0]}
-                </div>
+                <div className={styles.tooltipSectionTitle}>{lines[0]}</div>
               )}
 
               <ul className={styles.tooltipList}>
                 {lines.slice(hasHeading ? 1 : 0).map((line, i) => (
-                  <li key={i}>
-                    {line.replace(/^•\s*/, '')}
-                  </li>
+                  <li key={i}>{line.replace(/^•\s*/, '')}</li>
                 ))}
               </ul>
             </div>

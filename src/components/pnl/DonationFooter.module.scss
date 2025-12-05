@@ -1,34 +1,34 @@
-@use "sass:map";
+@use 'sass:map';
 @use '../../styles/variables.module.scss' as variables;
 
 .donationFooter {
-    margin-top: variables.spacing(lg);
-    padding: variables.spacing(md);
-    background: variables.bg-color(card);
-    border-radius: border-radius(md);
-    text-align: center;
-    width: 100%;
-    box-sizing: border-box;
-  
-    .title {
-      font-size: variables.font-size(lg);
-      font-weight: font-weight(bold);
-      margin-bottom: variables.spacing(sm);
-    }
-  
-    .address {
-      font-family: monospace;
-      font-size: variables.font-size(sm);
-      padding: variables.spacing(sm);
-      background: variables.bg-color(light);
-      border-radius: border-radius(sm);
-      cursor: pointer;
-      margin: variables.spacing(sm) 0;
-      word-break: break-all;
-    }
-  
-    .description {
-      font-size: variables.font-size(sm);
-      color: variables.text-color(secondary);
-    }
+  margin-top: variables.spacing(lg);
+  padding: variables.spacing(md);
+  background: variables.bg-color(card);
+  border-radius: border-radius(md);
+  text-align: center;
+  width: 100%;
+  box-sizing: border-box;
+
+  .title {
+    font-size: variables.font-size(lg);
+    font-weight: font-weight(bold);
+    margin-bottom: variables.spacing(sm);
   }
+
+  .address {
+    font-family: monospace;
+    font-size: variables.font-size(sm);
+    padding: variables.spacing(sm);
+    background: variables.bg-color(light);
+    border-radius: border-radius(sm);
+    cursor: pointer;
+    margin: variables.spacing(sm) 0;
+    word-break: break-all;
+  }
+
+  .description {
+    font-size: variables.font-size(sm);
+    color: variables.text-color(secondary);
+  }
+}

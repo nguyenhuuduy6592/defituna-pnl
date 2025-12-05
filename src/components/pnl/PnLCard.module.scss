@@ -21,14 +21,14 @@
   max-width: 500px;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 
+  box-shadow:
     0 20px 40px rgba(0, 0, 0, 0.4),
     0 0 0 1px rgba(255, 255, 255, 0.1);
   color: white;
   position: relative;
   animation: slideUp 0.4s ease-out;
   margin: variables.spacing(sm) 0;
-  
+
   @media (max-width: 480px) {
     padding: variables.spacing(xs);
     margin: variables.spacing(xs);
@@ -38,15 +38,15 @@
 }
 
 .cardContent {
-  background: linear-gradient(180deg, #243145 0%, #1E293B 100%);
+  background: linear-gradient(180deg, #243145 0%, #1e293b 100%);
   padding: variables.spacing(sm);
-  box-shadow: 
+  box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.2),
     inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   display: flex;
   flex-direction: column;
   gap: variables.spacing(xs);
-  
+
   @media (max-width: 480px) {
     padding: variables.spacing(xs);
   }
@@ -70,7 +70,7 @@
   align-items: center;
   gap: 2px;
   margin-bottom: variables.spacing(xs);
-  
+
   .titleWrapper {
     display: flex;
     align-items: center;
@@ -110,7 +110,7 @@
 
   &:hover {
     background: rgba(255, 255, 255, 0.2);
-    
+
     svg {
       color: white;
     }
@@ -129,7 +129,7 @@
   flex-direction: column;
   padding: 6px 10px;
   border-radius: 8px;
-  background: #0F172A;
+  background: #0f172a;
 
   .value {
     font-size: 1.8rem;
@@ -143,7 +143,7 @@
       font-size: 1.5rem;
       opacity: 0.8;
     }
-    
+
     .percentage {
       font-size: 0.8rem;
       font-weight: 500;
@@ -153,15 +153,15 @@
   }
 
   &.positive .value {
-    color: #10B981;
+    color: #10b981;
   }
 
   &.negative .value {
-    color: #EF4444;
+    color: #ef4444;
   }
 
   &.zero .value {
-    color: #60A5FA;
+    color: #60a5fa;
   }
 }
 
@@ -185,7 +185,7 @@
     font-weight: 400;
     white-space: nowrap;
     flex-shrink: 0;
-    
+
     .icon {
       font-size: 0.9em;
       opacity: 0.7;
@@ -204,23 +204,23 @@
     text-overflow: ellipsis;
 
     span.positive {
-      color: #10B981;
+      color: #10b981;
     }
 
     span.negative {
-      color: #EF4444;
+      color: #ef4444;
     }
 
     &.positive {
-      color: #10B981;
+      color: #10b981;
     }
 
     &.negative {
-      color: #EF4444;
+      color: #ef4444;
     }
 
     &.zero {
-      color: #60A5FA;
+      color: #60a5fa;
     }
   }
 }
@@ -270,7 +270,7 @@
   border-radius: 6px;
   width: max-content;
   font-size: 0.75rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .stateInRange {
@@ -336,7 +336,7 @@
   grid-template-columns: 1fr 1fr;
   gap: variables.spacing(xs);
   width: 100%;
-  
+
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
   }

@@ -1,4 +1,4 @@
-@use "sass:map";
+@use 'sass:map';
 @use '../../styles/variables.module.scss';
 
 .positionsTable {
@@ -9,18 +9,19 @@
   background: variables.bg-color(white);
   box-shadow: 0 1px 3px variables.color(shadow);
   font-size: variables.font-size(sm);
-  
+
   @include variables.responsive(md) {
     font-size: variables.font-size(base);
   }
-  
-  th, td {
+
+  th,
+  td {
     border: 1px solid variables.color(border);
     padding: variables.spacing(sm);
     text-align: left;
     white-space: nowrap;
   }
-  
+
   th {
     background: variables.bg-color(light);
     font-weight: 700;
@@ -28,11 +29,11 @@
     position: sticky;
     top: 0;
     z-index: 1;
-    
+
     &.sortable {
       cursor: pointer;
       user-select: none;
-      
+
       &:hover {
         background-color: variables.bg-color(hover);
       }
@@ -46,23 +47,29 @@
 
     td {
       color: variables.text-color(primary);
-  
-      &.positive { color: variables.color(positive); }
-      &.negative { color: variables.color(negative); }
-      &.zero { color: variables.text-color(secondary); }
+
+      &.positive {
+        color: variables.color(positive);
+      }
+      &.negative {
+        color: variables.color(negative);
+      }
+      &.zero {
+        color: variables.text-color(secondary);
+      }
 
       .positionLabel {
         font-weight: 700;
         cursor: pointer;
         transition: color 0.2s ease;
-        
+
         &:hover {
           color: variables.color(primary);
         }
-        
+
         &.invertedPair {
           color: variables.color(primary);
-          
+
           .invertedIndicator {
             display: inline-block;
             margin-left: variables.spacing(xs);
@@ -73,7 +80,8 @@
         }
       }
 
-      .positionLeverage, .positionPnlPercentage {
+      .positionLeverage,
+      .positionPnlPercentage {
         font-size: variables.font-size(xs);
       }
 
@@ -104,7 +112,8 @@
     width: 100%;
     overflow-x: auto;
     font-size: variables.font-size(xs);
-    th, td {
+    th,
+    td {
       white-space: nowrap;
       padding: variables.spacing(xs) variables.spacing(sm);
     }
@@ -175,7 +184,8 @@
         background: variables.color(warning) !important;
         color: variables.bg-color(white) !important;
       }
-      &.stateClosed, .stateLiquidated {
+      &.stateClosed,
+      .stateLiquidated {
         background: variables.color(negative) !important;
         color: variables.bg-color(white) !important;
       }
@@ -209,7 +219,8 @@
         box-shadow: none;
       }
     }
-    .shareButton, .chartButton {
+    .shareButton,
+    .chartButton {
       font-size: variables.font-size(base);
       width: 100%;
       justify-content: center;
@@ -230,7 +241,9 @@
   cursor: pointer;
   padding: variables.spacing(xs);
   border-radius: map.get(variables.$border-radius, sm);
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     background: variables.bg-color(light);
@@ -249,13 +262,12 @@
 .copyIcon {
   color: variables.text-color(secondary);
   transition: color 0.2s ease;
-  
+
   .walletCellContent:hover &,
   .walletCellContent:focus & {
     color: variables.color(primary);
   }
 }
-
 
 // State classes (shared)
 %state-cell {
@@ -306,7 +318,8 @@
   background: rgba(variables.color(primary), 0.1);
 }
 
-.shareButton, .chartButton {
+.shareButton,
+.chartButton {
   padding: variables.spacing(xs) variables.spacing(sm);
   border-radius: map.get(variables.$border-radius, sm);
   cursor: pointer;

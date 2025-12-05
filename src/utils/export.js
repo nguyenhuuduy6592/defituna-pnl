@@ -44,7 +44,10 @@ export const exportChartAsImage = async (elementRef, fileName) => {
 
     if (!fileName) {
       fileName = `export-${new Date().toISOString().slice(0, 10)}.png`;
-      console.warn('[exportCardAsImage] No file name provided, using default:', fileName);
+      console.warn(
+        '[exportCardAsImage] No file name provided, using default:',
+        fileName
+      );
     }
 
     const canvas = await html2canvas(elementRef.current, {
@@ -78,7 +81,10 @@ export const exportCardAsImage = async (contentRef, fileName) => {
 
     if (!fileName) {
       fileName = `export-${new Date().toISOString().slice(0, 10)}.png`;
-      console.warn('[exportCardAsImage] No file name provided, using default:', fileName);
+      console.warn(
+        '[exportCardAsImage] No file name provided, using default:',
+        fileName
+      );
     }
 
     const dataUrl = await generateImage(contentRef.current);
@@ -113,13 +119,20 @@ export const shareCard = async (elementRef, fileName, title, text) => {
 
     if (!fileName) {
       fileName = `share-${new Date().toISOString().slice(0, 10)}.png`;
-      console.warn('[shareCard] No file name provided, using default:', fileName);
+      console.warn(
+        '[shareCard] No file name provided, using default:',
+        fileName
+      );
     }
 
     // Find the content element that has the data-export-content attribute
-    const contentElement = elementRef.current.querySelector('[data-export-content]');
+    const contentElement = elementRef.current.querySelector(
+      '[data-export-content]'
+    );
     if (!contentElement) {
-      console.error('[shareCard] Could not find content element with data-export-content attribute');
+      console.error(
+        '[shareCard] Could not find content element with data-export-content attribute'
+      );
       return false;
     }
 

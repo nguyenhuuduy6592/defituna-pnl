@@ -12,14 +12,10 @@ describe('getFirstTransactionTimestamp', () => {
   });
 
   it('returns the oldest blockTime from transactions', async () => {
-    (global.fetch).mockResolvedValue({
+    global.fetch.mockResolvedValue({
       ok: true,
       json: async () => ({
-        result: [
-          { blockTime: 2000 },
-          { blockTime: 1000 },
-          { blockTime: 3000 },
-        ],
+        result: [{ blockTime: 2000 }, { blockTime: 1000 }, { blockTime: 3000 }],
       }),
     });
     const ts = await getFirstTransactionTimestamp(address);
@@ -27,7 +23,7 @@ describe('getFirstTransactionTimestamp', () => {
   });
 
   it('returns null if no transactions', async () => {
-    (global.fetch).mockResolvedValue({
+    global.fetch.mockResolvedValue({
       ok: true,
       json: async () => ({ result: [] }),
     });
@@ -36,14 +32,10 @@ describe('getFirstTransactionTimestamp', () => {
   });
 
   it('ignores transactions with missing blockTime', async () => {
-    (global.fetch).mockResolvedValue({
+    global.fetch.mockResolvedValue({
       ok: true,
       json: async () => ({
-        result: [
-          { blockTime: null },
-          { },
-          { blockTime: 1234 },
-        ],
+        result: [{ blockTime: null }, {}, { blockTime: 1234 }],
       }),
     });
     const ts = await getFirstTransactionTimestamp(address);
@@ -51,13 +43,10 @@ describe('getFirstTransactionTimestamp', () => {
   });
 
   it('returns null if all blockTimes are missing', async () => {
-    (global.fetch).mockResolvedValue({
+    global.fetch.mockResolvedValue({
       ok: true,
       json: async () => ({
-        result: [
-          { blockTime: null },
-          { },
-        ],
+        result: [{ blockTime: null }, {}],
       }),
     });
     const ts = await getFirstTransactionTimestamp(address);
@@ -65,13 +54,18 @@ describe('getFirstTransactionTimestamp', () => {
   });
 
   it('returns null on HTTP error', async () => {
-    (global.fetch).mockResolvedValue({ ok: false, status: 500, statusText: 'Server Error', text: async () => 'fail' });
+    global.fetch.mockResolvedValue({
+      ok: false,
+      status: 500,
+      statusText: 'Server Error',
+      text: async () => 'fail',
+    });
     const ts = await getFirstTransactionTimestamp(address);
     expect(ts).toBeNull();
   });
 
   it('returns null on RPC error', async () => {
-    (global.fetch).mockResolvedValue({
+    global.fetch.mockResolvedValue({
       ok: true,
       json: async () => ({ error: { message: 'RPC fail' } }),
     });
@@ -80,7 +74,7 @@ describe('getFirstTransactionTimestamp', () => {
   });
 
   it('returns null on network error', async () => {
-    (global.fetch).mockRejectedValue(new Error('network fail'));
+    global.fetch.mockRejectedValue(new Error('network fail'));
     const ts = await getFirstTransactionTimestamp(address);
     expect(ts).toBeNull();
   });

@@ -64,14 +64,14 @@ export const createRouterMock = ({
 export const createLocalStorageMock = () => {
   let store = {};
   return {
-    getItem: jest.fn(key => store[key]),
+    getItem: jest.fn((key) => store[key]),
     setItem: jest.fn((key, value) => {
       store[key] = value.toString();
     }),
     clear: jest.fn(() => {
       store = {};
     }),
-    removeItem: jest.fn(key => {
+    removeItem: jest.fn((key) => {
       delete store[key];
     }),
     getAllItems: () => store,
@@ -86,7 +86,7 @@ export const createTimeframeSelectorMock = () => {
   function MockTimeframeSelector({ timeframes, selected, onChange }) {
     return (
       <div data-testid="timeframe-selector">
-        {timeframes.map(timeframe => (
+        {timeframes.map((timeframe) => (
           <button
             key={timeframe}
             data-testid={`timeframe-${timeframe}`}
@@ -110,7 +110,9 @@ export const createTimeframeSelectorMock = () => {
  */
 export const createFetchMock = (responseMap = {}) => {
   return jest.fn((url) => {
-    const matchedPath = Object.keys(responseMap).find(path => url.includes(path));
+    const matchedPath = Object.keys(responseMap).find((path) =>
+      url.includes(path)
+    );
 
     if (matchedPath) {
       const response = responseMap[matchedPath];

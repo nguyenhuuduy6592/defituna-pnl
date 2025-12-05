@@ -24,14 +24,24 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
   const closeButtonRef = useRef(null);
 
   // Handle Escape key press
-  const handleEscape = useCallback((e) => {
-    if (e.key === 'Escape') {onClose();}
-  }, [onClose]);
+  const handleEscape = useCallback(
+    (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
   // Handle overlay click
-  const handleOverlayClick = useCallback((e) => {
-    if (e.target === e.currentTarget) {onClose();}
-  }, [onClose]);
+  const handleOverlayClick = useCallback(
+    (e) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -41,7 +51,9 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen, handleEscape]);
 
-  if (!isOpen) {return null;}
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div
@@ -67,29 +79,55 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
 
         <div className={styles.content}>
           <p>
-            <strong>Defituna PnL Viewer</strong> is a hobby project developed in my free time.
+            <strong>Defituna PnL Viewer</strong> is a hobby project developed in
+            my free time.
           </p>
 
           <DisclaimerSection title="Development Status">
             <ul>
-              <li>This is a personal project with no clear roadmap or due dates</li>
-              <li>Features are added based on personal interest and time availability</li>
-              <li>Limited testing capabilities may result in some features not working properly on all devices</li>
+              <li>
+                This is a personal project with no clear roadmap or due dates
+              </li>
+              <li>
+                Features are added based on personal interest and time
+                availability
+              </li>
+              <li>
+                Limited testing capabilities may result in some features not
+                working properly on all devices
+              </li>
             </ul>
           </DisclaimerSection>
 
           <DisclaimerSection title="Data & Privacy">
             <ul>
               <li>I do not collect any user data</li>
-              <li>All data is stored locally in your browser using localStorage or IndexedDB</li>
-              <li>This site is hosted on Vercel, which may collect server usage metrics (outside of my control)</li>
-              <li>No tracking or analytics scripts are included in this application</li>
+              <li>
+                All data is stored locally in your browser using localStorage or
+                IndexedDB
+              </li>
+              <li>
+                This site is hosted on Vercel, which may collect server usage
+                metrics (outside of my control)
+              </li>
+              <li>
+                No tracking or analytics scripts are included in this
+                application
+              </li>
             </ul>
           </DisclaimerSection>
 
           <DisclaimerSection title="Contact & Support">
             <p>
-              If you have feature requests or encounter issues, please reach out to me on Twitter: <a href="https://x.com/DuyNguyenM2E" target="_blank" rel="noopener noreferrer">@DuyNguyenM2E</a>
+              If you have feature requests or encounter issues, please reach out
+              to me on Twitter:{' '}
+              <a
+                href="https://x.com/DuyNguyenM2E"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                @DuyNguyenM2E
+              </a>
             </p>
           </DisclaimerSection>
         </div>

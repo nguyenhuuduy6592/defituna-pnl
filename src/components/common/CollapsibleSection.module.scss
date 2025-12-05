@@ -1,4 +1,4 @@
-@use "sass:map";
+@use 'sass:map';
 @use '../../styles/variables.module.scss' as variables;
 
 .sectionContainer {
@@ -15,7 +15,7 @@
   box-shadow: 0 2px 4px variables.color(shadow);
   cursor: pointer;
   transition: background-color 0.2s ease;
-  
+
   &:hover {
     background-color: variables.bg-color(light);
   }
@@ -32,7 +32,7 @@
 .collapseIcon {
   transition: transform 0.3s ease;
   color: variables.text-color(secondary);
-  
+
   &.expanded {
     transform: rotate(180deg);
   }
@@ -42,7 +42,7 @@
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease-out;
-  
+
   &.expanded {
     max-height: 5000px; // Arbitrary large value, will transition smoothly
     transition: max-height 0.5s ease-in;

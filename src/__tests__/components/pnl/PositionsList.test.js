@@ -12,7 +12,9 @@ jest.mock('../../../components/pnl/PnLCard', () => ({
   PnLCard: ({ position, onClose }) => (
     <div data-testid="pnl-card" onClick={onClose}>
       <div data-testid="pnl-card-pair">{position.pairDisplay}</div>
-      <div data-testid="pnl-card-percentage">{position.displayPnlPercentage}</div>
+      <div data-testid="pnl-card-percentage">
+        {position.displayPnlPercentage}
+      </div>
     </div>
   ),
 }));
@@ -21,7 +23,9 @@ jest.mock('../../../components/pnl/PositionChart', () => ({
   PositionChart: ({ position, positionHistory, onClose }) => (
     <div data-testid="position-chart" onClick={onClose}>
       <div data-testid="chart-pair">{position.pair}</div>
-      <div data-testid="chart-history-length">{positionHistory ? positionHistory.length : 0}</div>
+      <div data-testid="chart-history-length">
+        {positionHistory ? positionHistory.length : 0}
+      </div>
     </div>
   ),
 }));
@@ -44,10 +48,7 @@ jest.mock('../../../components/pnl/PositionsTable', () => ({
       <div data-testid="history-enabled">{historyEnabled.toString()}</div>
       <div data-testid="sort-field">{sortState.field}</div>
       <div data-testid="sort-direction">{sortState.direction}</div>
-      <button
-        data-testid="sort-button"
-        onClick={() => onSort('pnl')}
-      >
+      <button data-testid="sort-button" onClick={() => onSort('pnl')}>
         Sort
       </button>
       <button
@@ -59,7 +60,9 @@ jest.mock('../../../components/pnl/PositionsTable', () => ({
       {positions.map((position, index) => (
         <div key={index} data-testid={`position-${index}`}>
           <div data-testid={`position-${index}-pair`}>{position.pair}</div>
-          <div data-testid={`position-${index}-status`}>{position.displayStatus}</div>
+          <div data-testid={`position-${index}-status`}>
+            {position.displayStatus}
+          </div>
           <button
             data-testid={`share-${index}`}
             onClick={() => onShare(position)}
@@ -121,10 +124,10 @@ describe('PositionsList', () => {
 
     // Mock useHistoricalData hook
     useHistoricalData.mockImplementation(() => ({
-      getPositionHistory: jest.fn(async () => ([
+      getPositionHistory: jest.fn(async () => [
         { timestamp: 1, value: 100 },
         { timestamp: 2, value: 150 },
-      ])),
+      ]),
     }));
   });
 
@@ -146,11 +149,13 @@ describe('PositionsList', () => {
   });
 
   it('passes correct props to PositionsTable', () => {
-    render(<PositionsList
-      positions={mockPositions}
-      showWallet={true}
-      historyEnabled={true}
-    />);
+    render(
+      <PositionsList
+        positions={mockPositions}
+        showWallet={true}
+        historyEnabled={true}
+      />
+    );
 
     expect(screen.getByTestId('show-wallet')).toHaveTextContent('true');
     expect(screen.getByTestId('history-enabled')).toHaveTextContent('true');

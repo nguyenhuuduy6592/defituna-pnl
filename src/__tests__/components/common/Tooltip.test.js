@@ -128,7 +128,9 @@ describe('Tooltip Component', () => {
     );
 
     // Get trigger element
-    const trigger = screen.getByText('Accessibility').closest('.tooltipTrigger');
+    const trigger = screen
+      .getByText('Accessibility')
+      .closest('.tooltipTrigger');
 
     // Initial state
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
@@ -152,8 +154,14 @@ describe('Tooltip Component', () => {
     fireEvent.click(screen.getByText('Click me'));
 
     // Document event listeners should be added when tooltip is visible
-    expect(document.addEventListener).toHaveBeenCalledWith('mousedown', expect.any(Function));
-    expect(document.addEventListener).toHaveBeenCalledWith('touchstart', expect.any(Function));
+    expect(document.addEventListener).toHaveBeenCalledWith(
+      'mousedown',
+      expect.any(Function)
+    );
+    expect(document.addEventListener).toHaveBeenCalledWith(
+      'touchstart',
+      expect.any(Function)
+    );
   });
 
   it('removes event listeners when hidden', () => {
@@ -170,7 +178,13 @@ describe('Tooltip Component', () => {
     fireEvent.click(screen.getByText('Click me'));
 
     // Document event listeners should be removed
-    expect(document.removeEventListener).toHaveBeenCalledWith('mousedown', expect.any(Function));
-    expect(document.removeEventListener).toHaveBeenCalledWith('touchstart', expect.any(Function));
+    expect(document.removeEventListener).toHaveBeenCalledWith(
+      'mousedown',
+      expect.any(Function)
+    );
+    expect(document.removeEventListener).toHaveBeenCalledWith(
+      'touchstart',
+      expect.any(Function)
+    );
   });
 });

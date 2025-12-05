@@ -122,22 +122,30 @@ describe('useCountdown Hook', () => {
     it('should warn and not start with invalid seconds (0, negative, non-numeric)', () => {
       const { result } = renderHook(() => useCountdown());
 
-      act(() => { result.current.startCountdown(0); });
+      act(() => {
+        result.current.startCountdown(0);
+      });
       expect(result.current.countdown).toBe(0);
       expect(result.current.isRunning).toBe(false);
       expect(consoleWarnSpy).toHaveBeenCalledTimes(1);
 
-      act(() => { result.current.startCountdown(-5); });
+      act(() => {
+        result.current.startCountdown(-5);
+      });
       expect(result.current.countdown).toBe(0);
       expect(result.current.isRunning).toBe(false);
       expect(consoleWarnSpy).toHaveBeenCalledTimes(2);
 
-      act(() => { result.current.startCountdown('abc'); });
+      act(() => {
+        result.current.startCountdown('abc');
+      });
       expect(result.current.countdown).toBe(0);
       expect(result.current.isRunning).toBe(false);
       expect(consoleWarnSpy).toHaveBeenCalledTimes(3);
 
-      act(() => { result.current.startCountdown(null); });
+      act(() => {
+        result.current.startCountdown(null);
+      });
       expect(result.current.countdown).toBe(0);
       expect(result.current.isRunning).toBe(false);
       expect(consoleWarnSpy).toHaveBeenCalledTimes(4);

@@ -8,7 +8,6 @@ import {
 } from '../../utils/positionUtils';
 
 describe('positionUtils', () => {
-
   describe('getValueClass', () => {
     it('handles null and undefined inputs', () => {
       expect(getValueClass(null)).toBe('zero');
@@ -44,17 +43,21 @@ describe('positionUtils', () => {
     it('handles non-open states', () => {
       expect(calculateStatus({ state: 'closed' })).toBe('Closed');
       expect(calculateStatus({ state: 'liquidated' })).toBe('Liquidated');
-      expect(calculateStatus({ state: 'closed_by_limit_order' })).toBe('Limit Closed');
+      expect(calculateStatus({ state: 'closed_by_limit_order' })).toBe(
+        'Limit Closed'
+      );
       expect(calculateStatus({ state: 'custom' })).toBe('Custom');
     });
 
     it('handles open state with missing price data', () => {
       expect(calculateStatus({ state: 'open' })).toBe('Open (Unknown Range)');
-      expect(calculateStatus({
-        state: 'open',
-        currentPrice: 100,
-        rangePrices: { lower: null, upper: 200 },
-      })).toBe('Open (Unknown Range)');
+      expect(
+        calculateStatus({
+          state: 'open',
+          currentPrice: 100,
+          rangePrices: { lower: null, upper: 200 },
+        })
+      ).toBe('Open (Unknown Range)');
     });
 
     it('determines in-range status correctly', () => {
@@ -89,7 +92,7 @@ describe('positionUtils', () => {
       const result = addWalletAddressToPositions(positions, walletAddress);
 
       expect(result).toHaveLength(2);
-      result.forEach(position => {
+      result.forEach((position) => {
         expect(position.walletAddress).toBe(walletAddress);
       });
       expect(result[0].id).toBe(1);
@@ -107,10 +110,10 @@ describe('positionUtils', () => {
         p_addr: '0x123',
         state: 'open',
         pair: 'ETH/USD',
-        c_price: 1.00, // $1.00 (raw decimal)
-        e_price: 2.00, // $2.00 (raw decimal)
+        c_price: 1.0, // $1.00 (raw decimal)
+        e_price: 2.0, // $2.00 (raw decimal)
         lev: 2, // 2x (raw decimal)
-        sz: 100.00, // $100.00 (raw decimal)
+        sz: 100.0, // $100.00 (raw decimal)
         r_prices: { l: 0.9, u: 1.1 },
         liq_price: { l: 0.8, u: 1.2 },
         lim_prices: { l: 0.7, u: 1.3 },
@@ -129,10 +132,10 @@ describe('positionUtils', () => {
         positionAddress: '0x123',
         state: 'open',
         pair: 'ETH/USD',
-        currentPrice: 1.00,
-        entryPrice: 2.00,
+        currentPrice: 1.0,
+        entryPrice: 2.0,
         leverage: 2,
-        size: 100.00,
+        size: 100.0,
         rangePrices: { lower: 0.9, upper: 1.1 },
         liquidationPrice: { lower: 0.8, upper: 1.2 },
         limitOrderPrices: { lower: 0.7, upper: 1.3 },
@@ -156,9 +159,18 @@ describe('positionUtils', () => {
 
       const decoded = decodePosition(position);
 
-      expect(decoded.rangePrices).toEqual({ lower: undefined, upper: undefined });
-      expect(decoded.liquidationPrice).toEqual({ lower: undefined, upper: undefined });
-      expect(decoded.limitOrderPrices).toEqual({ lower: undefined, upper: undefined });
+      expect(decoded.rangePrices).toEqual({
+        lower: undefined,
+        upper: undefined,
+      });
+      expect(decoded.liquidationPrice).toEqual({
+        lower: undefined,
+        upper: undefined,
+      });
+      expect(decoded.limitOrderPrices).toEqual({
+        lower: undefined,
+        upper: undefined,
+      });
       expect(decoded.displayStatus).toBe('Open (Unknown Range)');
     });
   });
@@ -176,14 +188,14 @@ describe('positionUtils', () => {
           p_addr: '0x123',
           state: 'open',
           pair: 'ETH/USD',
-          c_price: 1.00,
+          c_price: 1.0,
           pnl: { u: 50, b: 1000 },
         },
         {
           p_addr: '0x456',
           state: 'closed',
           pair: 'BTC/USD',
-          c_price: 2.00,
+          c_price: 2.0,
           pnl: { u: -30, b: -500 },
         },
       ];

@@ -26,7 +26,9 @@ describe('useDebounceApi Hook', () => {
 
   describe('Initialization', () => {
     it('should initialize with correct default states', () => {
-      const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
+      const { result } = renderHook(() =>
+        useDebounceApi(mockApiCall, delay, initialData)
+      );
 
       expect(result.current.data).toEqual(initialData);
       expect(result.current.loading).toBe(false);
@@ -37,7 +39,9 @@ describe('useDebounceApi Hook', () => {
 
   describe('Execution Flow', () => {
     it('should set loading to true when execute is called', () => {
-      const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
+      const { result } = renderHook(() =>
+        useDebounceApi(mockApiCall, delay, initialData)
+      );
       act(() => {
         result.current.execute('arg1');
       });
@@ -51,7 +55,9 @@ describe('useDebounceApi Hook', () => {
     it('should update data and reset loading/error on successful API call', async () => {
       const apiResponse = { data: 'success' };
       mockApiCall.mockResolvedValue(apiResponse);
-      const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
+      const { result } = renderHook(() =>
+        useDebounceApi(mockApiCall, delay, initialData)
+      );
 
       let promise;
       // setLoading(true) happens, then the mocked debounce calls the internal callback immediately,
@@ -71,7 +77,9 @@ describe('useDebounceApi Hook', () => {
     it('should set error and reset loading on failed API call', async () => {
       const apiError = new Error('API Failed');
       mockApiCall.mockRejectedValue(apiError);
-      const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
+      const { result } = renderHook(() =>
+        useDebounceApi(mockApiCall, delay, initialData)
+      );
 
       let promise;
       // setLoading(true), immediate callback runs, awaits rejection, sets error state.
@@ -95,7 +103,9 @@ describe('useDebounceApi Hook', () => {
 
   describe('Race Condition Handling', () => {
     it('should only update state with the result of the latest call', async () => {
-      const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
+      const { result } = renderHook(() =>
+        useDebounceApi(mockApiCall, delay, initialData)
+      );
       const call1Args = ['call1'];
       const call2Args = ['call2'];
       const response1 = { data: 'response1' };
@@ -108,9 +118,13 @@ describe('useDebounceApi Hook', () => {
 
       let promise1, promise2;
       // Execute call 1 - runs immediately due to mock
-      await act(async () => { promise1 = result.current.execute(...call1Args); });
+      await act(async () => {
+        promise1 = result.current.execute(...call1Args);
+      });
       // Execute call 2 - runs immediately due to mock, increments latestCallIdRef
-      await act(async () => { promise2 = result.current.execute(...call2Args); });
+      await act(async () => {
+        promise2 = result.current.execute(...call2Args);
+      });
 
       // Even though call 1 finished first, its state update should have been ignored
       // because call 2 was initiated, incrementing latestCallIdRef.
@@ -123,7 +137,9 @@ describe('useDebounceApi Hook', () => {
     });
 
     it('should handle errors correctly even with race conditions', async () => {
-      const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
+      const { result } = renderHook(() =>
+        useDebounceApi(mockApiCall, delay, initialData)
+      );
       const call1Args = ['call1_success'];
       const call2Args = ['call2_error'];
       const response1 = { data: 'response1' };
@@ -132,11 +148,13 @@ describe('useDebounceApi Hook', () => {
       // Mock API responses
       mockApiCall
         .mockResolvedValueOnce(response1) // For first execute
-        .mockRejectedValueOnce(error2);  // For second execute
+        .mockRejectedValueOnce(error2); // For second execute
 
       let promise1, promise2;
       // Execute call 1 - runs immediately
-      await act(async () => { promise1 = result.current.execute(...call1Args); });
+      await act(async () => {
+        promise1 = result.current.execute(...call1Args);
+      });
       // Execute call 2 - runs immediately, fails
       await act(async () => {
         promise2 = result.current.execute(...call2Args);
@@ -155,13 +173,17 @@ describe('useDebounceApi Hook', () => {
 
   describe('Reset Behavior', () => {
     it('should reset data, loading, and error states to initial values', async () => {
-      const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
+      const { result } = renderHook(() =>
+        useDebounceApi(mockApiCall, delay, initialData)
+      );
       const testError = new Error('Temporary Error');
       mockApiCall.mockRejectedValueOnce(testError); // Mock API to throw once
 
       // Execute and wait for it to finish (and fail)
       await act(async () => {
-        try { await result.current.execute('arg_error'); } catch (e) {}
+        try {
+          await result.current.execute('arg_error');
+        } catch (e) {}
       });
 
       // Verify state is not initial before reset
@@ -182,21 +204,29 @@ describe('useDebounceApi Hook', () => {
 
     it('should prevent updates from calls initiated before reset', async () => {
       // Use real debounce for this test
-      debouncePromise.mockImplementationOnce(jest.requireActual('../../utils/debounce').debouncePromise);
+      debouncePromise.mockImplementationOnce(
+        jest.requireActual('../../utils/debounce').debouncePromise
+      );
       jest.useFakeTimers();
 
       const apiResponse = { data: 'success' };
       mockApiCall.mockResolvedValue(apiResponse);
-      const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
+      const { result } = renderHook(() =>
+        useDebounceApi(mockApiCall, delay, initialData)
+      );
 
       // Execute a call - uses real debounce this time
       let executePromise;
-      act(() => { executePromise = result.current.execute('arg1'); });
+      act(() => {
+        executePromise = result.current.execute('arg1');
+      });
       expect(result.current.loading).toBe(true);
       // mockApiCall should not have been called yet
 
       // Reset *before* the debounce delay finishes
-      act(() => { result.current.reset(); });
+      act(() => {
+        result.current.reset();
+      });
       expect(result.current.loading).toBe(false);
       expect(result.current.data).toEqual(initialData);
       expect(result.current.error).toBeNull(); // Ensure error is null after reset
@@ -207,7 +237,9 @@ describe('useDebounceApi Hook', () => {
       });
 
       // Allow promise microtasks to resolve (including the one inside debouncePromise)
-      await act(async () => { await Promise.resolve(); });
+      await act(async () => {
+        await Promise.resolve();
+      });
 
       // Assert that mockApiCall *was* likely called by the original debounce timer firing
       expect(mockApiCall).toHaveBeenCalledWith('arg1');
@@ -223,16 +255,22 @@ describe('useDebounceApi Hook', () => {
   describe('Cleanup', () => {
     it('should prevent state updates after unmount', async () => {
       // Use real debounce for this test to simulate async completion
-      debouncePromise.mockImplementationOnce(jest.requireActual('../../utils/debounce').debouncePromise);
+      debouncePromise.mockImplementationOnce(
+        jest.requireActual('../../utils/debounce').debouncePromise
+      );
       jest.useFakeTimers();
 
       const apiResponse = { data: 'success' };
       mockApiCall.mockResolvedValue(apiResponse);
-      const { result, unmount } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
+      const { result, unmount } = renderHook(() =>
+        useDebounceApi(mockApiCall, delay, initialData)
+      );
 
       // Execute a call
       let executePromise;
-      act(() => { executePromise = result.current.execute('arg_unmount'); });
+      act(() => {
+        executePromise = result.current.execute('arg_unmount');
+      });
       expect(result.current.loading).toBe(true);
 
       // Unmount the hook *before* the debounce delay finishes
@@ -246,7 +284,9 @@ describe('useDebounceApi Hook', () => {
       });
 
       // Allow promise microtasks to resolve
-      await act(async () => { await Promise.resolve(); });
+      await act(async () => {
+        await Promise.resolve();
+      });
 
       // Assert API call was made (debounce finished)
       expect(mockApiCall).toHaveBeenCalledWith('arg_unmount');

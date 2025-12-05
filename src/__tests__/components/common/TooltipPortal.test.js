@@ -27,7 +27,7 @@ beforeAll(() => {
     if (
       typeof args[0] === 'string' &&
       (args[0].includes('Target container is not a DOM element') ||
-       args[0].includes('validateDOMNesting'))
+        args[0].includes('validateDOMNesting'))
     ) {
       return;
     }

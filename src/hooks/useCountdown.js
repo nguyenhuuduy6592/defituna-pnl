@@ -21,7 +21,7 @@ export const useCountdown = (initialValue = 0) => {
 
     if (isRunning && countdown > 0) {
       timerId = setInterval(() => {
-        setCountdown(prev => {
+        setCountdown((prev) => {
           const newValue = prev - 1;
           if (newValue <= 0) {
             setIsRunning(false);
@@ -33,7 +33,9 @@ export const useCountdown = (initialValue = 0) => {
     }
 
     return () => {
-      if (timerId) {clearInterval(timerId);}
+      if (timerId) {
+        clearInterval(timerId);
+      }
     };
   }, [countdown, isRunning]);
 
@@ -45,7 +47,9 @@ export const useCountdown = (initialValue = 0) => {
     const validSeconds = parseInt(seconds, 10);
 
     if (isNaN(validSeconds) || validSeconds <= 0) {
-      console.warn('Invalid countdown value provided, must be a positive number');
+      console.warn(
+        'Invalid countdown value provided, must be a positive number'
+      );
       return;
     }
 

@@ -52,9 +52,13 @@ export async function getFirstTransactionTimestamp(address) {
     // We need the one with the smallest blockTime.
     // Some transactions might not have blockTime, so filter them out.
     const oldestTx = signatures
-      .filter(sig => sig.blockTime !== null && typeof sig.blockTime !== 'undefined')
+      .filter(
+        (sig) => sig.blockTime !== null && typeof sig.blockTime !== 'undefined'
+      )
       .reduce((earliest, current) => {
-        return !earliest || current.blockTime < earliest.blockTime ? current : earliest;
+        return !earliest || current.blockTime < earliest.blockTime
+          ? current
+          : earliest;
       }, null);
 
     if (!oldestTx) {
@@ -73,7 +77,6 @@ export async function getFirstTransactionTimestamp(address) {
     //   new Date(timestamp * 1000)
     // );
     return timestamp; // Return the Unix timestamp (seconds)
-
   } catch (error) {
     console.error(
       'Network or other error fetching first transaction timestamp for address',

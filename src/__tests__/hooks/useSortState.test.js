@@ -4,12 +4,18 @@ import { useSortState } from '../../hooks/useSortState';
 describe('useSortState Hook', () => {
   it('should initialize with default values', () => {
     const { result } = renderHook(() => useSortState());
-    expect(result.current.sortState).toEqual({ field: 'age', direction: 'desc' });
+    expect(result.current.sortState).toEqual({
+      field: 'age',
+      direction: 'desc',
+    });
   });
 
   it('should initialize with provided values', () => {
     const { result } = renderHook(() => useSortState('tvl', 'asc'));
-    expect(result.current.sortState).toEqual({ field: 'tvl', direction: 'asc' });
+    expect(result.current.sortState).toEqual({
+      field: 'tvl',
+      direction: 'asc',
+    });
   });
 
   describe('handleSort', () => {
@@ -20,7 +26,10 @@ describe('useSortState Hook', () => {
         result.current.handleSort('tvl');
       });
 
-      expect(result.current.sortState).toEqual({ field: 'tvl', direction: 'desc' });
+      expect(result.current.sortState).toEqual({
+        field: 'tvl',
+        direction: 'desc',
+      });
     });
 
     it('should toggle direction when sorting by the same field (desc to asc)', () => {
@@ -30,7 +39,10 @@ describe('useSortState Hook', () => {
         result.current.handleSort('age');
       });
 
-      expect(result.current.sortState).toEqual({ field: 'age', direction: 'asc' });
+      expect(result.current.sortState).toEqual({
+        field: 'age',
+        direction: 'asc',
+      });
     });
 
     it('should toggle direction when sorting by the same field (asc to desc)', () => {
@@ -40,7 +52,10 @@ describe('useSortState Hook', () => {
         result.current.handleSort('age');
       });
 
-      expect(result.current.sortState).toEqual({ field: 'age', direction: 'desc' });
+      expect(result.current.sortState).toEqual({
+        field: 'age',
+        direction: 'desc',
+      });
     });
 
     it('should handle multiple sorts correctly', () => {
@@ -50,25 +65,37 @@ describe('useSortState Hook', () => {
       act(() => {
         result.current.handleSort('tvl');
       });
-      expect(result.current.sortState).toEqual({ field: 'tvl', direction: 'desc' });
+      expect(result.current.sortState).toEqual({
+        field: 'tvl',
+        direction: 'desc',
+      });
 
       // Sort by same field 'tvl' -> { field: 'tvl', direction: 'asc' }
       act(() => {
         result.current.handleSort('tvl');
       });
-      expect(result.current.sortState).toEqual({ field: 'tvl', direction: 'asc' });
+      expect(result.current.sortState).toEqual({
+        field: 'tvl',
+        direction: 'asc',
+      });
 
       // Sort by new field 'fee' -> { field: 'fee', direction: 'asc' }
       act(() => {
         result.current.handleSort('fee');
       });
-      expect(result.current.sortState).toEqual({ field: 'fee', direction: 'asc' });
+      expect(result.current.sortState).toEqual({
+        field: 'fee',
+        direction: 'asc',
+      });
 
       // Sort by same field 'fee' -> { field: 'fee', direction: 'desc' }
       act(() => {
         result.current.handleSort('fee');
       });
-      expect(result.current.sortState).toEqual({ field: 'fee', direction: 'desc' });
+      expect(result.current.sortState).toEqual({
+        field: 'fee',
+        direction: 'desc',
+      });
     });
   });
 

@@ -47,10 +47,7 @@ jest.mock('../../hooks', () => ({
 jest.mock('../../components/pnl/WalletForm', () => ({
   WalletForm: jest.fn(({ onSubmit }) => (
     <div data-testid="wallet-form">
-      <input
-        data-testid="wallet-input"
-        placeholder="Enter wallet address"
-      />
+      <input data-testid="wallet-input" placeholder="Enter wallet address" />
       <button
         data-testid="submit-button"
         onClick={() => {
@@ -66,66 +63,74 @@ jest.mock('../../components/pnl/WalletForm', () => ({
 }));
 
 jest.mock('../../components/pnl/AutoRefresh', () => ({
-  AutoRefresh: jest.fn(({ autoRefresh, onToggle, refreshInterval, onIntervalChange, countdown }) => {
-    // Create mock toggle function if not provided
-    const handleToggle = onToggle || jest.fn();
+  AutoRefresh: jest.fn(
+    ({
+      autoRefresh,
+      onToggle,
+      refreshInterval,
+      onIntervalChange,
+      countdown,
+    }) => {
+      // Create mock toggle function if not provided
+      const handleToggle = onToggle || jest.fn();
 
-    return (
-      <div data-testid="auto-refresh">
-        <input
-          type="checkbox"
-          checked={autoRefresh}
-          onChange={() => handleToggle(!autoRefresh)}
-          data-testid="auto-refresh-toggle"
-        />
-        <select
-          value={refreshInterval}
-          onChange={(e) => onIntervalChange && onIntervalChange(e)}
-          data-testid="refresh-interval"
-        >
-          <option value="30">30s</option>
-          <option value="60">60s</option>
-        </select>
-        <span data-testid="countdown">{countdown}</span>
-      </div>
-    );
-  }),
+      return (
+        <div data-testid="auto-refresh">
+          <input
+            type="checkbox"
+            checked={autoRefresh}
+            onChange={() => handleToggle(!autoRefresh)}
+            data-testid="auto-refresh-toggle"
+          />
+          <select
+            value={refreshInterval}
+            onChange={(e) => onIntervalChange && onIntervalChange(e)}
+            data-testid="refresh-interval"
+          >
+            <option value="30">30s</option>
+            <option value="60">60s</option>
+          </select>
+          <span data-testid="countdown">{countdown}</span>
+        </div>
+      );
+    }
+  ),
 }));
 
 jest.mock('../../components/common/DisclaimerModal', () => ({
-  DisclaimerModal: jest.fn(({ isOpen, onClose }) => (
+  DisclaimerModal: jest.fn(({ isOpen, onClose }) =>
     isOpen ? (
       <div data-testid="disclaimer-modal">
-        <button onClick={onClose} data-testid="accept-disclaimer">Accept</button>
+        <button onClick={onClose} data-testid="accept-disclaimer">
+          Accept
+        </button>
       </div>
     ) : null
-  )),
+  ),
 }));
 
 // Create a loading indicator component for tests
 jest.mock('../../components/common/LoadingOverlay', () => ({
-  LoadingOverlay: jest.fn(({ loading, children }) => (
-    loading ? (
-      <div data-testid="loading-indicator">Loading...</div>
-    ) : children
-  )),
+  LoadingOverlay: jest.fn(({ loading, children }) =>
+    loading ? <div data-testid="loading-indicator">Loading...</div> : children
+  ),
 }));
 
 // Mock fetch for API calls
 global.fetch = jest.fn();
 
 // Mock localStorage
-const localStorageMock = (function() {
+const localStorageMock = (function () {
   let store = {};
   return {
-    getItem: jest.fn(key => store[key]),
+    getItem: jest.fn((key) => store[key]),
     setItem: jest.fn((key, value) => {
       store[key] = value.toString();
     }),
     clear: jest.fn(() => {
       store = {};
     }),
-    removeItem: jest.fn(key => {
+    removeItem: jest.fn((key) => {
       delete store[key];
     }),
   };
@@ -153,25 +158,53 @@ describe('Home Page', () => {
   });
 
   it('renders the wallet form', () => {
-    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
+    render(
+      <PriceProvider>
+        <DisplayCurrencyProvider>
+          <HomePage />
+        </DisplayCurrencyProvider>
+      </PriceProvider>
+    );
     expect(screen.getByTestId('wallet-form')).toBeInTheDocument();
   });
 
   it('renders the auto-refresh component', () => {
-    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
+    render(
+      <PriceProvider>
+        <DisplayCurrencyProvider>
+          <HomePage />
+        </DisplayCurrencyProvider>
+      </PriceProvider>
+    );
     expect(screen.getByTestId('auto-refresh')).toBeInTheDocument();
   });
 
   it('shows disclaimer modal on first visit', () => {
-    localStorage.getItem.mockImplementation(key => key === 'disclaimerShown' ? null : undefined);
-    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
+    localStorage.getItem.mockImplementation((key) =>
+      key === 'disclaimerShown' ? null : undefined
+    );
+    render(
+      <PriceProvider>
+        <DisplayCurrencyProvider>
+          <HomePage />
+        </DisplayCurrencyProvider>
+      </PriceProvider>
+    );
     expect(screen.getByTestId('disclaimer-modal')).toBeInTheDocument();
   });
 
   it('does not show disclaimer on subsequent visits', () => {
-    localStorage.getItem.mockImplementation(key => key === 'disclaimerShown' ? 'true' : undefined); // Simulate returning visitor
+    localStorage.getItem.mockImplementation((key) =>
+      key === 'disclaimerShown' ? 'true' : undefined
+    ); // Simulate returning visitor
 
-    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
+    render(
+      <PriceProvider>
+        <DisplayCurrencyProvider>
+          <HomePage />
+        </DisplayCurrencyProvider>
+      </PriceProvider>
+    );
 
     expect(screen.queryByTestId('disclaimer-modal')).not.toBeInTheDocument();
   });
@@ -179,7 +212,13 @@ describe('Home Page', () => {
   it('toggles auto-refresh when button is clicked', () => {
     const { AutoRefresh } = require('../../components/pnl/AutoRefresh');
 
-    render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
+    render(
+      <PriceProvider>
+        <DisplayCurrencyProvider>
+          <HomePage />
+        </DisplayCurrencyProvider>
+      </PriceProvider>
+    );
 
     const autoRefreshToggle = screen.getByTestId('auto-refresh-toggle');
     fireEvent.click(autoRefreshToggle);

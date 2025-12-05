@@ -25,46 +25,48 @@ SubmitButton.displayName = 'SubmitButton';
 /**
  * Input field component with dropdown functionality
  */
-const WalletInput = memo(({
-  inputRef,
-  wallet,
-  onWalletChange,
-  setShowDropdown,
-  loading,
-  showDropdown,
-  uniqueSavedWallets,
-  activeWallets,
-  toggleWalletActive,
-  onRemoveWallet,
-  onClearWallets,
-}) => (
-  <div className={styles.inputContainer}>
-    <input
-      ref={inputRef}
-      type="text"
-      value={wallet}
-      onChange={e => onWalletChange(e.target.value)}
-      onFocus={() => setShowDropdown(true)}
-      onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
-      placeholder="Enter wallet address"
-      className={styles.input}
-      disabled={loading}
-      aria-label="Wallet address input"
-      title="Enter a Solana wallet address"
-    />
-
-    {showDropdown && uniqueSavedWallets.length > 0 && (
-      <SavedWalletsDropdown
-        uniqueSavedWallets={uniqueSavedWallets}
-        activeWallets={activeWallets}
-        onWalletChange={onWalletChange}
-        toggleWalletActive={toggleWalletActive}
-        onRemoveWallet={onRemoveWallet}
-        onClearWallets={onClearWallets}
+const WalletInput = memo(
+  ({
+    inputRef,
+    wallet,
+    onWalletChange,
+    setShowDropdown,
+    loading,
+    showDropdown,
+    uniqueSavedWallets,
+    activeWallets,
+    toggleWalletActive,
+    onRemoveWallet,
+    onClearWallets,
+  }) => (
+    <div className={styles.inputContainer}>
+      <input
+        ref={inputRef}
+        type="text"
+        value={wallet}
+        onChange={(e) => onWalletChange(e.target.value)}
+        onFocus={() => setShowDropdown(true)}
+        onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+        placeholder="Enter wallet address"
+        className={styles.input}
+        disabled={loading}
+        aria-label="Wallet address input"
+        title="Enter a Solana wallet address"
       />
-    )}
-  </div>
-));
+
+      {showDropdown && uniqueSavedWallets.length > 0 && (
+        <SavedWalletsDropdown
+          uniqueSavedWallets={uniqueSavedWallets}
+          activeWallets={activeWallets}
+          onWalletChange={onWalletChange}
+          toggleWalletActive={toggleWalletActive}
+          onRemoveWallet={onRemoveWallet}
+          onClearWallets={onClearWallets}
+        />
+      )}
+    </div>
+  )
+);
 
 WalletInput.displayName = 'WalletInput';
 
@@ -112,39 +114,47 @@ const WalletForm = memo(function WalletForm({
    * Handles form submission.
    * Validates the input wallet address and updates the active wallets list.
    */
-  const handleSubmit = useCallback((e) => {
-    if (e) {
-      e.preventDefault();
-    }
+  const handleSubmit = useCallback(
+    (e) => {
+      if (e) {
+        e.preventDefault();
+      }
 
-    const trimmedWallet = wallet.trim();
+      const trimmedWallet = wallet.trim();
 
-    // No input and no active wallets? Error.
-    if (!trimmedWallet && activeWallets.length === 0) {
-      showNotification('Please enter or select at least one wallet address', 'error');
-      return;
-    }
-
-    // If there's input, validate it.
-    if (trimmedWallet) {
-      if (!isValidWalletAddress(trimmedWallet)) {
-        showNotification('Invalid Solana wallet address format', 'error');
+      // No input and no active wallets? Error.
+      if (!trimmedWallet && activeWallets.length === 0) {
+        showNotification(
+          'Please enter or select at least one wallet address',
+          'error'
+        );
         return;
       }
-      // Add the new valid wallet to active wallets
-      const newActiveWallets = [...new Set([...activeWallets, trimmedWallet])];
-      // Only update if the list actually changed
-      if (newActiveWallets.length > activeWallets.length) {
-        setActiveWallets(newActiveWallets);
+
+      // If there's input, validate it.
+      if (trimmedWallet) {
+        if (!isValidWalletAddress(trimmedWallet)) {
+          showNotification('Invalid Solana wallet address format', 'error');
+          return;
+        }
+        // Add the new valid wallet to active wallets
+        const newActiveWallets = [
+          ...new Set([...activeWallets, trimmedWallet]),
+        ];
+        // Only update if the list actually changed
+        if (newActiveWallets.length > activeWallets.length) {
+          setActiveWallets(newActiveWallets);
+        }
       }
-    }
 
-    // If we have input OR pre-existing active wallets, proceed with submission
-    onSubmit(e);
+      // If we have input OR pre-existing active wallets, proceed with submission
+      onSubmit(e);
 
-    // Clear input after successful add/submit
-    onWalletChange('');
-  }, [wallet, activeWallets, setActiveWallets, onSubmit, onWalletChange]);
+      // Clear input after successful add/submit
+      onWalletChange('');
+    },
+    [wallet, activeWallets, setActiveWallets, onSubmit, onWalletChange]
+  );
 
   /**
    * Handles keydown events on wallet chip spans for accessibility.

@@ -34,43 +34,65 @@ export const PnLDisplay = ({
 
   // Use provided data or default data
   const displayData = useMemo(() => {
-    if (!data) {return defaultData;}
+    if (!data) {
+      return defaultData;
+    }
 
     const positions = Array.isArray(data.positions) ? data.positions : [];
 
     // for each position, add the pnlClass, displayedValue, and percentageString
     for (const position of positions) {
       // ----- START: PNL formatting -----
-      const pnlTokenValue = position.pnlData.token_pnl.reduce((sum, token) => sum + token.amount, 0);
+      const pnlTokenValue = position.pnlData.token_pnl.reduce(
+        (sum, token) => sum + token.amount,
+        0
+      );
       const pnlUsdValue = position.pnlData.pnl_usd.amount;
       position.pnlData.pnlClass = getValueClass(pnlUsdValue);
       position.pnlData.pnlClassInSol = getValueClass(pnlTokenValue);
 
       position.pnlData.displayedValue = `$${formatNumber(position.pnlData.pnl_usd.amount)}`;
-      position.pnlData.displayedValueInSol = position.pnlData.token_pnl.map(token => `${formatNumber(token.amount)} ${token.token}`).join(', ');
+      position.pnlData.displayedValueInSol = position.pnlData.token_pnl
+        .map((token) => `${formatNumber(token.amount)} ${token.token}`)
+        .join(', ');
 
       position.pnlData.percentageString = `(${formatPercentage(position.pnlData.pnl_usd.bps / 10000)})`;
-      position.pnlData.percentageStringInSol = position.pnlData.token_pnl.map(token => `(${formatPercentage(token.bps / 10000)})`).join(', ');
+      position.pnlData.percentageStringInSol = position.pnlData.token_pnl
+        .map((token) => `(${formatPercentage(token.bps / 10000)})`)
+        .join(', ');
       // ----- END: PNL formatting -----
 
       // ----- START: YIELD formatting -----
-      const yieldTokenValue = position.yieldData.tokens.reduce((sum, token) => sum + token.amount, 0);
+      const yieldTokenValue = position.yieldData.tokens.reduce(
+        (sum, token) => sum + token.amount,
+        0
+      );
       const yieldUsdValue = position.yieldData.usd.amount;
       position.yieldData.yieldClass = getValueClass(yieldUsdValue);
       position.yieldData.yieldClassInSol = getValueClass(yieldTokenValue);
 
       position.yieldData.displayedValue = `$${formatNumber(position.yieldData.usd.amount)}`;
-      position.yieldData.displayedValueInSol = position.yieldData.tokens.map(token => `${formatNumber(token.amount)} ${token.token}`).join('<br />');
+      position.yieldData.displayedValueInSol = position.yieldData.tokens
+        .map((token) => `${formatNumber(token.amount)} ${token.token}`)
+        .join('<br />');
       // ----- END: YIELD formatting -----
 
       // ----- START: COMPOUNDED formatting -----
-      const compoundedTokenValue = position.compoundedData.tokens.reduce((sum, token) => sum + token.amount, 0);
+      const compoundedTokenValue = position.compoundedData.tokens.reduce(
+        (sum, token) => sum + token.amount,
+        0
+      );
       const compoundedUsdValue = position.compoundedData.usd.amount;
-      position.compoundedData.compoundedClass = getValueClass(compoundedUsdValue);
-      position.compoundedData.compoundedClassInSol = getValueClass(compoundedTokenValue);
+      position.compoundedData.compoundedClass =
+        getValueClass(compoundedUsdValue);
+      position.compoundedData.compoundedClassInSol =
+        getValueClass(compoundedTokenValue);
 
       position.compoundedData.displayedValue = `$${formatNumber(position.compoundedData.usd.amount)}`;
-      position.compoundedData.displayedValueInSol = position.compoundedData.tokens.map(token => `${formatNumber(token.amount)} ${token.token}`).join('<br />');
+      position.compoundedData.displayedValueInSol =
+        position.compoundedData.tokens
+          .map((token) => `${formatNumber(token.amount)} ${token.token}`)
+          .join('<br />');
       // ----- END: COMPOUNDED formatting -----
     }
 
@@ -99,25 +121,41 @@ export const PnLDisplay = ({
         <div className={styles.controlsHeader}>
           <CurrencyToggle />
         </div>
-        {positionsWithAge.length > 1 &&
+        {positionsWithAge.length > 1 && (
           <div className={styles.cardRow}>
             <TotalPnLDisplay
               label="Total Size"
-              totalValue={showInSol ? displayData.totalSizeInSol : `${formatNumber(displayData.totalSize, false)} $`} />
+              totalValue={
+                showInSol
+                  ? displayData.totalSizeInSol
+                  : `${formatNumber(displayData.totalSize, false)} $`
+              }
+            />
 
             <TotalPnLDisplay
               label="Total PnL"
-              totalValue={showInSol ? displayData.totalPnLInSol : displayData.totalPnL} />
+              totalValue={
+                showInSol ? displayData.totalPnLInSol : displayData.totalPnL
+              }
+            />
 
             <TotalPnLDisplay
               label="Total Yield"
-              totalValue={showInSol ? displayData.totalYieldInSol : displayData.totalYield} />
+              totalValue={
+                showInSol ? displayData.totalYieldInSol : displayData.totalYield
+              }
+            />
 
             <TotalPnLDisplay
               label="Total Compounded"
-              totalValue={showInSol ? displayData.totalCompoundedInSol : displayData.totalCompounded} />
+              totalValue={
+                showInSol
+                  ? displayData.totalCompoundedInSol
+                  : displayData.totalCompounded
+              }
+            />
           </div>
-        }
+        )}
 
         <PositionsList
           positions={positionsWithAge}

@@ -23,7 +23,11 @@ describe('CollapsibleSection', () => {
 
   it('does not render when visible is false', () => {
     const { container } = render(
-      <CollapsibleSection title={TITLE} storageKey={STORAGE_KEY} visible={false}>
+      <CollapsibleSection
+        title={TITLE}
+        storageKey={STORAGE_KEY}
+        visible={false}
+      >
         <div>{CHILD_TEXT}</div>
       </CollapsibleSection>
     );
@@ -32,7 +36,11 @@ describe('CollapsibleSection', () => {
 
   it('is expanded by default if defaultExpanded is true', () => {
     render(
-      <CollapsibleSection title={TITLE} storageKey={STORAGE_KEY} defaultExpanded={true}>
+      <CollapsibleSection
+        title={TITLE}
+        storageKey={STORAGE_KEY}
+        defaultExpanded={true}
+      >
         <div>{CHILD_TEXT}</div>
       </CollapsibleSection>
     );
@@ -42,7 +50,11 @@ describe('CollapsibleSection', () => {
 
   it('is collapsed by default if defaultExpanded is false', () => {
     render(
-      <CollapsibleSection title={TITLE} storageKey={STORAGE_KEY} defaultExpanded={false}>
+      <CollapsibleSection
+        title={TITLE}
+        storageKey={STORAGE_KEY}
+        defaultExpanded={false}
+      >
         <div>{CHILD_TEXT}</div>
       </CollapsibleSection>
     );
@@ -52,7 +64,11 @@ describe('CollapsibleSection', () => {
 
   it('toggles expanded/collapsed state on header click', () => {
     render(
-      <CollapsibleSection title={TITLE} storageKey={STORAGE_KEY} defaultExpanded={true}>
+      <CollapsibleSection
+        title={TITLE}
+        storageKey={STORAGE_KEY}
+        defaultExpanded={true}
+      >
         <div>{CHILD_TEXT}</div>
       </CollapsibleSection>
     );
@@ -67,7 +83,11 @@ describe('CollapsibleSection', () => {
 
   it('persists expanded state to localStorage', () => {
     render(
-      <CollapsibleSection title={TITLE} storageKey={STORAGE_KEY} defaultExpanded={true}>
+      <CollapsibleSection
+        title={TITLE}
+        storageKey={STORAGE_KEY}
+        defaultExpanded={true}
+      >
         <div>{CHILD_TEXT}</div>
       </CollapsibleSection>
     );
@@ -83,7 +103,11 @@ describe('CollapsibleSection', () => {
   it('loads expanded state from localStorage on mount', () => {
     localStorage.setItem(STORAGE_KEY, 'false');
     render(
-      <CollapsibleSection title={TITLE} storageKey={STORAGE_KEY} defaultExpanded={true}>
+      <CollapsibleSection
+        title={TITLE}
+        storageKey={STORAGE_KEY}
+        defaultExpanded={true}
+      >
         <div>{CHILD_TEXT}</div>
       </CollapsibleSection>
     );

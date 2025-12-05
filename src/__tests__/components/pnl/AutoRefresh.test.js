@@ -128,7 +128,9 @@ describe('AutoRefresh Component', () => {
       render(<AutoRefresh {...defaultProps} autoRefresh={true} />);
 
       const selectProd = screen.getByRole('combobox');
-      const optionsProd = Array.from(selectProd.children).map(option => option.value);
+      const optionsProd = Array.from(selectProd.children).map(
+        (option) => option.value
+      );
       expect(optionsProd).toEqual(['15', '30', '60', '300']);
       expect(optionsProd).not.toContain('5');
 
@@ -144,7 +146,9 @@ describe('AutoRefresh Component', () => {
       render(<AutoRefresh {...defaultProps} autoRefresh={true} />);
 
       const selectDev = screen.getByRole('combobox');
-      const optionsDev = Array.from(selectDev.children).map(option => option.value);
+      const optionsDev = Array.from(selectDev.children).map(
+        (option) => option.value
+      );
       expect(optionsDev).toEqual(['5', '15', '30', '60', '300']);
 
       // Cleanup
@@ -156,7 +160,10 @@ describe('AutoRefresh Component', () => {
 
       const select = screen.getByRole('combobox');
       expect(select).toHaveAttribute('aria-label', 'Select refresh interval');
-      expect(select).toHaveAttribute('title', 'Select how often to refresh the data');
+      expect(select).toHaveAttribute(
+        'title',
+        'Select how often to refresh the data'
+      );
     });
   });
 
@@ -171,16 +178,14 @@ describe('AutoRefresh Component', () => {
         />
       );
 
-      expect(screen.getByText('Next refresh in 45 seconds')).toBeInTheDocument();
+      expect(
+        screen.getByText('Next refresh in 45 seconds')
+      ).toBeInTheDocument();
     });
 
     it('displays loading message when loading', () => {
       render(
-        <AutoRefresh
-          {...defaultProps}
-          autoRefresh={true}
-          loading={true}
-        />
+        <AutoRefresh {...defaultProps} autoRefresh={true} loading={true} />
       );
 
       expect(screen.getByText('Refreshing data...')).toBeInTheDocument();

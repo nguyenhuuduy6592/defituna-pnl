@@ -52,14 +52,17 @@ export function useDebounceApi(apiCall, delay = 500, initialData = null) {
   ).current;
 
   // Execute function that can be called from components
-  const execute = useCallback(async (...args) => {
-    setLoading(true);
-    try {
-      return await debouncedApiCall(...args);
-    } catch (err) {
-      return Promise.reject(err);
-    }
-  }, [debouncedApiCall]);
+  const execute = useCallback(
+    async (...args) => {
+      setLoading(true);
+      try {
+        return await debouncedApiCall(...args);
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    },
+    [debouncedApiCall]
+  );
 
   // Reset function to clear states
   const reset = useCallback(() => {
@@ -88,8 +91,5 @@ export function useDebounceApi(apiCall, delay = 500, initialData = null) {
  * @returns {Function} - Debounced function
  */
 export function useDebounce(fn, delay = 300) {
-  return useCallback(
-    debouncePromise(fn, delay),
-    [fn, delay]
-  );
+  return useCallback(debouncePromise(fn, delay), [fn, delay]);
 }

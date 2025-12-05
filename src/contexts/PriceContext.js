@@ -33,7 +33,9 @@ export function PriceProvider({ children }) {
   // For now, we'll let the page trigger it after PnL load as per previous logic
 
   return (
-    <PriceContext.Provider value={{ solPrice, lastUpdate, updateSolPrice, isLoading, error }}>
+    <PriceContext.Provider
+      value={{ solPrice, lastUpdate, updateSolPrice, isLoading, error }}
+    >
       {children}
     </PriceContext.Provider>
   );

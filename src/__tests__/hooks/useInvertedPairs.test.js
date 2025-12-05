@@ -39,7 +39,10 @@ describe('useInvertedPairs Hook', () => {
     expect(result.current.invertedPairs).toEqual(new Set(initialPairs));
     expect(getItemSpy).toHaveBeenCalledWith('invertedPairs');
     // Initial useEffect might rewrite it, but it should be the same value initially
-    expect(setItemSpy).toHaveBeenCalledWith('invertedPairs', JSON.stringify(initialPairs));
+    expect(setItemSpy).toHaveBeenCalledWith(
+      'invertedPairs',
+      JSON.stringify(initialPairs)
+    );
   });
 
   describe('handlePairInversion', () => {
@@ -56,7 +59,10 @@ describe('useInvertedPairs Hook', () => {
 
       expect(result.current.invertedPairs).toEqual(new Set(['PAIR_A']));
       expect(setItemSpy).toHaveBeenCalledTimes(1);
-      expect(setItemSpy).toHaveBeenCalledWith('invertedPairs', JSON.stringify(['PAIR_A']));
+      expect(setItemSpy).toHaveBeenCalledWith(
+        'invertedPairs',
+        JSON.stringify(['PAIR_A'])
+      );
     });
 
     it('should remove a pair from the set and update localStorage', () => {
@@ -76,7 +82,10 @@ describe('useInvertedPairs Hook', () => {
 
       expect(result.current.invertedPairs).toEqual(new Set(['PAIR_B']));
       expect(setItemSpy).toHaveBeenCalledTimes(1);
-      expect(setItemSpy).toHaveBeenCalledWith('invertedPairs', JSON.stringify(['PAIR_B']));
+      expect(setItemSpy).toHaveBeenCalledWith(
+        'invertedPairs',
+        JSON.stringify(['PAIR_B'])
+      );
     });
 
     it('should toggle pairs correctly and update localStorage', () => {
@@ -84,22 +93,41 @@ describe('useInvertedPairs Hook', () => {
       setItemSpy.mockClear(); // Clear initial setItem
 
       // Add PAIR_X
-      act(() => { result.current.handlePairInversion('PAIR_X'); });
+      act(() => {
+        result.current.handlePairInversion('PAIR_X');
+      });
       expect(result.current.invertedPairs).toEqual(new Set(['PAIR_X']));
-      expect(setItemSpy).toHaveBeenLastCalledWith('invertedPairs', JSON.stringify(['PAIR_X']));
+      expect(setItemSpy).toHaveBeenLastCalledWith(
+        'invertedPairs',
+        JSON.stringify(['PAIR_X'])
+      );
 
       // Add PAIR_Y
-      act(() => { result.current.handlePairInversion('PAIR_Y'); });
-      expect(result.current.invertedPairs).toEqual(new Set(['PAIR_X', 'PAIR_Y']));
-      expect(setItemSpy).toHaveBeenLastCalledWith('invertedPairs', JSON.stringify(['PAIR_X', 'PAIR_Y']));
+      act(() => {
+        result.current.handlePairInversion('PAIR_Y');
+      });
+      expect(result.current.invertedPairs).toEqual(
+        new Set(['PAIR_X', 'PAIR_Y'])
+      );
+      expect(setItemSpy).toHaveBeenLastCalledWith(
+        'invertedPairs',
+        JSON.stringify(['PAIR_X', 'PAIR_Y'])
+      );
 
       // Remove PAIR_X
-      act(() => { result.current.handlePairInversion('PAIR_X'); });
+      act(() => {
+        result.current.handlePairInversion('PAIR_X');
+      });
       expect(result.current.invertedPairs).toEqual(new Set(['PAIR_Y']));
-      expect(setItemSpy).toHaveBeenLastCalledWith('invertedPairs', JSON.stringify(['PAIR_Y']));
+      expect(setItemSpy).toHaveBeenLastCalledWith(
+        'invertedPairs',
+        JSON.stringify(['PAIR_Y'])
+      );
 
       // Remove PAIR_Y
-      act(() => { result.current.handlePairInversion('PAIR_Y'); });
+      act(() => {
+        result.current.handlePairInversion('PAIR_Y');
+      });
       expect(result.current.invertedPairs).toEqual(new Set([]));
       expect(setItemSpy).toHaveBeenLastCalledWith('invertedPairs', '[]');
 

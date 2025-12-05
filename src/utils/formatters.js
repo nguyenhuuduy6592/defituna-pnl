@@ -20,7 +20,9 @@ const FRACTION_DIGITS_DEFAULT = 2;
  * @returns {string} The formatted number as a string (defaults to '0.00' if input is invalid).
  */
 export const formatNumber = (num, abbreviate = true) => {
-  if (num === null || num === undefined) {return '0.00';}
+  if (num === null || num === undefined) {
+    return '0.00';
+  }
 
   const number = Number(num);
   const absNum = Math.abs(number);
@@ -28,9 +30,15 @@ export const formatNumber = (num, abbreviate = true) => {
 
   // Handle large number abbreviations if requested
   if (abbreviate) {
-    if (absNum >= 1e9) {return sign + (absNum / 1e9).toFixed(2) + 'B';}
-    if (absNum >= 1e6) {return sign + (absNum / 1e6).toFixed(2) + 'M';}
-    if (absNum >= 1e3) {return sign + (absNum / 1e3).toFixed(2) + 'K';}
+    if (absNum >= 1e9) {
+      return sign + (absNum / 1e9).toFixed(2) + 'B';
+    }
+    if (absNum >= 1e6) {
+      return sign + (absNum / 1e6).toFixed(2) + 'M';
+    }
+    if (absNum >= 1e3) {
+      return sign + (absNum / 1e3).toFixed(2) + 'K';
+    }
   }
 
   // Handle small numbers with more precision
@@ -54,10 +62,14 @@ export const formatNumber = (num, abbreviate = true) => {
  * @returns {string} Formatted percentage with % suffix
  */
 export const formatPercentage = (value, digits = 2) => {
-  if (value === null || value === undefined) {return '0.00%';}
+  if (value === null || value === undefined) {
+    return '0.00%';
+  }
 
   const percentValue = Number(value) * 100;
-  if (isNaN(percentValue)) {return 'N/A';}
+  if (isNaN(percentValue)) {
+    return 'N/A';
+  }
 
   return percentValue.toFixed(digits) + '%';
 };
@@ -70,7 +82,9 @@ export const formatPercentage = (value, digits = 2) => {
  * @returns {string} The formatted value as a string (defaults to ' 0.00    ' if input is invalid).
  */
 export const formatValue = (val) => {
-  if (val === null || val === undefined) {return ' 0.00    ';} // Padded default
+  if (val === null || val === undefined) {
+    return ' 0.00    ';
+  } // Padded default
 
   const absVal = Math.abs(val);
   const sign = val >= 0 ? ' ' : '-'; // Space for positive, minus for negative
@@ -92,7 +106,9 @@ export const formatValue = (val) => {
  * @returns {string} The formatted duration string (defaults to 'Unknown' if input is invalid or zero).
  */
 export const formatDuration = (ageSeconds) => {
-  if (ageSeconds === null || ageSeconds === undefined || ageSeconds <= 0) {return 'Unknown';}
+  if (ageSeconds === null || ageSeconds === undefined || ageSeconds <= 0) {
+    return 'Unknown';
+  }
 
   const days = Math.floor(ageSeconds / 86400);
   const hours = Math.floor((ageSeconds % 86400) / 3600);
@@ -100,25 +116,36 @@ export const formatDuration = (ageSeconds) => {
   const seconds = Math.floor(ageSeconds % 60);
 
   const parts = [];
-  if (days > 0) {parts.push(`${days}d`);}
-  if (hours > 0) {parts.push(`${hours}h`);}
-  if (minutes > 0) {parts.push(`${minutes}m`);}
+  if (days > 0) {
+    parts.push(`${days}d`);
+  }
+  if (hours > 0) {
+    parts.push(`${hours}h`);
+  }
+  if (minutes > 0) {
+    parts.push(`${minutes}m`);
+  }
 
   // Show seconds in these cases:
   // 1. When there are no larger units
   // 2. When we have exactly minutes and seconds (e.g., "1m 30s")
   // 3. When we have days/hours, minutes, and significant seconds (>= 10s)
-  if (seconds > 0 && (
-    parts.length === 0 || // No larger units
-    (parts.length === 1 && minutes > 0) || // Only minutes present
-    (parts.length === 2 && ((days > 0 && minutes > 0) || (hours > 0 && minutes > 0)) && seconds >= 10) || // Days/hours and minutes present, and at least 10 seconds
-    (parts.length === 3 && seconds >= 10) // All larger units present and at least 10 seconds
-  )) {
+  if (
+    seconds > 0 &&
+    (parts.length === 0 || // No larger units
+      (parts.length === 1 && minutes > 0) || // Only minutes present
+      (parts.length === 2 &&
+        ((days > 0 && minutes > 0) || (hours > 0 && minutes > 0)) &&
+        seconds >= 10) || // Days/hours and minutes present, and at least 10 seconds
+      (parts.length === 3 && seconds >= 10)) // All larger units present and at least 10 seconds
+  ) {
     parts.push(`${Math.max(1, seconds)}s`);
   }
 
   // If no parts (e.g., ageSeconds was between 0 and 1), default to 1s
-  if (parts.length === 0) {return '1s';}
+  if (parts.length === 0) {
+    return '1s';
+  }
 
   return parts.join(' ');
 };
@@ -130,7 +157,9 @@ export const formatDuration = (ageSeconds) => {
  * @returns {string} The formatted address (e.g., '0x1234...abcd') or 'Unknown' if input is invalid.
  */
 export const formatWalletAddress = (address) => {
-  if (!address || typeof address !== 'string' || address.length < 10) {return 'Unknown';}
+  if (!address || typeof address !== 'string' || address.length < 10) {
+    return 'Unknown';
+  }
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
 
@@ -141,7 +170,9 @@ export const formatWalletAddress = (address) => {
  * @returns {string} Formatted fee with $ prefix
  */
 export const formatFee = (fee, abbreviate = true) => {
-  if (fee === null || fee === undefined) {return '$0.00';}
+  if (fee === null || fee === undefined) {
+    return '$0.00';
+  }
 
   return '$' + formatNumber(fee, abbreviate);
 };

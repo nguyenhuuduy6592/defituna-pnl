@@ -1,60 +1,65 @@
-@use "sass:map";
+@use 'sass:map';
 @use '../../styles/variables.module.scss' as variables;
 
 .pnlHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: variables.spacing(md);
-  }
-  
-  .pnlGrid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: variables.spacing(md);
-    margin-top: variables.spacing(sm);
-  
-    @include variables.responsive(sm) {
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    }
-  }
-  
-  .pnlItem {
-    @include variables.card;
-    padding: variables.spacing(md);
-    background: variables.bg-color(card);
-    border-radius: border-radius(md);
-    box-shadow: box-shadow(sm);
-    transition: box-shadow 0.3s ease;
-    width: 100%;
-    box-sizing: border-box;
-    
-    &:hover {
-      box-shadow: box-shadow(md);
-    }
-  
-    .label {
-      font-size: variables.font-size(sm);
-      color: variables.text-color(secondary);
-      margin-bottom: variables.spacing(xs);
-    }
-  
-    .value {
-      font-size: variables.font-size(xl);
-      font-weight: font-weight(bold);
-      font-family: monospace;
-      word-break: break-word;
-      
-      &.positive { color: variables.color(positive); }
-      &.negative { color: variables.color(negative); }
-      &.zero { color: variables.color(zero); }
-    }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: variables.spacing(md);
+}
 
-    .solValue {
-      font-size: variables.font-size(sm);
-      font-weight: font-weight(normal);
-      color: variables.text-color(secondary);
-      margin-left: variables.spacing(xs);
+.pnlGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: variables.spacing(md);
+  margin-top: variables.spacing(sm);
+
+  @include variables.responsive(sm) {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+}
+
+.pnlItem {
+  @include variables.card;
+  padding: variables.spacing(md);
+  background: variables.bg-color(card);
+  border-radius: border-radius(md);
+  box-shadow: box-shadow(sm);
+  transition: box-shadow 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+
+  &:hover {
+    box-shadow: box-shadow(md);
+  }
+
+  .label {
+    font-size: variables.font-size(sm);
+    color: variables.text-color(secondary);
+    margin-bottom: variables.spacing(xs);
+  }
+
+  .value {
+    font-size: variables.font-size(xl);
+    font-weight: font-weight(bold);
+    font-family: monospace;
+    word-break: break-word;
+
+    &.positive {
+      color: variables.color(positive);
+    }
+    &.negative {
+      color: variables.color(negative);
+    }
+    &.zero {
+      color: variables.color(zero);
     }
   }
-  
+
+  .solValue {
+    font-size: variables.font-size(sm);
+    font-weight: font-weight(normal);
+    color: variables.text-color(secondary);
+    margin-left: variables.spacing(xs);
+  }
+}

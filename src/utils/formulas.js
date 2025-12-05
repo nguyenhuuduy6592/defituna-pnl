@@ -32,7 +32,10 @@ export function calculateLeverage({ price, debtA, debtB, totalA, totalB }) {
 
     const totalValue = numTotalA * numPrice + numTotalB;
     if (totalValue <= 0) {
-      console.warn('[calculateLeverage] Total value is zero or negative:', totalValue);
+      console.warn(
+        '[calculateLeverage] Total value is zero or negative:',
+        totalValue
+      );
       return 1.0; // Default leverage
     }
 
@@ -40,7 +43,9 @@ export function calculateLeverage({ price, debtA, debtB, totalA, totalB }) {
 
     // Prevent division by zero or negative values
     if (totalValue <= debtValue) {
-      console.warn('[calculateLeverage] Total value less than or equal to debt value');
+      console.warn(
+        '[calculateLeverage] Total value less than or equal to debt value'
+      );
       return 100.0; // Cap at max leverage for display
     }
 
@@ -65,11 +70,21 @@ export function calculateLeverage({ price, debtA, debtB, totalA, totalB }) {
  * @param {number} params.liquidationThreshold - Liquidation threshold (e.g., 0.05 for 5%)
  * @returns {Object} Object containing lower and upper liquidation prices
  */
-export function computeLiquidationPrices({ lowerPrice, upperPrice, debtA, debtB, liquidity, liquidationThreshold }) {
+export function computeLiquidationPrices({
+  lowerPrice,
+  upperPrice,
+  debtA,
+  debtB,
+  liquidity,
+  liquidationThreshold,
+}) {
   try {
     // Input validation
     if (!lowerPrice || !upperPrice || lowerPrice >= upperPrice) {
-      console.warn('[computeLiquidationPrices] Invalid price range:', { lowerPrice, upperPrice });
+      console.warn('[computeLiquidationPrices] Invalid price range:', {
+        lowerPrice,
+        upperPrice,
+      });
       return { lowerLiquidationPrice: 0, upperLiquidationPrice: 0 };
     }
 
@@ -89,14 +104,18 @@ export function computeLiquidationPrices({ lowerPrice, upperPrice, debtA, debtB,
     const lowerSqrtPrice = Math.sqrt(numLowerPrice);
     const upperSqrtPrice = Math.sqrt(numUpperPrice);
 
-    const a = numDebtA + numLiquidationThreshold * (numLiquidity / upperSqrtPrice);
+    const a =
+      numDebtA + numLiquidationThreshold * (numLiquidity / upperSqrtPrice);
     const b = -2 * numLiquidationThreshold * numLiquidity;
-    const c = numDebtB + numLiquidationThreshold * (numLiquidity * lowerSqrtPrice);
+    const c =
+      numDebtB + numLiquidationThreshold * (numLiquidity * lowerSqrtPrice);
 
     const discriminant = b * b - 4 * a * c;
 
     if (discriminant < 0 || a === 0) {
-      console.warn('[computeLiquidationPrices] No real solution exists or division by zero.');
+      console.warn(
+        '[computeLiquidationPrices] No real solution exists or division by zero.'
+      );
       return { lowerLiquidationPrice: 0, upperLiquidationPrice: 0 };
     }
 
@@ -144,7 +163,13 @@ export function createEmptyPositionTemplate() {
  * @param {Object} tokenBData - Token B metadata
  * @returns {Object} Processed position with calculated values
  */
-export function processTunaPosition(positionData, poolData, marketData, tokenAData, tokenBData) {
+export function processTunaPosition(
+  positionData,
+  poolData,
+  marketData,
+  tokenAData,
+  tokenBData
+) {
   try {
     // Validate inputs
     if (!positionData?.data || !poolData?.data) {
@@ -167,9 +192,14 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
     const pool = poolData.data;
 
     // Find matching market data
-    const market = marketData?.data?.find(m => m.pool_address === pool.address);
+    const market = marketData?.data?.find(
+      (m) => m.pool_address === pool.address
+    );
     if (!market) {
-      console.error('[processTunaPosition] No matching market found for pool', pool.address);
+      console.error(
+        '[processTunaPosition] No matching market found for pool',
+        pool.address
+      );
       return createEmptyPositionTemplate();
     }
 
@@ -182,30 +212,71 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
     // Convert string amounts to numbers with proper decimal handling
     const totalA = Number(position.total_a?.amount || 0) / 10 ** tokenADecimals;
     const totalB = Number(position.total_b?.amount || 0) / 10 ** tokenBDecimals;
-    const debtA = Number(position.current_loan_a?.amount || 0) / 10 ** tokenADecimals;
-    const debtB = Number(position.current_loan_b?.amount || 0) / 10 ** tokenBDecimals;
-    const loanFundsA = Number(position.loan_funds_a?.amount || 0) / 10 ** tokenADecimals;
-    const loanFundsB = Number(position.loan_funds_b?.amount || 0) / 10 ** tokenBDecimals;
+    const debtA =
+      Number(position.current_loan_a?.amount || 0) / 10 ** tokenADecimals;
+    const debtB =
+      Number(position.current_loan_b?.amount || 0) / 10 ** tokenBDecimals;
+    const loanFundsA =
+      Number(position.loan_funds_a?.amount || 0) / 10 ** tokenADecimals;
+    const loanFundsB =
+      Number(position.loan_funds_b?.amount || 0) / 10 ** tokenBDecimals;
     const yieldA = Number(position.yield_a?.amount || 0) / 10 ** tokenADecimals;
     const yieldB = Number(position.yield_b?.amount || 0) / 10 ** tokenBDecimals;
-    const compoundedA = Number(position.compounded_yield_a?.amount || 0) / 10 ** tokenADecimals;
-    const compoundedB = Number(position.compounded_yield_b?.amount || 0) / 10 ** tokenBDecimals;
+    const compoundedA =
+      Number(position.compounded_yield_a?.amount || 0) / 10 ** tokenADecimals;
+    const compoundedB =
+      Number(position.compounded_yield_b?.amount || 0) / 10 ** tokenBDecimals;
     const pnlA = Number(position.pnl_a?.amount || 0) / 10 ** tokenADecimals;
     const pnlB = Number(position.pnl_b?.amount || 0) / 10 ** tokenBDecimals;
 
     // Calculate prices and ticks
-    const currentPrice = tickIndexToPrice(pool.tick_current_index, tokenADecimals, tokenBDecimals);
-    const lowerRangePrice = tickIndexToPrice(position.tick_lower_index, tokenADecimals, tokenBDecimals);
-    const upperRangePrice = tickIndexToPrice(position.tick_upper_index, tokenADecimals, tokenBDecimals);
-    const lowerLimitOrderPrice = position.tick_stop_loss_index == -2147483648 ? 0 : tickIndexToPrice(position.tick_stop_loss_index, tokenADecimals, tokenBDecimals);
-    const upperLimitOrderPrice = position.tick_take_profit_index == 2147483647 ? 0 :tickIndexToPrice(position.tick_take_profit_index, tokenADecimals, tokenBDecimals);
+    const currentPrice = tickIndexToPrice(
+      pool.tick_current_index,
+      tokenADecimals,
+      tokenBDecimals
+    );
+    const lowerRangePrice = tickIndexToPrice(
+      position.tick_lower_index,
+      tokenADecimals,
+      tokenBDecimals
+    );
+    const upperRangePrice = tickIndexToPrice(
+      position.tick_upper_index,
+      tokenADecimals,
+      tokenBDecimals
+    );
+    const lowerLimitOrderPrice =
+      position.tick_stop_loss_index == -2147483648
+        ? 0
+        : tickIndexToPrice(
+            position.tick_stop_loss_index,
+            tokenADecimals,
+            tokenBDecimals
+          );
+    const upperLimitOrderPrice =
+      position.tick_take_profit_index == 2147483647
+        ? 0
+        : tickIndexToPrice(
+            position.tick_take_profit_index,
+            tokenADecimals,
+            tokenBDecimals
+          );
 
     // Calculate leverage
-    const leverage = calculateLeverage({ price: currentPrice, debtA, debtB, totalA, totalB });
+    const leverage = calculateLeverage({
+      price: currentPrice,
+      debtA,
+      debtB,
+      totalA,
+      totalB,
+    });
 
     // Calculate size and collateral
-    const size = Number(position.total_a?.usd || 0) + Number(position.total_b?.usd || 0) +
-            Number(position.leftovers_a?.usd || 0) + Number(position.leftovers_b?.usd || 0);
+    const size =
+      Number(position.total_a?.usd || 0) +
+      Number(position.total_b?.usd || 0) +
+      Number(position.leftovers_a?.usd || 0) +
+      Number(position.leftovers_b?.usd || 0);
     const collateral = {
       tokenA: totalA - debtA,
       tokenB: totalB - debtB,
@@ -216,23 +287,31 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
     const debt = {
       tokenA: debtA,
       tokenB: debtB,
-      usd: Number(position.current_loan_a?.usd || 0) + Number(position.current_loan_b?.usd || 0),
+      usd:
+        Number(position.current_loan_a?.usd || 0) +
+        Number(position.current_loan_b?.usd || 0),
     };
 
     const interest = {
       tokenA: debtA - loanFundsA,
       tokenB: debtB - loanFundsB,
-      usd: Number(position.current_loan_a?.usd || 0) - Number(position.loan_funds_a?.usd || 0) +
-                 Number(position.current_loan_b?.usd || 0) - Number(position.loan_funds_b?.usd || 0),
+      usd:
+        Number(position.current_loan_a?.usd || 0) -
+        Number(position.loan_funds_a?.usd || 0) +
+        Number(position.current_loan_b?.usd || 0) -
+        Number(position.loan_funds_b?.usd || 0),
     };
 
     // Calculate liquidation prices
     let liquidationPrices;
     if (leverage == 1) {
-      liquidationPrices = { lowerLiquidationPrice: 0, upperLiquidationPrice: 0 };
-    }
-    else {
-      const liquidationThreshold = (market.liquidation_threshold || 0) / 1000000; // Convert from parts per million
+      liquidationPrices = {
+        lowerLiquidationPrice: 0,
+        upperLiquidationPrice: 0,
+      };
+    } else {
+      const liquidationThreshold =
+        (market.liquidation_threshold || 0) / 1000000; // Convert from parts per million
       liquidationPrices = computeLiquidationPrices({
         lowerPrice: lowerRangePrice,
         upperPrice: upperRangePrice,
@@ -244,11 +323,18 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
     }
 
     // Calculate entry and limit order prices
-    const entryPrice = position.entry_sqrt_price ? sqrtPriceToPrice(BigInt(position.entry_sqrt_price), tokenADecimals, tokenBDecimals) : 0;
+    const entryPrice = position.entry_sqrt_price
+      ? sqrtPriceToPrice(
+          BigInt(position.entry_sqrt_price),
+          tokenADecimals,
+          tokenBDecimals
+        )
+      : 0;
 
     // Calculate yield values
     const yieldValue = {
-      usd: Number(position.yield_a?.usd || 0) + Number(position.yield_b?.usd || 0),
+      usd:
+        Number(position.yield_a?.usd || 0) + Number(position.yield_b?.usd || 0),
       a: {
         amount: yieldA,
       },
@@ -258,7 +344,9 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
     };
 
     const compounded = {
-      usd: Number(position.compounded_yield_a?.usd || 0) + Number(position.compounded_yield_b?.usd || 0),
+      usd:
+        Number(position.compounded_yield_a?.usd || 0) +
+        Number(position.compounded_yield_b?.usd || 0),
       a: {
         amount: compoundedA,
       },
@@ -306,7 +394,10 @@ export function processTunaPosition(positionData, poolData, marketData, tokenADa
       pnl,
     };
   } catch (error) {
-    console.error('[processTunaPosition] Error processing position:', error.message);
+    console.error(
+      '[processTunaPosition] Error processing position:',
+      error.message
+    );
     return createEmptyPositionTemplate();
   }
 }

@@ -11,11 +11,14 @@ export const useInvertedPairs = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('invertedPairs', JSON.stringify(Array.from(invertedPairs)));
+    localStorage.setItem(
+      'invertedPairs',
+      JSON.stringify(Array.from(invertedPairs))
+    );
   }, [invertedPairs]);
 
   const handlePairInversion = useCallback((pair) => {
-    setInvertedPairs(prev => {
+    setInvertedPairs((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(pair)) {
         newSet.delete(pair);
@@ -26,7 +29,10 @@ export const useInvertedPairs = () => {
     });
   }, []);
 
-  const isInverted = useCallback((pair) => invertedPairs.has(pair), [invertedPairs]);
+  const isInverted = useCallback(
+    (pair) => invertedPairs.has(pair),
+    [invertedPairs]
+  );
 
   return {
     invertedPairs,

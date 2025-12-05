@@ -37,52 +37,74 @@ export const useHistoricalData = () => {
     }
   }, []);
 
-  const savePositionSnapshot = useCallback(async (positions, timestamp = Date.now()) => {
-    if (!enabled || !dbInstance || !Array.isArray(positions)) {return;}
-
-    try {
-      const success = await saveSnapshot(dbInstance, positions, timestamp);
-      success ? setError(null) : handleError(null, 'Failed to save position history data');
-    } catch (error) {
-      handleError(error, 'Failed to save position history data');
-    }
-  }, [enabled, dbInstance]);
-
-  const getPositionHistory = useCallback(async (positionId, timeRange) => {
-    if (!dbInstance) {return [];}
-
-    try {
-      const history = await getHistory(dbInstance, positionId, timeRange);
-      setError(null);
-      return history;
-    } catch (error) {
-      handleError(error, 'Failed to retrieve position history data');
-      return [];
-    }
-  }, [dbInstance]);
-
-  const toggleHistoryEnabled = useCallback(async (newEnabled) => {
-    try {
-      if (newEnabled && !dbInstance) {
-        const db = await initializeDB();
-        if (!db) {return;}
+  const savePositionSnapshot = useCallback(
+    async (positions, timestamp = Date.now()) => {
+      if (!enabled || !dbInstance || !Array.isArray(positions)) {
+        return;
       }
-      setEnabled(newEnabled);
-      localStorage.setItem('historicalDataEnabled', String(newEnabled));
-      setError(null);
-    } catch (error) {
-      handleError(error, 'Failed to toggle history collection feature');
-    }
-  }, [dbInstance, initializeDB]);
+
+      try {
+        const success = await saveSnapshot(dbInstance, positions, timestamp);
+        success
+          ? setError(null)
+          : handleError(null, 'Failed to save position history data');
+      } catch (error) {
+        handleError(error, 'Failed to save position history data');
+      }
+    },
+    [enabled, dbInstance]
+  );
+
+  const getPositionHistory = useCallback(
+    async (positionId, timeRange) => {
+      if (!dbInstance) {
+        return [];
+      }
+
+      try {
+        const history = await getHistory(dbInstance, positionId, timeRange);
+        setError(null);
+        return history;
+      } catch (error) {
+        handleError(error, 'Failed to retrieve position history data');
+        return [];
+      }
+    },
+    [dbInstance]
+  );
+
+  const toggleHistoryEnabled = useCallback(
+    async (newEnabled) => {
+      try {
+        if (newEnabled && !dbInstance) {
+          const db = await initializeDB();
+          if (!db) {
+            return;
+          }
+        }
+        setEnabled(newEnabled);
+        localStorage.setItem('historicalDataEnabled', String(newEnabled));
+        setError(null);
+      } catch (error) {
+        handleError(error, 'Failed to toggle history collection feature');
+      }
+    },
+    [dbInstance, initializeDB]
+  );
 
   useEffect(() => {
-    const savedEnabled = localStorage.getItem('historicalDataEnabled') === 'true';
+    const savedEnabled =
+      localStorage.getItem('historicalDataEnabled') === 'true';
     if (savedEnabled) {
       initializeDB()
-        .then(db => {
-          if (db) {setEnabled(true);}
+        .then((db) => {
+          if (db) {
+            setEnabled(true);
+          }
         })
-        .catch(error => handleError(error, 'Failed to initialize historical data features'));
+        .catch((error) =>
+          handleError(error, 'Failed to initialize historical data features')
+        );
     }
   }, [initializeDB]);
 

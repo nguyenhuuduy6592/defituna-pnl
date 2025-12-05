@@ -1,4 +1,4 @@
-@use "sass:map";
+@use 'sass:map';
 @use '../../styles/variables.module.scss';
 
 .refreshControls {
@@ -35,8 +35,8 @@
   color: variables.text-color(primary);
   font-size: variables.font-size(base);
   padding: variables.spacing(xs) 0;
-  
-  input[type="checkbox"] {
+
+  input[type='checkbox'] {
     width: variables.spacing(md);
     height: variables.spacing(md);
     margin: 0;
@@ -63,11 +63,11 @@
     font-size: variables.font-size(sm);
     min-width: 120px;
     margin: 0;
-    
+
     @include variables.responsive(sm) {
       width: auto;
     }
-    
+
     &:focus {
       outline: none;
       border-color: variables.color(primary);

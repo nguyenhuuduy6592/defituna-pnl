@@ -27,7 +27,7 @@ describe('TimeframeSelector Component', () => {
       />
     );
 
-    defaultTimeframes.forEach(timeframe => {
+    defaultTimeframes.forEach((timeframe) => {
       expect(screen.getByText(timeframe)).toBeInTheDocument();
     });
   });
@@ -68,14 +68,9 @@ describe('TimeframeSelector Component', () => {
   });
 
   it('uses default timeframes when none are provided', () => {
-    render(
-      <TimeframeSelector
-        selected="24h"
-        onChange={mockOnChange}
-      />
-    );
+    render(<TimeframeSelector selected="24h" onChange={mockOnChange} />);
 
-    defaultTimeframes.forEach(timeframe => {
+    defaultTimeframes.forEach((timeframe) => {
       expect(screen.getByText(timeframe)).toBeInTheDocument();
     });
   });
@@ -103,7 +98,7 @@ describe('TimeframeSelector Component', () => {
       />
     );
 
-    customTimeframes.forEach(timeframe => {
+    customTimeframes.forEach((timeframe) => {
       expect(screen.getByText(timeframe)).toBeInTheDocument();
     });
 
@@ -137,7 +132,7 @@ describe('TimeframeSelector Component', () => {
     const buttons = screen.getAllByRole('button');
     expect(buttons.length).toBe(defaultTimeframes.length);
 
-    buttons.forEach(button => {
+    buttons.forEach((button) => {
       expect(button).toHaveClass('timeframeButton');
     });
   });

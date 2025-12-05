@@ -9,7 +9,7 @@ export default function App({ Component, pageProps }) {
       window.addEventListener('load', () => {
         navigator.serviceWorker
           .register('/service-worker.js')
-          .catch(error => {
+          .catch((error) => {
             console.error('Service Worker registration failed:', error);
           });
       });

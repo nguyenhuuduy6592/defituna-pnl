@@ -29,26 +29,40 @@ describe('HistoryConfirmationModal Component', () => {
     });
 
     it('renders the enable modal with correct title', () => {
-      expect(screen.getByText('Enable Historical Data Storage')).toBeInTheDocument();
+      expect(
+        screen.getByText('Enable Historical Data Storage')
+      ).toBeInTheDocument();
     });
 
     it('renders enable-specific content', () => {
-      expect(screen.getByText(/This feature will store your position data locally/)).toBeInTheDocument();
-      expect(screen.getByText('Historical performance chart')).toBeInTheDocument();
+      expect(
+        screen.getByText(/This feature will store your position data locally/)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('Historical performance chart')
+      ).toBeInTheDocument();
     });
 
     it('renders important notes for enabling', () => {
       expect(screen.getByText('Important notes:')).toBeInTheDocument();
-      expect(screen.getByText(/Auto-refresh will be enabled/)).toBeInTheDocument();
-      expect(screen.getByText(/The browser tab must be open/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Auto-refresh will be enabled/)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/The browser tab must be open/)
+      ).toBeInTheDocument();
     });
 
     it('shows correct confirm button text', () => {
-      expect(screen.getByRole('button', { name: /Enable historical data storage/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /Enable historical data storage/i })
+      ).toBeInTheDocument();
     });
 
     it('calls onConfirm when confirm button is clicked', () => {
-      const confirmButton = screen.getByRole('button', { name: /Enable historical data storage/i });
+      const confirmButton = screen.getByRole('button', {
+        name: /Enable historical data storage/i,
+      });
       fireEvent.click(confirmButton);
       expect(mockOnConfirm).toHaveBeenCalledTimes(1);
     });
@@ -66,27 +80,43 @@ describe('HistoryConfirmationModal Component', () => {
     });
 
     it('renders the disable modal with correct title', () => {
-      expect(screen.getByText('Disable Historical Data Storage')).toBeInTheDocument();
+      expect(
+        screen.getByText('Disable Historical Data Storage')
+      ).toBeInTheDocument();
     });
 
     it('renders disable-specific content', () => {
-      expect(screen.getByText(/Disabling historical data storage will:/)).toBeInTheDocument();
-      expect(screen.getByText(/Stop collecting new position data/)).toBeInTheDocument();
-      expect(screen.getByText(/Remove access to historical performance charts/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Disabling historical data storage will:/)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Stop collecting new position data/)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Remove access to historical performance charts/)
+      ).toBeInTheDocument();
     });
 
     it('renders important notes for disabling', () => {
       expect(screen.getByText('Important notes:')).toBeInTheDocument();
-      expect(screen.getByText(/You can re-enable this feature/)).toBeInTheDocument();
-      expect(screen.getByText(/Existing data will be preserved/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/You can re-enable this feature/)
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/Existing data will be preserved/)
+      ).toBeInTheDocument();
     });
 
     it('shows correct confirm button text', () => {
-      expect(screen.getByRole('button', { name: /Disable historical data storage/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /Disable historical data storage/i })
+      ).toBeInTheDocument();
     });
 
     it('calls onConfirm when confirm button is clicked', () => {
-      const confirmButton = screen.getByRole('button', { name: /Disable historical data storage/i });
+      const confirmButton = screen.getByRole('button', {
+        name: /Disable historical data storage/i,
+      });
       fireEvent.click(confirmButton);
       expect(mockOnConfirm).toHaveBeenCalledTimes(1);
     });

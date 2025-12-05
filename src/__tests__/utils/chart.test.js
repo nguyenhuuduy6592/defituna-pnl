@@ -20,7 +20,6 @@ jest.mock('../components/pnl/PositionChart.module.scss', () => ({
 }));
 
 describe('Chart Utils', () => {
-
   describe('prepareChartData', () => {
     it('should return an empty array for invalid input', () => {
       expect(prepareChartData(null)).toEqual([]);
@@ -31,9 +30,18 @@ describe('Chart Utils', () => {
 
     it('should process position history and extract relevant fields', () => {
       const history = [
-        { timestamp: '2023-01-01T10:00:00Z', pnl: { usd: 100 }, yield: { value: 5 } },
+        {
+          timestamp: '2023-01-01T10:00:00Z',
+          pnl: { usd: 100 },
+          yield: { value: 5 },
+        },
         { timestamp: 1672574400000, pnl: 150, yield: null, compounded: 20 }, // 2023-01-01T12:00:00Z
-        { timestamp: '2023-01-01T11:00:00Z', pnl: { value: 120 }, yield_a: 2, yield_b: { usd: 3 } }, // Out of order
+        {
+          timestamp: '2023-01-01T11:00:00Z',
+          pnl: { value: 120 },
+          yield_a: 2,
+          yield_b: { usd: 3 },
+        }, // Out of order
       ];
       const expected = [
         { timestamp: 1672567200000, pnl: 100, yield: 5, compounded: 0 },
@@ -48,7 +56,11 @@ describe('Chart Utils', () => {
       // Test case without the null entry that causes a TypeError
       const historyWithoutNull = [
         { timestamp: '2023-01-01T10:00:00Z' }, // Missing pnl/yield
-        { timestamp: 1672574400000, pnl: 'invalid', yield: { usd: 'not a number' } },
+        {
+          timestamp: 1672574400000,
+          pnl: 'invalid',
+          yield: { usd: 'not a number' },
+        },
         { pnl: 100, yield: 5 }, // Missing timestamp
         { timestamp: 'invalid-date', pnl: 50, yield: 2 },
       ];
@@ -56,7 +68,7 @@ describe('Chart Utils', () => {
       // Expecting entries with 0 for missing/invalid pnl/yield
       // Entries with invalid/missing timestamps might have current time or be filtered depending on implementation
       expect(result.length).toBeLessThanOrEqual(historyWithoutNull.length);
-      result.forEach(item => {
+      result.forEach((item) => {
         expect(typeof item.timestamp).toBe('number');
         // Allow timestamp to be NaN if date string was invalid, but it must be number type
         // expect(isNaN(item.timestamp)).toBe(false); // <-- Original failing assertion
@@ -68,12 +80,12 @@ describe('Chart Utils', () => {
         expect(isNaN(item.compounded)).toBe(false);
       });
       // Specific check for the valid entry with missing timestamp (should get a fallback like Date.now())
-      const entryMissingTimestamp = result.find(item => item.pnl === 100);
+      const entryMissingTimestamp = result.find((item) => item.pnl === 100);
       expect(entryMissingTimestamp).toBeDefined();
       expect(isNaN(entryMissingTimestamp.timestamp)).toBe(false); // Fallback should be valid number
       expect(entryMissingTimestamp.yield).toBe(5);
       // Specific check for invalid date (should result in NaN timestamp)
-      const entryInvalidDate = result.find(item => item.pnl === 50);
+      const entryInvalidDate = result.find((item) => item.pnl === 50);
       expect(entryInvalidDate).toBeDefined();
       expect(isNaN(entryInvalidDate.timestamp)).toBe(true); // Expect NaN here
       expect(entryInvalidDate.yield).toBe(2);
@@ -88,13 +100,26 @@ describe('Chart Utils', () => {
       ];
       // Expect the function call within the arrow function to throw the specific error
       expect(() => prepareChartData(historyWithNull)).toThrow(TypeError);
-      expect(() => prepareChartData(historyWithNull)).toThrow('Cannot read properties of null (reading \'timestamp\')');
+      expect(() => prepareChartData(historyWithNull)).toThrow(
+        "Cannot read properties of null (reading 'timestamp')"
+      );
     });
 
     it('should correctly sum yield_a and yield_b when yield is zero or missing', () => {
       const history = [
-        { timestamp: '2023-01-01T10:00:00Z', pnl: 100, yield: 0, yield_a: { usd: 2 }, yield_b: 3 },
-        { timestamp: '2023-01-01T11:00:00Z', pnl: 120, yield_a: 1, yield_b: { value: 4 } }, // yield missing
+        {
+          timestamp: '2023-01-01T10:00:00Z',
+          pnl: 100,
+          yield: 0,
+          yield_a: { usd: 2 },
+          yield_b: 3,
+        },
+        {
+          timestamp: '2023-01-01T11:00:00Z',
+          pnl: 120,
+          yield_a: 1,
+          yield_b: { value: 4 },
+        }, // yield missing
       ];
       const expected = [
         { timestamp: 1672567200000, pnl: 100, yield: 5, compounded: 0 }, // 2 + 3
@@ -120,13 +145,41 @@ describe('Chart Utils', () => {
 
   describe('groupChartData', () => {
     const sampleData = [
-      { timestamp: new Date('2023-01-01T10:01:00Z').getTime(), pnl: 10, yield: 1 },
-      { timestamp: new Date('2023-01-01T10:04:00Z').getTime(), pnl: 12, yield: 1.1 }, // End of first 5min interval
-      { timestamp: new Date('2023-01-01T10:06:00Z').getTime(), pnl: 15, yield: 1.2 },
-      { timestamp: new Date('2023-01-01T10:09:00Z').getTime(), pnl: 16, yield: 1.3 }, // End of second 5min interval
-      { timestamp: new Date('2023-01-01T10:11:00Z').getTime(), pnl: 18, yield: 1.4 }, // Third 5min interval
-      { timestamp: new Date('2023-01-01T10:35:00Z').getTime(), pnl: 20, yield: 1.5 }, // Belongs to 10:30 interval
-      { timestamp: new Date('2023-01-01T11:05:00Z').getTime(), pnl: 25, yield: 1.6 }, // New hour, 11:05 interval
+      {
+        timestamp: new Date('2023-01-01T10:01:00Z').getTime(),
+        pnl: 10,
+        yield: 1,
+      },
+      {
+        timestamp: new Date('2023-01-01T10:04:00Z').getTime(),
+        pnl: 12,
+        yield: 1.1,
+      }, // End of first 5min interval
+      {
+        timestamp: new Date('2023-01-01T10:06:00Z').getTime(),
+        pnl: 15,
+        yield: 1.2,
+      },
+      {
+        timestamp: new Date('2023-01-01T10:09:00Z').getTime(),
+        pnl: 16,
+        yield: 1.3,
+      }, // End of second 5min interval
+      {
+        timestamp: new Date('2023-01-01T10:11:00Z').getTime(),
+        pnl: 18,
+        yield: 1.4,
+      }, // Third 5min interval
+      {
+        timestamp: new Date('2023-01-01T10:35:00Z').getTime(),
+        pnl: 20,
+        yield: 1.5,
+      }, // Belongs to 10:30 interval
+      {
+        timestamp: new Date('2023-01-01T11:05:00Z').getTime(),
+        pnl: 25,
+        yield: 1.6,
+      }, // New hour, 11:05 interval
     ];
 
     it('should return empty array for invalid input', () => {
@@ -161,20 +214,40 @@ describe('Chart Utils', () => {
         new Date('2023-01-01T11:00:00Z').getTime(),
         new Date('2023-01-01T11:05:00Z').getTime(),
       ].sort();
-      expect(result.map(item => item.timestamp).sort()).toEqual(expectedTimestamps);
+      expect(result.map((item) => item.timestamp).sort()).toEqual(
+        expectedTimestamps
+      );
 
       // Check values for intervals that should contain data
-      expect(result.find(r => r.timestamp === expectedTimestamps[0]).pnl).toBe(12); // Last entry in 10:00-10:04 interval
-      expect(result.find(r => r.timestamp === expectedTimestamps[1]).pnl).toBe(16); // Last entry in 10:05-10:09 interval
-      expect(result.find(r => r.timestamp === expectedTimestamps[2]).pnl).toBe(18); // Last entry in 10:10-10:14 interval
-      expect(result.find(r => r.timestamp === expectedTimestamps[7]).pnl).toBe(20); // Last entry in 10:35-10:39 interval (index 7 is 10:35)
-      expect(result.find(r => r.timestamp === expectedTimestamps[13]).pnl).toBe(25); // Last entry in 11:05-11:09 interval (index 13 is 11:05)
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[0]).pnl
+      ).toBe(12); // Last entry in 10:00-10:04 interval
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[1]).pnl
+      ).toBe(16); // Last entry in 10:05-10:09 interval
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[2]).pnl
+      ).toBe(18); // Last entry in 10:10-10:14 interval
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[7]).pnl
+      ).toBe(20); // Last entry in 10:35-10:39 interval (index 7 is 10:35)
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[13]).pnl
+      ).toBe(25); // Last entry in 11:05-11:09 interval (index 13 is 11:05)
 
       // Check values for intervals that should be null gaps
-      expect(result.find(r => r.timestamp === expectedTimestamps[3]).pnl).toBeNull(); // 10:15 interval
-      expect(result.find(r => r.timestamp === expectedTimestamps[4]).pnl).toBeNull(); // 10:20 interval
-      expect(result.find(r => r.timestamp === expectedTimestamps[5]).pnl).toBeNull(); // 10:25 interval
-      expect(result.find(r => r.timestamp === expectedTimestamps[6]).pnl).toBeNull(); // 10:30 interval (10:35 data point is in *next* interval)
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[3]).pnl
+      ).toBeNull(); // 10:15 interval
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[4]).pnl
+      ).toBeNull(); // 10:20 interval
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[5]).pnl
+      ).toBeNull(); // 10:25 interval
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[6]).pnl
+      ).toBeNull(); // 10:30 interval (10:35 data point is in *next* interval)
       // ... check other null gaps as needed
     });
 
@@ -186,9 +259,15 @@ describe('Chart Utils', () => {
       ].sort();
 
       expect(result.length).toBe(2);
-      expect(result.map(item => item.timestamp).sort()).toEqual(expectedTimestamps);
-      expect(result.find(r => r.timestamp === expectedTimestamps[0]).pnl).toBe(20); // Last entry before 11:00
-      expect(result.find(r => r.timestamp === expectedTimestamps[1]).pnl).toBe(25); // Last entry at 11:05
+      expect(result.map((item) => item.timestamp).sort()).toEqual(
+        expectedTimestamps
+      );
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[0]).pnl
+      ).toBe(20); // Last entry before 11:00
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[1]).pnl
+      ).toBe(25); // Last entry at 11:05
     });
 
     it('should handle different time periods correctly (e.g., 15min) filling gaps with null', () => {
@@ -207,14 +286,26 @@ describe('Chart Utils', () => {
         new Date('2023-01-01T11:00:00Z').getTime(), // 11:00-11:14
       ].sort();
 
-      expect(result.map(item => item.timestamp).sort()).toEqual(expectedTimestamps);
+      expect(result.map((item) => item.timestamp).sort()).toEqual(
+        expectedTimestamps
+      );
 
       // Check values for each interval
-      expect(result.find(r => r.timestamp === expectedTimestamps[0]).pnl).toBe(18); // Last entry at 10:11 (in 10:00 interval)
-      expect(result.find(r => r.timestamp === expectedTimestamps[1]).pnl).toBeNull(); // 10:15 interval is null
-      expect(result.find(r => r.timestamp === expectedTimestamps[2]).pnl).toBe(20); // Last entry at 10:35 (in 10:30 interval)
-      expect(result.find(r => r.timestamp === expectedTimestamps[3]).pnl).toBeNull(); // 10:45 interval is null
-      expect(result.find(r => r.timestamp === expectedTimestamps[4]).pnl).toBe(25); // Last entry at 11:05 (in 11:00 interval)
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[0]).pnl
+      ).toBe(18); // Last entry at 10:11 (in 10:00 interval)
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[1]).pnl
+      ).toBeNull(); // 10:15 interval is null
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[2]).pnl
+      ).toBe(20); // Last entry at 10:35 (in 10:30 interval)
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[3]).pnl
+      ).toBeNull(); // 10:45 interval is null
+      expect(
+        result.find((r) => r.timestamp === expectedTimestamps[4]).pnl
+      ).toBe(25); // Last entry at 11:05 (in 11:00 interval)
     });
 
     it('should handle entries with invalid timestamps gracefully', () => {
@@ -284,8 +375,12 @@ describe('Chart Utils', () => {
       Date.prototype.toLocaleTimeString = jest.fn(() => mockTime);
       Date.prototype.toLocaleDateString = jest.fn(); // Ensure date part is not called/used
 
-      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '5min')).toBe(mockTime);
-      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '1hour')).toBe(mockTime);
+      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '5min')).toBe(
+        mockTime
+      );
+      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '1hour')).toBe(
+        mockTime
+      );
       expect(Date.prototype.toLocaleDateString).not.toHaveBeenCalled();
     });
 
@@ -294,9 +389,15 @@ describe('Chart Utils', () => {
       Date.prototype.toLocaleTimeString = jest.fn(); // Ensure time part is not called/used
       Date.prototype.toLocaleDateString = jest.fn(() => mockDate);
 
-      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '1day')).toBe(mockDate);
-      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '1week')).toBe(mockDate);
-      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '1month')).toBe(mockDate);
+      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '1day')).toBe(
+        mockDate
+      );
+      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '1week')).toBe(
+        mockDate
+      );
+      expect(formatXAxisLabel(date1.getTime(), dataSingleDay, '1month')).toBe(
+        mockDate
+      );
       expect(Date.prototype.toLocaleTimeString).not.toHaveBeenCalled();
     });
 
@@ -307,8 +408,12 @@ describe('Chart Utils', () => {
       Date.prototype.toLocaleDateString = jest.fn(() => mockDate);
 
       const expectedFormat = `${mockDate} ${mockTime}`;
-      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '5min')).toBe(expectedFormat);
-      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '1hour')).toBe(expectedFormat);
+      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '5min')).toBe(
+        expectedFormat
+      );
+      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '1hour')).toBe(
+        expectedFormat
+      );
     });
 
     it('should format date only for long periods spanning multiple days', () => {
@@ -316,9 +421,15 @@ describe('Chart Utils', () => {
       Date.prototype.toLocaleTimeString = jest.fn(); // Ensure time part is not called/used
       Date.prototype.toLocaleDateString = jest.fn(() => mockDate);
 
-      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '1day')).toBe(mockDate);
-      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '1week')).toBe(mockDate);
-      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '1month')).toBe(mockDate);
+      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '1day')).toBe(
+        mockDate
+      );
+      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '1week')).toBe(
+        mockDate
+      );
+      expect(formatXAxisLabel(date1.getTime(), dataMultiDay, '1month')).toBe(
+        mockDate
+      );
       expect(Date.prototype.toLocaleTimeString).not.toHaveBeenCalled();
     });
   });
@@ -331,30 +442,56 @@ describe('Chart Utils', () => {
     ];
 
     it('should return null if not active', () => {
-      const { container } = render(<CustomChartTooltip active={false} payload={mockPayload} label={mockLabel} />);
+      const { container } = render(
+        <CustomChartTooltip
+          active={false}
+          payload={mockPayload}
+          label={mockLabel}
+        />
+      );
       expect(container.firstChild).toBeNull();
     });
 
     it('should return null if payload is empty or missing', () => {
-      let container = render(<CustomChartTooltip active={true} payload={[]} label={mockLabel} />).container;
+      let container = render(
+        <CustomChartTooltip active={true} payload={[]} label={mockLabel} />
+      ).container;
       expect(container.firstChild).toBeNull();
 
-      container = render(<CustomChartTooltip active={true} payload={null} label={mockLabel} />).container;
+      container = render(
+        <CustomChartTooltip active={true} payload={null} label={mockLabel} />
+      ).container;
       expect(container.firstChild).toBeNull();
 
-      container = render(<CustomChartTooltip active={true} payload={undefined} label={mockLabel} />).container;
+      container = render(
+        <CustomChartTooltip
+          active={true}
+          payload={undefined}
+          label={mockLabel}
+        />
+      ).container;
       expect(container.firstChild).toBeNull();
     });
 
     it('should render correctly with active and valid payload', () => {
-      render(<CustomChartTooltip active={true} payload={mockPayload} label={mockLabel} />);
+      render(
+        <CustomChartTooltip
+          active={true}
+          payload={mockPayload}
+          label={mockLabel}
+        />
+      );
 
       // Check timestamp label (using mock for toLocaleTimeString)
-      const expectedTime = new Date(mockLabel).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const expectedTime = new Date(mockLabel).toLocaleTimeString(undefined, {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
       expect(screen.getByText(expectedTime)).toBeInTheDocument();
 
       // Check payload entries
-      mockPayload.forEach(entry => {
+      mockPayload.forEach((entry) => {
         // Check name and formatted value
         const expectedText = `${entry.name}: formatted_${entry.value}`;
         const element = screen.getByText(expectedText);
@@ -364,7 +501,9 @@ describe('Chart Utils', () => {
       });
 
       // Check mocked CSS class
-      expect(screen.getByText(expectedTime).parentElement).toHaveClass('mockTooltipClass');
+      expect(screen.getByText(expectedTime).parentElement).toHaveClass(
+        'mockTooltipClass'
+      );
     });
   });
 });

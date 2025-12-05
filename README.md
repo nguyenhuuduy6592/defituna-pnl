@@ -20,6 +20,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 First, set up your environment variables:
 
 1. Copy `.env.local.example` to `.env.local`:
+
    ```bash
    cp .env.local.example .env.local
    ```
@@ -27,6 +28,7 @@ First, set up your environment variables:
 2. Create an account at [Helius](https://www.helius.dev/) and generate an API key
 
 3. Configure your environment variables in `.env.local`:
+
    ```
    # API Configuration
    DEFITUNA_API_URL=https://api.defituna.com/api/v1
@@ -63,16 +65,16 @@ npm test -- <path-to-test-file>
 
 ### Test Coverage Summary
 
-| Category | Components Tested | Total Coverage |
-|---------|-------------------|----------------|
-| Common Components | 6/8 (75%) | 68.77% |
-| PnL Components | 13/13 (100%) | 94.51% |
-| Education Components | 1/1 (100%) | 100% |
-| History Components | 2/2 (100%) | 100% |
-| Pool Components | 4/4 (100%) | 98.49% |
-| Hooks | 9/9 (100%) | 89.67% |
-| Utils | 12/13 (92.3%) | 90.7% |
-| Contexts | 1/1 (100%) | 100% |
+| Category             | Components Tested | Total Coverage |
+| -------------------- | ----------------- | -------------- |
+| Common Components    | 6/8 (75%)         | 68.77%         |
+| PnL Components       | 13/13 (100%)      | 94.51%         |
+| Education Components | 1/1 (100%)        | 100%           |
+| History Components   | 2/2 (100%)        | 100%           |
+| Pool Components      | 4/4 (100%)        | 98.49%         |
+| Hooks                | 9/9 (100%)        | 89.67%         |
+| Utils                | 12/13 (92.3%)     | 90.7%          |
+| Contexts             | 1/1 (100%)        | 100%           |
 
 Overall project coverage: 80.77% statements, 73.97% branches, 80.04% functions, 80.85% lines
 

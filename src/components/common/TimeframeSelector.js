@@ -8,7 +8,11 @@ import styles from '../../styles/TimeframeSelector.module.scss';
  * @param {Function} props.onChange - Callback function when timeframe changes
  * @returns {JSX.Element} TimeframeSelector component
  */
-export default function TimeframeSelector({ timeframes = ['24h', '7d', '30d'], selected = '24h', onChange }) {
+export default function TimeframeSelector({
+  timeframes = ['24h', '7d', '30d'],
+  selected = '24h',
+  onChange,
+}) {
   return (
     <div className={styles.timeframeSelector}>
       {timeframes.map((timeframe) => (

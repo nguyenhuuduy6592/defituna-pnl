@@ -8,7 +8,12 @@ import { PriceProvider } from '../../../contexts/PriceContext';
 // Mock the child components to isolate testing to just the PnLDisplay component
 jest.mock('../../../components/pnl/PositionsList', () => ({
   PositionsList: ({ positions, showWallet, historyEnabled }) => (
-    <div data-testid="positions-list" data-positions={JSON.stringify(positions)} data-showwallet={showWallet.toString()} data-historyenabled={historyEnabled.toString()}>
+    <div
+      data-testid="positions-list"
+      data-positions={JSON.stringify(positions)}
+      data-showwallet={showWallet.toString()}
+      data-historyenabled={historyEnabled.toString()}
+    >
       Positions List Mock
     </div>
   ),
@@ -24,7 +29,11 @@ jest.mock('../../../components/pnl/DonationFooter', () => ({
 
 jest.mock('../../../components/pnl/TotalPnLDisplay', () => ({
   TotalPnLDisplay: ({ label, totalValue }) => (
-    <div data-testid={`total-pnl-${label.replace(/\s+/g, '-').toLowerCase()}`} data-label={label} data-totalvalue={totalValue}>
+    <div
+      data-testid={`total-pnl-${label.replace(/\s+/g, '-').toLowerCase()}`}
+      data-label={label}
+      data-totalvalue={totalValue}
+    >
       {label}: {totalValue}
     </div>
   ),
@@ -39,7 +48,8 @@ jest.mock('../../../components/common/LoadingOverlay', () => ({
 }));
 
 jest.mock('../../../components/pnl/hooks/usePositionAges', () => ({
-  usePositionAges: (positions) => positions.map(pos => ({ ...pos, age: '30 days' })),
+  usePositionAges: (positions) =>
+    positions.map((pos) => ({ ...pos, age: '30 days' })),
 }));
 
 // Mock styles
@@ -49,7 +59,9 @@ jest.mock('../../../components/pnl/PnLDisplay.module.scss', () => ({
 }));
 
 jest.mock('../../../components/common/CurrencyToggle', () => ({
-  CurrencyToggle: () => <div data-testid="currency-toggle">Currency Toggle Mock</div>,
+  CurrencyToggle: () => (
+    <div data-testid="currency-toggle">Currency Toggle Mock</div>
+  ),
 }));
 
 // Clean up after each test
@@ -148,7 +160,9 @@ describe('PnLDisplay Component', () => {
     expect(positionsList).toHaveAttribute('data-historyenabled', 'true');
 
     // Verify positions are passed with age data
-    const passedPositions = JSON.parse(positionsList.getAttribute('data-positions'));
+    const passedPositions = JSON.parse(
+      positionsList.getAttribute('data-positions')
+    );
     expect(passedPositions).toHaveLength(2);
     expect(passedPositions[0]).toHaveProperty('age', '30 days');
   });

@@ -32,20 +32,36 @@ describe('Custom Document (_document.js)', () => {
     // Use renderToStaticMarkup for easier checking of Head contents
     const markup = renderToStaticMarkup(<Document />);
 
-    expect(markup).toContain('<meta name="application-name" content="DeFi Tuna PnL"/>');
-    expect(markup).toContain('<meta name="description" content="Track your DeFi positions and PnL"/>');
+    expect(markup).toContain(
+      '<meta name="application-name" content="DeFi Tuna PnL"/>'
+    );
+    expect(markup).toContain(
+      '<meta name="description" content="Track your DeFi positions and PnL"/>'
+    );
     expect(markup).toContain('<meta name="theme-color" content="#0A1928"/>');
-    expect(markup).toContain('<meta name="mobile-web-app-capable" content="yes"/>');
-    expect(markup).toContain('<meta name="apple-mobile-web-app-capable" content="yes"/>');
-    expect(markup).toContain('<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>');
-    expect(markup).toContain('<meta name="apple-mobile-web-app-title" content="DeFi Tuna"/>');
+    expect(markup).toContain(
+      '<meta name="mobile-web-app-capable" content="yes"/>'
+    );
+    expect(markup).toContain(
+      '<meta name="apple-mobile-web-app-capable" content="yes"/>'
+    );
+    expect(markup).toContain(
+      '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>'
+    );
+    expect(markup).toContain(
+      '<meta name="apple-mobile-web-app-title" content="DeFi Tuna"/>'
+    );
   });
 
   it('includes manifest, favicon, and apple-touch-icon links in the Head', () => {
     const markup = renderToStaticMarkup(<Document />);
 
-    expect(markup).toContain('<link rel="apple-touch-icon" href="/icon-192x192.png"/>');
+    expect(markup).toContain(
+      '<link rel="apple-touch-icon" href="/icon-192x192.png"/>'
+    );
     expect(markup).toContain('<link rel="manifest" href="/manifest.json"/>');
-    expect(markup).toContain('<link rel="icon" type="image/png" href="/favicon.svg"/>');
+    expect(markup).toContain(
+      '<link rel="icon" type="image/png" href="/favicon.svg"/>'
+    );
   });
 });

@@ -1,4 +1,4 @@
-@use "sass:map";
+@use 'sass:map';
 @use 'variables.module.scss';
 
 // Chart colors as CSS variables
@@ -10,12 +10,22 @@
 }
 
 // Reset and base styles
-html, 
+html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    Fira Sans,
+    Droid Sans,
+    Helvetica Neue,
+    sans-serif;
   font-size: variables.font-size(base);
   color: variables.text-color(primary);
   line-height: 1.5;
@@ -24,7 +34,7 @@ body {
 
 * {
   box-sizing: border-box;
-  
+
   &::before,
   &::after {
     box-sizing: border-box;
@@ -37,7 +47,7 @@ body {
   max-width: 90vw; // Makes the container responsive to viewport width
   margin: 0 auto;
   padding: variables.spacing(md);
-  
+
   @include variables.responsive(sm) {
     padding: variables.spacing(lg);
   }
@@ -48,27 +58,34 @@ body {
 }
 
 // Typography
-h1 { 
+h1 {
   font-size: variables.font-size(xl) * 1.5;
   margin-bottom: variables.spacing(lg);
 }
 
-h2 { 
+h2 {
   font-size: variables.font-size(xl);
   margin-bottom: variables.spacing(md);
 }
 
-h3 { 
+h3 {
   font-size: variables.font-size(lg);
   margin-bottom: variables.spacing(md);
 }
 
-h4, h5, h6 { 
+h4,
+h5,
+h6 {
   font-size: variables.font-size(base);
   margin-bottom: variables.spacing(sm);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   color: variables.text-color(primary);
   margin-top: 0;
   font-weight: 600;
@@ -94,20 +111,20 @@ button {
 }
 
 // Common status classes
-.loading { 
-  color: variables.color(primary); 
+.loading {
+  color: variables.color(primary);
   margin-top: variables.spacing(sm);
   display: flex;
   align-items: center;
   gap: variables.spacing(xs);
 
   &::after {
-    content: "...";
+    content: '...';
   }
 }
 
-.error { 
-  color: variables.color(negative); 
+.error {
+  color: variables.color(negative);
   margin-top: variables.spacing(sm);
   padding: variables.spacing(sm);
   border-radius: map.get(variables.$border-radius, sm);
@@ -115,25 +132,53 @@ button {
 }
 
 // Common utility classes
-.text-primary { color: variables.text-color(primary); }
-.text-secondary { color: variables.text-color(secondary); }
-.text-disabled { color: variables.text-color(disabled); }
+.text-primary {
+  color: variables.text-color(primary);
+}
+.text-secondary {
+  color: variables.text-color(secondary);
+}
+.text-disabled {
+  color: variables.text-color(disabled);
+}
 
-.positive { color: variables.color(positive); }
-.negative { color: variables.color(negative); }
-.zero { color: variables.color(zero); }
+.positive {
+  color: variables.color(positive);
+}
+.negative {
+  color: variables.color(negative);
+}
+.zero {
+  color: variables.color(zero);
+}
 
-.bg-light { background-color: variables.bg-color(light); }
-.bg-white { background-color: variables.bg-color(white); }
+.bg-light {
+  background-color: variables.bg-color(light);
+}
+.bg-white {
+  background-color: variables.bg-color(white);
+}
 
 // Spacing utilities
-.mt-sm { margin-top: variables.spacing(sm); }
-.mt-md { margin-top: variables.spacing(md); }
-.mt-lg { margin-top: variables.spacing(lg); }
+.mt-sm {
+  margin-top: variables.spacing(sm);
+}
+.mt-md {
+  margin-top: variables.spacing(md);
+}
+.mt-lg {
+  margin-top: variables.spacing(lg);
+}
 
-.mb-sm { margin-bottom: variables.spacing(sm); }
-.mb-md { margin-bottom: variables.spacing(md); }
-.mb-lg { margin-bottom: variables.spacing(lg); }
+.mb-sm {
+  margin-bottom: variables.spacing(sm);
+}
+.mb-md {
+  margin-bottom: variables.spacing(md);
+}
+.mb-lg {
+  margin-bottom: variables.spacing(lg);
+}
 
 // Accessibility
 .visually-hidden {

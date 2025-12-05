@@ -51,8 +51,12 @@ describe('DonationFooter Component', () => {
 
     expect(screen.getByText('Support me')).toBeInTheDocument();
     expect(screen.getByRole('button')).toBeInTheDocument();
-    expect(screen.getByText('formatted-0x1234567890abcdef1234567890abcdef12345678')).toBeInTheDocument();
-    expect(screen.getByText(/Your support helps keep the tool running/)).toBeInTheDocument();
+    expect(
+      screen.getByText('formatted-0x1234567890abcdef1234567890abcdef12345678')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Your support helps keep the tool running/)
+    ).toBeInTheDocument();
   });
 
   it('calls copyToClipboard when address is clicked', () => {
@@ -61,7 +65,9 @@ describe('DonationFooter Component', () => {
     const addressButton = screen.getByRole('button');
     fireEvent.click(addressButton);
 
-    expect(copyToClipboard).toHaveBeenCalledWith('0x1234567890abcdef1234567890abcdef12345678');
+    expect(copyToClipboard).toHaveBeenCalledWith(
+      '0x1234567890abcdef1234567890abcdef12345678'
+    );
   });
 
   it('applies correct CSS classes to elements', () => {
@@ -76,15 +82,21 @@ describe('DonationFooter Component', () => {
     const address = screen.getByRole('button');
     expect(address).toHaveClass('address-mock');
 
-    const description = screen.getByText(/Your support helps keep the tool running/);
+    const description = screen.getByText(
+      /Your support helps keep the tool running/
+    );
     expect(description).toHaveClass('description-mock');
   });
 
   it('formats the wallet address using the formatter utility', () => {
     render(<DonationFooter visible={true} />);
 
-    expect(formatWalletAddress).toHaveBeenCalledWith('0x1234567890abcdef1234567890abcdef12345678');
-    expect(screen.getByRole('button')).toHaveTextContent('formatted-0x1234567890abcdef1234567890abcdef12345678');
+    expect(formatWalletAddress).toHaveBeenCalledWith(
+      '0x1234567890abcdef1234567890abcdef12345678'
+    );
+    expect(screen.getByRole('button')).toHaveTextContent(
+      'formatted-0x1234567890abcdef1234567890abcdef12345678'
+    );
   });
 
   it('applies correct accessibility attributes to address button', () => {
@@ -92,7 +104,10 @@ describe('DonationFooter Component', () => {
 
     const addressButton = screen.getByRole('button');
     expect(addressButton).toHaveAttribute('tabIndex', '0');
-    expect(addressButton).toHaveAttribute('aria-label', 'Copy donation wallet address');
+    expect(addressButton).toHaveAttribute(
+      'aria-label',
+      'Copy donation wallet address'
+    );
     expect(addressButton).toHaveAttribute('title', 'Click to copy');
   });
 

@@ -15,41 +15,59 @@ export const prepareChartData = (positionHistory) => {
     return [];
   }
 
-  return positionHistory.map(snapshot => {
-    let timestamp;
-    if (typeof snapshot.timestamp === 'number') {
-      timestamp = snapshot.timestamp;
-    } else if (typeof snapshot.timestamp === 'string') {
-      timestamp = new Date(snapshot.timestamp).getTime();
-    } else {
-      timestamp = Date.now(); // Fallback, should ideally not happen
-    }
+  return positionHistory
+    .map((snapshot) => {
+      let timestamp;
+      if (typeof snapshot.timestamp === 'number') {
+        timestamp = snapshot.timestamp;
+      } else if (typeof snapshot.timestamp === 'string') {
+        timestamp = new Date(snapshot.timestamp).getTime();
+      } else {
+        timestamp = Date.now(); // Fallback, should ideally not happen
+      }
 
-    const getSafeFloat = (value) => {
-      const num = parseFloat(value);
-      return isNaN(num) ? 0 : num;
-    };
+      const getSafeFloat = (value) => {
+        const num = parseFloat(value);
+        return isNaN(num) ? 0 : num;
+      };
 
-    // Extract PnL and Yield safely
-    const pnl = getSafeFloat(snapshot.pnl?.usd ?? snapshot.pnl?.value ?? snapshot.pnl ?? 0);
-    let yieldValue = getSafeFloat(snapshot.yield?.usd ?? snapshot.yield?.value ?? snapshot.yield ?? 0);
+      // Extract PnL and Yield safely
+      const pnl = getSafeFloat(
+        snapshot.pnl?.usd ?? snapshot.pnl?.value ?? snapshot.pnl ?? 0
+      );
+      let yieldValue = getSafeFloat(
+        snapshot.yield?.usd ?? snapshot.yield?.value ?? snapshot.yield ?? 0
+      );
 
-    // If yield is zero or missing, try summing yield_a and yield_b
-    if (yieldValue === 0 && (snapshot.yield_a || snapshot.yield_b)) {
-      const yieldA = getSafeFloat(snapshot.yield_a?.usd ?? snapshot.yield_a?.value ?? snapshot.yield_a ?? 0);
-      const yieldB = getSafeFloat(snapshot.yield_b?.usd ?? snapshot.yield_b?.value ?? snapshot.yield_b ?? 0);
-      yieldValue = yieldA + yieldB;
-    }
+      // If yield is zero or missing, try summing yield_a and yield_b
+      if (yieldValue === 0 && (snapshot.yield_a || snapshot.yield_b)) {
+        const yieldA = getSafeFloat(
+          snapshot.yield_a?.usd ??
+            snapshot.yield_a?.value ??
+            snapshot.yield_a ??
+            0
+        );
+        const yieldB = getSafeFloat(
+          snapshot.yield_b?.usd ??
+            snapshot.yield_b?.value ??
+            snapshot.yield_b ??
+            0
+        );
+        yieldValue = yieldA + yieldB;
+      }
 
-    return {
-      timestamp,
-      pnl,
-      yield: yieldValue,
-      // Add other potentially useful values if needed, ensuring they are numbers
-      compounded: getSafeFloat(snapshot.compounded?.usd ?? snapshot.compounded ?? 0),
-      // Add other fields if necessary, e.g., size, collateral
-    };
-  }).sort((a, b) => a.timestamp - b.timestamp);
+      return {
+        timestamp,
+        pnl,
+        yield: yieldValue,
+        // Add other potentially useful values if needed, ensuring they are numbers
+        compounded: getSafeFloat(
+          snapshot.compounded?.usd ?? snapshot.compounded ?? 0
+        ),
+        // Add other fields if necessary, e.g., size, collateral
+      };
+    })
+    .sort((a, b) => a.timestamp - b.timestamp);
 };
 
 /**
@@ -68,8 +86,12 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
   let maxTimestamp = -Infinity;
 
   // First pass: Group existing data and find min/max timestamps
-  data.forEach(entry => {
-    if (!entry || typeof entry.timestamp !== 'number' || isNaN(entry.timestamp)) {
+  data.forEach((entry) => {
+    if (
+      !entry ||
+      typeof entry.timestamp !== 'number' ||
+      isNaN(entry.timestamp)
+    ) {
       return; // Skip invalid entries
     }
 
@@ -87,39 +109,47 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
       intervalDate.setSeconds(0, 0); // Normalize seconds/ms
 
       // Determine the start of the interval based on the period
-      switch(period) {
-      case TIME_PERIODS.MINUTE_1.value:
-        // Key is the start of the minute
-        break;
-      case TIME_PERIODS.MINUTE_5.value:
-        intervalDate.setMinutes(Math.floor(intervalDate.getMinutes() / 5) * 5);
-        break;
-      case TIME_PERIODS.MINUTE_15.value:
-        intervalDate.setMinutes(Math.floor(intervalDate.getMinutes() / 15) * 15);
-        break;
-      case TIME_PERIODS.MINUTE_30.value:
-        intervalDate.setMinutes(Math.floor(intervalDate.getMinutes() / 30) * 30);
-        break;
-      case TIME_PERIODS.HOUR_1.value:
-        intervalDate.setMinutes(0);
-        break;
-      case TIME_PERIODS.HOUR_4.value:
-        intervalDate.setMinutes(0);
-        intervalDate.setHours(Math.floor(intervalDate.getHours() / 4) * 4);
-        break;
-      case TIME_PERIODS.DAY_1.value:
-        intervalDate.setHours(0, 0, 0, 0);
-        break;
-      case TIME_PERIODS.WEEK_1.value:
-        intervalDate.setHours(0, 0, 0, 0);
-        intervalDate.setDate(intervalDate.getDate() - intervalDate.getDay());
-        break;
-      case TIME_PERIODS.MONTH_1.value:
-        intervalDate.setHours(0, 0, 0, 0);
-        intervalDate.setDate(1);
-        break;
-      default:
-        intervalDate.setMinutes(Math.floor(intervalDate.getMinutes() / 5) * 5);
+      switch (period) {
+        case TIME_PERIODS.MINUTE_1.value:
+          // Key is the start of the minute
+          break;
+        case TIME_PERIODS.MINUTE_5.value:
+          intervalDate.setMinutes(
+            Math.floor(intervalDate.getMinutes() / 5) * 5
+          );
+          break;
+        case TIME_PERIODS.MINUTE_15.value:
+          intervalDate.setMinutes(
+            Math.floor(intervalDate.getMinutes() / 15) * 15
+          );
+          break;
+        case TIME_PERIODS.MINUTE_30.value:
+          intervalDate.setMinutes(
+            Math.floor(intervalDate.getMinutes() / 30) * 30
+          );
+          break;
+        case TIME_PERIODS.HOUR_1.value:
+          intervalDate.setMinutes(0);
+          break;
+        case TIME_PERIODS.HOUR_4.value:
+          intervalDate.setMinutes(0);
+          intervalDate.setHours(Math.floor(intervalDate.getHours() / 4) * 4);
+          break;
+        case TIME_PERIODS.DAY_1.value:
+          intervalDate.setHours(0, 0, 0, 0);
+          break;
+        case TIME_PERIODS.WEEK_1.value:
+          intervalDate.setHours(0, 0, 0, 0);
+          intervalDate.setDate(intervalDate.getDate() - intervalDate.getDay());
+          break;
+        case TIME_PERIODS.MONTH_1.value:
+          intervalDate.setHours(0, 0, 0, 0);
+          intervalDate.setDate(1);
+          break;
+        default:
+          intervalDate.setMinutes(
+            Math.floor(intervalDate.getMinutes() / 5) * 5
+          );
       }
       keyTimestamp = intervalDate.getTime();
     } catch {
@@ -128,7 +158,6 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
 
     // Store the *latest* entry for each interval key
     groups.set(keyTimestamp, { ...entry, timestamp: keyTimestamp }); // Use keyTimestamp for grouping
-
   });
 
   if (minTimestamp === Infinity || maxTimestamp === -Infinity) {
@@ -137,41 +166,96 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
 
   // Determine the time step based on the period
   let stepMs;
-  switch(period) {
-  case TIME_PERIODS.MINUTE_1.value: stepMs = 60 * 1000; break;
-  case TIME_PERIODS.MINUTE_5.value: stepMs = 5 * 60 * 1000; break;
-  case TIME_PERIODS.MINUTE_15.value: stepMs = 15 * 60 * 1000; break;
-  case TIME_PERIODS.MINUTE_30.value: stepMs = 30 * 60 * 1000; break;
-  case TIME_PERIODS.HOUR_1.value: stepMs = 60 * 60 * 1000; break;
-  case TIME_PERIODS.HOUR_4.value: stepMs = 4 * 60 * 60 * 1000; break;
-  case TIME_PERIODS.DAY_1.value: stepMs = 24 * 60 * 60 * 1000; break;
+  switch (period) {
+    case TIME_PERIODS.MINUTE_1.value:
+      stepMs = 60 * 1000;
+      break;
+    case TIME_PERIODS.MINUTE_5.value:
+      stepMs = 5 * 60 * 1000;
+      break;
+    case TIME_PERIODS.MINUTE_15.value:
+      stepMs = 15 * 60 * 1000;
+      break;
+    case TIME_PERIODS.MINUTE_30.value:
+      stepMs = 30 * 60 * 1000;
+      break;
+    case TIME_PERIODS.HOUR_1.value:
+      stepMs = 60 * 60 * 1000;
+      break;
+    case TIME_PERIODS.HOUR_4.value:
+      stepMs = 4 * 60 * 60 * 1000;
+      break;
+    case TIME_PERIODS.DAY_1.value:
+      stepMs = 24 * 60 * 60 * 1000;
+      break;
     // Weekly/Monthly steps are tricky due to variable days/months, handle carefully
     // For simplicity here, we'll use average days. Refine if precise calendar alignment needed.
-  case TIME_PERIODS.WEEK_1.value: stepMs = 7 * 24 * 60 * 60 * 1000; break;
-  case TIME_PERIODS.MONTH_1.value: stepMs = 30 * 24 * 60 * 60 * 1000; break; // Approximate
-  default: stepMs = 5 * 60 * 1000; // Default to 5 minutes
+    case TIME_PERIODS.WEEK_1.value:
+      stepMs = 7 * 24 * 60 * 60 * 1000;
+      break;
+    case TIME_PERIODS.MONTH_1.value:
+      stepMs = 30 * 24 * 60 * 60 * 1000;
+      break; // Approximate
+    default:
+      stepMs = 5 * 60 * 1000; // Default to 5 minutes
   }
 
   // Ensure we start from the first interval containing minTimestamp
   const firstIntervalDate = new Date(minTimestamp);
   firstIntervalDate.setSeconds(0, 0);
-  switch(period) {
-  case TIME_PERIODS.MINUTE_1.value: break;
-  case TIME_PERIODS.MINUTE_5.value: firstIntervalDate.setMinutes(Math.floor(firstIntervalDate.getMinutes() / 5) * 5); break;
-  case TIME_PERIODS.MINUTE_15.value: firstIntervalDate.setMinutes(Math.floor(firstIntervalDate.getMinutes() / 15) * 15); break;
-  case TIME_PERIODS.MINUTE_30.value: firstIntervalDate.setMinutes(Math.floor(firstIntervalDate.getMinutes() / 30) * 30); break;
-  case TIME_PERIODS.HOUR_1.value: firstIntervalDate.setMinutes(0); break;
-  case TIME_PERIODS.HOUR_4.value: firstIntervalDate.setMinutes(0); firstIntervalDate.setHours(Math.floor(firstIntervalDate.getHours() / 4) * 4); break;
-  case TIME_PERIODS.DAY_1.value: firstIntervalDate.setHours(0, 0, 0, 0); break;
-  case TIME_PERIODS.WEEK_1.value: firstIntervalDate.setHours(0, 0, 0, 0); firstIntervalDate.setDate(firstIntervalDate.getDate() - firstIntervalDate.getDay()); break;
-  case TIME_PERIODS.MONTH_1.value: firstIntervalDate.setHours(0, 0, 0, 0); firstIntervalDate.setDate(1); break;
-  default: firstIntervalDate.setMinutes(Math.floor(firstIntervalDate.getMinutes() / 5) * 5);
+  switch (period) {
+    case TIME_PERIODS.MINUTE_1.value:
+      break;
+    case TIME_PERIODS.MINUTE_5.value:
+      firstIntervalDate.setMinutes(
+        Math.floor(firstIntervalDate.getMinutes() / 5) * 5
+      );
+      break;
+    case TIME_PERIODS.MINUTE_15.value:
+      firstIntervalDate.setMinutes(
+        Math.floor(firstIntervalDate.getMinutes() / 15) * 15
+      );
+      break;
+    case TIME_PERIODS.MINUTE_30.value:
+      firstIntervalDate.setMinutes(
+        Math.floor(firstIntervalDate.getMinutes() / 30) * 30
+      );
+      break;
+    case TIME_PERIODS.HOUR_1.value:
+      firstIntervalDate.setMinutes(0);
+      break;
+    case TIME_PERIODS.HOUR_4.value:
+      firstIntervalDate.setMinutes(0);
+      firstIntervalDate.setHours(
+        Math.floor(firstIntervalDate.getHours() / 4) * 4
+      );
+      break;
+    case TIME_PERIODS.DAY_1.value:
+      firstIntervalDate.setHours(0, 0, 0, 0);
+      break;
+    case TIME_PERIODS.WEEK_1.value:
+      firstIntervalDate.setHours(0, 0, 0, 0);
+      firstIntervalDate.setDate(
+        firstIntervalDate.getDate() - firstIntervalDate.getDay()
+      );
+      break;
+    case TIME_PERIODS.MONTH_1.value:
+      firstIntervalDate.setHours(0, 0, 0, 0);
+      firstIntervalDate.setDate(1);
+      break;
+    default:
+      firstIntervalDate.setMinutes(
+        Math.floor(firstIntervalDate.getMinutes() / 5) * 5
+      );
   }
   let currentTimestamp = firstIntervalDate.getTime();
 
   const resultData = [];
   let iterations = 0; // Safety counter
-  const maxIterations = (maxTimestamp - currentTimestamp) / (stepMs > 0 ? stepMs : 60000) + data.length + 100; // Generous limit
+  const maxIterations =
+    (maxTimestamp - currentTimestamp) / (stepMs > 0 ? stepMs : 60000) +
+    data.length +
+    100; // Generous limit
 
   // Second pass: Iterate through all expected intervals and fill gaps with null
   while (currentTimestamp <= maxTimestamp && iterations < maxIterations) {
@@ -204,13 +288,15 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
 
     // Remove the previous safety break, using iterations counter instead
     // if (resultData.length > data.length * 2 && data.length > 0) { ... }
-    if(stepMs <= 0) {
+    if (stepMs <= 0) {
       break;
     }
   }
 
   if (iterations >= maxIterations) {
-    console.warn('[groupChartData] Iteration limit reached, loop terminated prematurely.');
+    console.warn(
+      '[groupChartData] Iteration limit reached, loop terminated prematurely.'
+    );
   }
 
   return resultData;
@@ -223,12 +309,20 @@ export const groupChartData = (data, period = TIME_PERIODS.MINUTE_5.value) => {
  * @param {string} period - The currently selected time period value.
  * @returns {string} The formatted date/time string.
  */
-export const formatXAxisLabel = (timestamp, allData = [], period = TIME_PERIODS.MINUTE_5.value) => {
-  if (!timestamp || isNaN(timestamp) || allData.length === 0) {return '';}
+export const formatXAxisLabel = (
+  timestamp,
+  allData = [],
+  period = TIME_PERIODS.MINUTE_5.value
+) => {
+  if (!timestamp || isNaN(timestamp) || allData.length === 0) {
+    return '';
+  }
 
   try {
     const date = new Date(timestamp);
-    if (isNaN(date.getTime())) {return '';}
+    if (isNaN(date.getTime())) {
+      return '';
+    }
 
     const firstTimestamp = allData[0]?.timestamp;
     const lastTimestamp = allData[allData.length - 1]?.timestamp;
@@ -239,9 +333,10 @@ export const formatXAxisLabel = (timestamp, allData = [], period = TIME_PERIODS.
       const startDate = new Date(firstTimestamp);
       const endDate = new Date(lastTimestamp);
       // Check if years, months, or days are different
-      spansMultipleDays = startDate.getFullYear() !== endDate.getFullYear() ||
-                          startDate.getMonth() !== endDate.getMonth() ||
-                          startDate.getDate() !== endDate.getDate();
+      spansMultipleDays =
+        startDate.getFullYear() !== endDate.getFullYear() ||
+        startDate.getMonth() !== endDate.getMonth() ||
+        startDate.getDate() !== endDate.getDate();
     }
 
     const timeOptions = { hour: '2-digit', minute: '2-digit' };
@@ -250,26 +345,26 @@ export const formatXAxisLabel = (timestamp, allData = [], period = TIME_PERIODS.
     // Always show date if multiple days are spanned
     if (spansMultipleDays) {
       switch (period) {
-      case TIME_PERIODS.DAY_1.value:
-      case TIME_PERIODS.WEEK_1.value:
-      case TIME_PERIODS.MONTH_1.value:
-        // For longer periods spanning multiple days, just show the date
-        return date.toLocaleDateString(undefined, dateOptionsShort);
-      default:
-        // For shorter periods spanning multiple days, show date and time
-        return `${date.toLocaleDateString(undefined, dateOptionsShort)} ${date.toLocaleTimeString(undefined, timeOptions)}`;
+        case TIME_PERIODS.DAY_1.value:
+        case TIME_PERIODS.WEEK_1.value:
+        case TIME_PERIODS.MONTH_1.value:
+          // For longer periods spanning multiple days, just show the date
+          return date.toLocaleDateString(undefined, dateOptionsShort);
+        default:
+          // For shorter periods spanning multiple days, show date and time
+          return `${date.toLocaleDateString(undefined, dateOptionsShort)} ${date.toLocaleTimeString(undefined, timeOptions)}`;
       }
     } else {
       // If data is within a single day, primarily show time
       switch (period) {
-      case TIME_PERIODS.DAY_1.value:
-      case TIME_PERIODS.WEEK_1.value:
-      case TIME_PERIODS.MONTH_1.value:
-        // Even on the same day, for long periods, showing date might be useful
-        return date.toLocaleDateString(undefined, dateOptionsShort);
-      default:
-        // For shorter periods within the same day, just show time
-        return date.toLocaleTimeString(undefined, timeOptions);
+        case TIME_PERIODS.DAY_1.value:
+        case TIME_PERIODS.WEEK_1.value:
+        case TIME_PERIODS.MONTH_1.value:
+          // Even on the same day, for long periods, showing date might be useful
+          return date.toLocaleDateString(undefined, dateOptionsShort);
+        default:
+          // For shorter periods within the same day, just show time
+          return date.toLocaleTimeString(undefined, timeOptions);
       }
     }
   } catch (error) {
@@ -286,13 +381,23 @@ export const formatXAxisLabel = (timestamp, allData = [], period = TIME_PERIODS.
  * @param {number} props.label - The timestamp label for the hovered point.
  * @returns {JSX.Element|null} The rendered tooltip or null.
  */
-export const CustomChartTooltip = React.memo(function CustomChartTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) {return null;}
+export const CustomChartTooltip = React.memo(function CustomChartTooltip({
+  active,
+  payload,
+  label,
+}) {
+  if (!active || !payload?.length) {
+    return null;
+  }
 
   return (
     <div className={styles.tooltip}>
       <p className={styles.tooltipLabel}>
-        {new Date(label).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+        {new Date(label).toLocaleTimeString(undefined, {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        })}
       </p>
       {payload.map((entry, index) => (
         <p key={index} style={{ color: entry.color }}>

@@ -36,7 +36,10 @@ describe('DeFiTuna Utilities', () => {
 
     // processTunaPosition mock needs clearing if used across tests without re-mocking
     const formulasMock = require('../../utils/formulas'); // Get the mocked module
-    if (formulasMock.processTunaPosition && formulasMock.processTunaPosition.mockClear) {
+    if (
+      formulasMock.processTunaPosition &&
+      formulasMock.processTunaPosition.mockClear
+    ) {
       formulasMock.processTunaPosition.mockClear();
     }
 
@@ -55,22 +58,35 @@ describe('DeFiTuna Utilities', () => {
 
     it('should fetch positions for a given wallet', async () => {
       const { fetchPositions } = require('../../utils/defituna');
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockApiResponse,
+      });
 
       const positions = await fetchPositions(wallet);
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(`http://mock-api.com/users/${wallet}/tuna-positions`);
+      expect(fetch).toHaveBeenCalledWith(
+        `http://mock-api.com/users/${wallet}/tuna-positions`
+      );
       expect(positions).toEqual(mockApiResponse.data);
     });
 
     it('should throw an error if wallet is not provided', async () => {
       const { fetchPositions } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       // No fetch mock needed
-      await expect(fetchPositions(null)).rejects.toThrow('Wallet address is required');
-      await expect(fetchPositions(undefined)).rejects.toThrow('Wallet address is required');
-      await expect(fetchPositions('')).rejects.toThrow('Wallet address is required');
+      await expect(fetchPositions(null)).rejects.toThrow(
+        'Wallet address is required'
+      );
+      await expect(fetchPositions(undefined)).rejects.toThrow(
+        'Wallet address is required'
+      );
+      await expect(fetchPositions('')).rejects.toThrow(
+        'Wallet address is required'
+      );
       expect(fetch).not.toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
@@ -78,84 +94,140 @@ describe('DeFiTuna Utilities', () => {
     it('should throw an error if API fetch fails', async () => {
       const { fetchPositions } = require('../../utils/defituna');
       const errorMessage = 'Network Error';
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       fetch.mockRejectedValueOnce(new Error(errorMessage));
 
       await expect(fetchPositions(wallet)).rejects.toThrow(errorMessage);
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(`http://mock-api.com/users/${wallet}/tuna-positions`);
+      expect(fetch).toHaveBeenCalledWith(
+        `http://mock-api.com/users/${wallet}/tuna-positions`
+      );
       // Check console log was called due to catch block
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchPositions] Error:', errorMessage);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchPositions] Error:',
+        errorMessage
+      );
       consoleSpy.mockRestore();
     });
 
     it('should throw an error if API response is not ok', async () => {
       const { fetchPositions } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      fetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: 'Not Found' });
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+      });
 
-      await expect(fetchPositions(wallet)).rejects.toThrow('Failed to fetch positions: 404 Not Found');
+      await expect(fetchPositions(wallet)).rejects.toThrow(
+        'Failed to fetch positions: 404 Not Found'
+      );
 
       expect(fetch).toHaveBeenCalledTimes(1);
       // Check console log was called due to catch block
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchPositions] Error:', 'Failed to fetch positions: 404 Not Found');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchPositions] Error:',
+        'Failed to fetch positions: 404 Not Found'
+      );
       consoleSpy.mockRestore();
     });
 
     it('should throw an error if API returns invalid data structure', async () => {
       const { fetchPositions } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       const invalidResponse = { not_data: [] };
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => invalidResponse });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => invalidResponse,
+      });
 
-      await expect(fetchPositions(wallet)).rejects.toThrow('Invalid positions data received from API');
+      await expect(fetchPositions(wallet)).rejects.toThrow(
+        'Invalid positions data received from API'
+      );
 
       // Check console log was called before throwing
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchPositions] Invalid positions data received:', undefined); // data is destructured, will be undefined
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchPositions] Invalid positions data received:',
+        undefined
+      ); // data is destructured, will be undefined
       // Check console log from catch block
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchPositions] Error:', 'Invalid positions data received from API');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchPositions] Error:',
+        'Invalid positions data received from API'
+      );
       consoleSpy.mockRestore();
     });
 
     it('should throw an error if API returns non-array data', async () => {
       const { fetchPositions } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       const invalidData = { id: 1 };
       const invalidResponse = { data: invalidData };
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => invalidResponse });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => invalidResponse,
+      });
 
-      await expect(fetchPositions(wallet)).rejects.toThrow('Invalid positions data received from API');
+      await expect(fetchPositions(wallet)).rejects.toThrow(
+        'Invalid positions data received from API'
+      );
 
       // Check console log was called before throwing
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchPositions] Invalid positions data received:', invalidData);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchPositions] Invalid positions data received:',
+        invalidData
+      );
       // Check console log from catch block
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchPositions] Error:', 'Invalid positions data received from API');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchPositions] Error:',
+        'Invalid positions data received from API'
+      );
       consoleSpy.mockRestore();
     });
   });
 
   describe('fetchPoolData', () => {
     const poolAddress = 'pool123';
-    const mockPoolData = { id: 'pool123', token_a_mint: 'mintA', token_b_mint: 'mintB' };
+    const mockPoolData = {
+      id: 'pool123',
+      token_a_mint: 'mintA',
+      token_b_mint: 'mintB',
+    };
     const mockApiResponse = { data: mockPoolData };
     const cacheTTL = 30 * 1000;
 
     it('should fetch pool data for a given address when cache is empty', async () => {
       const { fetchPoolData } = require('../../utils/defituna');
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockApiResponse,
+      });
 
       const poolData = await fetchPoolData(poolAddress);
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(`http://mock-api.com/pools/${poolAddress}`);
+      expect(fetch).toHaveBeenCalledWith(
+        `http://mock-api.com/pools/${poolAddress}`
+      );
       expect(poolData).toEqual(mockPoolData);
     });
 
     it('should use cache if valid', async () => {
       const { fetchPoolData } = require('../../utils/defituna');
       // First call to populate cache
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockApiResponse,
+      });
       await fetchPoolData(poolAddress);
       expect(fetch).toHaveBeenCalledTimes(1);
       fetch.mockClear(); // Clear calls before next check
@@ -169,7 +241,10 @@ describe('DeFiTuna Utilities', () => {
     it('should fetch new data if cache is expired', async () => {
       const { fetchPoolData } = require('../../utils/defituna');
       // First call to populate cache
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockApiResponse,
+      });
       await fetchPoolData(poolAddress);
       expect(fetch).toHaveBeenCalledTimes(1);
 
@@ -177,71 +252,123 @@ describe('DeFiTuna Utilities', () => {
 
       // Second call should fetch again
       const updatedMockData = { ...mockPoolData, updated: true };
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ data: updatedMockData }) });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: updatedMockData }),
+      });
       const poolData = await fetchPoolData(poolAddress);
 
       expect(fetch).toHaveBeenCalledTimes(2); // Called again
-      expect(fetch).toHaveBeenNthCalledWith(2, `http://mock-api.com/pools/${poolAddress}`);
+      expect(fetch).toHaveBeenNthCalledWith(
+        2,
+        `http://mock-api.com/pools/${poolAddress}`
+      );
       expect(poolData).toEqual(updatedMockData);
     });
 
     it('should throw an error if pool address is not provided', async () => {
       const { fetchPoolData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      await expect(fetchPoolData(null)).rejects.toThrow('Pool address is required');
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      await expect(fetchPoolData(null)).rejects.toThrow(
+        'Pool address is required'
+      );
       expect(fetch).not.toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchPoolData] No pool address provided');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchPoolData] No pool address provided'
+      );
       consoleSpy.mockRestore();
     });
 
     it('should throw an error if API fetch fails', async () => {
       const { fetchPoolData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       const errorMessage = 'Network Error';
       fetch.mockRejectedValueOnce(new Error(errorMessage));
 
       await expect(fetchPoolData(poolAddress)).rejects.toThrow(errorMessage);
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[fetchPoolData] Error fetching pool data'), errorMessage);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchPoolData] Error fetching pool data'),
+        errorMessage
+      );
       consoleSpy.mockRestore();
     });
 
     it('should throw an error if API response is not ok', async () => {
       const { fetchPoolData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      fetch.mockResolvedValueOnce({ ok: false, status: 500, statusText: 'Server Error' });
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Server Error',
+      });
 
-      await expect(fetchPoolData(poolAddress)).rejects.toThrow('Failed to fetch pool data: 500 Server Error');
+      await expect(fetchPoolData(poolAddress)).rejects.toThrow(
+        'Failed to fetch pool data: 500 Server Error'
+      );
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[fetchPoolData] Error fetching pool data'), 'Failed to fetch pool data: 500 Server Error');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchPoolData] Error fetching pool data'),
+        'Failed to fetch pool data: 500 Server Error'
+      );
       consoleSpy.mockRestore();
     });
 
     it('should throw an error if API response lacks data field', async () => {
       const { fetchPoolData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ not_the_data: {} }) });
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ not_the_data: {} }),
+      });
 
-      await expect(fetchPoolData(poolAddress)).rejects.toThrow('API response missing data field');
+      await expect(fetchPoolData(poolAddress)).rejects.toThrow(
+        'API response missing data field'
+      );
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[fetchPoolData] No data field in API response'));
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[fetchPoolData] Error fetching pool data'), 'API response missing data field');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchPoolData] No data field in API response')
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchPoolData] Error fetching pool data'),
+        'API response missing data field'
+      );
       consoleSpy.mockRestore();
     });
 
     it('should throw an error if API response has null data field', async () => {
       const { fetchPoolData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ data: null }) });
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: null }),
+      });
 
-      await expect(fetchPoolData(poolAddress)).rejects.toThrow('API response missing data field');
+      await expect(fetchPoolData(poolAddress)).rejects.toThrow(
+        'API response missing data field'
+      );
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[fetchPoolData] No data field in API response'));
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[fetchPoolData] Error fetching pool data'), 'API response missing data field');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchPoolData] No data field in API response')
+      );
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchPoolData] Error fetching pool data'),
+        'API response missing data field'
+      );
       consoleSpy.mockRestore();
     });
   });
@@ -252,7 +379,10 @@ describe('DeFiTuna Utilities', () => {
 
     it('should fetch market data when cache is empty', async () => {
       const { fetchMarketData } = require('../../utils/defituna');
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockMarketData });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockMarketData,
+      });
 
       const marketData = await fetchMarketData();
 
@@ -264,7 +394,10 @@ describe('DeFiTuna Utilities', () => {
     it('should use cache if valid', async () => {
       const { fetchMarketData } = require('../../utils/defituna');
       // First call
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockMarketData });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockMarketData,
+      });
       await fetchMarketData();
       expect(fetch).toHaveBeenCalledTimes(1);
       fetch.mockClear();
@@ -278,7 +411,10 @@ describe('DeFiTuna Utilities', () => {
     it('should fetch new data if cache is expired', async () => {
       const { fetchMarketData } = require('../../utils/defituna');
       // First call
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockMarketData });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockMarketData,
+      });
       await fetchMarketData();
       expect(fetch).toHaveBeenCalledTimes(1);
 
@@ -286,7 +422,10 @@ describe('DeFiTuna Utilities', () => {
 
       // Second call
       const updatedMockData = { ...mockMarketData, SOL: { price: 150 } };
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => updatedMockData });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => updatedMockData,
+      });
       const marketData = await fetchMarketData();
 
       expect(fetch).toHaveBeenCalledTimes(2);
@@ -296,26 +435,42 @@ describe('DeFiTuna Utilities', () => {
 
     it('should throw an error if API fetch fails', async () => {
       const { fetchMarketData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       const errorMessage = 'Network Error';
       fetch.mockRejectedValueOnce(new Error(errorMessage));
 
       await expect(fetchMarketData()).rejects.toThrow(errorMessage);
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchMarketData] Error:', errorMessage);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchMarketData] Error:',
+        errorMessage
+      );
       consoleSpy.mockRestore();
     });
 
     it('should throw an error if API response is not ok', async () => {
       const { fetchMarketData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      fetch.mockResolvedValueOnce({ ok: false, status: 403, statusText: 'Forbidden' });
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        statusText: 'Forbidden',
+      });
 
-      await expect(fetchMarketData()).rejects.toThrow('Failed to fetch market data: 403 Forbidden');
+      await expect(fetchMarketData()).rejects.toThrow(
+        'Failed to fetch market data: 403 Forbidden'
+      );
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchMarketData] Error:', 'Failed to fetch market data: 403 Forbidden');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchMarketData] Error:',
+        'Failed to fetch market data: 403 Forbidden'
+      );
       consoleSpy.mockRestore();
     });
   });
@@ -324,7 +479,8 @@ describe('DeFiTuna Utilities', () => {
     const mintAddress = 'mintAbc123';
     const mockTokenApiData = { symbol: 'TOK', mint: mintAddress, decimals: 8 }; // Raw API data
     const mockApiResponse = { data: mockTokenApiData };
-    const expectedTokenData = { // Formatted data returned by function
+    const expectedTokenData = {
+      // Formatted data returned by function
       symbol: mockTokenApiData.symbol,
       mint: mockTokenApiData.mint,
       decimals: mockTokenApiData.decimals,
@@ -338,19 +494,27 @@ describe('DeFiTuna Utilities', () => {
 
     it('should fetch token data for a given mint address when cache is empty', async () => {
       const { fetchTokenData } = require('../../utils/defituna');
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockApiResponse,
+      });
 
       const tokenData = await fetchTokenData(mintAddress);
 
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(`http://mock-api.com/mints/${mintAddress}`);
+      expect(fetch).toHaveBeenCalledWith(
+        `http://mock-api.com/mints/${mintAddress}`
+      );
       expect(tokenData).toEqual(expectedTokenData);
     });
 
     it('should use cache if valid', async () => {
       const { fetchTokenData } = require('../../utils/defituna');
       // First call
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockApiResponse,
+      });
       await fetchTokenData(mintAddress);
       expect(fetch).toHaveBeenCalledTimes(1);
       fetch.mockClear();
@@ -364,7 +528,10 @@ describe('DeFiTuna Utilities', () => {
     it('should fetch new data if cache is expired', async () => {
       const { fetchTokenData } = require('../../utils/defituna');
       // First call
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => mockApiResponse });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockApiResponse,
+      });
       await fetchTokenData(mintAddress);
       expect(fetch).toHaveBeenCalledTimes(1);
 
@@ -373,7 +540,10 @@ describe('DeFiTuna Utilities', () => {
       // Second call
       const updatedMockApiData = { ...mockTokenApiData, symbol: 'NEWTOK' };
       const updatedExpectedData = { ...expectedTokenData, symbol: 'NEWTOK' };
-      fetch.mockResolvedValueOnce({ ok: true, json: async () => ({ data: updatedMockApiData }) });
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ data: updatedMockApiData }),
+      });
       const tokenData = await fetchTokenData(mintAddress);
 
       expect(fetch).toHaveBeenCalledTimes(2);
@@ -382,18 +552,24 @@ describe('DeFiTuna Utilities', () => {
 
     it('should return default structure if mint address is not provided', async () => {
       const { fetchTokenData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       // No fetch mock needed
       const result = await fetchTokenData(null);
       expect(result).toEqual(defaultStructure(null));
       expect(fetch).not.toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith('[fetchTokenData] No mint address provided');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[fetchTokenData] No mint address provided'
+      );
       consoleSpy.mockRestore();
     });
 
     it('should return default structure and log error if API fetch fails', async () => {
       const { fetchTokenData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       const errorMessage = 'Network Error';
       fetch.mockRejectedValueOnce(new Error(errorMessage));
 
@@ -401,39 +577,71 @@ describe('DeFiTuna Utilities', () => {
 
       expect(result).toEqual(defaultStructure(mintAddress));
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[fetchTokenData] Error fetching token data'), errorMessage);
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchTokenData] Error fetching token data'),
+        errorMessage
+      );
       consoleSpy.mockRestore();
     });
 
     it('should return default structure and log error if API response is not ok', async () => {
       const { fetchTokenData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      fetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: 'Not Found' });
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      fetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: 'Not Found',
+      });
 
       const result = await fetchTokenData(mintAddress);
 
       expect(result).toEqual(defaultStructure(mintAddress));
       expect(fetch).toHaveBeenCalledTimes(1);
-      expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('[fetchTokenData] Error fetching token data'), 'Failed to fetch token data: 404 Not Found');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchTokenData] Error fetching token data'),
+        'Failed to fetch token data: 404 Not Found'
+      );
       consoleSpy.mockRestore();
     });
   });
-
 
   // --- Processing Function Tests ---
   describe('processPositionsData', () => {
     // Mock data needed for these tests
     const mockPositionsRaw = [
-      { address: 'pos1', pool: 'poolA', state: 'active', opened_at: '2023-01-01T10:00:00Z' /* ... other raw fields */ },
+      {
+        address: 'pos1',
+        pool: 'poolA',
+        state: 'active',
+        opened_at: '2023-01-01T10:00:00Z' /* ... other raw fields */,
+      },
       { address: 'pos2', pool: 'poolB', state: 'active' /* ... */ },
       { address: 'pos3', pool: 'poolA', state: 'closed' /* ... */ },
       { address: 'pos4_no_pool_data', pool: 'poolC_missing', state: 'active' },
-      { address: 'pos5_no_token_data', pool: 'poolD_bad_token', state: 'active' },
+      {
+        address: 'pos5_no_token_data',
+        pool: 'poolD_bad_token',
+        state: 'active',
+      },
       { address: 'pos6_invalid', pool: null, state: 'active' }, // Invalid position
     ];
-    const mockPoolA = { address: 'poolA', token_a_mint: 'mintA', token_b_mint: 'mintB' };
-    const mockPoolB = { address: 'poolB', token_a_mint: 'mintC', token_b_mint: 'mintD' };
-    const mockPoolD = { address: 'poolD_bad_token', token_a_mint: 'mintE_missing', token_b_mint: 'mintF' }; // Pool with a missing token
+    const mockPoolA = {
+      address: 'poolA',
+      token_a_mint: 'mintA',
+      token_b_mint: 'mintB',
+    };
+    const mockPoolB = {
+      address: 'poolB',
+      token_a_mint: 'mintC',
+      token_b_mint: 'mintD',
+    };
+    const mockPoolD = {
+      address: 'poolD_bad_token',
+      token_a_mint: 'mintE_missing',
+      token_b_mint: 'mintF',
+    }; // Pool with a missing token
     const mockMarketData = { marketInfo: 'some_data' };
     const mockTokenA = { mint: 'mintA', symbol: 'AAA', decimals: 6 };
     const mockTokenB = { mint: 'mintB', symbol: 'BBB', decimals: 9 };
@@ -442,12 +650,13 @@ describe('DeFiTuna Utilities', () => {
     const mockTokenF = { mint: 'mintF', symbol: 'FFF', decimals: 7 };
     // Mock return value from the actual formulas.processTunaPosition
     const mockProcessedPositionResult = {
-      currentPrice: 10.5, entryPrice: 10,
+      currentPrice: 10.5,
+      entryPrice: 10,
       rangePrices: { lower: 9, upper: 11 },
       liquidationPrice: { lower: 8, upper: 12 },
       limitOrderPrices: { lower: null, upper: null },
       leverage: 2.5,
-      size: 1000.50,
+      size: 1000.5,
       pnl: {
         usd: 50.256,
         bps: 502,
@@ -480,7 +689,7 @@ describe('DeFiTuna Utilities', () => {
       liq_price: { l: 8, u: 12 },
       lim_prices: { l: null, u: null }, // Nulls remain null
       lev: 2.5, // raw decimal value
-      sz: 1000.50, // raw decimal value
+      sz: 1000.5, // raw decimal value
       pnl: { u: 50.256, b: 502 }, // raw decimal value
       yld: { u: 5.1 }, // raw decimal value
       cmp: { u: 55.35 }, // raw decimal value
@@ -491,14 +700,18 @@ describe('DeFiTuna Utilities', () => {
 
     it('should return an empty array for null, undefined, or empty input', async () => {
       const { processPositionsData } = require('../../utils/defituna');
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
       // No fetch mock needed
 
       expect(await processPositionsData(null)).toEqual([]);
       expect(await processPositionsData(undefined)).toEqual([]);
       expect(await processPositionsData([])).toEqual([]);
       expect(fetch).not.toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalledWith('[processPositionsData] No positions data provided');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[processPositionsData] No positions data provided'
+      );
       expect(consoleSpy).toHaveBeenCalledTimes(3);
       consoleSpy.mockRestore();
     });
@@ -510,14 +723,32 @@ describe('DeFiTuna Utilities', () => {
       fetch.mockImplementation(async (url) => {
         const urlStr = url.toString();
         // Simplified: provide all expected successful fetches
-        if (urlStr.includes('/markets')) {return { ok: true, json: async () => mockMarketData };}
-        if (urlStr.includes('/pools/poolA')) {return { ok: true, json: async () => ({ data: mockPoolA }) };}
-        if (urlStr.includes('/pools/poolB')) {return { ok: true, json: async () => ({ data: mockPoolB }) };}
-        if (urlStr.includes('/mints/mintA')) {return { ok: true, json: async () => ({ data: mockTokenA }) };}
-        if (urlStr.includes('/mints/mintB')) {return { ok: true, json: async () => ({ data: mockTokenB }) };}
-        if (urlStr.includes('/mints/mintC')) {return { ok: true, json: async () => ({ data: mockTokenC }) };}
-        if (urlStr.includes('/mints/mintD')) {return { ok: true, json: async () => ({ data: mockTokenD }) };}
-        return { ok: false, status: 404, statusText: `Unhandled Mock: ${urlStr}` };
+        if (urlStr.includes('/markets')) {
+          return { ok: true, json: async () => mockMarketData };
+        }
+        if (urlStr.includes('/pools/poolA')) {
+          return { ok: true, json: async () => ({ data: mockPoolA }) };
+        }
+        if (urlStr.includes('/pools/poolB')) {
+          return { ok: true, json: async () => ({ data: mockPoolB }) };
+        }
+        if (urlStr.includes('/mints/mintA')) {
+          return { ok: true, json: async () => ({ data: mockTokenA }) };
+        }
+        if (urlStr.includes('/mints/mintB')) {
+          return { ok: true, json: async () => ({ data: mockTokenB }) };
+        }
+        if (urlStr.includes('/mints/mintC')) {
+          return { ok: true, json: async () => ({ data: mockTokenC }) };
+        }
+        if (urlStr.includes('/mints/mintD')) {
+          return { ok: true, json: async () => ({ data: mockTokenD }) };
+        }
+        return {
+          ok: false,
+          status: 404,
+          statusText: `Unhandled Mock: ${urlStr}`,
+        };
       });
       processTunaPosition.mockReturnValue(mockProcessedPositionResult);
 
@@ -531,9 +762,13 @@ describe('DeFiTuna Utilities', () => {
       expect(fetch).toHaveBeenCalledWith('http://mock-api.com/mints/mintB');
       expect(fetch).toHaveBeenCalledWith('http://mock-api.com/mints/mintC');
       expect(fetch).toHaveBeenCalledWith('http://mock-api.com/mints/mintD');
-      const fetchCalls = fetch.mock.calls.map(call => call[0]);
-      expect(fetchCalls.filter(url => url.includes('/pools/poolA')).length).toBe(1);
-      expect(fetchCalls.filter(url => url.includes('/mints/mintA')).length).toBe(1);
+      const fetchCalls = fetch.mock.calls.map((call) => call[0]);
+      expect(
+        fetchCalls.filter((url) => url.includes('/pools/poolA')).length
+      ).toBe(1);
+      expect(
+        fetchCalls.filter((url) => url.includes('/mints/mintA')).length
+      ).toBe(1);
     });
 
     it('should call processTunaPosition for each valid position with correct arguments', async () => {
@@ -542,14 +777,32 @@ describe('DeFiTuna Utilities', () => {
       // Setup fetch mock (same as above test)
       fetch.mockImplementation(async (url) => {
         const urlStr = url.toString();
-        if (urlStr.includes('/markets')) {return { ok: true, json: async () => mockMarketData };}
-        if (urlStr.includes('/pools/poolA')) {return { ok: true, json: async () => ({ data: mockPoolA }) };}
-        if (urlStr.includes('/pools/poolB')) {return { ok: true, json: async () => ({ data: mockPoolB }) };}
-        if (urlStr.includes('/mints/mintA')) {return { ok: true, json: async () => ({ data: mockTokenA }) };}
-        if (urlStr.includes('/mints/mintB')) {return { ok: true, json: async () => ({ data: mockTokenB }) };}
-        if (urlStr.includes('/mints/mintC')) {return { ok: true, json: async () => ({ data: mockTokenC }) };}
-        if (urlStr.includes('/mints/mintD')) {return { ok: true, json: async () => ({ data: mockTokenD }) };}
-        return { ok: false, status: 404, statusText: `Unhandled Mock: ${urlStr}` };
+        if (urlStr.includes('/markets')) {
+          return { ok: true, json: async () => mockMarketData };
+        }
+        if (urlStr.includes('/pools/poolA')) {
+          return { ok: true, json: async () => ({ data: mockPoolA }) };
+        }
+        if (urlStr.includes('/pools/poolB')) {
+          return { ok: true, json: async () => ({ data: mockPoolB }) };
+        }
+        if (urlStr.includes('/mints/mintA')) {
+          return { ok: true, json: async () => ({ data: mockTokenA }) };
+        }
+        if (urlStr.includes('/mints/mintB')) {
+          return { ok: true, json: async () => ({ data: mockTokenB }) };
+        }
+        if (urlStr.includes('/mints/mintC')) {
+          return { ok: true, json: async () => ({ data: mockTokenC }) };
+        }
+        if (urlStr.includes('/mints/mintD')) {
+          return { ok: true, json: async () => ({ data: mockTokenD }) };
+        }
+        return {
+          ok: false,
+          status: 404,
+          statusText: `Unhandled Mock: ${urlStr}`,
+        };
       });
       processTunaPosition.mockReturnValue(mockProcessedPositionResult);
 
@@ -557,14 +810,29 @@ describe('DeFiTuna Utilities', () => {
 
       // Assertions (remain the same)
       expect(processTunaPosition).toHaveBeenCalledTimes(3);
-      expect(processTunaPosition).toHaveBeenNthCalledWith(1,
-        { data: mockPositionsRaw[0] }, { data: mockPoolA }, mockMarketData, mockTokenA, mockTokenB
+      expect(processTunaPosition).toHaveBeenNthCalledWith(
+        1,
+        { data: mockPositionsRaw[0] },
+        { data: mockPoolA },
+        mockMarketData,
+        mockTokenA,
+        mockTokenB
       );
-      expect(processTunaPosition).toHaveBeenNthCalledWith(2,
-        { data: mockPositionsRaw[1] }, { data: mockPoolB }, mockMarketData, mockTokenC, mockTokenD
+      expect(processTunaPosition).toHaveBeenNthCalledWith(
+        2,
+        { data: mockPositionsRaw[1] },
+        { data: mockPoolB },
+        mockMarketData,
+        mockTokenC,
+        mockTokenD
       );
-      expect(processTunaPosition).toHaveBeenNthCalledWith(3,
-        { data: mockPositionsRaw[2] }, { data: mockPoolA }, mockMarketData, mockTokenA, mockTokenB
+      expect(processTunaPosition).toHaveBeenNthCalledWith(
+        3,
+        { data: mockPositionsRaw[2] },
+        { data: mockPoolA },
+        mockMarketData,
+        mockTokenA,
+        mockTokenB
       );
     });
 
@@ -574,11 +842,23 @@ describe('DeFiTuna Utilities', () => {
       // Setup fetch mock for this test (only need poolA and its tokens)
       fetch.mockImplementation(async (url) => {
         const urlStr = url.toString();
-        if (urlStr.includes('/markets')) {return { ok: true, json: async () => mockMarketData };}
-        if (urlStr.includes('/pools/poolA')) {return { ok: true, json: async () => ({ data: mockPoolA }) };}
-        if (urlStr.includes('/mints/mintA')) {return { ok: true, json: async () => ({ data: mockTokenA }) };}
-        if (urlStr.includes('/mints/mintB')) {return { ok: true, json: async () => ({ data: mockTokenB }) };}
-        return { ok: false, status: 404, statusText: `Unhandled Mock: ${urlStr}` };
+        if (urlStr.includes('/markets')) {
+          return { ok: true, json: async () => mockMarketData };
+        }
+        if (urlStr.includes('/pools/poolA')) {
+          return { ok: true, json: async () => ({ data: mockPoolA }) };
+        }
+        if (urlStr.includes('/mints/mintA')) {
+          return { ok: true, json: async () => ({ data: mockTokenA }) };
+        }
+        if (urlStr.includes('/mints/mintB')) {
+          return { ok: true, json: async () => ({ data: mockTokenB }) };
+        }
+        return {
+          ok: false,
+          status: 404,
+          statusText: `Unhandled Mock: ${urlStr}`,
+        };
       });
       processTunaPosition.mockReturnValue(mockProcessedPositionResult);
 
@@ -598,26 +878,60 @@ describe('DeFiTuna Utilities', () => {
       // Test Adjusted: Expect Promise.all to reject when fetchPoolData fails
       const { processPositionsData } = require('../../utils/defituna');
       const { processTunaPosition } = require('../../utils/formulas');
-      const consoleSpyError = jest.spyOn(console, 'error').mockImplementation(() => {});
-      const consoleSpyWarn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpyError = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      const consoleSpyWarn = jest
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
       fetch.mockImplementation(async (url) => {
         const urlStr = url.toString();
-        if (urlStr.includes('/markets')) {return { ok: true, json: async () => mockMarketData };}
-        if (urlStr.includes('/pools/poolA')) {return { ok: true, json: async () => ({ data: mockPoolA }) };}
-        if (urlStr.includes('/pools/poolB')) {return { ok: true, json: async () => ({ data: mockPoolB }) };}
-        if (urlStr.includes('/pools/poolD_bad_token')) {return { ok: true, json: async () => ({ data: mockPoolD }) };}
-        if (urlStr.includes('/pools/poolC_missing')) {return { ok: false, status: 404, statusText: 'Not Found' };} // Simulate missing pool
+        if (urlStr.includes('/markets')) {
+          return { ok: true, json: async () => mockMarketData };
+        }
+        if (urlStr.includes('/pools/poolA')) {
+          return { ok: true, json: async () => ({ data: mockPoolA }) };
+        }
+        if (urlStr.includes('/pools/poolB')) {
+          return { ok: true, json: async () => ({ data: mockPoolB }) };
+        }
+        if (urlStr.includes('/pools/poolD_bad_token')) {
+          return { ok: true, json: async () => ({ data: mockPoolD }) };
+        }
+        if (urlStr.includes('/pools/poolC_missing')) {
+          return { ok: false, status: 404, statusText: 'Not Found' };
+        } // Simulate missing pool
         // Provide fetches for tokens needed by other valid positions
-        if (urlStr.includes('/mints/')) {return { ok: true, json: async () => ({ data: { mint: urlStr.split('/').pop(), symbol: 'TEMP', decimals: 6 } }) };}
-        return { ok: false, status: 404, statusText: `Unhandled Mock: ${urlStr}` };
+        if (urlStr.includes('/mints/')) {
+          return {
+            ok: true,
+            json: async () => ({
+              data: {
+                mint: urlStr.split('/').pop(),
+                symbol: 'TEMP',
+                decimals: 6,
+              },
+            }),
+          };
+        }
+        return {
+          ok: false,
+          status: 404,
+          statusText: `Unhandled Mock: ${urlStr}`,
+        };
       });
       processTunaPosition.mockReturnValue(mockProcessedPositionResult);
 
       // Expect the entire process to fail because Promise.all rejects
-      await expect(processPositionsData(mockPositionsRaw)).rejects.toThrow('Failed to fetch pool data: 404 Not Found');
+      await expect(processPositionsData(mockPositionsRaw)).rejects.toThrow(
+        'Failed to fetch pool data: 404 Not Found'
+      );
 
       // Verify relevant console logs were still called before the rejection
-      expect(consoleSpyError).toHaveBeenCalledWith(expect.stringContaining('[fetchPoolData] Error fetching pool data'), 'Failed to fetch pool data: 404 Not Found');
+      expect(consoleSpyError).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchPoolData] Error fetching pool data'),
+        'Failed to fetch pool data: 404 Not Found'
+      );
       // expect(consoleSpyWarn).toHaveBeenCalledWith('[processPositionsData] Invalid position data:', mockPositionsRaw[5]); // This log is not reached if Promise.all rejects early
       consoleSpyError.mockRestore();
       consoleSpyWarn.mockRestore();
@@ -627,35 +941,69 @@ describe('DeFiTuna Utilities', () => {
       // Test Adjusted: Expect position NOT to be filtered, processTunaPosition called with default token
       const { processPositionsData } = require('../../utils/defituna');
       const { processTunaPosition } = require('../../utils/formulas');
-      const consoleSpyError = jest.spyOn(console, 'error').mockImplementation(() => {});
-      const consoleSpyWarn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      const consoleSpyError = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      const consoleSpyWarn = jest
+        .spyOn(console, 'warn')
+        .mockImplementation(() => {});
       fetch.mockImplementation(async (url) => {
         const urlStr = url.toString();
-        if (urlStr.includes('/markets')) {return { ok: true, json: async () => mockMarketData };}
-        if (urlStr.includes('/pools/poolA')) {return { ok: true, json: async () => ({ data: mockPoolA }) };}
-        if (urlStr.includes('/pools/poolB')) {return { ok: true, json: async () => ({ data: mockPoolB }) };}
-        if (urlStr.includes('/pools/poolD_bad_token')) {return { ok: true, json: async () => ({ data: mockPoolD }) };}
-        if (urlStr.includes('/pools/poolC_missing')) {return { ok: true, json: async () => ({ data: {} }) };}
-        if (urlStr.includes('/mints/mintA')) {return { ok: true, json: async () => ({ data: mockTokenA }) };}
-        if (urlStr.includes('/mints/mintB')) {return { ok: true, json: async () => ({ data: mockTokenB }) };}
-        if (urlStr.includes('/mints/mintC')) {return { ok: true, json: async () => ({ data: mockTokenC }) };}
-        if (urlStr.includes('/mints/mintD')) {return { ok: true, json: async () => ({ data: mockTokenD }) };}
-        if (urlStr.includes('/mints/mintF')) {return { ok: true, json: async () => ({ data: mockTokenF }) };}
-        if (urlStr.includes('/mints/mintE_missing')) {return { ok: false, status: 404, statusText: 'Not Found' };} // fetchTokenData handles this internally
-        return { ok: false, status: 404, statusText: `Unhandled Mock: ${urlStr}` };
+        if (urlStr.includes('/markets')) {
+          return { ok: true, json: async () => mockMarketData };
+        }
+        if (urlStr.includes('/pools/poolA')) {
+          return { ok: true, json: async () => ({ data: mockPoolA }) };
+        }
+        if (urlStr.includes('/pools/poolB')) {
+          return { ok: true, json: async () => ({ data: mockPoolB }) };
+        }
+        if (urlStr.includes('/pools/poolD_bad_token')) {
+          return { ok: true, json: async () => ({ data: mockPoolD }) };
+        }
+        if (urlStr.includes('/pools/poolC_missing')) {
+          return { ok: true, json: async () => ({ data: {} }) };
+        }
+        if (urlStr.includes('/mints/mintA')) {
+          return { ok: true, json: async () => ({ data: mockTokenA }) };
+        }
+        if (urlStr.includes('/mints/mintB')) {
+          return { ok: true, json: async () => ({ data: mockTokenB }) };
+        }
+        if (urlStr.includes('/mints/mintC')) {
+          return { ok: true, json: async () => ({ data: mockTokenC }) };
+        }
+        if (urlStr.includes('/mints/mintD')) {
+          return { ok: true, json: async () => ({ data: mockTokenD }) };
+        }
+        if (urlStr.includes('/mints/mintF')) {
+          return { ok: true, json: async () => ({ data: mockTokenF }) };
+        }
+        if (urlStr.includes('/mints/mintE_missing')) {
+          return { ok: false, status: 404, statusText: 'Not Found' };
+        } // fetchTokenData handles this internally
+        return {
+          ok: false,
+          status: 404,
+          statusText: `Unhandled Mock: ${urlStr}`,
+        };
       });
       processTunaPosition.mockReturnValue(mockProcessedPositionResult);
 
       const result = await processPositionsData(mockPositionsRaw);
 
       // Find the result for pos5 - it SHOULD exist due to current logic
-      const pos5Result = result.find(p => p.p_addr === 'pos5_no_token_data');
+      const pos5Result = result.find((p) => p.p_addr === 'pos5_no_token_data');
       expect(pos5Result).toBeDefined();
       // Check that the pair reflects the default token symbol structure
       expect(pos5Result.pair).toBe('mint...sing/FFF');
 
       // Check that processTunaPosition was called for pos5, potentially with default token data for mintE
-      const defaultTokenE = { symbol: 'mint...sing', mint: 'mintE_missing', decimals: 9 };
+      const defaultTokenE = {
+        symbol: 'mint...sing',
+        mint: 'mintE_missing',
+        decimals: 9,
+      };
       expect(processTunaPosition).toHaveBeenCalledWith(
         { data: mockPositionsRaw[4] }, // pos5 data
         { data: mockPoolD },
@@ -665,7 +1013,10 @@ describe('DeFiTuna Utilities', () => {
       );
 
       // Check expected console logs
-      expect(consoleSpyError).toHaveBeenCalledWith(expect.stringContaining('[fetchTokenData] Error fetching token data'), expect.stringContaining('Failed to fetch token data: 404 Not Found'));
+      expect(consoleSpyError).toHaveBeenCalledWith(
+        expect.stringContaining('[fetchTokenData] Error fetching token data'),
+        expect.stringContaining('Failed to fetch token data: 404 Not Found')
+      );
       // The code DOES NOT log '[processPositionsData] Missing token data' because the default token is considered valid by the `if (!tokenA || !tokenB)` check
       consoleSpyError.mockRestore();
       consoleSpyWarn.mockRestore();
@@ -683,9 +1034,16 @@ describe('DeFiTuna Utilities', () => {
       });
 
       // Spy on console.error as the outer function also logs the error
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
-      await expect(processPositionsData(mockPositionsRaw.slice(0, 1))).rejects.toThrow('Market Data Unavailable');
-      expect(consoleSpy).toHaveBeenCalledWith('[processPositionsData] Error processing positions data:', 'Market Data Unavailable');
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+      await expect(
+        processPositionsData(mockPositionsRaw.slice(0, 1))
+      ).rejects.toThrow('Market Data Unavailable');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[processPositionsData] Error processing positions data:',
+        'Market Data Unavailable'
+      );
       consoleSpy.mockRestore();
     });
 
@@ -696,14 +1054,32 @@ describe('DeFiTuna Utilities', () => {
       // Setup fetch mock for valid data fetching
       fetch.mockImplementation(async (url) => {
         const urlStr = url.toString();
-        if (urlStr.includes('/markets')) {return { ok: true, json: async () => mockMarketData };}
-        if (urlStr.includes('/pools/poolA')) {return { ok: true, json: async () => ({ data: mockPoolA }) };}
-        if (urlStr.includes('/pools/poolB')) {return { ok: true, json: async () => ({ data: mockPoolB }) };}
-        if (urlStr.includes('/mints/mintA')) {return { ok: true, json: async () => ({ data: mockTokenA }) };}
-        if (urlStr.includes('/mints/mintB')) {return { ok: true, json: async () => ({ data: mockTokenB }) };}
-        if (urlStr.includes('/mints/mintC')) {return { ok: true, json: async () => ({ data: mockTokenC }) };}
-        if (urlStr.includes('/mints/mintD')) {return { ok: true, json: async () => ({ data: mockTokenD }) };}
-        return { ok: false, status: 404, statusText: `Unhandled Mock: ${urlStr}` };
+        if (urlStr.includes('/markets')) {
+          return { ok: true, json: async () => mockMarketData };
+        }
+        if (urlStr.includes('/pools/poolA')) {
+          return { ok: true, json: async () => ({ data: mockPoolA }) };
+        }
+        if (urlStr.includes('/pools/poolB')) {
+          return { ok: true, json: async () => ({ data: mockPoolB }) };
+        }
+        if (urlStr.includes('/mints/mintA')) {
+          return { ok: true, json: async () => ({ data: mockTokenA }) };
+        }
+        if (urlStr.includes('/mints/mintB')) {
+          return { ok: true, json: async () => ({ data: mockTokenB }) };
+        }
+        if (urlStr.includes('/mints/mintC')) {
+          return { ok: true, json: async () => ({ data: mockTokenC }) };
+        }
+        if (urlStr.includes('/mints/mintD')) {
+          return { ok: true, json: async () => ({ data: mockTokenD }) };
+        }
+        return {
+          ok: false,
+          status: 404,
+          statusText: `Unhandled Mock: ${urlStr}`,
+        };
       });
 
       const processingError = new Error('Calculation failed');
@@ -716,13 +1092,20 @@ describe('DeFiTuna Utilities', () => {
       });
 
       // Spy on console.error as the outer catch block *will* log this error
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
 
       // Expect the outer promise to reject due to the uncaught error in .map
-      await expect(processPositionsData(mockPositionsRaw.slice(0, 3))).rejects.toThrow('Calculation failed');
+      await expect(
+        processPositionsData(mockPositionsRaw.slice(0, 3))
+      ).rejects.toThrow('Calculation failed');
 
       // Verify the outer catch block logged the error
-      expect(consoleSpy).toHaveBeenCalledWith('[processPositionsData] Error processing positions data:', 'Calculation failed');
+      expect(consoleSpy).toHaveBeenCalledWith(
+        '[processPositionsData] Error processing positions data:',
+        'Calculation failed'
+      );
       consoleSpy.mockRestore();
     });
   });

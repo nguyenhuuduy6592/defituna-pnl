@@ -13,9 +13,7 @@ export const TotalPnLDisplay = ({ label, totalValue }) => {
     <div className={styles.pnlHeader}>
       <div className={styles.pnlGrid}>
         <div className={styles.pnlItem}>
-          <div className={styles.label}>
-            {label}
-          </div>
+          <div className={styles.label}>{label}</div>
           <div dangerouslySetInnerHTML={{ __html: totalValue }} />
         </div>
       </div>

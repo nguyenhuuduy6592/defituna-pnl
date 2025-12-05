@@ -1,7 +1,6 @@
 import { fetchPositions, processPositionsData } from '../../utils/defituna';
 import { isValidWalletAddress } from '../../utils/validation';
 
-
 async function fetchPnL(wallet) {
   if (!wallet) {
     throw new Error('Wallet address is required');
@@ -11,7 +10,11 @@ async function fetchPnL(wallet) {
   const positionsData = await fetchPositions(wallet);
 
   // Handle empty positions case early
-  if (!positionsData || !Array.isArray(positionsData) || positionsData.length === 0) {
+  if (
+    !positionsData ||
+    !Array.isArray(positionsData) ||
+    positionsData.length === 0
+  ) {
     return {
       t_pnl: 0, // Encode field name - totalPnL becomes t_pnl
       positions: [],

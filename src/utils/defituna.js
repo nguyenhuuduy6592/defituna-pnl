@@ -7,10 +7,9 @@ import { KNOWN_TOKENS, STABLE_TOKENS } from './constants.js';
 import { processTunaPosition } from './formulas.js';
 
 // --- Simple In-Memory Cache with Different TTLs ---
-const POOL_CACHE_TTL = 30 * 1000;       // 30 seconds for pool data (contains dynamic ticks)
+const POOL_CACHE_TTL = 30 * 1000; // 30 seconds for pool data (contains dynamic ticks)
 const MARKET_CACHE_TTL = 60 * 60 * 1000; // 1 hour for market data (changes infrequently)
 const TOKEN_CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours for token data (extremely static)
-
 
 // --- Cache Functions ---
 // Map cache structure: <key, {data: any, timestamp: number}>
@@ -43,9 +42,13 @@ export async function fetchPositions(wallet) {
 
   try {
     // This data always needs to be fresh since it's the main position data
-    const response = await fetch(`${process.env.DEFITUNA_API_URL}/users/${wallet}/tuna-positions`);
+    const response = await fetch(
+      `${process.env.DEFITUNA_API_URL}/users/${wallet}/tuna-positions`
+    );
     if (!response.ok) {
-      throw new Error(`Failed to fetch positions: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch positions: ${response.status} ${response.statusText}`
+      );
     }
 
     const { data } = await response.json();
@@ -74,13 +77,20 @@ export async function fetchPoolData(poolAddress) {
 
   try {
     // Pool data has a short TTL since it contains the dynamic tick_current_index
-    if (poolCache.has(poolAddress) && isCacheValid(poolCache.get(poolAddress).timestamp, POOL_CACHE_TTL)) {
+    if (
+      poolCache.has(poolAddress) &&
+      isCacheValid(poolCache.get(poolAddress).timestamp, POOL_CACHE_TTL)
+    ) {
       return poolCache.get(poolAddress).data;
     }
 
-    const response = await fetch(`${process.env.DEFITUNA_API_URL}/pools/${poolAddress}`);
+    const response = await fetch(
+      `${process.env.DEFITUNA_API_URL}/pools/${poolAddress}`
+    );
     if (!response.ok) {
-      throw new Error(`Failed to fetch pool data: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch pool data: ${response.status} ${response.statusText}`
+      );
     }
 
     // Parse the response and extract the data field
@@ -90,7 +100,9 @@ export async function fetchPoolData(poolAddress) {
     const poolData = responseJson.data;
 
     if (!poolData) {
-      console.error(`[fetchPoolData] No data field in API response for ${poolAddress}`);
+      console.error(
+        `[fetchPoolData] No data field in API response for ${poolAddress}`
+      );
       throw new Error('API response missing data field');
     }
 
@@ -98,7 +110,10 @@ export async function fetchPoolData(poolAddress) {
     poolCache.set(poolAddress, { data: poolData, timestamp: Date.now() });
     return poolData;
   } catch (error) {
-    console.error(`[fetchPoolData] Error fetching pool data for ${poolAddress}:`, error.message);
+    console.error(
+      `[fetchPoolData] Error fetching pool data for ${poolAddress}:`,
+      error.message
+    );
     throw error;
   }
 }
@@ -111,13 +126,18 @@ export async function fetchPoolData(poolAddress) {
 export async function fetchMarketData() {
   try {
     // Market data has a long TTL since it changes infrequently
-    if (marketCache.data && isCacheValid(marketCache.timestamp, MARKET_CACHE_TTL)) {
+    if (
+      marketCache.data &&
+      isCacheValid(marketCache.timestamp, MARKET_CACHE_TTL)
+    ) {
       return marketCache.data;
     }
 
     const response = await fetch(`${process.env.DEFITUNA_API_URL}/markets`);
     if (!response.ok) {
-      throw new Error(`Failed to fetch market data: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch market data: ${response.status} ${response.statusText}`
+      );
     }
     const data = await response.json();
     marketCache.data = data;
@@ -146,13 +166,20 @@ export async function fetchTokenData(mintAddress) {
 
   try {
     // Token data is practically permanent
-    if (tokenCache.has(mintAddress) && isCacheValid(tokenCache.get(mintAddress).timestamp, TOKEN_CACHE_TTL)) {
+    if (
+      tokenCache.has(mintAddress) &&
+      isCacheValid(tokenCache.get(mintAddress).timestamp, TOKEN_CACHE_TTL)
+    ) {
       return tokenCache.get(mintAddress).data;
     }
 
-    const response = await fetch(`${process.env.DEFITUNA_API_URL}/mints/${mintAddress}`);
+    const response = await fetch(
+      `${process.env.DEFITUNA_API_URL}/mints/${mintAddress}`
+    );
     if (!response.ok) {
-      throw new Error(`Failed to fetch token data: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch token data: ${response.status} ${response.statusText}`
+      );
     }
     const { data } = await response.json();
     const tokenData = {
@@ -163,7 +190,10 @@ export async function fetchTokenData(mintAddress) {
     tokenCache.set(mintAddress, { data: tokenData, timestamp: Date.now() });
     return tokenData;
   } catch (error) {
-    console.error(`[fetchTokenData] Error fetching token data for ${mintAddress}:`, error.message);
+    console.error(
+      `[fetchTokenData] Error fetching token data for ${mintAddress}:`,
+      error.message
+    );
     // Don't cache errors, but return default structure
     return {
       symbol: `${mintAddress.slice(0, 4)}...${mintAddress.slice(-4)}`,
@@ -180,7 +210,11 @@ export async function fetchTokenData(mintAddress) {
  * @throws {Error} If processing fails
  */
 export async function processPositionsData(positionsData) {
-  if (!positionsData || !Array.isArray(positionsData) || positionsData.length === 0) {
+  if (
+    !positionsData ||
+    !Array.isArray(positionsData) ||
+    positionsData.length === 0
+  ) {
     console.warn('[processPositionsData] No positions data provided');
     return [];
   }
@@ -190,10 +224,14 @@ export async function processPositionsData(positionsData) {
     const marketDataPromise = fetchMarketData(); // Start fetching, don't await yet
 
     // 2. Get unique pools from positions
-    const uniquePools = [...new Set(positionsData.map(d => d.pool).filter(Boolean))];
+    const uniquePools = [
+      ...new Set(positionsData.map((d) => d.pool).filter(Boolean)),
+    ];
 
     // 3. Fetch pool data in parallel
-    const poolPromises = uniquePools.map(poolAddress => fetchPoolData(poolAddress));
+    const poolPromises = uniquePools.map((poolAddress) =>
+      fetchPoolData(poolAddress)
+    );
     const poolResponses = await Promise.all(poolPromises);
     const poolsData = uniquePools.reduce((acc, poolAddress, index) => {
       acc[poolAddress] = poolResponses[index];
@@ -206,21 +244,30 @@ export async function processPositionsData(positionsData) {
     // 4. Get unique token mints from all pools
     const uniqueMints = new Set();
 
-    Object.values(poolsData).forEach(poolResponse => {
+    Object.values(poolsData).forEach((poolResponse) => {
       // Adapted to handle the new API structure - poolResponse is now the direct data object
       if (poolResponse) {
         // Access token mints directly from the pool object
-        if (poolResponse.token_a_mint) {uniqueMints.add(poolResponse.token_a_mint);}
-        if (poolResponse.token_b_mint) {uniqueMints.add(poolResponse.token_b_mint);}
+        if (poolResponse.token_a_mint) {
+          uniqueMints.add(poolResponse.token_a_mint);
+        }
+        if (poolResponse.token_b_mint) {
+          uniqueMints.add(poolResponse.token_b_mint);
+        }
       } else {
-        console.warn('[processPositionsData] Invalid pool response encountered while extracting mints:', poolResponse);
+        console.warn(
+          '[processPositionsData] Invalid pool response encountered while extracting mints:',
+          poolResponse
+        );
       }
     });
 
     const uniqueMintsArray = Array.from(uniqueMints);
 
     // 5. Fetch token data in parallel
-    const tokenPromises = uniqueMintsArray.map(mintAddress => fetchTokenData(mintAddress));
+    const tokenPromises = uniqueMintsArray.map((mintAddress) =>
+      fetchTokenData(mintAddress)
+    );
     const tokenResults = await Promise.all(tokenPromises);
     const tokensData = uniqueMintsArray.reduce((acc, mintAddress, index) => {
       acc[mintAddress] = tokenResults[index];
@@ -228,176 +275,226 @@ export async function processPositionsData(positionsData) {
     }, {});
 
     // 6. Process each position with all the gathered data
-    const processed = positionsData.map((position) => {
-      if (!position || !position.pool) {
-        console.warn('[processPositionsData] Invalid position data:', position);
-        return null;
-      }
+    const processed = positionsData
+      .map((position) => {
+        if (!position || !position.pool) {
+          console.warn(
+            '[processPositionsData] Invalid position data:',
+            position
+          );
+          return null;
+        }
 
-      const poolAddress = position.pool;
-      const poolData = poolsData[poolAddress];
+        const poolAddress = position.pool;
+        const poolData = poolsData[poolAddress];
 
-      // Check if pool data exists - with the new API structure
-      if (!poolData) {
-        console.error('[processPositionsData] Missing or invalid pool data for position:', position);
-        return null;
-      }
+        // Check if pool data exists - with the new API structure
+        if (!poolData) {
+          console.error(
+            '[processPositionsData] Missing or invalid pool data for position:',
+            position
+          );
+          return null;
+        }
 
-      // Get token data using the mints from the pool
-      const tokenA = tokensData[poolData.token_a_mint];
-      const tokenB = tokensData[poolData.token_b_mint];
+        // Get token data using the mints from the pool
+        const tokenA = tokensData[poolData.token_a_mint];
+        const tokenB = tokensData[poolData.token_b_mint];
 
-      if (!tokenA || !tokenB) {
-        console.error('[processPositionsData] Missing token data for position:', position);
-        return null;
-      }
+        if (!tokenA || !tokenB) {
+          console.error(
+            '[processPositionsData] Missing token data for position:',
+            position
+          );
+          return null;
+        }
 
-      // Process the position with the updated data structure
-      const processedPosition = processTunaPosition(
-        { data: position },
-        { data: poolData }, // Preserve the expected structure for the formulas
-        marketData,
-        tokenA,
-        tokenB
-      );
+        // Process the position with the updated data structure
+        const processedPosition = processTunaPosition(
+          { data: position },
+          { data: poolData }, // Preserve the expected structure for the formulas
+          marketData,
+          tokenA,
+          tokenB
+        );
 
-      // Return only the fields actually used by the frontend with numeric encoding for decimal values
-      return {
-        // Core position data (no encoding needed)
-        p_addr: position.address,
-        state: position.state,
-        pair: `${tokenA.symbol}/${tokenB.symbol}`,
+        // Return only the fields actually used by the frontend with numeric encoding for decimal values
+        return {
+          // Core position data (no encoding needed)
+          p_addr: position.address,
+          state: position.state,
+          pair: `${tokenA.symbol}/${tokenB.symbol}`,
 
-        // Add opened_at if available
-        opened_at: position.opened_at,
+          // Add opened_at if available
+          opened_at: position.opened_at,
 
-        // Price data (raw decimal values)
-        c_price: processedPosition.currentPrice, // currentPrice
-        e_price: processedPosition.entryPrice,   // entryPrice
-        r_prices: { // rangePrices
-          l: processedPosition.rangePrices.lower,
-          u: processedPosition.rangePrices.upper,
-        },
-
-        // Liquidation prices (raw decimal values)
-        liq_price: { // liquidationPrice
-          l: processedPosition.liquidationPrice.lower,
-          u: processedPosition.liquidationPrice.upper,
-        },
-        lim_prices: { // limitOrderPrices
-          l: processedPosition.limitOrderPrices.lower,
-          u: processedPosition.limitOrderPrices.upper,
-        },
-
-        // Positional data (raw decimal values)
-        lev: processedPosition.leverage, // leverage
-        sz: processedPosition.size,           // size
-
-        // Financial metrics (raw decimal values)
-        pnl: {
-          u: processedPosition.pnl.usd, // usd
-          b: processedPosition.pnl.bps, // bps is already an integer, no encoding needed
-        },
-        yld: { // yield
-          u: processedPosition.yield.usd, // usd
-        },
-        cmp: { // compounded
-          u: processedPosition.compounded.usd, // usd
-        },
-
-        // Display amounts (raw decimal values)
-        col: { // collateral
-          u: processedPosition.collateral.usd, // usd
-        },
-        dbt: { // debt
-          u: processedPosition.debt.usd, // usd
-        },
-        int: { // interest
-          u: processedPosition.interest.usd, // usd
-        },
-        pnlData: { // new field for pnl data
-          pnl_usd: {
-            amount: processedPosition.pnl.usd,
-            bps: processedPosition.pnl.bps,
+          // Price data (raw decimal values)
+          c_price: processedPosition.currentPrice, // currentPrice
+          e_price: processedPosition.entryPrice, // entryPrice
+          r_prices: {
+            // rangePrices
+            l: processedPosition.rangePrices.lower,
+            u: processedPosition.rangePrices.upper,
           },
-          token_pnl: (() => {
-            if (tokenA.symbol === KNOWN_TOKENS.SOL.symbol || tokenB.symbol === KNOWN_TOKENS.SOL.symbol) {
-              return [{
-                token: tokenA.symbol === KNOWN_TOKENS.SOL.symbol ? tokenA.symbol : tokenB.symbol,
-                amount: tokenA.symbol === KNOWN_TOKENS.SOL.symbol ? processedPosition.pnl.a.amount : processedPosition.pnl.b.amount,
-                bps: tokenA.symbol === KNOWN_TOKENS.SOL.symbol ? processedPosition.pnl.a.bps : processedPosition.pnl.b.bps,
-              }];
-            }
-            else if (STABLE_TOKENS.includes(tokenA.symbol) && STABLE_TOKENS.includes(tokenB.symbol)) {
-              return [{
-                token: '$',
-                amount: processedPosition.pnl.usd,
-                bps: processedPosition.pnl.usd.bps,
-              }];
-            }
-            else if (STABLE_TOKENS.includes(tokenA.symbol) || STABLE_TOKENS.includes(tokenB.symbol)) {
-              return [{
-                token: STABLE_TOKENS.includes(tokenA.symbol) ? tokenB.symbol : tokenA.symbol,
-                amount: STABLE_TOKENS.includes(tokenA.symbol) ? processedPosition.pnl.b.amount : processedPosition.pnl.a.amount,
-                bps: STABLE_TOKENS.includes(tokenA.symbol) ? processedPosition.pnl.b.bps : processedPosition.pnl.a.bps,
-              }];
-            }
-            else {
-              return [
-                {
-                  token: tokenA.symbol,
-                  amount: processedPosition.pnl.a.amount,
-                  bps: processedPosition.pnl.a.bps,
-                },
-                {
-                  token: tokenB.symbol,
-                  amount: processedPosition.pnl.b.amount,
-                  bps: processedPosition.pnl.b.bps,
-                },
-              ];
-            }
-          })(),
-        },
-        yieldData: {
-          usd: {
-            amount: processedPosition.yield.usd,
+
+          // Liquidation prices (raw decimal values)
+          liq_price: {
+            // liquidationPrice
+            l: processedPosition.liquidationPrice.lower,
+            u: processedPosition.liquidationPrice.upper,
           },
-          tokens: [
-            {
-              token: tokenA.symbol,
-              amount: processedPosition.yield.a.amount,
-            },
-            {
-              token: tokenB.symbol,
-              amount: processedPosition.yield.b.amount,
-            },
-          ],
-        },
-        compoundedData: {
-          usd: {
-            amount: processedPosition.compounded.usd,
+          lim_prices: {
+            // limitOrderPrices
+            l: processedPosition.limitOrderPrices.lower,
+            u: processedPosition.limitOrderPrices.upper,
           },
-          tokens: [
-            {
-              token: tokenA.symbol,
-              amount: processedPosition.compounded.a.amount,
+
+          // Positional data (raw decimal values)
+          lev: processedPosition.leverage, // leverage
+          sz: processedPosition.size, // size
+
+          // Financial metrics (raw decimal values)
+          pnl: {
+            u: processedPosition.pnl.usd, // usd
+            b: processedPosition.pnl.bps, // bps is already an integer, no encoding needed
+          },
+          yld: {
+            // yield
+            u: processedPosition.yield.usd, // usd
+          },
+          cmp: {
+            // compounded
+            u: processedPosition.compounded.usd, // usd
+          },
+
+          // Display amounts (raw decimal values)
+          col: {
+            // collateral
+            u: processedPosition.collateral.usd, // usd
+          },
+          dbt: {
+            // debt
+            u: processedPosition.debt.usd, // usd
+          },
+          int: {
+            // interest
+            u: processedPosition.interest.usd, // usd
+          },
+          pnlData: {
+            // new field for pnl data
+            pnl_usd: {
+              amount: processedPosition.pnl.usd,
+              bps: processedPosition.pnl.bps,
             },
-            {
-              token: tokenB.symbol,
-              amount: processedPosition.compounded.b.amount,
+            token_pnl: (() => {
+              if (
+                tokenA.symbol === KNOWN_TOKENS.SOL.symbol ||
+                tokenB.symbol === KNOWN_TOKENS.SOL.symbol
+              ) {
+                return [
+                  {
+                    token:
+                      tokenA.symbol === KNOWN_TOKENS.SOL.symbol
+                        ? tokenA.symbol
+                        : tokenB.symbol,
+                    amount:
+                      tokenA.symbol === KNOWN_TOKENS.SOL.symbol
+                        ? processedPosition.pnl.a.amount
+                        : processedPosition.pnl.b.amount,
+                    bps:
+                      tokenA.symbol === KNOWN_TOKENS.SOL.symbol
+                        ? processedPosition.pnl.a.bps
+                        : processedPosition.pnl.b.bps,
+                  },
+                ];
+              } else if (
+                STABLE_TOKENS.includes(tokenA.symbol) &&
+                STABLE_TOKENS.includes(tokenB.symbol)
+              ) {
+                return [
+                  {
+                    token: '$',
+                    amount: processedPosition.pnl.usd,
+                    bps: processedPosition.pnl.usd.bps,
+                  },
+                ];
+              } else if (
+                STABLE_TOKENS.includes(tokenA.symbol) ||
+                STABLE_TOKENS.includes(tokenB.symbol)
+              ) {
+                return [
+                  {
+                    token: STABLE_TOKENS.includes(tokenA.symbol)
+                      ? tokenB.symbol
+                      : tokenA.symbol,
+                    amount: STABLE_TOKENS.includes(tokenA.symbol)
+                      ? processedPosition.pnl.b.amount
+                      : processedPosition.pnl.a.amount,
+                    bps: STABLE_TOKENS.includes(tokenA.symbol)
+                      ? processedPosition.pnl.b.bps
+                      : processedPosition.pnl.a.bps,
+                  },
+                ];
+              } else {
+                return [
+                  {
+                    token: tokenA.symbol,
+                    amount: processedPosition.pnl.a.amount,
+                    bps: processedPosition.pnl.a.bps,
+                  },
+                  {
+                    token: tokenB.symbol,
+                    amount: processedPosition.pnl.b.amount,
+                    bps: processedPosition.pnl.b.bps,
+                  },
+                ];
+              }
+            })(),
+          },
+          yieldData: {
+            usd: {
+              amount: processedPosition.yield.usd,
             },
-          ],
-        },
-        symbol: {
-          a: tokenA.symbol,
-          b: tokenB.symbol,
-        },
-      };
-    }).filter(Boolean);
+            tokens: [
+              {
+                token: tokenA.symbol,
+                amount: processedPosition.yield.a.amount,
+              },
+              {
+                token: tokenB.symbol,
+                amount: processedPosition.yield.b.amount,
+              },
+            ],
+          },
+          compoundedData: {
+            usd: {
+              amount: processedPosition.compounded.usd,
+            },
+            tokens: [
+              {
+                token: tokenA.symbol,
+                amount: processedPosition.compounded.a.amount,
+              },
+              {
+                token: tokenB.symbol,
+                amount: processedPosition.compounded.b.amount,
+              },
+            ],
+          },
+          symbol: {
+            a: tokenA.symbol,
+            b: tokenB.symbol,
+          },
+        };
+      })
+      .filter(Boolean);
 
     return processed;
   } catch (error) {
-    console.error('[processPositionsData] Error processing positions data:', error.message);
+    console.error(
+      '[processPositionsData] Error processing positions data:',
+      error.message
+    );
     throw error;
   }
 }

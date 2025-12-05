@@ -28,12 +28,14 @@ export function debounce(func, wait, immediate = false) {
 
   let timeout;
 
-  return function(...args) {
+  return function (...args) {
     const context = this;
 
-    const later = function() {
+    const later = function () {
       timeout = null;
-      if (!immediate) {func.apply(context, args);}
+      if (!immediate) {
+        func.apply(context, args);
+      }
     };
 
     const callNow = immediate && !timeout;
@@ -41,7 +43,9 @@ export function debounce(func, wait, immediate = false) {
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
 
-    if (callNow) {func.apply(context, args);}
+    if (callNow) {
+      func.apply(context, args);
+    }
   };
 }
 
@@ -80,14 +84,14 @@ export function debouncePromise(asyncFunc, wait) {
   // Capture the function reference to avoid `this` issues in setTimeout
   let debouncedFunc = null;
 
-  debouncedFunc = function(...args) {
+  debouncedFunc = function (...args) {
     const self = this; // Preserve original context for asyncFunc call if needed
 
     try {
       // If we already have a current promise in flight and a new call comes in,
       // queue up a promise resolver for after the current call finishes
       if (currentPromise) {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           // Save the latest arguments and resolver
           queuedPromiseResolver = { args, resolve };
         });
@@ -120,7 +124,7 @@ export function debouncePromise(asyncFunc, wait) {
       // If we have a timeout but no current promise, clear it and set up a new one
       clearTimeout(timeout);
 
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         timeout = setTimeout(() => {
           timeout = null;
           try {
@@ -143,7 +147,10 @@ export function debouncePromise(asyncFunc, wait) {
               }
             });
           } catch (error) {
-            console.error('[debouncePromise] Error in debounced function:', error);
+            console.error(
+              '[debouncePromise] Error in debounced function:',
+              error
+            );
             resolve(Promise.reject(error));
           }
         }, wait);

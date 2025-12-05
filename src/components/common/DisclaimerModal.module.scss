@@ -1,5 +1,5 @@
-@use "sass:color";
-@use "sass:map";
+@use 'sass:color';
+@use 'sass:map';
 @use '../../styles/variables.module.scss';
 
 .overlay {
@@ -84,7 +84,7 @@
     color: variables.color(primary);
     text-decoration: none;
     font-weight: 500;
-    
+
     &:hover {
       text-decoration: underline;
     }
@@ -93,7 +93,7 @@
 
 .section {
   margin-top: variables.spacing(md);
-  
+
   h3 {
     font-size: variables.font-size(md);
     margin-bottom: variables.spacing(xs);
@@ -126,8 +126,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
@@ -139,4 +143,4 @@
     opacity: 1;
     transform: translateY(0);
   }
-} 
+}

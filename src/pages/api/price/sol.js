@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   const now = Date.now();
 
   // Check cache first
-  if (cachedSolPrice && (now - lastFetchTime < CACHE_TTL)) {
+  if (cachedSolPrice && now - lastFetchTime < CACHE_TTL) {
     return res.status(200).json({
       price: cachedSolPrice,
       timestamp: lastFetchTime,
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   try {
     const response = await fetchWithTimeout(targetUrl, {
       headers: {
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
 
@@ -41,7 +41,8 @@ export default async function handler(req, res) {
       throw new Error('Invalid price data from API');
     }
 
-    cachedSolPrice = Number(data?.data?.price || 0) / 10 ** data?.data?.decimals;
+    cachedSolPrice =
+      Number(data?.data?.price || 0) / 10 ** data?.data?.decimals;
     lastFetchTime = now;
 
     res.status(200).json({

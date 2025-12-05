@@ -32,7 +32,9 @@ export const SearchInput = ({ value, onChange, placeholder }) => (
  */
 export const PoolComparisonTable = ({ pools, timeframe, onRemovePool }) => (
   <div data-testid="pool-comparison-table">
-    <div>Comparing {pools.length} pools for timeframe: {timeframe}</div>
+    <div>
+      Comparing {pools.length} pools for timeframe: {timeframe}
+    </div>
     <table>
       <thead>
         <tr>
@@ -44,11 +46,15 @@ export const PoolComparisonTable = ({ pools, timeframe, onRemovePool }) => (
         </tr>
       </thead>
       <tbody>
-        {pools.map(pool => (
+        {pools.map((pool) => (
           <tr key={pool.address} data-testid={`pool-row-${pool.address}`}>
-            <td>{pool.tokenA.symbol}/{pool.tokenB.symbol}</td>
+            <td>
+              {pool.tokenA.symbol}/{pool.tokenB.symbol}
+            </td>
             <td>${(pool.tvl_usdc / 1000000).toFixed(2)}M</td>
-            <td>${((pool.stats[timeframe]?.volume || 0) / 1000000).toFixed(2)}M</td>
+            <td>
+              ${((pool.stats[timeframe]?.volume || 0) / 1000000).toFixed(2)}M
+            </td>
             <td>{pool.fee_rate / 100}%</td>
             <td>
               <button
@@ -73,12 +79,20 @@ export const PoolComparisonTable = ({ pools, timeframe, onRemovePool }) => (
  * @returns {JSX.Element} Mock PoolStatsCard component
  */
 export const PoolStatsCard = ({ pool, timeframe }) => (
-  <div data-testid={`pool-stats-${pool.address}`} data-pool-id={pool.address} data-timeframe={timeframe}>
-    <h2>{pool.tokenA.symbol}/{pool.tokenB.symbol} Pool</h2>
+  <div
+    data-testid={`pool-stats-${pool.address}`}
+    data-pool-id={pool.address}
+    data-timeframe={timeframe}
+  >
+    <h2>
+      {pool.tokenA.symbol}/{pool.tokenB.symbol} Pool
+    </h2>
     <div className="stats-container">
       <div className="stat-item">
         <div className="stat-label">TVL</div>
-        <div className="stat-value">${(pool.tvl_usdc / 1000000).toFixed(2)}M</div>
+        <div className="stat-value">
+          ${(pool.tvl_usdc / 1000000).toFixed(2)}M
+        </div>
       </div>
       <div className="stat-item">
         <div className="stat-label">Fee Rate</div>
@@ -90,7 +104,9 @@ export const PoolStatsCard = ({ pool, timeframe }) => (
       </div>
       <div className="stat-item">
         <div className="stat-label">Volume ({timeframe})</div>
-        <div className="stat-value">${((pool.stats[timeframe]?.volume || 0) / 1000000).toFixed(2)}M</div>
+        <div className="stat-value">
+          ${((pool.stats[timeframe]?.volume || 0) / 1000000).toFixed(2)}M
+        </div>
       </div>
       <div className="stat-item">
         <div className="stat-label">Fees ({timeframe})</div>
@@ -116,8 +132,8 @@ export const PoolDropdown = ({ pools, selectedPools, onSelectPool }) => (
     >
       <option value="">Select a pool</option>
       {pools
-        .filter(p => !selectedPools.includes(p.address))
-        .map(pool => (
+        .filter((p) => !selectedPools.includes(p.address))
+        .map((pool) => (
           <option key={pool.address} value={pool.address}>
             {pool.tokenA.symbol}/{pool.tokenB.symbol}
           </option>
@@ -135,7 +151,9 @@ export const PoolDropdown = ({ pools, selectedPools, onSelectPool }) => (
  */
 export const PoolPriceChart = ({ pool, timeframe }) => (
   <div data-testid="pool-price-chart">
-    <div>Chart for {pool.tokenA.symbol}/{pool.tokenB.symbol}</div>
+    <div>
+      Chart for {pool.tokenA.symbol}/{pool.tokenB.symbol}
+    </div>
     <div>Timeframe: {timeframe}</div>
   </div>
 );
@@ -149,7 +167,9 @@ export const PoolPriceChart = ({ pool, timeframe }) => (
  */
 export const PoolVolumeChart = ({ pool, timeframe }) => (
   <div data-testid="pool-volume-chart">
-    <div>Volume Chart for {pool.tokenA.symbol}/{pool.tokenB.symbol}</div>
+    <div>
+      Volume Chart for {pool.tokenA.symbol}/{pool.tokenB.symbol}
+    </div>
     <div>Timeframe: {timeframe}</div>
   </div>
 );

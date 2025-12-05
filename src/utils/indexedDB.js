@@ -44,26 +44,34 @@ export const initializeDB = async () => {
  * @param {number} timestamp - Optional timestamp (defaults to current time)
  * @returns {Promise<boolean>} Success status
  */
-export const savePositionSnapshot = async (db, positions, timestamp = Date.now()) => {
-  if (!db || !Array.isArray(positions)) {return false;}
+export const savePositionSnapshot = async (
+  db,
+  positions,
+  timestamp = Date.now()
+) => {
+  if (!db || !Array.isArray(positions)) {
+    return false;
+  }
 
   try {
     const tx = db.transaction(STORE_NAME, 'readwrite');
     const store = tx.objectStore(STORE_NAME);
 
     // Save each position in the transaction
-    await Promise.all(positions.map(position => {
-      if (!position || !position.pair || !position.positionAddress) {
-        return Promise.resolve(); // Skip invalid positions
-      }
+    await Promise.all(
+      positions.map((position) => {
+        if (!position || !position.pair || !position.positionAddress) {
+          return Promise.resolve(); // Skip invalid positions
+        }
 
-      const id = `${position.pair}-${position.positionAddress}`;
-      return store.add({
-        ...position,
-        id,
-        timestamp,
-      });
-    }));
+        const id = `${position.pair}-${position.positionAddress}`;
+        return store.add({
+          ...position,
+          id,
+          timestamp,
+        });
+      })
+    );
 
     await tx.done;
     return true;
@@ -82,7 +90,9 @@ export const savePositionSnapshot = async (db, positions, timestamp = Date.now()
  * @returns {Promise<Array>} Array of historical position records
  */
 export const getPositionHistory = async (db, positionId, timeRange) => {
-  if (!db) {return [];}
+  if (!db) {
+    return [];
+  }
 
   try {
     const tx = db.transaction(STORE_NAME, 'readonly');
@@ -94,7 +104,7 @@ export const getPositionHistory = async (db, positionId, timeRange) => {
     const range = IDBKeyRange.lowerBound(startTime);
 
     const history = await index.getAll(range);
-    return history.filter(item => item.id === positionId);
+    return history.filter((item) => item.id === positionId);
   } catch (error) {
     console.error('Failed to get position history:', error);
     return [];
@@ -108,8 +118,13 @@ export const getPositionHistory = async (db, positionId, timeRange) => {
  * @param {number} retentionDays - Number of days to retain data for
  * @returns {Promise<boolean>} Success status
  */
-export const cleanupOldData = async (db, retentionDays = DEFAULT_RETENTION_DAYS) => {
-  if (!db) {return false;}
+export const cleanupOldData = async (
+  db,
+  retentionDays = DEFAULT_RETENTION_DAYS
+) => {
+  if (!db) {
+    return false;
+  }
 
   try {
     const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -117,7 +132,7 @@ export const cleanupOldData = async (db, retentionDays = DEFAULT_RETENTION_DAYS)
     const index = store.index('timestamp');
 
     // Calculate cutoff time based on retention period
-    const cutoffTime = Date.now() - (retentionDays * 24 * 60 * 60 * 1000);
+    const cutoffTime = Date.now() - retentionDays * 24 * 60 * 60 * 1000;
     const range = IDBKeyRange.upperBound(cutoffTime);
 
     // Delete all records older than the cutoff time

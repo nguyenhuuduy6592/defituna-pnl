@@ -31,7 +31,9 @@ export const showNotification = (message, type = 'success') => {
     }
 
     if (!COLORS[type]) {
-      console.warn(`[showNotification] Invalid notification type: ${type}, defaulting to success`);
+      console.warn(
+        `[showNotification] Invalid notification type: ${type}, defaulting to success`
+      );
       type = 'success';
     }
 

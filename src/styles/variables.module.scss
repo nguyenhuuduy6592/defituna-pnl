@@ -1,18 +1,24 @@
-@use "sass:map";
+@use 'sass:map';
 
 // Colors
 $colors: (
   primary: #0070f3,
   hover: #005bb5,
   disabled: #ccc,
-  positive: #22c55e,  // Green for positive values
-  negative: #ef4444,  // Red for negative values
-  neutral: #f59e0b,   // Orange for neutral/warning values
-  low: #dc2626,       // Deep red for very low values
-  medium: #f59e0b,    // Orange for medium values
-  high: #16a34a,      // Deep green for high values
+  positive: #22c55e,
+  // Green for positive values
+  negative: #ef4444,
+  // Red for negative values
+  neutral: #f59e0b,
+  // Orange for neutral/warning values
+  low: #dc2626,
+  // Deep red for very low values
+  medium: #f59e0b,
+  // Orange for medium values
+  high: #16a34a,
+  // Deep green for high values
   border: #e5e7eb,
-  shadow: rgba(0,0,0,0.1),
+  shadow: rgba(0, 0, 0, 0.1),
   success: #22c55e,
   info: #0ea5e9,
   warning: #f59e0b,
@@ -20,18 +26,24 @@ $colors: (
     primary: #1f2937,
     secondary: #6b7280,
     disabled: #9ca3af,
-    positive: #15803d,  // Darker green for text
-    negative: #b91c1c,  // Darker red for text
-    neutral: #b45309    // Darker orange for text
+    positive: #15803d,
+    // Darker green for text
+    negative: #b91c1c,
+    // Darker red for text
+    neutral: #b45309,
+    // Darker orange for text
   ),
   bg: (
     light: #f9fafb,
     th: #f3f4f6,
     white: #ffffff,
-    positive: #dcfce7,  // Light green background
-    negative: #fee2e2,  // Light red background
-    neutral: #fef3c7    // Light orange background
-  )
+    positive: #dcfce7,
+    // Light green background
+    negative: #fee2e2,
+    // Light red background
+    neutral: #fef3c7,
+    // Light orange background
+  ),
 );
 
 // Spacing
@@ -40,7 +52,7 @@ $spacing: (
   sm: 8px,
   md: 16px,
   lg: 24px,
-  xl: 32px
+  xl: 32px,
 );
 
 // Breakpoints
@@ -48,23 +60,27 @@ $breakpoints: (
   sm: 576px,
   md: 768px,
   lg: 992px,
-  xl: 1200px
+  xl: 1200px,
 );
 
 // Border radius
 $border-radius: (
   sm: 4px,
   md: 8px,
-  lg: 16px
+  lg: 16px,
 );
 
 // Typography
 $font-sizes: (
-  xs: 0.75rem,   // 12px
-  sm: 0.875rem,  // 14px
-  base: 1rem,    // 16px
-  lg: 1.125rem,  // 18px
-  xl: 1.25rem    // 20px
+  xs: 0.75rem,
+  // 12px
+  sm: 0.875rem,
+  // 14px
+  base: 1rem,
+  // 16px
+  lg: 1.125rem,
+  // 18px
+  xl: 1.25rem, // 20px
 );
 
 // Mixins
@@ -139,7 +155,7 @@ $font-sizes: (
   border-radius: map.get($border-radius, sm);
   cursor: pointer;
   transition: background-color 0.2s ease;
-  
+
   &:disabled {
     cursor: not-allowed;
   }
@@ -150,7 +166,7 @@ $font-sizes: (
   border: 1px solid color(border);
   border-radius: map.get($border-radius, sm);
   width: 100%;
-  
+
   &:focus {
     outline: none;
     border-color: color(primary);

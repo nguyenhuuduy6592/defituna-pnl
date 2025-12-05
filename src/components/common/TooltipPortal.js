@@ -29,14 +29,16 @@ export const TooltipPortal = ({
 
   // Calculate and update tooltip position
   const updatePosition = useCallback(() => {
-    if (!targetRef.current) {return;}
+    if (!targetRef.current) {
+      return;
+    }
 
     const rect = targetRef.current.getBoundingClientRect();
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
 
     let top = rect.top + scrollTop;
-    let left = rect.left + (rect.width / 2) + scrollLeft;
+    let left = rect.left + rect.width / 2 + scrollLeft;
 
     // Adjust position based on the specified position prop
     if (position === 'top') {
@@ -50,7 +52,9 @@ export const TooltipPortal = ({
 
   // Handle position updates
   useEffect(() => {
-    if (!show) {return;}
+    if (!show) {
+      return;
+    }
 
     updatePosition();
     window.addEventListener('scroll', updatePosition);
@@ -62,7 +66,9 @@ export const TooltipPortal = ({
     };
   }, [show, updatePosition]);
 
-  if (!show) {return null;}
+  if (!show) {
+    return null;
+  }
 
   // Get transform style based on position
   const getTransformStyle = () => {
@@ -81,9 +87,7 @@ export const TooltipPortal = ({
       role="tooltip"
       aria-live="polite"
     >
-      <div className={`${styles.tooltip} ${styles[position]}`}>
-        {children}
-      </div>
+      <div className={`${styles.tooltip} ${styles[position]}`}>{children}</div>
     </div>,
     portalContainer
   );

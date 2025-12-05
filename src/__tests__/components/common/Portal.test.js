@@ -23,7 +23,11 @@ describe('Portal Component', () => {
   });
 
   it('renders different content when provided', () => {
-    render(<Portal><button>Click me</button></Portal>);
+    render(
+      <Portal>
+        <button>Click me</button>
+      </Portal>
+    );
 
     // Check that the new content is rendered
     expect(screen.getByRole('button')).toBeInTheDocument();

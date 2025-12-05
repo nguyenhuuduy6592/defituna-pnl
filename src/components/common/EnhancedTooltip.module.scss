@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: center;
   color: variables.color(primary);
-  
+
   // Add a larger touch target for mobile
   @media (max-width: 767px) {
     padding: 6px;
@@ -23,18 +23,22 @@
 // Tooltip is now rendered in the document body via portal
 .tooltip {
   position: fixed;
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98));
+  background: linear-gradient(
+    145deg,
+    rgba(15, 23, 42, 0.98),
+    rgba(30, 41, 59, 0.98)
+  );
   color: white;
   border-radius: 10px;
   // Extremely high z-index since it's now at body level
   z-index: 99999;
-  box-shadow: 
+  box-shadow:
     0 10px 25px -5px rgba(0, 0, 0, 0.3),
     0 4px 10px -5px rgba(0, 0, 0, 0.2);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: 
+  transition:
     opacity 0.2s ease,
     visibility 0.2s ease,
     transform 0.25s cubic-bezier(0.2, 1, 0.3, 1);
@@ -43,7 +47,7 @@
   backdrop-filter: blur(8px);
   transform-origin: center center;
   transform: scale(0.95);
-  
+
   // Border with slight glow
   border: 1px solid rgba(112, 128, 144, 0.15);
 
@@ -68,10 +72,10 @@
   background: inherit;
   border-radius: 2px;
   transform: rotate(45deg);
-  
+
   // Default border styling
   border: inherit;
-  
+
   // Position-specific arrow styles
   .tooltip.bottom & {
     top: -5px;
@@ -79,21 +83,21 @@
     border-right: none;
     border-bottom: none;
   }
-  
+
   .tooltip.top & {
     bottom: -5px;
     transform: translateX(-50%) rotate(45deg);
     border-left: none;
     border-top: none;
   }
-  
+
   .tooltip.right & {
     left: -5px;
     transform: translateY(-50%) rotate(45deg);
     border-right: none;
     border-bottom: none;
   }
-  
+
   .tooltip.left & {
     right: -5px;
     transform: translateY(-50%) rotate(45deg);
@@ -106,7 +110,7 @@
   padding: 12px;
   font-size: 12px;
   line-height: 1.4;
-  
+
   @media (max-width: 767px) {
     padding: 10px;
     font-size: 11px;
@@ -124,14 +128,14 @@
 // Header section styling
 .tooltipHeader {
   margin-bottom: 8px;
-  
+
   .tooltipHeaderTitle {
     font-weight: 600;
     font-size: 13px;
     color: white;
     margin-bottom: 3px;
   }
-  
+
   .tooltipHeaderDescription {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.8);
@@ -141,11 +145,11 @@
 // Section styling
 .tooltipSection {
   margin-bottom: 8px;
-  
+
   &:last-child {
     margin-bottom: 0;
   }
-  
+
   .tooltipSectionTitle {
     font-weight: 600;
     font-size: 12px;
@@ -159,17 +163,17 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  
+
   li {
     position: relative;
     padding-left: 14px;
     margin-bottom: 4px;
     color: rgba(255, 255, 255, 0.8);
-    
+
     &:last-child {
       margin-bottom: 0;
     }
-    
+
     &::before {
       content: '•';
       position: absolute;
@@ -177,4 +181,4 @@
       color: variables.color(primary);
     }
   }
-} 
+}

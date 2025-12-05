@@ -8,7 +8,9 @@ import { DisplayCurrencyProvider } from '../../../contexts/DisplayCurrencyContex
 
 // Mock dependencies
 jest.mock('../../../components/common/Portal', () => ({
-  Portal: ({ children }) => <div data-testid="portal-container">{children}</div>,
+  Portal: ({ children }) => (
+    <div data-testid="portal-container">{children}</div>
+  ),
 }));
 
 jest.mock('../../../utils/export', () => ({
@@ -168,7 +170,9 @@ describe('PnLCard', () => {
     );
 
     // Find the download button by its container and icon
-    const downloadButton = screen.getByTestId('download-icon').closest('button');
+    const downloadButton = screen
+      .getByTestId('download-icon')
+      .closest('button');
     fireEvent.click(downloadButton);
 
     // exportCardAsImage should have been called
@@ -335,7 +339,9 @@ describe('PnLCard', () => {
     expect(closeButton).toBeInTheDocument();
 
     // Check that download button is present
-    const downloadButton = screen.getByTestId('download-icon').closest('button');
+    const downloadButton = screen
+      .getByTestId('download-icon')
+      .closest('button');
     expect(downloadButton).toBeInTheDocument();
 
     // Check that share button is present
@@ -345,8 +351,14 @@ describe('PnLCard', () => {
     // Instead of testing focus which is challenging in JSDOM,
     // test that the buttons have the right aria attributes
     expect(closeButton).toHaveAttribute('aria-label', 'Close');
-    expect(downloadButton).toHaveAttribute('aria-label', 'Download ETH/USDC PnL card as PNG');
-    expect(shareButton).toHaveAttribute('aria-label', 'Share ETH/USDC PnL card');
+    expect(downloadButton).toHaveAttribute(
+      'aria-label',
+      'Download ETH/USDC PnL card as PNG'
+    );
+    expect(shareButton).toHaveAttribute(
+      'aria-label',
+      'Share ETH/USDC PnL card'
+    );
   });
 
   it('adds snapshot test for visual regression', () => {
@@ -454,11 +466,19 @@ describe('PnLCard', () => {
     expect(closeButton).toHaveAttribute('aria-label', 'Close');
 
     // Check action buttons have proper aria attributes
-    const downloadButton = screen.getByTestId('download-icon').closest('button');
-    expect(downloadButton).toHaveAttribute('aria-label', 'Download ETH/USDC PnL card as PNG');
+    const downloadButton = screen
+      .getByTestId('download-icon')
+      .closest('button');
+    expect(downloadButton).toHaveAttribute(
+      'aria-label',
+      'Download ETH/USDC PnL card as PNG'
+    );
 
     const shareButton = screen.getByTestId('share-icon').closest('button');
-    expect(shareButton).toHaveAttribute('aria-label', 'Share ETH/USDC PnL card');
+    expect(shareButton).toHaveAttribute(
+      'aria-label',
+      'Share ETH/USDC PnL card'
+    );
   });
 
   it('prevents background scrolling when modal is open', () => {

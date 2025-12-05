@@ -1,0 +1,7 @@
+# Ignore directories
+.vscode/
+public/
+node_modules/
+improvements/
+dist/
+.next/

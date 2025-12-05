@@ -10,7 +10,9 @@ const renderWithProvider = (ui) =>
 describe('CurrencyToggle', () => {
   it('renders with current currency', () => {
     renderWithProvider(<CurrencyToggle />);
-    expect(screen.getByRole('button', { name: /Display:/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Display:/i })
+    ).toBeInTheDocument();
   });
 
   it('toggles currency on click', () => {

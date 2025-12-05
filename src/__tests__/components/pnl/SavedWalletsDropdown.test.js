@@ -5,7 +5,9 @@ import { formatWalletAddress } from '../../../utils';
 
 // Mock dependencies
 jest.mock('../../../utils', () => ({
-  formatWalletAddress: jest.fn(address => `${address.slice(0, 6)}...${address.slice(-4)}`),
+  formatWalletAddress: jest.fn(
+    (address) => `${address.slice(0, 6)}...${address.slice(-4)}`
+  ),
 }));
 
 describe('SavedWalletsDropdown', () => {
@@ -30,12 +32,14 @@ describe('SavedWalletsDropdown', () => {
     expect(screen.getByRole('listbox')).toBeInTheDocument();
 
     // Check that all wallets are rendered
-    defaultProps.uniqueSavedWallets.forEach(wallet => {
+    defaultProps.uniqueSavedWallets.forEach((wallet) => {
       expect(screen.getByText(formatWalletAddress(wallet))).toBeInTheDocument();
     });
 
     // Check that clear button is rendered
-    expect(screen.getByRole('button', { name: /clear all wallets/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /clear all wallets/i })
+    ).toBeInTheDocument();
   });
 
   it('highlights active wallets', () => {
@@ -81,7 +85,9 @@ describe('SavedWalletsDropdown', () => {
     render(<SavedWalletsDropdown {...defaultProps} />);
 
     // Get all activation buttons
-    const activationButtons = screen.getAllByRole('button', { name: /(activate|deactivate) wallet/i });
+    const activationButtons = screen.getAllByRole('button', {
+      name: /(activate|deactivate) wallet/i,
+    });
 
     // Click the first button (deactivate wallet1)
     fireEvent.click(activationButtons[0]);
@@ -96,7 +102,9 @@ describe('SavedWalletsDropdown', () => {
     render(<SavedWalletsDropdown {...defaultProps} />);
 
     // Get all remove buttons
-    const removeButtons = screen.getAllByRole('button', { name: /remove wallet/i });
+    const removeButtons = screen.getAllByRole('button', {
+      name: /remove wallet/i,
+    });
 
     // Click the second button (remove wallet2)
     fireEvent.click(removeButtons[1]);
@@ -107,7 +115,9 @@ describe('SavedWalletsDropdown', () => {
     render(<SavedWalletsDropdown {...defaultProps} />);
 
     // Click the clear button
-    const clearButton = screen.getByRole('button', { name: /clear all wallets/i });
+    const clearButton = screen.getByRole('button', {
+      name: /clear all wallets/i,
+    });
     fireEvent.click(clearButton);
 
     // Check that the click is properly stopped from propagating
@@ -118,24 +128,32 @@ describe('SavedWalletsDropdown', () => {
     render(<SavedWalletsDropdown {...defaultProps} uniqueSavedWallets={[]} />);
 
     // Clear button should not be rendered
-    expect(screen.queryByRole('button', { name: /clear all wallets/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /clear all wallets/i })
+    ).not.toBeInTheDocument();
   });
 
   it('calls event handlers when buttons are clicked', () => {
     render(<SavedWalletsDropdown {...defaultProps} />);
 
     // Test remove wallet
-    const removeButtons = screen.getAllByRole('button', { name: /remove wallet/i });
+    const removeButtons = screen.getAllByRole('button', {
+      name: /remove wallet/i,
+    });
     fireEvent.click(removeButtons[0]);
     expect(defaultProps.onRemoveWallet).toHaveBeenCalledWith('wallet1');
 
     // Test toggle wallet active
-    const activationButtons = screen.getAllByRole('button', { name: /(activate|deactivate) wallet/i });
+    const activationButtons = screen.getAllByRole('button', {
+      name: /(activate|deactivate) wallet/i,
+    });
     fireEvent.click(activationButtons[0]);
     expect(defaultProps.toggleWalletActive).toHaveBeenCalledWith('wallet1');
 
     // Test clear all
-    const clearButton = screen.getByRole('button', { name: /clear all wallets/i });
+    const clearButton = screen.getByRole('button', {
+      name: /clear all wallets/i,
+    });
     fireEvent.click(clearButton);
     expect(defaultProps.onClearWallets).toHaveBeenCalled();
   });
@@ -154,9 +172,15 @@ describe('SavedWalletsDropdown', () => {
     render(<ParentComponent />);
 
     // Get buttons
-    const removeButtons = screen.getAllByRole('button', { name: /remove wallet/i });
-    const activationButtons = screen.getAllByRole('button', { name: /(activate|deactivate) wallet/i });
-    const clearButton = screen.getByRole('button', { name: /clear all wallets/i });
+    const removeButtons = screen.getAllByRole('button', {
+      name: /remove wallet/i,
+    });
+    const activationButtons = screen.getAllByRole('button', {
+      name: /(activate|deactivate) wallet/i,
+    });
+    const clearButton = screen.getByRole('button', {
+      name: /clear all wallets/i,
+    });
 
     // Click buttons and verify parent click handler isn't triggered
     fireEvent.click(removeButtons[0]);

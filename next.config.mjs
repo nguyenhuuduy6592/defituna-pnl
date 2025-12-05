@@ -38,7 +38,7 @@ const nextConfig = {
 
     // Suppress the specific WebAssembly async/await warning
     config.ignoreWarnings = [
-      { module: /orca_whirlpools_core_js_bindings_bg\.wasm$/ }
+      { module: /orca_whirlpools_core_js_bindings_bg\.wasm$/ },
     ];
 
     return config;

@@ -22,13 +22,45 @@ describe('formula', () => {
     });
 
     it('returns default leverage for invalid price', () => {
-      expect(calculateLeverage({ price: 0, debtA: 1, debtB: 1000, totalA: 2, totalB: 2000 })).toBe(1.0);
-      expect(calculateLeverage({ price: -1, debtA: 1, debtB: 1000, totalA: 2, totalB: 2000 })).toBe(1.0);
-      expect(calculateLeverage({ price: NaN, debtA: 1, debtB: 1000, totalA: 2, totalB: 2000 })).toBe(1.0);
+      expect(
+        calculateLeverage({
+          price: 0,
+          debtA: 1,
+          debtB: 1000,
+          totalA: 2,
+          totalB: 2000,
+        })
+      ).toBe(1.0);
+      expect(
+        calculateLeverage({
+          price: -1,
+          debtA: 1,
+          debtB: 1000,
+          totalA: 2,
+          totalB: 2000,
+        })
+      ).toBe(1.0);
+      expect(
+        calculateLeverage({
+          price: NaN,
+          debtA: 1,
+          debtB: 1000,
+          totalA: 2,
+          totalB: 2000,
+        })
+      ).toBe(1.0);
     });
 
     it('handles zero or negative total value', () => {
-      expect(calculateLeverage({ price: 2000, debtA: 0, debtB: 0, totalA: 0, totalB: 0 })).toBe(1.0);
+      expect(
+        calculateLeverage({
+          price: 2000,
+          debtA: 0,
+          debtB: 0,
+          totalA: 0,
+          totalB: 0,
+        })
+      ).toBe(1.0);
     });
 
     it('caps leverage at 100x', () => {
@@ -66,7 +98,9 @@ describe('formula', () => {
       });
 
       expect(result.lowerLiquidationPrice).toBeGreaterThan(0);
-      expect(result.upperLiquidationPrice).toBeGreaterThan(result.lowerLiquidationPrice);
+      expect(result.upperLiquidationPrice).toBeGreaterThan(
+        result.lowerLiquidationPrice
+      );
     });
 
     it('returns zeros for invalid price range', () => {
@@ -111,7 +145,9 @@ describe('formula', () => {
       });
 
       expect(result.lowerLiquidationPrice).toBeGreaterThan(0);
-      expect(result.upperLiquidationPrice).toBeGreaterThan(result.lowerLiquidationPrice);
+      expect(result.upperLiquidationPrice).toBeGreaterThan(
+        result.lowerLiquidationPrice
+      );
     });
   });
 
@@ -222,14 +258,16 @@ describe('formula', () => {
       };
 
       const mockMarketData = {
-        data: [{
-          pool_address: 'pool1',
-          liquidation_threshold: 50000, // 5%
-        }],
+        data: [
+          {
+            pool_address: 'pool1',
+            liquidation_threshold: 50000, // 5%
+          },
+        ],
       };
 
       const mockTokenAData = { decimals: 18 }; // Token A (18 decimals)
-      const mockTokenBData = { decimals: 6 };  // Token B (6 decimals)
+      const mockTokenBData = { decimals: 6 }; // Token B (6 decimals)
 
       const result = processTunaPosition(
         mockPositionData,
@@ -262,13 +300,18 @@ describe('formula', () => {
       expect(result.pnl.bps).toBe(1000);
 
       // Check price calculations (prices are in raw form with decimals)
-      const decimalsAdjustment = 10 ** (mockTokenAData.decimals - mockTokenBData.decimals);
+      const decimalsAdjustment =
+        10 ** (mockTokenAData.decimals - mockTokenBData.decimals);
       expect(result.currentPrice).toBe(decimalsAdjustment);
       expect(result.entryPrice).toBe(decimalsAdjustment);
       expect(result.rangePrices.lower).toBeLessThan(decimalsAdjustment);
       expect(result.rangePrices.upper).toBeGreaterThan(decimalsAdjustment);
-      expect(result.limitOrderPrices.lower).toBeLessThan(result.rangePrices.lower);
-      expect(result.limitOrderPrices.upper).toBeGreaterThan(result.rangePrices.upper);
+      expect(result.limitOrderPrices.lower).toBeLessThan(
+        result.rangePrices.lower
+      );
+      expect(result.limitOrderPrices.upper).toBeGreaterThan(
+        result.rangePrices.upper
+      );
     });
 
     it('handles missing optional values', () => {
@@ -290,10 +333,12 @@ describe('formula', () => {
           },
         },
         {
-          data: [{
-            pool_address: 'pool1',
-            liquidation_threshold: 50000,
-          }],
+          data: [
+            {
+              pool_address: 'pool1',
+              liquidation_threshold: 50000,
+            },
+          ],
         },
         { decimals: 18 },
         { decimals: 6 }
@@ -328,12 +373,14 @@ describe('formula', () => {
           },
         },
         {
-          data: [{
-            pool_address: 'pool1',
-          }],
+          data: [
+            {
+              pool_address: 'pool1',
+            },
+          ],
         },
         {}, // No decimals specified
-        {}  // No decimals specified
+        {} // No decimals specified
       );
 
       // Should use 0 as default for decimals
@@ -363,9 +410,7 @@ describe('formula', () => {
       const mockTokenAData = { decimals: 6 };
       const mockTokenBData = { decimals: 6 };
       const mockMarketData = {
-        data: [
-          { pool_address: 'pool1' },
-        ],
+        data: [{ pool_address: 'pool1' }],
       };
 
       const result = formulas.processTunaPosition(

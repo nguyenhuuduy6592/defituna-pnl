@@ -9,38 +9,24 @@ describe('validation utilities', () => {
         'DfiGBi6GhpUvhkQDQxqfqFSxeGJJqHPg5K7zeqD4qVjw',
       ];
 
-      validAddresses.forEach(address => {
+      validAddresses.forEach((address) => {
         expect(isValidWalletAddress(address)).toBe(true);
       });
     });
 
     describe('returns false for invalid inputs', () => {
       it('rejects non-string inputs', () => {
-        const nonStringInputs = [
-          null,
-          undefined,
-          123,
-          {},
-          [],
-          true,
-          false,
-        ];
+        const nonStringInputs = [null, undefined, 123, {}, [], true, false];
 
-        nonStringInputs.forEach(input => {
+        nonStringInputs.forEach((input) => {
           expect(isValidWalletAddress(input)).toBe(false);
         });
       });
 
       it('rejects empty or whitespace strings', () => {
-        const emptyInputs = [
-          '',
-          ' ',
-          '   ',
-          '\t',
-          '\n',
-        ];
+        const emptyInputs = ['', ' ', '   ', '\t', '\n'];
 
-        emptyInputs.forEach(input => {
+        emptyInputs.forEach((input) => {
           expect(isValidWalletAddress(input)).toBe(false);
         });
       });
@@ -54,7 +40,7 @@ describe('validation utilities', () => {
           'Dfi', // way too short
         ];
 
-        invalidLengthAddresses.forEach(address => {
+        invalidLengthAddresses.forEach((address) => {
           expect(isValidWalletAddress(address)).toBe(false);
         });
       });
@@ -70,7 +56,7 @@ describe('validation utilities', () => {
           'DfiGBi6GhpUvhkQDQxqfqFSxeGJJqHPg5K7zeqD4qVj$', // contains $
         ];
 
-        addressesWithInvalidChars.forEach(address => {
+        addressesWithInvalidChars.forEach((address) => {
           expect(isValidWalletAddress(address)).toBe(false);
         });
       });

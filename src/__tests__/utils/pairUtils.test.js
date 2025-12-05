@@ -32,7 +32,9 @@ describe('invertPairString', () => {
 
   it('handles errors gracefully', () => {
     const pair = {
-      toString: () => { throw new Error('Mock error'); },
+      toString: () => {
+        throw new Error('Mock error');
+      },
     };
     expect(invertPairString(pair)).toBe('');
   });
@@ -69,7 +71,9 @@ describe('invertPrice', () => {
 
   it('handles errors gracefully', () => {
     const mockPrice = {
-      valueOf: () => { throw new Error('Mock error'); },
+      valueOf: () => {
+        throw new Error('Mock error');
+      },
     };
     expect(invertPrice(mockPrice)).toBeNull();
   });
@@ -173,7 +177,9 @@ describe('getAdjustedPosition', () => {
 
   it('handles errors gracefully', () => {
     const position = {
-      get currentPrice() { throw new Error('Mock error'); },
+      get currentPrice() {
+        throw new Error('Mock error');
+      },
     };
     expect(getAdjustedPosition(position, true)).toBe(position);
   });

@@ -17,7 +17,10 @@ export const invertPairString = (pair) => {
     }
 
     if (!pair.includes('/')) {
-      console.warn('[invertPairString] Invalid pair format (missing separator):', pair);
+      console.warn(
+        '[invertPairString] Invalid pair format (missing separator):',
+        pair
+      );
       return pair;
     }
 
@@ -73,7 +76,9 @@ export const getAdjustedPosition = (position, isInverted) => {
     return {};
   }
 
-  if (!isInverted) {return position;}
+  if (!isInverted) {
+    return position;
+  }
 
   try {
     return {
@@ -94,7 +99,10 @@ export const getAdjustedPosition = (position, isInverted) => {
       },
     };
   } catch (error) {
-    console.error('[getAdjustedPosition] Error adjusting position for inversion:', error);
+    console.error(
+      '[getAdjustedPosition] Error adjusting position for inversion:',
+      error
+    );
     return position;
   }
 };

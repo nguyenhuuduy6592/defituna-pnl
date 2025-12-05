@@ -67,7 +67,9 @@ describe('LoadingOverlay Component', () => {
       </LoadingOverlay>
     );
 
-    expect(screen.queryByText('Custom loading message')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Custom loading message')
+    ).not.toBeInTheDocument();
     expect(screen.queryByText(defaultMessage)).not.toBeInTheDocument();
   });
 

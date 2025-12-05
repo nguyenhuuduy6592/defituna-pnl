@@ -19,7 +19,10 @@ const REFRESH_INTERVAL_KEY = 'refreshInterval';
  * @returns {Function} returns.setRefreshInterval - Function to update refresh interval
  * @returns {number} returns.refreshCountdown - Countdown until next refresh in seconds
  */
-export const useAutoRefresh = (onRefresh, initialInterval = DEFAULT_INTERVAL) => {
+export const useAutoRefresh = (
+  onRefresh,
+  initialInterval = DEFAULT_INTERVAL
+) => {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [refreshInterval, setRefreshInterval] = useState(initialInterval);
   const [refreshCountdown, setRefreshCountdown] = useState(initialInterval);
@@ -37,7 +40,8 @@ export const useAutoRefresh = (onRefresh, initialInterval = DEFAULT_INTERVAL) =>
   useEffect(() => {
     try {
       // Load auto-refresh state
-      const savedAutoRefresh = localStorage.getItem(AUTO_REFRESH_KEY) === 'true';
+      const savedAutoRefresh =
+        localStorage.getItem(AUTO_REFRESH_KEY) === 'true';
       setAutoRefresh(savedAutoRefresh);
 
       // Load refresh interval

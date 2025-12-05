@@ -4,9 +4,8 @@ import { ClusterBar } from '../../../components/pnl/ClusterBar';
 
 // Mock the TooltipPortal component
 jest.mock('../../../components/common/TooltipPortal', () => ({
-  TooltipPortal: ({ children, targetRef, show }) => (
-    show ? <div data-testid="tooltip-portal">{children}</div> : null
-  ),
+  TooltipPortal: ({ children, targetRef, show }) =>
+    show ? <div data-testid="tooltip-portal">{children}</div> : null,
 }));
 
 describe('ClusterBar', () => {
@@ -27,7 +26,9 @@ describe('ClusterBar', () => {
     render(<ClusterBar {...defaultProps} />);
 
     // Check the container is rendered
-    expect(screen.getByLabelText('Position composition breakdown')).toBeInTheDocument();
+    expect(
+      screen.getByLabelText('Position composition breakdown')
+    ).toBeInTheDocument();
 
     // Check all segments are rendered with correct percentages
     expect(screen.getByLabelText('Collateral: 60.0%')).toBeInTheDocument();
@@ -46,7 +47,9 @@ describe('ClusterBar', () => {
     expect(screen.queryByTestId('tooltip-portal')).not.toBeInTheDocument();
 
     // Show tooltip on mouse enter
-    const barContainer = screen.getByLabelText('Position composition breakdown').querySelector('div');
+    const barContainer = screen
+      .getByLabelText('Position composition breakdown')
+      .querySelector('div');
     fireEvent.mouseEnter(barContainer);
 
     // Tooltip should be visible with correct data
@@ -68,7 +71,14 @@ describe('ClusterBar', () => {
   });
 
   it('handles zero values correctly', () => {
-    render(<ClusterBar size={0} collateral={{ usd: 0 }} debt={{ usd: 0 }} interest={{ usd: 0 }} />);
+    render(
+      <ClusterBar
+        size={0}
+        collateral={{ usd: 0 }}
+        debt={{ usd: 0 }}
+        interest={{ usd: 0 }}
+      />
+    );
 
     // All segments should show 0%
     expect(screen.getByLabelText('Collateral: 0.0%')).toBeInTheDocument();
@@ -122,7 +132,9 @@ describe('ClusterBar', () => {
     expect(screen.getAllByText('$1K').length).toBeGreaterThan(0);
 
     // Show tooltip to check formatted values
-    const barContainer = screen.getByLabelText('Position composition breakdown').querySelector('div');
+    const barContainer = screen
+      .getByLabelText('Position composition breakdown')
+      .querySelector('div');
     fireEvent.mouseEnter(barContainer);
 
     // Check for custom formatted values in tooltip

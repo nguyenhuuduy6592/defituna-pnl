@@ -18,14 +18,14 @@ export function setupPageTests() {
   const localStorageMock = (() => {
     let store = {};
     return {
-      getItem: jest.fn(key => store[key] || null),
+      getItem: jest.fn((key) => store[key] || null),
       setItem: jest.fn((key, value) => {
         store[key] = value.toString();
       }),
       clear: jest.fn(() => {
         store = {};
       }),
-      removeItem: jest.fn(key => {
+      removeItem: jest.fn((key) => {
         delete store[key];
       }),
     };
@@ -54,9 +54,7 @@ export function mockNextComponents() {
   });
 
   jest.mock('next/head', () => {
-    const MockHead = ({ children }) => (
-      <div data-testid="head">{children}</div>
-    );
+    const MockHead = ({ children }) => <div data-testid="head">{children}</div>;
     MockHead.displayName = 'MockHead';
     return {
       __esModule: true,
@@ -149,7 +147,7 @@ export function mockCommonComponents() {
   jest.mock('../../../components/common/TimeframeSelector', () => {
     const MockTimeframeSelector = ({ timeframes, selected, onChange }) => (
       <div data-testid="timeframe-selector">
-        {timeframes.map(timeframe => (
+        {timeframes.map((timeframe) => (
           <button
             key={timeframe}
             data-testid={`timeframe-${timeframe}`}
@@ -268,7 +266,7 @@ export function mockHooks() {
 
   jest.mock('../../../hooks/usePoolData', () => ({
     usePoolData: jest.fn((poolId) => {
-      const pool = createMockPools().find(p => p.address === poolId);
+      const pool = createMockPools().find((p) => p.address === poolId);
       return {
         loading: false,
         error: null,

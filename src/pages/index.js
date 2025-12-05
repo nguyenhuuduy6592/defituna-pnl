@@ -13,9 +13,7 @@ import {
 import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
-import {
-  fetchWalletPnL,
-} from '../utils';
+import { fetchWalletPnL } from '../utils';
 import styles from './index.module.scss';
 import { useRouter } from 'next/router';
 import { usePriceContext } from '../contexts/PriceContext';
@@ -65,18 +63,23 @@ const HomePage = () => {
   }, []);
 
   // Debounced version for auto-refresh - extract the execute function
-  const { execute: debouncedExecuteFetchWalletPnL } = useDebounceApi(fetchWalletPnL, 500);
+  const { execute: debouncedExecuteFetchWalletPnL } = useDebounceApi(
+    fetchWalletPnL,
+    500
+  );
 
   // Aggregate PnL data from multiple wallets, filtering out errors
   const aggregatePnLData = useCallback((walletsData, solPrice) => {
-    const validData = walletsData.filter(d => d && !d.error);
-    if (validData.length === 0) {return null;}
+    const validData = walletsData.filter((d) => d && !d.error);
+    if (validData.length === 0) {
+      return null;
+    }
 
-    const allPositions = validData.flatMap(d => d.positions || []);
+    const allPositions = validData.flatMap((d) => d.positions || []);
 
     const totalPnLInSol = (() => {
       const tokenTotals = allPositions.reduce((acc, position) => {
-        position.pnlData.token_pnl.forEach(token => {
+        position.pnlData.token_pnl.forEach((token) => {
           if (!acc[token.token]) {
             acc[token.token] = 0;
           }
@@ -101,7 +104,7 @@ const HomePage = () => {
 
     const totalYieldInSol = (() => {
       const tokenTotals = allPositions.reduce((acc, position) => {
-        position.yieldData.tokens.forEach(token => {
+        position.yieldData.tokens.forEach((token) => {
           if (!acc[token.token]) {
             acc[token.token] = 0;
           }
@@ -126,7 +129,7 @@ const HomePage = () => {
 
     const totalCompoundedInSol = (() => {
       const tokenTotals = allPositions.reduce((acc, position) => {
-        position.compoundedData.tokens.forEach(token => {
+        position.compoundedData.tokens.forEach((token) => {
           if (!acc[token.token]) {
             acc[token.token] = 0;
           }
@@ -181,80 +184,90 @@ const HomePage = () => {
   }, []);
 
   // Function to fetch PnL for specified wallets
-  const fetchPnLData = useCallback(async (walletsToFetch, isSubmission = false) => {
-    if (!walletsToFetch || walletsToFetch.length === 0) {
-      setAggregatedData(null);
-      setErrorMessage('');
-      return;
-    }
-
-    setLoading(true);
-    setErrorMessage('');
-
-    try {
-      const solPrice = await updateSolPrice();
-
-      // Select the appropriate fetch function
-      const fetchFunc = isSubmission ? fetchWalletPnL : debouncedExecuteFetchWalletPnL;
-
-      const results = await Promise.all(
-        walletsToFetch.map(address => fetchFunc(address))
-      );
-
-      const fetchErrors = results.filter(r => r && r.error).map(r => r.error);
-      let combined = null; // Initialize combined data
-
-      if (fetchErrors.length > 0) {
-        // Set error message but don't clear existing data immediately
-        setErrorMessage(`Failed to fetch data for ${fetchErrors.length} wallet(s). Please wait for next refresh.`);
-        // Attempt to aggregate still, maybe some wallets succeeded
-        combined = aggregatePnLData(results, solPrice);
-        if (!combined) {
-          // If aggregation fails completely after errors, clear data
-          setAggregatedData(null);
-        }
-      } else {
-        // Clear error message on successful fetch/refresh
+  const fetchPnLData = useCallback(
+    async (walletsToFetch, isSubmission = false) => {
+      if (!walletsToFetch || walletsToFetch.length === 0) {
+        setAggregatedData(null);
         setErrorMessage('');
-        combined = aggregatePnLData(results, solPrice);
+        return;
       }
 
-      if (combined) {
-        setAggregatedData(combined);
+      setLoading(true);
+      setErrorMessage('');
 
-        // Handle history data if enabled
-        if (historyEnabled) {
-          await savePositionSnapshot(combined.positions);
+      try {
+        const solPrice = await updateSolPrice();
+
+        // Select the appropriate fetch function
+        const fetchFunc = isSubmission
+          ? fetchWalletPnL
+          : debouncedExecuteFetchWalletPnL;
+
+        const results = await Promise.all(
+          walletsToFetch.map((address) => fetchFunc(address))
+        );
+
+        const fetchErrors = results
+          .filter((r) => r && r.error)
+          .map((r) => r.error);
+        let combined = null; // Initialize combined data
+
+        if (fetchErrors.length > 0) {
+          // Set error message but don't clear existing data immediately
+          setErrorMessage(
+            `Failed to fetch data for ${fetchErrors.length} wallet(s). Please wait for next refresh.`
+          );
+          // Attempt to aggregate still, maybe some wallets succeeded
+          combined = aggregatePnLData(results, solPrice);
+          if (!combined) {
+            // If aggregation fails completely after errors, clear data
+            setAggregatedData(null);
+          }
+        } else {
+          // Clear error message on successful fetch/refresh
+          setErrorMessage('');
+          combined = aggregatePnLData(results, solPrice);
         }
 
-        // Handle wallet form submission logic (adding wallet, clearing input)
-        if (isSubmission && wallet) {
-          addWallet(wallet);
-          setWallet('');
+        if (combined) {
+          setAggregatedData(combined);
+
+          // Handle history data if enabled
+          if (historyEnabled) {
+            await savePositionSnapshot(combined.positions);
+          }
+
+          // Handle wallet form submission logic (adding wallet, clearing input)
+          if (isSubmission && wallet) {
+            addWallet(wallet);
+            setWallet('');
+          }
+        } else if (fetchErrors.length === 0) {
+          setErrorMessage('No position data found for the provided wallet(s).');
         }
-      } else if (fetchErrors.length === 0) {
-        setErrorMessage('No position data found for the provided wallet(s).');
+      } catch (err) {
+        console.error('Error in fetchPnLData:', err);
+        setErrorMessage(
+          err.message || 'An unexpected error occurred while fetching data.'
+        );
+        setAggregatedData(null);
+      } finally {
+        setLoading(false);
       }
-
-    } catch (err) {
-      console.error('Error in fetchPnLData:', err);
-      setErrorMessage(err.message || 'An unexpected error occurred while fetching data.');
-      setAggregatedData(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    activeWallets,
-    aggregatePnLData,
-    historyEnabled,
-    savePositionSnapshot,
-    fetchWalletPnL,
-    wallet,
-    addWallet,
-    setWallet,
-    debouncedExecuteFetchWalletPnL,
-    updateSolPrice,
-  ]);
+    },
+    [
+      activeWallets,
+      aggregatePnLData,
+      historyEnabled,
+      savePositionSnapshot,
+      fetchWalletPnL,
+      wallet,
+      addWallet,
+      setWallet,
+      debouncedExecuteFetchWalletPnL,
+      updateSolPrice,
+    ]
+  );
 
   const {
     autoRefresh,
@@ -268,33 +281,52 @@ const HomePage = () => {
     }, [fetchPnLData, activeWallets])
   );
 
-
   // Handle initial load and wallet query parameter
   useEffect(() => {
     if (router.isReady && !initialFetched.current) {
       const walletParam = router.query.wallet;
       if (walletParam) {
-        const wallets = walletParam.split(',').map(w => w.trim()).filter(w => w);
+        const wallets = walletParam
+          .split(',')
+          .map((w) => w.trim())
+          .filter((w) => w);
         if (wallets.length > 0) {
           console.log(`Handle wallet query parameter: ${wallets}`);
           setActiveWallets(wallets);
           fetchPnLData(wallets, false);
         }
-      } else
+      } else if (
+        activeWallets.length > 0 &&
+        !aggregatedData &&
+        !loading &&
+        !errorMessage
+      ) {
         // Initial load logic: Fetch only if wallets are active, no data yet, not already loading, and no error shown
-        if (activeWallets.length > 0 && !aggregatedData && !loading && !errorMessage) {
-          console.log(`Auto fetch data if there are active wallets on page load 1: ${activeWallets}`);
-          fetchPnLData(activeWallets, false);
-        }
+        console.log(
+          `Auto fetch data if there are active wallets on page load 1: ${activeWallets}`
+        );
+        fetchPnLData(activeWallets, false);
+      }
       // Clear data/error if no wallets are active
       if (activeWallets.length === 0) {
-        console.log('Auto fetch data if there are active wallets on page load 2');
+        console.log(
+          'Auto fetch data if there are active wallets on page load 2'
+        );
         setAggregatedData(null);
         setErrorMessage('');
       }
       initialFetched.current = true;
     }
-  }, [router.isReady, router.query.wallet, activeWallets, aggregatedData, loading, errorMessage, fetchPnLData, setActiveWallets]);
+  }, [
+    router.isReady,
+    router.query.wallet,
+    activeWallets,
+    aggregatedData,
+    loading,
+    errorMessage,
+    fetchPnLData,
+    setActiveWallets,
+  ]);
 
   // Load all historical data
   useEffect(() => {
@@ -305,7 +337,9 @@ const HomePage = () => {
 
           for (const position of aggregatedData.positions) {
             if (position.positionAddress) {
-              const history = await getPositionHistory(position.positionAddress);
+              const history = await getPositionHistory(
+                position.positionAddress
+              );
               if (history && history.length > 0) {
                 allHistory.push(...history);
               }
@@ -322,13 +356,15 @@ const HomePage = () => {
     }
   }, [historyEnabled, aggregatedData, getPositionHistory]);
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const walletsToSubmit = wallet ? [wallet] : activeWallets;
     if (walletsToSubmit.length > 0) {
       await fetchPnLData(walletsToSubmit, true);
     } else {
-      setErrorMessage('Please enter a wallet address or select a saved wallet.');
+      setErrorMessage(
+        'Please enter a wallet address or select a saved wallet.'
+      );
       setAggregatedData(null);
     }
   };
@@ -343,21 +379,21 @@ const HomePage = () => {
     localStorage.setItem('disclaimerShown', 'true');
   };
 
-
-
   const title = 'Defituna PnL Viewer';
   return (
     <div className="container">
       <title>{title}</title>
       <div className={styles.titleContainer}>
         <h1>{title}</h1>
-        <Tooltip content={`• View Defituna positions and PnL
+        <Tooltip
+          content={`• View Defituna positions and PnL
 • No transactions needed - just enter wallet address
 • Support for multiple wallets
 • Auto-refresh data with configurable intervals
 • Historical data tracking for positions
 • Position age tracking
-• PnL card to share with friends`}>
+• PnL card to share with friends`}
+        >
           <div className={styles.infoIcon}>
             <BsInfoCircle />
           </div>
@@ -390,7 +426,9 @@ const HomePage = () => {
         setShowDropdown={setShowDropdown}
       />
 
-      {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
+      {errorMessage && (
+        <div className={styles.errorMessage}>{errorMessage}</div>
+      )}
 
       {activeWallets.length > 0 && (
         <AutoRefresh
@@ -420,19 +458,22 @@ const HomePage = () => {
               positionsHistory={allPositionsHistory}
             />
           </CollapsibleSection>
-
         </>
       )}
 
-      {!loading && !errorMessage && !aggregatedData && activeWallets.length > 0 && (
-        <div className={styles.noDataMessage}>No position data found for the selected wallet(s).</div>
-      )}
+      {!loading &&
+        !errorMessage &&
+        !aggregatedData &&
+        activeWallets.length > 0 && (
+          <div className={styles.noDataMessage}>
+            No position data found for the selected wallet(s).
+          </div>
+        )}
 
       <DisclaimerModal
         isOpen={disclaimerOpen}
         onClose={handleCloseDisclaimer}
       />
-
     </div>
   );
 };

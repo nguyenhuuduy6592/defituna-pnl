@@ -7,10 +7,11 @@ import { HistoryToggle } from '../history/HistoryToggle';
  */
 const RefreshStatus = ({ loading, countdown }) => (
   <div className={styles.refreshStatus}>
-    {loading ?
-      <span>Refreshing data...</span> :
+    {loading ? (
+      <span>Refreshing data...</span>
+    ) : (
       <span>Next refresh in {countdown} seconds</span>
-    }
+    )}
   </div>
 );
 
@@ -59,9 +60,12 @@ export const AutoRefresh = ({
   historyEnabled,
   onHistoryToggle,
 }) => {
-  const handleAutoRefreshToggle = useCallback((e) => {
-    setAutoRefresh(e.target.checked);
-  }, [setAutoRefresh]);
+  const handleAutoRefreshToggle = useCallback(
+    (e) => {
+      setAutoRefresh(e.target.checked);
+    },
+    [setAutoRefresh]
+  );
 
   return (
     <div className={styles.refreshControls}>
@@ -93,10 +97,7 @@ export const AutoRefresh = ({
             onChange={onIntervalChange}
           />
 
-          <RefreshStatus
-            loading={loading}
-            countdown={autoRefreshCountdown}
-          />
+          <RefreshStatus loading={loading} countdown={autoRefreshCountdown} />
         </>
       )}
     </div>

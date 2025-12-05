@@ -69,7 +69,9 @@ describe('debounce', () => {
 
   it('should throw error for invalid input', () => {
     // Silence console.error for these specific tests
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
     expect(() => debounce(null, 100)).toThrow(TypeError);
     expect(() => debounce(() => {}, -100)).toThrow(TypeError);
@@ -124,7 +126,9 @@ describe('debouncePromise', () => {
 
   it('should throw error for invalid input', () => {
     // Silence console.error for these specific tests
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {});
 
     expect(() => debouncePromise(null, 100)).toThrow(TypeError);
     expect(() => debouncePromise(() => {}, -100)).toThrow(TypeError);
