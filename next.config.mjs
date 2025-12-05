@@ -35,6 +35,12 @@ const nextConfig = {
       test: /\.wasm$/,
       type: 'webassembly/async',
     });
+
+    // Suppress the specific WebAssembly async/await warning
+    config.ignoreWarnings = [
+      { module: /orca_whirlpools_core_js_bindings_bg\.wasm$/ }
+    ];
+
     return config;
   },
   headers: async () => [
