@@ -15,31 +15,31 @@ jest.mock('../../hooks', () => ({
     toggleWalletActive: jest.fn(),
     savedWallets: [
       { address: 'wallet1', name: 'My Wallet 1' },
-      { address: 'wallet2', name: 'My Wallet 2' }
+      { address: 'wallet2', name: 'My Wallet 2' },
     ],
     addWallet: jest.fn(),
     removeWallet: jest.fn(),
-    clearWallets: jest.fn()
+    clearWallets: jest.fn(),
   })),
   useAutoRefresh: jest.fn(() => ({
     autoRefresh: true,
     setAutoRefresh: jest.fn(),
     refreshInterval: 60,
     setRefreshInterval: jest.fn(),
-    refreshCountdown: 30
+    refreshCountdown: 30,
   })),
   useCountdown: jest.fn(() => ({
     countdown: 0,
-    startCountdown: jest.fn()
+    startCountdown: jest.fn(),
   })),
   useHistoricalData: jest.fn(() => ({
     enabled: true,
     toggleHistoryEnabled: jest.fn(),
     savePositionSnapshot: jest.fn(),
-    getPositionHistory: jest.fn(() => [])
+    getPositionHistory: jest.fn(() => []),
   })),
   useDebounceApi: jest.fn(() => ({
-    execute: jest.fn()
+    execute: jest.fn(),
   })),
 }));
 
@@ -47,12 +47,12 @@ jest.mock('../../hooks', () => ({
 jest.mock('../../components/pnl/WalletForm', () => ({
   WalletForm: jest.fn(({ onSubmit }) => (
     <div data-testid="wallet-form">
-      <input 
-        data-testid="wallet-input" 
+      <input
+        data-testid="wallet-input"
         placeholder="Enter wallet address"
       />
-      <button 
-        data-testid="submit-button" 
+      <button
+        data-testid="submit-button"
         onClick={() => {
           // Simulate a proper event object
           const fakeEvent = { preventDefault: jest.fn() };
@@ -62,24 +62,24 @@ jest.mock('../../components/pnl/WalletForm', () => ({
         Submit
       </button>
     </div>
-  ))
+  )),
 }));
 
 jest.mock('../../components/pnl/AutoRefresh', () => ({
   AutoRefresh: jest.fn(({ autoRefresh, onToggle, refreshInterval, onIntervalChange, countdown }) => {
     // Create mock toggle function if not provided
     const handleToggle = onToggle || jest.fn();
-    
+
     return (
       <div data-testid="auto-refresh">
-        <input 
-          type="checkbox" 
-          checked={autoRefresh} 
+        <input
+          type="checkbox"
+          checked={autoRefresh}
           onChange={() => handleToggle(!autoRefresh)}
           data-testid="auto-refresh-toggle"
         />
-        <select 
-          value={refreshInterval} 
+        <select
+          value={refreshInterval}
           onChange={(e) => onIntervalChange && onIntervalChange(e)}
           data-testid="refresh-interval"
         >
@@ -89,7 +89,7 @@ jest.mock('../../components/pnl/AutoRefresh', () => ({
         <span data-testid="countdown">{countdown}</span>
       </div>
     );
-  })
+  }),
 }));
 
 jest.mock('../../components/common/DisclaimerModal', () => ({
@@ -99,7 +99,7 @@ jest.mock('../../components/common/DisclaimerModal', () => ({
         <button onClick={onClose} data-testid="accept-disclaimer">Accept</button>
       </div>
     ) : null
-  ))
+  )),
 }));
 
 // Create a loading indicator component for tests
@@ -108,7 +108,7 @@ jest.mock('../../components/common/LoadingOverlay', () => ({
     loading ? (
       <div data-testid="loading-indicator">Loading...</div>
     ) : children
-  ))
+  )),
 }));
 
 // Mock fetch for API calls
@@ -132,13 +132,13 @@ const localStorageMock = (function() {
 })();
 
 Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock
+  value: localStorageMock,
 });
 
 describe('Home Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Mock successful API response
     fetch.mockResolvedValue({
       ok: true,
@@ -146,9 +146,9 @@ describe('Home Page', () => {
         totalPnL: 1234.56,
         positions: [
           { id: 'pos1', pnl: 500, wallet: 'wallet1' },
-          { id: 'pos2', pnl: 734.56, wallet: 'wallet2' }
-        ]
-      })
+          { id: 'pos2', pnl: 734.56, wallet: 'wallet2' },
+        ],
+      }),
     });
   });
 
@@ -170,20 +170,20 @@ describe('Home Page', () => {
 
   it('does not show disclaimer on subsequent visits', () => {
     localStorage.getItem.mockImplementation(key => key === 'disclaimerShown' ? 'true' : undefined); // Simulate returning visitor
-    
+
     render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
-    
+
     expect(screen.queryByTestId('disclaimer-modal')).not.toBeInTheDocument();
   });
 
   it('toggles auto-refresh when button is clicked', () => {
     const { AutoRefresh } = require('../../components/pnl/AutoRefresh');
-    
+
     render(<PriceProvider><DisplayCurrencyProvider><HomePage /></DisplayCurrencyProvider></PriceProvider>);
-    
+
     const autoRefreshToggle = screen.getByTestId('auto-refresh-toggle');
     fireEvent.click(autoRefreshToggle);
-    
+
     expect(AutoRefresh).toHaveBeenCalled();
   });
 });

@@ -90,4 +90,4 @@ describe('CollapsibleSection', () => {
     // Should be collapsed (not visible)
     expect(screen.getByText(CHILD_TEXT)).toBeInTheDocument();
   });
-}); 
+});

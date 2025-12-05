@@ -7,7 +7,7 @@ import { LoadingOverlay } from '../../../components/common/LoadingOverlay';
 jest.mock('../../../components/common/LoadingOverlay.module.scss', () => ({
   loadingContainer: 'loadingContainer',
   loadingOverlay: 'loadingOverlay',
-  loadingOverlayHidden: 'loadingOverlayHidden'
+  loadingOverlayHidden: 'loadingOverlayHidden',
 }));
 
 describe('LoadingOverlay Component', () => {
@@ -77,7 +77,7 @@ describe('LoadingOverlay Component', () => {
         <div>{childText}</div>
       </LoadingOverlay>
     );
-    
+
     const overlay = screen.getByText(defaultMessage).parentElement;
     expect(overlay).toHaveClass('loadingOverlay');
     expect(overlay).not.toHaveClass('loadingOverlayHidden');
@@ -89,7 +89,7 @@ describe('LoadingOverlay Component', () => {
         <div>{childText}</div>
       </LoadingOverlay>
     );
-    
+
     // Find the overlay div directly since there's no text
     const overlay = document.querySelector('.loadingOverlay');
     expect(overlay).toHaveClass('loadingOverlayHidden');
@@ -101,7 +101,7 @@ describe('LoadingOverlay Component', () => {
         <div>{childText}</div>
       </LoadingOverlay>
     );
-    
+
     const overlay = screen.getByText(defaultMessage).parentElement;
     expect(overlay).toHaveAttribute('aria-hidden', 'false');
     expect(overlay).toHaveAttribute('aria-live', 'polite');
@@ -113,7 +113,7 @@ describe('LoadingOverlay Component', () => {
         <div>{childText}</div>
       </LoadingOverlay>
     );
-    
+
     // Find the overlay div directly
     const overlay = document.querySelector('.loadingOverlay');
     expect(overlay).toHaveAttribute('aria-hidden', 'true');
@@ -144,4 +144,4 @@ describe('LoadingOverlay Component', () => {
 
     expect(screen.getByText(defaultMessage)).toBeInTheDocument();
   });
-}); 
+});

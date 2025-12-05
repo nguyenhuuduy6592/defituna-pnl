@@ -7,7 +7,7 @@ const LOCAL_STORAGE_KEY = 'defituna-pnl-showInSol';
 
 export function DisplayCurrencyProvider({ children }) {
   // Initialize with a default value, will be updated by useEffect on client-side
-  const [showInSol, setShowInSol] = useState(false); 
+  const [showInSol, setShowInSol] = useState(false);
 
   // Effect to load preference from localStorage on initial client-side render
   useEffect(() => {
@@ -46,7 +46,7 @@ export function DisplayCurrencyProvider({ children }) {
     showInSol,
     toggleCurrency,
     // Derived value for convenience, can be 'USD' or 'SOL'
-    currentCurrency: showInSol ? 'TOKENS' : 'USD' 
+    currentCurrency: showInSol ? 'TOKENS' : 'USD',
   };
 
   return (
@@ -62,4 +62,4 @@ export function useDisplayCurrency() {
     throw new Error('useDisplayCurrency must be used within a DisplayCurrencyProvider');
   }
   return context;
-} 
+}

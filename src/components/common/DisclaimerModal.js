@@ -25,12 +25,12 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
 
   // Handle Escape key press
   const handleEscape = useCallback((e) => {
-    if (e.key === 'Escape') onClose();
+    if (e.key === 'Escape') {onClose();}
   }, [onClose]);
 
-  // Handle overlay click 
+  // Handle overlay click
   const handleOverlayClick = useCallback((e) => {
-    if (e.target === e.currentTarget) onClose();
+    if (e.target === e.currentTarget) {onClose();}
   }, [onClose]);
 
   useEffect(() => {
@@ -41,10 +41,10 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen, handleEscape]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {return null;}
 
   return (
-    <div 
+    <div
       className={styles.overlay}
       role="dialog"
       aria-labelledby="disclaimer-title"
@@ -54,8 +54,8 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
       <div className={styles.modal}>
         <div className={styles.header}>
           <h2 id="disclaimer-title">Project Disclaimer</h2>
-          <button 
-            className={styles.closeButton} 
+          <button
+            className={styles.closeButton}
             onClick={onClose}
             ref={closeButtonRef}
             aria-label="Close"
@@ -69,7 +69,7 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
           <p>
             <strong>Defituna PnL Viewer</strong> is a hobby project developed in my free time.
           </p>
-          
+
           <DisclaimerSection title="Development Status">
             <ul>
               <li>This is a personal project with no clear roadmap or due dates</li>
@@ -77,7 +77,7 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
               <li>Limited testing capabilities may result in some features not working properly on all devices</li>
             </ul>
           </DisclaimerSection>
-          
+
           <DisclaimerSection title="Data & Privacy">
             <ul>
               <li>I do not collect any user data</li>
@@ -95,8 +95,8 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
         </div>
 
         <div className={styles.actions}>
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className={styles.confirmButton}
             aria-label="Close disclaimer"
           >
@@ -106,4 +106,4 @@ export const DisclaimerModal = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
-}; 
+};

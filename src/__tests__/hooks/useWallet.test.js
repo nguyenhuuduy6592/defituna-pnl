@@ -419,4 +419,4 @@ describe('useWallet Hook', () => {
       expect(setItemMock).toHaveBeenCalledTimes(1);
     });
   });
-}); 
+});

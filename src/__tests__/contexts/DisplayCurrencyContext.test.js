@@ -10,7 +10,7 @@ const localStorageMock = (() => {
     getItem: (key) => store[key] || null,
     setItem: (key, value) => { store[key] = value.toString(); },
     clear: () => { store = {}; },
-    removeItem: (key) => { delete store[key]; }
+    removeItem: (key) => { delete store[key]; },
   };
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
@@ -79,4 +79,4 @@ describe('DisplayCurrencyContext', () => {
     expect(() => render(<BrokenComponent />)).toThrow();
     spy.mockRestore();
   });
-}); 
+});

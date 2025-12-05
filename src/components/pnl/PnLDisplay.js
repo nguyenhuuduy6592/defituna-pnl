@@ -18,24 +18,24 @@ const defaultData = {
 
 /**
  * Component for displaying PnL data and positions with loading state
- * 
+ *
  * @param {Object} props Component props
  * @param {Object} props.data Data containing PnL and positions information
  * @param {boolean} props.historyEnabled Whether position history is enabled
  * @param {boolean} props.loading Whether data is currently loading
  * @returns {JSX.Element} Rendered component
  */
-export const PnLDisplay = ({ 
-  data, 
-  historyEnabled = false, 
-  loading = false
+export const PnLDisplay = ({
+  data,
+  historyEnabled = false,
+  loading = false,
 }) => {
   const { showInSol } = useDisplayCurrency();
 
   // Use provided data or default data
   const displayData = useMemo(() => {
-    if (!data) return defaultData;
-    
+    if (!data) {return defaultData;}
+
     const positions = Array.isArray(data.positions) ? data.positions : [];
 
     // for each position, add the pnlClass, displayedValue, and percentageString
@@ -45,10 +45,10 @@ export const PnLDisplay = ({
       const pnlUsdValue = position.pnlData.pnl_usd.amount;
       position.pnlData.pnlClass = getValueClass(pnlUsdValue);
       position.pnlData.pnlClassInSol = getValueClass(pnlTokenValue);
-    
+
       position.pnlData.displayedValue = `$${formatNumber(position.pnlData.pnl_usd.amount)}`;
       position.pnlData.displayedValueInSol = position.pnlData.token_pnl.map(token => `${formatNumber(token.amount)} ${token.token}`).join(', ');
-    
+
       position.pnlData.percentageString = `(${formatPercentage(position.pnlData.pnl_usd.bps / 10000)})`;
       position.pnlData.percentageStringInSol = position.pnlData.token_pnl.map(token => `(${formatPercentage(token.bps / 10000)})`).join(', ');
       // ----- END: PNL formatting -----
@@ -73,7 +73,7 @@ export const PnLDisplay = ({
       position.compoundedData.displayedValueInSol = position.compoundedData.tokens.map(token => `${formatNumber(token.amount)} ${token.token}`).join('<br />');
       // ----- END: COMPOUNDED formatting -----
     }
-  
+
     return {
       totalPnL: data.totalPnL,
       totalPnLInSol: data.totalPnLInSol,
@@ -84,12 +84,12 @@ export const PnLDisplay = ({
       totalSize: data.totalSize,
       totalSizeInSol: data.totalSizeInSol,
       positions,
-      walletCount: typeof data.walletCount === 'number' ? data.walletCount : 0
+      walletCount: typeof data.walletCount === 'number' ? data.walletCount : 0,
     };
   }, [data, showInSol]);
 
   const positionsWithAge = usePositionAges(displayData.positions);
-  
+
   // Only show donation footer if we have positions
   const showDonationFooter = displayData.positions.length > 0;
 
@@ -99,7 +99,7 @@ export const PnLDisplay = ({
         <div className={styles.controlsHeader}>
           <CurrencyToggle />
         </div>
-        {positionsWithAge.length > 1 && 
+        {positionsWithAge.length > 1 &&
           <div className={styles.cardRow}>
             <TotalPnLDisplay
               label="Total Size"
@@ -108,18 +108,18 @@ export const PnLDisplay = ({
             <TotalPnLDisplay
               label="Total PnL"
               totalValue={showInSol ? displayData.totalPnLInSol : displayData.totalPnL} />
-            
+
             <TotalPnLDisplay
               label="Total Yield"
               totalValue={showInSol ? displayData.totalYieldInSol : displayData.totalYield} />
-          
+
             <TotalPnLDisplay
               label="Total Compounded"
               totalValue={showInSol ? displayData.totalCompoundedInSol : displayData.totalCompounded} />
           </div>
         }
 
-        <PositionsList 
+        <PositionsList
           positions={positionsWithAge}
           showWallet={displayData.walletCount > 1}
           historyEnabled={historyEnabled}

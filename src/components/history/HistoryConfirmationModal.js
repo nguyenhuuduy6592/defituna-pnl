@@ -23,7 +23,7 @@ const EnableContent = () => (
     <ul>
       <li>Historical performance chart</li>
     </ul>
-    
+
     <NoticeSection title="Important notes:">
       <ul>
         <li>Auto-refresh will be enabled to collect data regularly</li>
@@ -50,7 +50,7 @@ const DisableContent = () => (
       <li>Remove access to historical performance charts</li>
       <li>Keep existing data until browser data is cleared</li>
     </ul>
-    
+
     <NoticeSection title="Important notes:">
       <ul>
         <li>You can re-enable this feature at any time</li>
@@ -63,7 +63,7 @@ const DisableContent = () => (
 
 /**
  * Modal for confirming historical data storage settings changes
- * 
+ *
  * @param {Object} props Component props
  * @param {Function} props.onConfirm Callback for confirming the action
  * @param {Function} props.onCancel Callback for canceling the action
@@ -74,12 +74,12 @@ export const HistoryConfirmationModal = ({ onConfirm, onCancel, isEnabling }) =>
 
   // Handle Escape key press
   const handleEscape = useCallback((e) => {
-    if (e.key === 'Escape') onCancel();
+    if (e.key === 'Escape') {onCancel();}
   }, [onCancel]);
 
   // Handle clicks outside the modal
   const handleOverlayClick = useCallback((e) => {
-    if (e.target === e.currentTarget) onCancel();
+    if (e.target === e.currentTarget) {onCancel();}
   }, [onCancel]);
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export const HistoryConfirmationModal = ({ onConfirm, onCancel, isEnabling }) =>
   const confirmButtonText = isEnabling ? 'Enable Historical Data' : 'Disable Historical Data';
 
   return (
-    <div 
+    <div
       className={styles.overlay}
       role="dialog"
       aria-labelledby="modal-title"
@@ -102,8 +102,8 @@ export const HistoryConfirmationModal = ({ onConfirm, onCancel, isEnabling }) =>
       <div className={styles.modal}>
         <div className={styles.header}>
           <h2 id="modal-title">{modalTitle}</h2>
-          <button 
-            className={styles.closeButton} 
+          <button
+            className={styles.closeButton}
             onClick={onCancel}
             ref={closeButtonRef}
             aria-label="Close"
@@ -118,17 +118,17 @@ export const HistoryConfirmationModal = ({ onConfirm, onCancel, isEnabling }) =>
         </div>
 
         <div className={styles.actions}>
-          <button 
-            onClick={onCancel} 
+          <button
+            onClick={onCancel}
             className={styles.cancelButton}
             aria-label={`Cancel ${isEnabling ? 'enabling' : 'disabling'} historical data`}
             title={`Cancel ${isEnabling ? 'enabling' : 'disabling'} historical data storage`}
           >
             Cancel
           </button>
-          <button 
-            onClick={onConfirm} 
-            className={styles.confirmButton} 
+          <button
+            onClick={onConfirm}
+            className={styles.confirmButton}
             autoFocus
             aria-label={`${isEnabling ? 'Enable' : 'Disable'} historical data storage`}
             title={`${isEnabling ? 'Enable' : 'Disable'} historical data storage`}

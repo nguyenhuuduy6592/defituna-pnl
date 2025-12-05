@@ -8,28 +8,28 @@ import { DisplayCurrencyProvider } from '../../../contexts/DisplayCurrencyContex
 
 // Mock dependencies
 jest.mock('../../../components/common/Portal', () => ({
-  Portal: ({ children }) => <div data-testid="portal-container">{children}</div>
+  Portal: ({ children }) => <div data-testid="portal-container">{children}</div>,
 }));
 
 jest.mock('../../../utils/export', () => ({
   exportCardAsImage: jest.fn(),
-  shareCard: jest.fn()
+  shareCard: jest.fn(),
 }));
 
 jest.mock('../../../utils/positionUtils', () => ({
   getValueClass: jest.fn().mockReturnValue('positive'),
-  getStateClass: jest.fn().mockReturnValue('active')
+  getStateClass: jest.fn().mockReturnValue('active'),
 }));
 
 jest.mock('react-icons/hi', () => ({
   HiX: () => <span data-testid="close-icon">X</span>,
   HiDownload: () => <span data-testid="download-icon">Download</span>,
-  HiShare: () => <span data-testid="share-icon">Share</span>
+  HiShare: () => <span data-testid="share-icon">Share</span>,
 }));
 
 jest.mock('react-icons/bs', () => ({
   BsCurrencyDollar: () => <span data-testid="currency-icon">$</span>,
-  BsClock: () => <span data-testid="clock-icon">Clock</span>
+  BsClock: () => <span data-testid="clock-icon">Clock</span>,
 }));
 
 jest.mock('react-icons/fa', () => ({
@@ -41,7 +41,7 @@ jest.mock('react-icons/fa', () => ({
   FaInfoCircle: () => <span data-testid="info-icon">Info</span>,
   FaCalendarCheck: () => <span data-testid="calendar-icon">Calendar</span>,
   FaExclamationTriangle: () => <span data-testid="warning-icon">Warning</span>,
-  FaArrowsAltV: () => <span data-testid="arrows-v-icon">Arrows</span>
+  FaArrowsAltV: () => <span data-testid="arrows-v-icon">Arrows</span>,
 }));
 
 describe('PnLCard', () => {
@@ -58,23 +58,23 @@ describe('PnLCard', () => {
     currentPrice: 1800,
     rangePrices: {
       lower: 1600,
-      upper: 2000
+      upper: 2000,
     },
     liquidationPrice: {
       lower: 1400,
-      upper: 2200
+      upper: 2200,
     },
     limitOrderPrices: {
       lower: 1500,
-      upper: 2100
+      upper: 2100,
     },
     positionAddress: '0x123456',
-    age: 30 // days
+    age: 30, // days
   };
 
   // Mock callbacks and utility functions
   const onClose = jest.fn();
-  
+
   beforeEach(() => {
     // Reset mocks
     jest.clearAllMocks();
@@ -92,35 +92,35 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Check that the modal has rendered with correct role
     expect(screen.getByRole('dialog')).toBeInTheDocument();
-    
+
     // Check title and pair display
     expect(screen.getByText('Position Details')).toBeInTheDocument();
     expect(screen.getByText('ETH/USDC')).toBeInTheDocument();
-    
+
     // Check status badge
     expect(screen.getByText('Active')).toBeInTheDocument();
-    
+
     // Check PnL display - get element with role status
     const pnlValue = screen.getByRole('status');
     expect(pnlValue).toBeInTheDocument();
     expect(pnlValue).toHaveTextContent('1.00K');
-    
+
     // Check for the percentage - it's in a nested element
     const pnlContent = pnlValue.textContent;
     expect(pnlContent).toContain('$1.00K(20.00%%)');
-    
+
     // Check financial details - using the actual formatting with K for thousands
     expect(screen.getByText(/Collateral/i)).toBeInTheDocument();
     expect(screen.getByText('$5.00K')).toBeInTheDocument();
     expect(screen.getByText('2.00x')).toBeInTheDocument();
-    
+
     // Check price information - using the actual formatting with K for thousands
     expect(screen.getByText(/Range/i)).toBeInTheDocument();
     expect(screen.getByText('$1.60K - $2.00K')).toBeInTheDocument();
-    
+
     // Check action buttons using test ids
     expect(screen.getByTestId('download-icon')).toBeInTheDocument();
     expect(screen.getByTestId('share-icon')).toBeInTheDocument();
@@ -130,10 +130,10 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Click the close button using test id
     fireEvent.click(screen.getByTestId('close-icon').closest('button'));
-    
+
     // onClose should have been called
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -142,10 +142,10 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Click the overlay (the dialog element itself)
     fireEvent.click(screen.getByRole('dialog'));
-    
+
     // onClose should have been called
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -154,10 +154,10 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Simulate pressing escape key
     fireEvent.keyDown(document, { key: 'Escape' });
-    
+
     // onClose should have been called
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -166,11 +166,11 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Find the download button by its container and icon
     const downloadButton = screen.getByTestId('download-icon').closest('button');
     fireEvent.click(downloadButton);
-    
+
     // exportCardAsImage should have been called
     expect(exportCardAsImage).toHaveBeenCalledTimes(1);
     // Check that first argument is provided
@@ -183,11 +183,11 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Find the share button by its container and icon
     const shareButton = screen.getByTestId('share-icon').closest('button');
     fireEvent.click(shareButton);
-    
+
     // shareCard should have been called
     expect(shareCard).toHaveBeenCalledTimes(1);
     // Check that first argument is provided
@@ -200,15 +200,15 @@ describe('PnLCard', () => {
     const closedPosition = {
       ...defaultPosition,
       displayStatus: 'Closed',
-      closedAt: Date.now()
+      closedAt: Date.now(),
     };
-    
+
     getStateClass.mockReturnValue('closed');
-    
+
     renderWithProviders(
       <PnLCard position={closedPosition} onClose={onClose} />
     );
-    
+
     // Check status badge
     expect(screen.getByText('Closed')).toBeInTheDocument();
   });
@@ -221,11 +221,11 @@ describe('PnLCard', () => {
       compounded: { usd: 0 },
       collateral: { usd: 10 },
     };
-    
+
     renderWithProviders(
       <PnLCard position={incompletePosition} onClose={onClose} />
     );
-    
+
     // Check that pair is displayed (using fallback from pair if pairDisplay is missing)
     expect(screen.getByText('ETH/USDC')).toBeInTheDocument();
   });
@@ -234,10 +234,10 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Check that getValueClass was called
     expect(getValueClass).toHaveBeenCalled();
-    
+
     // Check that getStateClass was called
     expect(getStateClass).toHaveBeenCalled();
   });
@@ -246,7 +246,7 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Look for text content matching exact values rather than text labels
     expect(screen.getByText('$1.60K - $2.00K')).toBeInTheDocument();
     expect(screen.getByText('$1.40K / $2.20K')).toBeInTheDocument();
@@ -255,19 +255,19 @@ describe('PnLCard', () => {
   it('handles out-of-range price status correctly', () => {
     const outOfRangePosition = {
       ...defaultPosition,
-      currentPrice: 2500 // Outside the upper range
+      currentPrice: 2500, // Outside the upper range
     };
-    
+
     // Provide a mock implementation for this test
     getStateClass.mockReturnValue('warning');
-    
+
     const { container } = renderWithProviders(
       <PnLCard position={outOfRangePosition} onClose={onClose} />
     );
-    
+
     // Instead of looking for specific text, check that the component renders at all
     expect(container).toBeInTheDocument();
-    
+
     // Check that it still displays the basic position information
     expect(screen.getByText('ETH/USDC')).toBeInTheDocument();
     expect(screen.getByRole('status')).toBeInTheDocument();
@@ -277,10 +277,10 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Check for Liq Price text instead of Liquidation
     expect(screen.getByText(/Liq Price/i)).toBeInTheDocument();
-    
+
     // Should show both lower and upper limits
     expect(screen.getByText('$1.40K / $2.20K')).toBeInTheDocument();
   });
@@ -292,20 +292,20 @@ describe('PnLCard', () => {
       closedAt: Date.now(),
       liquidationPrice: {
         lower: 1400,
-        upper: 2200
-      }
+        upper: 2200,
+      },
     };
-    
+
     getStateClass.mockReturnValue('closed');
-    
+
     renderWithProviders(
       <PnLCard position={closedPosition} onClose={onClose} />
     );
-    
+
     // For closed positions, the Liq Price row may not exist at all
     // Check for Closed At text which should appear for closed positions
     expect(screen.getByText(/Closed At/i)).toBeInTheDocument();
-    
+
     // Liquidation prices should not be visible for closed positions
     expect(screen.queryByText('$1.40K / $2.20K')).not.toBeInTheDocument();
   });
@@ -314,10 +314,10 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Check for LL / UL text instead of Limit Orders
     expect(screen.getByText(/LL \/ UL/i)).toBeInTheDocument();
-    
+
     // Look for the specific formatted values
     const negativeValue = screen.getByText('$1.50K');
     const positiveValue = screen.getByText('$2.10K');
@@ -329,19 +329,19 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Check that close button is present
     const closeButton = screen.getByTestId('close-icon').closest('button');
     expect(closeButton).toBeInTheDocument();
-    
+
     // Check that download button is present
     const downloadButton = screen.getByTestId('download-icon').closest('button');
     expect(downloadButton).toBeInTheDocument();
-    
+
     // Check that share button is present
     const shareButton = screen.getByTestId('share-icon').closest('button');
     expect(shareButton).toBeInTheDocument();
-    
+
     // Instead of testing focus which is challenging in JSDOM,
     // test that the buttons have the right aria attributes
     expect(closeButton).toHaveAttribute('aria-label', 'Close');
@@ -359,13 +359,13 @@ describe('PnLCard', () => {
   it('handles position with missing price range data', () => {
     const positionWithoutRanges = {
       ...defaultPosition,
-      rangePrices: null
+      rangePrices: null,
     };
-    
+
     renderWithProviders(
       <PnLCard position={positionWithoutRanges} onClose={onClose} />
     );
-    
+
     // Check that range text is present but may not display "Unknown" directly
     const rangeLabel = screen.getByText(/Range/i);
     // Get the closest div to the range label
@@ -379,14 +379,14 @@ describe('PnLCard', () => {
       ...defaultPosition,
       rangePrices: {
         lower: 1600,
-        upper: null
-      }
+        upper: null,
+      },
     };
-    
+
     renderWithProviders(
       <PnLCard position={positionWithPartialRanges} onClose={onClose} />
     );
-    
+
     // Check that range text is present but may not display "Unknown" directly
     const rangeLabel = screen.getByText(/Range/i);
     // Get the closest div to the range label
@@ -398,13 +398,13 @@ describe('PnLCard', () => {
   it('handles position with no current price data', () => {
     const positionWithoutCurrentPrice = {
       ...defaultPosition,
-      currentPrice: null
+      currentPrice: null,
     };
-    
+
     renderWithProviders(
       <PnLCard position={positionWithoutCurrentPrice} onClose={onClose} />
     );
-    
+
     // Instead of looking for specific text, check for the in-range status row
     const inRangeLabel = screen.getByText(/Range/i).closest('div');
     expect(inRangeLabel).toBeInTheDocument();
@@ -413,13 +413,13 @@ describe('PnLCard', () => {
   it('handles position with no collateral data', () => {
     const positionWithoutCollateral = {
       ...defaultPosition,
-      collateral: null
+      collateral: null,
     };
-    
+
     renderWithProviders(
       <PnLCard position={positionWithoutCollateral} onClose={onClose} />
     );
-    
+
     // Should display "N/A" for collateral
     expect(screen.getByText(/Collateral/i)).toBeInTheDocument();
     expect(screen.getByText('N/A')).toBeInTheDocument();
@@ -428,13 +428,13 @@ describe('PnLCard', () => {
   it('handles position with no leverage data', () => {
     const positionWithoutLeverage = {
       ...defaultPosition,
-      leverage: null
+      leverage: null,
     };
-    
+
     renderWithProviders(
       <PnLCard position={positionWithoutLeverage} onClose={onClose} />
     );
-    
+
     // Should display "N/A" for leverage
     expect(screen.getByText('N/A')).toBeInTheDocument();
   });
@@ -443,20 +443,20 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Check dialog has proper aria attributes
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-labelledby', 'modal-title');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
-    
+
     // Check close button has proper aria attributes
     const closeButton = screen.getByTestId('close-icon').closest('button');
     expect(closeButton).toHaveAttribute('aria-label', 'Close');
-    
+
     // Check action buttons have proper aria attributes
     const downloadButton = screen.getByTestId('download-icon').closest('button');
     expect(downloadButton).toHaveAttribute('aria-label', 'Download ETH/USDC PnL card as PNG');
-    
+
     const shareButton = screen.getByTestId('share-icon').closest('button');
     expect(shareButton).toHaveAttribute('aria-label', 'Share ETH/USDC PnL card');
   });
@@ -465,11 +465,11 @@ describe('PnLCard', () => {
     const { unmount } = renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Check if listeners are called and cleanup works
     // This is a basic check for the effect, detailed DOM manipulation would require more complex setup
     unmount();
-    
+
     // Simulate escape key after unmount to verify cleanup
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(onClose).not.toHaveBeenCalled();
@@ -479,11 +479,11 @@ describe('PnLCard', () => {
     renderWithProviders(
       <PnLCard position={defaultPosition} onClose={onClose} />
     );
-    
+
     // Use getAllByTestId instead of getByTestId since there are multiple elements with the same test ID
     expect(screen.getAllByTestId('currency-icon')[0]).toBeInTheDocument();
     expect(screen.getByTestId('scale-icon')).toBeInTheDocument();
     expect(screen.getByTestId('coins-icon')).toBeInTheDocument();
     expect(screen.getByTestId('sync-icon')).toBeInTheDocument();
   });
-}); 
+});

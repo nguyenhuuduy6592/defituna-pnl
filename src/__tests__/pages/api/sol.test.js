@@ -2,7 +2,7 @@ import handler from '../../../pages/api/price/sol';
 import { fetchWithTimeout } from '../../../utils/api';
 
 jest.mock('../../../utils/api', () => ({
-  fetchWithTimeout: jest.fn()
+  fetchWithTimeout: jest.fn(),
 }));
 
 describe('/api/price/sol', () => {
@@ -17,7 +17,7 @@ describe('/api/price/sol', () => {
     req = { method: 'GET' };
     res = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      json: jest.fn(),
     };
     jest.spyOn(Date, 'now').mockReturnValue(1000000);
     jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -49,7 +49,7 @@ describe('/api/price/sol', () => {
   it('returns cached price if within TTL', async () => {
     // First call to set cache
     fetchWithTimeout.mockResolvedValue({
-      json: async () => ({ data: { price: '100000', decimals: 3 } })
+      json: async () => ({ data: { price: '100000', decimals: 3 } }),
     });
     await handler(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
@@ -64,7 +64,7 @@ describe('/api/price/sol', () => {
 
   it('fetches and returns price from API', async () => {
     fetchWithTimeout.mockResolvedValue({
-      json: async () => ({ data: { price: '123456', decimals: 3 } })
+      json: async () => ({ data: { price: '123456', decimals: 3 } }),
     });
     await handler(req, res);
     expect(fetchWithTimeout).toHaveBeenCalledWith(
@@ -88,4 +88,4 @@ describe('/api/price/sol', () => {
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ error: 'Failed to fetch SOL price from CoinGecko' });
   });
-}); 
+});

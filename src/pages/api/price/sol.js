@@ -24,19 +24,19 @@ export default async function handler(req, res) {
     return res.status(200).json({
       price: cachedSolPrice,
       timestamp: lastFetchTime,
-      source: 'cache'
+      source: 'cache',
     });
   }
 
   try {
     const response = await fetchWithTimeout(targetUrl, {
       headers: {
-        'Accept': 'application/json'
-      }
+        'Accept': 'application/json',
+      },
     });
 
     const data = await response.json();
-    
+
     if (!data?.data?.price || !data?.data?.decimals) {
       throw new Error('Invalid price data from API');
     }
@@ -53,4 +53,4 @@ export default async function handler(req, res) {
     // Don't return cached data on error, let client handle it or try again
     res.status(500).json({ error: 'Failed to fetch SOL price from CoinGecko' });
   }
-} 
+}

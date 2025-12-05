@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 
 const PriceContext = createContext();
 
@@ -14,7 +14,7 @@ export function PriceProvider({ children }) {
     try {
       const response = await fetch('/api/price/sol');
       const data = await response.json();
-      
+
       if (response.ok && data.price) {
         setSolPrice(data.price);
         setLastUpdate(data.timestamp);
@@ -45,4 +45,4 @@ export function usePriceContext() {
     throw new Error('usePriceContext must be used within a PriceProvider');
   }
   return context;
-} 
+}

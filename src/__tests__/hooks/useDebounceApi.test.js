@@ -21,7 +21,7 @@ describe('useDebounceApi Hook', () => {
   const initialData = { initial: true };
 
   beforeEach(() => {
-     mockApiCall.mockClear(); // Clear api call mock too
+    mockApiCall.mockClear(); // Clear api call mock too
   });
 
   describe('Initialization', () => {
@@ -45,12 +45,12 @@ describe('useDebounceApi Hook', () => {
       // but the loading state is set *before* the debounced function is called.
       expect(result.current.loading).toBe(true);
       // Api call happens sync now due to mock
-      expect(mockApiCall).toHaveBeenCalledWith('arg1'); 
+      expect(mockApiCall).toHaveBeenCalledWith('arg1');
     });
 
     it('should update data and reset loading/error on successful API call', async () => {
       const apiResponse = { data: 'success' };
-      mockApiCall.mockResolvedValue(apiResponse); 
+      mockApiCall.mockResolvedValue(apiResponse);
       const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
 
       let promise;
@@ -64,13 +64,13 @@ describe('useDebounceApi Hook', () => {
       expect(result.current.loading).toBe(false);
       expect(result.current.data).toEqual(apiResponse);
       expect(result.current.error).toBeNull();
-      await expect(promise).resolves.toEqual(apiResponse); 
+      await expect(promise).resolves.toEqual(apiResponse);
       expect(mockApiCall).toHaveBeenCalledWith('arg1');
     });
 
     it('should set error and reset loading on failed API call', async () => {
       const apiError = new Error('API Failed');
-      mockApiCall.mockRejectedValue(apiError); 
+      mockApiCall.mockRejectedValue(apiError);
       const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
 
       let promise;
@@ -79,13 +79,13 @@ describe('useDebounceApi Hook', () => {
         // Execute returns the promise from the internal callback
         promise = result.current.execute('arg2');
         // Catch expected rejection from the execute promise itself
-        await promise.catch(() => {}); 
+        await promise.catch(() => {});
       });
 
       // Assert final state
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBe(apiError);
-      expect(result.current.data).toEqual(initialData); 
+      expect(result.current.data).toEqual(initialData);
       await expect(promise).rejects.toThrow(apiError); // Verify rejection
       expect(mockApiCall).toHaveBeenCalledWith('arg2');
     });
@@ -138,8 +138,8 @@ describe('useDebounceApi Hook', () => {
       // Execute call 1 - runs immediately
       await act(async () => { promise1 = result.current.execute(...call1Args); });
       // Execute call 2 - runs immediately, fails
-      await act(async () => { 
-        promise2 = result.current.execute(...call2Args); 
+      await act(async () => {
+        promise2 = result.current.execute(...call2Args);
         await promise2.catch(() => {}); // Catch expected error
       });
 
@@ -161,7 +161,7 @@ describe('useDebounceApi Hook', () => {
 
       // Execute and wait for it to finish (and fail)
       await act(async () => {
-        try { await result.current.execute('arg_error'); } catch (e) {} 
+        try { await result.current.execute('arg_error'); } catch (e) {}
       });
 
       // Verify state is not initial before reset
@@ -184,7 +184,7 @@ describe('useDebounceApi Hook', () => {
       // Use real debounce for this test
       debouncePromise.mockImplementationOnce(jest.requireActual('../../utils/debounce').debouncePromise);
       jest.useFakeTimers();
-      
+
       const apiResponse = { data: 'success' };
       mockApiCall.mockResolvedValue(apiResponse);
       const { result } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
@@ -205,27 +205,27 @@ describe('useDebounceApi Hook', () => {
       await act(async () => {
         jest.advanceTimersByTime(delay + 100);
       });
-      
+
       // Allow promise microtasks to resolve (including the one inside debouncePromise)
-      await act(async () => { await Promise.resolve(); }); 
+      await act(async () => { await Promise.resolve(); });
 
       // Assert that mockApiCall *was* likely called by the original debounce timer firing
-      expect(mockApiCall).toHaveBeenCalledWith('arg1'); 
+      expect(mockApiCall).toHaveBeenCalledWith('arg1');
       // But assert that the state REMAINS reset because the internal callId check failed
       expect(result.current.data).toEqual(initialData);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeNull();
-      
+
       jest.useRealTimers(); // Restore real timers
     });
   });
 
   describe('Cleanup', () => {
     it('should prevent state updates after unmount', async () => {
-       // Use real debounce for this test to simulate async completion
+      // Use real debounce for this test to simulate async completion
       debouncePromise.mockImplementationOnce(jest.requireActual('../../utils/debounce').debouncePromise);
       jest.useFakeTimers();
-      
+
       const apiResponse = { data: 'success' };
       mockApiCall.mockResolvedValue(apiResponse);
       const { result, unmount } = renderHook(() => useDebounceApi(mockApiCall, delay, initialData));
@@ -240,24 +240,24 @@ describe('useDebounceApi Hook', () => {
         unmount();
       });
 
-       // Advance timers past the delay to trigger the debounced call
+      // Advance timers past the delay to trigger the debounced call
       await act(async () => {
         jest.advanceTimersByTime(delay + 100);
       });
-      
+
       // Allow promise microtasks to resolve
-      await act(async () => { await Promise.resolve(); }); 
+      await act(async () => { await Promise.resolve(); });
 
       // Assert API call was made (debounce finished)
       expect(mockApiCall).toHaveBeenCalledWith('arg_unmount');
-      
+
       // We cannot check the hook's state after unmount.
       // The critical part is that the cleanup mechanism (incrementing latestCallIdRef)
       // prevents React from trying to update state on an unmounted component,
       // thus avoiding potential memory leaks and React warnings.
       // No direct assertion possible here, relies on correct hook implementation.
-      
+
       jest.useRealTimers();
     });
   });
-}); 
+});

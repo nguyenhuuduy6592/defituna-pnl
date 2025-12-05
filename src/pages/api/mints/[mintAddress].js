@@ -27,4 +27,4 @@ export default async function handler(req, res) {
     console.error(`Network or other error for ${targetUrl}:`, error);
     return res.status(500).json({ message: 'Error fetching mint data from upstream API.', error: error.message });
   }
-} 
+}

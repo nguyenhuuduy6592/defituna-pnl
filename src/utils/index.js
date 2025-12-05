@@ -12,4 +12,4 @@ export * from './chart';
 export * from './export';
 export * from './indexedDB';
 export * from './pnlUtils';
-export * from './solanaUtils'; 
+export * from './solanaUtils';

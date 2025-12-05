@@ -9,7 +9,7 @@ beforeEach(() => {
   // Clear mocks and localStorage before each test
   jest.clearAllMocks();
   localStorage.clear();
-  
+
   // Spy on localStorage methods
   getItemSpy = jest.spyOn(Storage.prototype, 'getItem');
   setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
@@ -46,7 +46,7 @@ describe('useInvertedPairs Hook', () => {
     it('should add a pair to the set and update localStorage', () => {
       const { result } = renderHook(() => useInvertedPairs());
       expect(result.current.invertedPairs).toEqual(new Set());
-      
+
       // Clear initial setItem call from useEffect
       setItemSpy.mockClear();
 
@@ -66,8 +66,8 @@ describe('useInvertedPairs Hook', () => {
 
       const { result } = renderHook(() => useInvertedPairs());
       expect(result.current.invertedPairs).toEqual(new Set(initialPairs));
-      
-       // Clear initial setItem call from useEffect
+
+      // Clear initial setItem call from useEffect
       setItemSpy.mockClear();
 
       act(() => {
@@ -79,7 +79,7 @@ describe('useInvertedPairs Hook', () => {
       expect(setItemSpy).toHaveBeenCalledWith('invertedPairs', JSON.stringify(['PAIR_B']));
     });
 
-     it('should toggle pairs correctly and update localStorage', () => {
+    it('should toggle pairs correctly and update localStorage', () => {
       const { result } = renderHook(() => useInvertedPairs());
       setItemSpy.mockClear(); // Clear initial setItem
 
@@ -97,7 +97,7 @@ describe('useInvertedPairs Hook', () => {
       act(() => { result.current.handlePairInversion('PAIR_X'); });
       expect(result.current.invertedPairs).toEqual(new Set(['PAIR_Y']));
       expect(setItemSpy).toHaveBeenLastCalledWith('invertedPairs', JSON.stringify(['PAIR_Y']));
-      
+
       // Remove PAIR_Y
       act(() => { result.current.handlePairInversion('PAIR_Y'); });
       expect(result.current.invertedPairs).toEqual(new Set([]));
@@ -119,7 +119,7 @@ describe('useInvertedPairs Hook', () => {
     });
 
     it('should return false if pair is not in the set', () => {
-       const initialPairs = ['PAIR1'];
+      const initialPairs = ['PAIR1'];
       localStorage.setItem('invertedPairs', JSON.stringify(initialPairs));
       getItemSpy.mockReturnValueOnce(JSON.stringify(initialPairs));
 
@@ -128,18 +128,18 @@ describe('useInvertedPairs Hook', () => {
     });
 
     it('should reflect changes after handlePairInversion', () => {
-       const { result } = renderHook(() => useInvertedPairs());
-       expect(result.current.isInverted('NEW_PAIR')).toBe(false);
+      const { result } = renderHook(() => useInvertedPairs());
+      expect(result.current.isInverted('NEW_PAIR')).toBe(false);
 
-       act(() => {
+      act(() => {
         result.current.handlePairInversion('NEW_PAIR');
       });
-       expect(result.current.isInverted('NEW_PAIR')).toBe(true);
+      expect(result.current.isInverted('NEW_PAIR')).toBe(true);
 
-       act(() => {
+      act(() => {
         result.current.handlePairInversion('NEW_PAIR');
       });
-       expect(result.current.isInverted('NEW_PAIR')).toBe(false);
+      expect(result.current.isInverted('NEW_PAIR')).toBe(false);
     });
   });
-}); 
+});

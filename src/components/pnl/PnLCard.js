@@ -2,10 +2,10 @@ import { useRef, useEffect, useCallback, useMemo } from 'react';
 import { HiX } from 'react-icons/hi';
 import { HiDownload, HiShare } from 'react-icons/hi';
 import { BsCurrencyDollar, BsClock } from 'react-icons/bs';
-import { 
+import {
   FaBalanceScale, FaCoins, FaSyncAlt, FaWallet, FaArrowsAltH, FaInfoCircle, FaCalendarCheck,
   FaExclamationTriangle,
-  FaArrowsAltV
+  FaArrowsAltV,
 } from 'react-icons/fa';
 import { Portal } from '../common/Portal';
 import styles from './PnLCard.module.scss';
@@ -41,7 +41,7 @@ const PnLDisplay = ({ value, valueClass, displayPnlPercentage }) => {
   ) : null;
 
   return (
-    <div 
+    <div
       className={`${styles.pnl} ${styles[valueClass]}`}
       role="status"
       aria-live="polite"
@@ -59,7 +59,7 @@ const PnLDisplay = ({ value, valueClass, displayPnlPercentage }) => {
  */
 const StatusDisplay = ({ status }) => {
   const stateClass = getStateClass(status);
-  
+
   return (
     <div className={`${styles.statusBadge} ${styles[stateClass]}`}>
       {status}
@@ -72,16 +72,16 @@ const StatusDisplay = ({ status }) => {
  */
 const CardActions = ({ onExport, onShare, pairName }) => (
   <div className={styles.actions}>
-    <button 
-      onClick={onExport} 
+    <button
+      onClick={onExport}
       aria-label={`Download ${pairName} PnL card as PNG`}
       title="Download PnL card as PNG image"
     >
       <HiDownload className={styles.buttonIcon} />
       Download PNG
     </button>
-    <button 
-      onClick={onShare} 
+    <button
+      onClick={onShare}
       aria-label={`Share ${pairName} PnL card`}
       title="Share PnL card"
     >
@@ -94,7 +94,7 @@ const CardActions = ({ onExport, onShare, pairName }) => (
 /**
  * A modal card that displays detailed PnL information for a position
  * with options to export as image or share
- * 
+ *
  * @param {Object} props Component props
  * @param {Object} props.position Position data to display
  * @param {Function} props.onClose Callback to close the card
@@ -112,18 +112,18 @@ export const PnLCard = ({ position, onClose }) => {
   // Handle escape key press
   useEffect(() => {
     closeButtonRef.current?.focus();
-    
+
     const handleEscape = (e) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {onClose();}
     };
-    
+
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
   // Handle overlay click
   const handleOverlayClick = useCallback((e) => {
-    if (e.target === e.currentTarget) onClose();
+    if (e.target === e.currentTarget) {onClose();}
   }, [onClose]);
 
   // Handle export button click
@@ -141,29 +141,29 @@ export const PnLCard = ({ position, onClose }) => {
       `Check out my ${displayPair} position on DeFiTuna!`
     );
   }, [displayPair, cardRef]);
-  
+
   // Get value classes for styling
   const pnlValueClass = getValueClass(position.pnl.usd);
   const yieldValueClass = getValueClass(position.yield.usd);
   const compoundedValueClass = getValueClass(position.compounded.usd);
-  
+
   // Format price range for display if available
   let priceRangeDisplay = 'Unknown';
   if (position.rangePrices?.lower != null && position.rangePrices?.upper != null) {
     priceRangeDisplay = `$${formatNumber(position.rangePrices.lower)} - $${formatNumber(position.rangePrices.upper)}`;
   }
-  
+
   // Determine if position is in range
   let inRangeStatus = 'Unknown';
   if (position.currentPrice != null && position.rangePrices?.lower != null && position.rangePrices?.upper != null) {
-    const isInRange = position.currentPrice >= position.rangePrices.lower && 
+    const isInRange = position.currentPrice >= position.rangePrices.lower &&
                       position.currentPrice <= position.rangePrices.upper;
     inRangeStatus = isInRange ? 'In range' : 'Out of range';
   }
-  
+
   // Format liquidation price range
   const formatLiqPrice = (price) => {
-    if (position.closedAt || price == null || price === 0) return '-';
+    if (position.closedAt || price == null || price === 0) {return '-';}
     return `$${formatNumber(price)}`;
   };
   const liqLower = formatLiqPrice(position.liquidationPrice?.lower);
@@ -176,10 +176,10 @@ export const PnLCard = ({ position, onClose }) => {
   const limitLower = formatLimitPrice(position.limitOrderPrices?.lower);
   const limitUpper = formatLimitPrice(position.limitOrderPrices?.upper);
   const showLimits = position.limitOrderPrices?.lower != null || position.limitOrderPrices?.upper != null;
-  
+
   // Updated helper to format value based on current currency preference
   const formatDisplayValue = useCallback((usdValue) => {
-    if (usdValue == null) return 'N/A';
+    if (usdValue == null) {return 'N/A';}
 
     if (showInSol) {
       if (usdValue === 0) {
@@ -204,7 +204,7 @@ export const PnLCard = ({ position, onClose }) => {
 
   return (
     <Portal>
-      <div 
+      <div
         className={styles.cardOverlay}
         role="dialog"
         aria-labelledby="modal-title"
@@ -214,8 +214,8 @@ export const PnLCard = ({ position, onClose }) => {
         <div className={styles.modalContainer} ref={cardRef}>
           <div className={styles.header}>
             <h2 id="modal-title">Position Details</h2>
-            <button 
-              className={styles.closeButton} 
+            <button
+              className={styles.closeButton}
               onClick={onClose}
               ref={closeButtonRef}
               aria-label="Close"
@@ -233,38 +233,38 @@ export const PnLCard = ({ position, onClose }) => {
                 <StatusDisplay status={position.displayStatus} />
               </div>
             </div>
-            
+
             {/* Performance Metrics Section - Combined PnL and Duration */}
             <div className={styles.performanceSection}>
-              <PnLDisplay 
+              <PnLDisplay
                 value={pnlForDisplay}
-                valueClass={pnlValueClass} 
+                valueClass={pnlValueClass}
                 displayPnlPercentage={pnlPercentageForDisplay}
               />
             </div>
-            
+
             {/* Details Grid Section */}
             <div className={styles.detailsGrid}>
               {/* Financial Details Column */}
               <div className={styles.detailsColumn}>
                 <dl className={styles.detailedStats}>
-                  <StatRow 
+                  <StatRow
                     icon={BsCurrencyDollar}
                     label="Collateral"
                     value={collateralForDisplay}
                   />
-                  <StatRow 
+                  <StatRow
                     icon={FaBalanceScale}
                     label="Leverage"
                     value={position.leverage ? `${formatNumber(position.leverage)}x` : 'N/A'}
                   />
-                  <StatRow 
+                  <StatRow
                     icon={FaCoins}
                     label="Fees Earned"
                     value={feesEarnedForDisplay}
                     valueClass={yieldValueClass}
                   />
-                  <StatRow 
+                  <StatRow
                     icon={FaSyncAlt}
                     label="Compounded"
                     value={compoundedForDisplay}
@@ -272,17 +272,17 @@ export const PnLCard = ({ position, onClose }) => {
                   />
                 </dl>
               </div>
-              
+
               {/* Position Parameters Column */}
               <div className={styles.detailsColumn}>
                 <dl className={styles.detailedStats}>
-                  <StatRow 
+                  <StatRow
                     icon={FaArrowsAltH}
                     label="Range"
                     value={priceRangeDisplay !== 'Unknown' ? priceRangeDisplay : 'N/A'}
                   />
                   {showLimits && (
-                    <StatRow 
+                    <StatRow
                       icon={FaArrowsAltV}
                       label="LL / UL"
                       value={
@@ -295,20 +295,20 @@ export const PnLCard = ({ position, onClose }) => {
                     />
                   )}
                   {showLiqPrice && (
-                    <StatRow 
+                    <StatRow
                       icon={FaExclamationTriangle}
                       label="Liq Price"
                       value={liqPriceDisplay}
                       valueClass={position.closedAt ? 'neutral' : 'negative'}
                     />
                   )}
-                  <StatRow 
+                  <StatRow
                     icon={BsClock}
                     label="Duration"
                     value={formatDuration(position.age)}
                   />
                   {position.closedAt && (
-                    <StatRow 
+                    <StatRow
                       icon={FaCalendarCheck}
                       label="Closed At"
                       value={new Date(position.closedAt).toLocaleString()}
@@ -319,7 +319,7 @@ export const PnLCard = ({ position, onClose }) => {
             </div>
           </div>
 
-          <CardActions 
+          <CardActions
             onExport={handleExport}
             onShare={handleShare}
             pairName={displayPair}

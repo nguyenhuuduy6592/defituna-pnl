@@ -21,7 +21,7 @@ describe('fetch-pnl API Handler', () => {
       positions.map(p => ({ ...p, // Simulate processing
         tka_s: p.tokenA?.symbol || '', // Encoded field: tokenA symbol
         tkb_s: p.tokenB?.symbol || '', // Encoded field: tokenB symbol
-        pnl: { u: p.pnl_usd || 0 } // Raw decimal value
+        pnl: { u: p.pnl_usd || 0 }, // Raw decimal value
       }))
     );
     global.console.error = jest.fn(); // Mock console.error
@@ -50,7 +50,7 @@ describe('fetch-pnl API Handler', () => {
     expect(res._getStatusCode()).toBe(400);
     expect(JSON.parse(res._getData())).toEqual({
       error: 'Invalid wallet address format',
-      details: 'Please provide a valid Solana wallet address'
+      details: 'Please provide a valid Solana wallet address',
     });
     expect(fetchPositions).not.toHaveBeenCalled();
   });
@@ -66,19 +66,19 @@ describe('fetch-pnl API Handler', () => {
 
     expect(res._getStatusCode()).toBe(200);
     expect(JSON.parse(res._getData())).toEqual({
-      t_pnl: 0, 
+      t_pnl: 0,
       positions: [],
-      message: 'No positions found for this wallet'
+      message: 'No positions found for this wallet',
     });
     expect(processPositionsData).not.toHaveBeenCalled();
   });
 
   it('should return 200 with processed positions and calculated total PnL for valid request', async () => {
     const mockRawPositions = [
-      { id: '1', pnl_usd: 10.50, tokenA: {symbol: 'SOL'}, tokenB: {symbol: 'USDC'} },
-      { id: '2', pnl_usd: -5.25, tokenA: {symbol: 'ETH'}, tokenB: {symbol: 'USDT'} },
-      { id: '3', pnl_usd: 0, tokenA: {symbol: 'BTC'}, tokenB: {symbol: 'USDC'} }, // Zero PnL
-      { id: '4', pnl_usd: undefined, tokenA: {symbol: 'RAY'}, tokenB: {symbol: 'SOL'} }, // Undefined PnL
+      { id: '1', pnl_usd: 10.50, tokenA: { symbol: 'SOL' }, tokenB: { symbol: 'USDC' } },
+      { id: '2', pnl_usd: -5.25, tokenA: { symbol: 'ETH' }, tokenB: { symbol: 'USDT' } },
+      { id: '3', pnl_usd: 0, tokenA: { symbol: 'BTC' }, tokenB: { symbol: 'USDC' } }, // Zero PnL
+      { id: '4', pnl_usd: undefined, tokenA: { symbol: 'RAY' }, tokenB: { symbol: 'SOL' } }, // Undefined PnL
     ];
     const expectedProcessedPositions = [
       { id: '1', tka_s: 'SOL', tkb_s: 'USDC', pnl_usd: 10.50, pnl: { u: 10.50 } },
@@ -144,14 +144,14 @@ describe('fetch-pnl API Handler', () => {
     expect(console.error).toHaveBeenCalledWith('Error in fetch-pnl:', error);
   });
 
-   it('should handle positions with null or undefined PNL correctly in total calculation', async () => {
+  it('should handle positions with null or undefined PNL correctly in total calculation', async () => {
     const mockRawPositions = [
-      { id: '1', pnl_usd: 100, tokenA: {symbol: 'A'}, tokenB: {symbol: 'B'} },
-      { id: '2', pnl_usd: null, tokenA: {symbol: 'C'}, tokenB: {symbol: 'D'} }, 
-      { id: '3', pnl_usd: undefined, tokenA: {symbol: 'E'}, tokenB: {symbol: 'F'} },
-      { id: '4', pnl_usd: -50, tokenA: {symbol: 'G'}, tokenB: {symbol: 'H'} },
+      { id: '1', pnl_usd: 100, tokenA: { symbol: 'A' }, tokenB: { symbol: 'B' } },
+      { id: '2', pnl_usd: null, tokenA: { symbol: 'C' }, tokenB: { symbol: 'D' } },
+      { id: '3', pnl_usd: undefined, tokenA: { symbol: 'E' }, tokenB: { symbol: 'F' } },
+      { id: '4', pnl_usd: -50, tokenA: { symbol: 'G' }, tokenB: { symbol: 'H' } },
     ];
-     const expectedProcessedPositions = [
+    const expectedProcessedPositions = [
       { id: '1', tka_s: 'A', tkb_s: 'B', pnl_usd: 100, pnl: { u: 100 } },
       { id: '2', tka_s: 'C', tkb_s: 'D', pnl_usd: null, pnl: { u: 0 } }, // Null PNL becomes 0
       { id: '3', tka_s: 'E', tkb_s: 'F', pnl_usd: undefined, pnl: { u: 0 } }, // Undefined PNL becomes 0
@@ -177,4 +177,4 @@ describe('fetch-pnl API Handler', () => {
     expect(responseData.positions).toEqual(expectedProcessedPositions);
   });
 
-}); 
+});

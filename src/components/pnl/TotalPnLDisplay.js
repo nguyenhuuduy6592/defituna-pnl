@@ -3,7 +3,7 @@ import styles from './TotalPnLDisplay.module.scss';
 
 /**
  * Component for displaying total PnL information across multiple wallets
- * 
+ *
  * @param {Object} props Component props
  * @param {number} props.totalPnL Total PnL value
  * @returns {JSX.Element} Rendered component
@@ -21,4 +21,4 @@ export const TotalPnLDisplay = ({ label, totalValue }) => {
       </div>
     </div>
   );
-}; 
+};

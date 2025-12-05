@@ -7,8 +7,8 @@ import { HistoryToggle } from '../history/HistoryToggle';
  */
 const RefreshStatus = ({ loading, countdown }) => (
   <div className={styles.refreshStatus}>
-    {loading ? 
-      <span>Refreshing data...</span> : 
+    {loading ?
+      <span>Refreshing data...</span> :
       <span>Next refresh in {countdown} seconds</span>
     }
   </div>
@@ -19,8 +19,8 @@ const RefreshStatus = ({ loading, countdown }) => (
  */
 const IntervalSelector = ({ value, onChange }) => (
   <div className={styles.intervalSelector}>
-    <select 
-      value={value} 
+    <select
+      value={value}
       onChange={onChange}
       aria-label="Select refresh interval"
       title="Select how often to refresh the data"
@@ -38,7 +38,7 @@ const IntervalSelector = ({ value, onChange }) => (
 
 /**
  * Component for controlling auto-refresh settings and historical data storage
- * 
+ *
  * @param {Object} props Component props
  * @param {boolean} props.autoRefresh Whether auto-refresh is enabled
  * @param {Function} props.setAutoRefresh Function to enable/disable auto-refresh
@@ -57,7 +57,7 @@ export const AutoRefresh = ({
   autoRefreshCountdown,
   loading,
   historyEnabled,
-  onHistoryToggle
+  onHistoryToggle,
 }) => {
   const handleAutoRefreshToggle = useCallback((e) => {
     setAutoRefresh(e.target.checked);
@@ -66,20 +66,20 @@ export const AutoRefresh = ({
   return (
     <div className={styles.refreshControls}>
       <div className={styles.refreshToggles}>
-        <label 
+        <label
           className={styles.refreshToggle}
           title="Automatically update position data at regular intervals. Useful for tracking real-time changes."
         >
-          <input 
-            type="checkbox" 
-            checked={autoRefresh} 
+          <input
+            type="checkbox"
+            checked={autoRefresh}
             onChange={handleAutoRefreshToggle}
             aria-label="Enable auto-refresh"
           />
           <span>Auto-refresh</span>
         </label>
-        
-        <HistoryToggle 
+
+        <HistoryToggle
           enabled={historyEnabled}
           onToggle={onHistoryToggle}
           setAutoRefresh={setAutoRefresh}
@@ -88,14 +88,14 @@ export const AutoRefresh = ({
 
       {autoRefresh && (
         <>
-          <IntervalSelector 
-            value={refreshInterval} 
+          <IntervalSelector
+            value={refreshInterval}
             onChange={onIntervalChange}
           />
-          
-          <RefreshStatus 
-            loading={loading} 
-            countdown={autoRefreshCountdown} 
+
+          <RefreshStatus
+            loading={loading}
+            countdown={autoRefreshCountdown}
           />
         </>
       )}

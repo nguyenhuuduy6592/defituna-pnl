@@ -2,7 +2,7 @@ import {
   processTunaPosition,
   calculateLeverage,
   computeLiquidationPrices,
-  createEmptyPositionTemplate
+  createEmptyPositionTemplate,
 } from '../../utils/formulas';
 
 // Import non-exported functions for testing
@@ -16,7 +16,7 @@ describe('formula', () => {
         debtA: 1,
         debtB: 1000,
         totalA: 2,
-        totalB: 2000
+        totalB: 2000,
       });
       expect(result).toBeCloseTo(2.0, 2);
     });
@@ -37,7 +37,7 @@ describe('formula', () => {
         debtA: 2,
         debtB: 4000,
         totalA: 2,
-        totalB: 4000
+        totalB: 4000,
       });
       expect(result).toBe(100.0);
     });
@@ -48,7 +48,7 @@ describe('formula', () => {
         debtA: '1',
         debtB: '1000',
         totalA: '2',
-        totalB: '2000'
+        totalB: '2000',
       });
       expect(result).toBeCloseTo(2.0, 2);
     });
@@ -62,9 +62,9 @@ describe('formula', () => {
         debtA: 1,
         debtB: 1000,
         liquidity: 1000000,
-        liquidationThreshold: 0.05
+        liquidationThreshold: 0.05,
       });
-      
+
       expect(result.lowerLiquidationPrice).toBeGreaterThan(0);
       expect(result.upperLiquidationPrice).toBeGreaterThan(result.lowerLiquidationPrice);
     });
@@ -76,12 +76,12 @@ describe('formula', () => {
         debtA: 1,
         debtB: 1000,
         liquidity: 1000000,
-        liquidationThreshold: 0.05
+        liquidationThreshold: 0.05,
       });
-      
+
       expect(result).toEqual({
         lowerLiquidationPrice: 0,
-        upperLiquidationPrice: 0
+        upperLiquidationPrice: 0,
       });
     });
 
@@ -92,12 +92,12 @@ describe('formula', () => {
         debtA: 1,
         debtB: 1000,
         liquidity: 0,
-        liquidationThreshold: 0.05
+        liquidationThreshold: 0.05,
       });
-      
+
       expect(result).toEqual({
         lowerLiquidationPrice: 0,
-        upperLiquidationPrice: 0
+        upperLiquidationPrice: 0,
       });
     });
 
@@ -107,9 +107,9 @@ describe('formula', () => {
         upperPrice: 3000,
         debtA: 1,
         debtB: 1000,
-        liquidity: 1000000
+        liquidity: 1000000,
       });
-      
+
       expect(result.lowerLiquidationPrice).toBeGreaterThan(0);
       expect(result.upperLiquidationPrice).toBeGreaterThan(result.lowerLiquidationPrice);
     });
@@ -118,7 +118,7 @@ describe('formula', () => {
   describe('createEmptyPositionTemplate', () => {
     it('creates a template with default values', () => {
       const template = createEmptyPositionTemplate();
-      
+
       expect(template).toEqual({
         leverage: 1,
         size: 0,
@@ -132,7 +132,7 @@ describe('formula', () => {
         yield: { tokenA: 0, tokenB: 0, usd: 0 },
         compounded: { tokenA: 0, tokenB: 0, usd: 0 },
         rangePrices: { lower: 0, upper: 0 },
-        pnl: { usd: 0, bps: 0 }
+        pnl: { usd: 0, bps: 0 },
       });
     });
 
@@ -210,22 +210,22 @@ describe('formula', () => {
           tick_upper_index: 1000,
           tick_stop_loss_index: -2000,
           tick_take_profit_index: 2000,
-          liquidity: '1000000'
-        }
+          liquidity: '1000000',
+        },
       };
 
       const mockPoolData = {
         data: {
           address: 'pool1',
-          tick_current_index: 0
-        }
+          tick_current_index: 0,
+        },
       };
 
       const mockMarketData = {
         data: [{
           pool_address: 'pool1',
-          liquidation_threshold: 50000 // 5%
-        }]
+          liquidation_threshold: 50000, // 5%
+        }],
       };
 
       const mockTokenAData = { decimals: 18 }; // Token A (18 decimals)
@@ -280,20 +280,20 @@ describe('formula', () => {
             tick_current_index: 0,
             tick_lower_index: -1000,
             tick_upper_index: 1000,
-            liquidity: '1000000'
-          }
+            liquidity: '1000000',
+          },
         },
         {
           data: {
             address: 'pool1',
-            tick_current_index: 0
-          }
+            tick_current_index: 0,
+          },
         },
         {
           data: [{
             pool_address: 'pool1',
-            liquidation_threshold: 50000
-          }]
+            liquidation_threshold: 50000,
+          }],
         },
         { decimals: 18 },
         { decimals: 6 }
@@ -318,19 +318,19 @@ describe('formula', () => {
           data: {
             total_a: { amount: '1000000000000000000' },
             total_b: { amount: '1000000' },
-            tick_current_index: 0
-          }
+            tick_current_index: 0,
+          },
         },
         {
           data: {
             address: 'pool1',
-            tick_current_index: 0
-          }
+            tick_current_index: 0,
+          },
         },
         {
           data: [{
-            pool_address: 'pool1'
-          }]
+            pool_address: 'pool1',
+          }],
         },
         {}, // No decimals specified
         {}  // No decimals specified
@@ -343,41 +343,41 @@ describe('formula', () => {
 
     it('handles error in price calculations', () => {
       const mockPositionData = {
-          data: {
-              token_a: 1000,
-              token_b: 2000,
-              liquidity: 5000,
-              tick_current_index: Number.MAX_SAFE_INTEGER + 1 // This will cause an error in calculations
-          }
+        data: {
+          token_a: 1000,
+          token_b: 2000,
+          liquidity: 5000,
+          tick_current_index: Number.MAX_SAFE_INTEGER + 1, // This will cause an error in calculations
+        },
       };
-      
+
       const mockPoolData = {
-          data: {
-              address: 'pool1',
-              token0: 'tokenA',
-              token1: 'tokenB',
-              tick_current_index: Number.MAX_SAFE_INTEGER + 1 // This will cause an error in calculations
-          }
+        data: {
+          address: 'pool1',
+          token0: 'tokenA',
+          token1: 'tokenB',
+          tick_current_index: Number.MAX_SAFE_INTEGER + 1, // This will cause an error in calculations
+        },
       };
-      
+
       const mockTokenAData = { decimals: 6 };
       const mockTokenBData = { decimals: 6 };
       const mockMarketData = {
-          data: [
-              { pool_address: 'pool1' }
-          ]
+        data: [
+          { pool_address: 'pool1' },
+        ],
       };
-      
+
       const result = formulas.processTunaPosition(
-          mockPositionData,
-          mockPoolData,
-          mockTokenAData,
-          mockTokenBData,
-          mockMarketData
+        mockPositionData,
+        mockPoolData,
+        mockTokenAData,
+        mockTokenBData,
+        mockMarketData
       );
-      
+
       // Verify that an empty template is returned
       expect(result).toEqual(formulas.createEmptyPositionTemplate());
     });
   });
-}); 
+});

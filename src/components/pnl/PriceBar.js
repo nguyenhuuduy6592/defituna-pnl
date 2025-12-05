@@ -8,8 +8,8 @@ import { TooltipPortal } from '../common/TooltipPortal';
 const TooltipRow = ({ point, formatValue }) => (
   <div className={styles.tooltipRow}>
     <span className={styles.tooltipLabel}>
-      <span 
-        className={`${styles.priceShape} ${styles[point.shape]}`} 
+      <span
+        className={`${styles.priceShape} ${styles[point.shape]}`}
         style={{ backgroundColor: point.color }}
       />
       {point.label}:
@@ -22,7 +22,7 @@ const TooltipRow = ({ point, formatValue }) => (
 
 /**
  * A visual price bar component showing current price within a specified range.
- * 
+ *
  * @param {Object} props Component props
  * @param {number} props.currentPrice Current market price
  * @param {number} props.entryPrice Position entry price
@@ -31,13 +31,13 @@ const TooltipRow = ({ point, formatValue }) => (
  * @param {Object} props.limitOrderPrices Limit order upper and lower prices
  * @param {Function} props.formatValue Function to format price values for display
  */
-export const PriceBar = ({ 
+export const PriceBar = ({
   currentPrice,
   entryPrice,
   liquidationPrice,
   rangePrices,
   limitOrderPrices,
-  formatValue
+  formatValue,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const containerRef = useRef(null);
@@ -46,63 +46,63 @@ export const PriceBar = ({
   const { pricePoints, minPrice, maxPrice, range, currentPricePoint } = useMemo(() => {
     // Define all possible price points for tooltip
     const allPoints = [
-      { 
-        value: liquidationPrice.lower, 
-        label: 'Liq. Lower', 
+      {
+        value: liquidationPrice.lower,
+        label: 'Liq. Lower',
         color: '#FF2D55',
-        shape: 'triangle-up'
+        shape: 'triangle-up',
       },
-      { 
-        value: liquidationPrice.upper, 
-        label: 'Liq. Upper', 
+      {
+        value: liquidationPrice.upper,
+        label: 'Liq. Upper',
         color: '#FF2D55',
-        shape: 'triangle-down'
+        shape: 'triangle-down',
       },
-      { 
-        value: entryPrice, 
-        label: 'Entry', 
+      {
+        value: entryPrice,
+        label: 'Entry',
         color: '#007AFF',
-        shape: 'diamond'
+        shape: 'diamond',
       },
-      { 
-        value: currentPrice, 
-        label: 'Current', 
+      {
+        value: currentPrice,
+        label: 'Current',
         color: '#FFCC00',
-        shape: 'circle'
+        shape: 'circle',
       },
-      { 
-        value: rangePrices.lower, 
-        label: 'Range Lower', 
+      {
+        value: rangePrices.lower,
+        label: 'Range Lower',
         color: '#34C759',
-        shape: 'square'
+        shape: 'square',
       },
-      { 
-        value: rangePrices.upper, 
-        label: 'Range Upper', 
+      {
+        value: rangePrices.upper,
+        label: 'Range Upper',
         color: '#34C759',
-        shape: 'square'
+        shape: 'square',
       },
       {
         value: limitOrderPrices.lower,
         label: 'Stop Loss',
         color: '#FF9500',
-        shape: 'triangle-up'
+        shape: 'triangle-up',
       },
       {
         value: limitOrderPrices.upper,
         label: 'Take Profit',
         color: '#FF9500',
-        shape: 'triangle-down'
-      }
+        shape: 'triangle-down',
+      },
     ];
-    
+
     // Filter out invalid price points
     const validPoints = allPoints.filter(point => (
-      point.value !== Infinity && 
-      point.value !== null && 
+      point.value !== Infinity &&
+      point.value !== null &&
       point.value !== 0
     )).sort((a, b) => b.value - a.value);
-    
+
     // Define overall bar min/max based on rangePrices with a padding for grace areas
     const graceAmount = (rangePrices.upper - rangePrices.lower) * 0.15; // 15% grace
     const finalMinPrice = rangePrices.lower - graceAmount;
@@ -129,29 +129,29 @@ export const PriceBar = ({
       currentPricePoint: {
         value: displayCurrentPriceValue,
         originalValue: currentPrice,
-        color: displayCurrentPriceColor
-      }
+        color: displayCurrentPriceColor,
+      },
     };
   }, [
-    currentPrice, 
-    entryPrice, 
-    liquidationPrice.lower, 
+    currentPrice,
+    entryPrice,
+    liquidationPrice.lower,
     liquidationPrice.upper,
     rangePrices.lower,
     rangePrices.upper,
     limitOrderPrices.lower,
-    limitOrderPrices.upper
+    limitOrderPrices.upper,
   ]);
 
   const getPosition = useCallback((price) => {
-    if (range === 0) return 50;
+    if (range === 0) {return 50;}
     return ((price - minPrice) / range) * 100;
   }, [minPrice, range]);
-  
+
   const handleMouseEnter = useCallback(() => {
     setShowTooltip(true);
   }, []);
-  
+
   const handleMouseLeave = useCallback(() => {
     setShowTooltip(false);
   }, []);
@@ -159,10 +159,10 @@ export const PriceBar = ({
   const tooltipContent = useMemo(() => (
     <div className={styles.tooltipContent}>
       {pricePoints.map((point, index) => (
-        <TooltipRow 
-          key={index} 
-          point={point} 
-          formatValue={formatValue} 
+        <TooltipRow
+          key={index}
+          point={point}
+          formatValue={formatValue}
         />
       ))}
     </div>
@@ -176,7 +176,7 @@ export const PriceBar = ({
   const rightGraceWidth = 100 - activeRangeEndPos;
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={styles.priceBarContainer}
       onMouseEnter={handleMouseEnter}
@@ -199,27 +199,27 @@ export const PriceBar = ({
           className={`${styles.barSegment} ${styles.graceRange}`}
           style={{ left: `${activeRangeStartPos + activeRangeWidth}%`, width: `${rightGraceWidth}%` }}
         />
-        
+
         {/* Range Price Labels */}
-        <div 
+        <div
           className={styles.priceLabel}
           style={{ left: `${activeRangeStartPos}%` }}
         >
           ${formatValue(rangePrices.lower)}
         </div>
-        <div 
+        <div
           className={styles.priceLabel}
           style={{ left: `${activeRangeEndPos}%` }}
         >
           ${formatValue(rangePrices.upper)}
         </div>
-        
+
         {/* Current Price Indicator */}
         <div
           className={styles.priceIndicator}
           style={{
             left: `${getPosition(currentPricePoint.value)}%`,
-            backgroundColor: currentPricePoint.color
+            backgroundColor: currentPricePoint.color,
           }}
           aria-label={`Current price: ${currentPricePoint.originalValue}`}
         />
@@ -235,4 +235,4 @@ export const PriceBar = ({
       )}
     </div>
   );
-}; 
+};

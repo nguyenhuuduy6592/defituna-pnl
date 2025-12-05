@@ -8,9 +8,9 @@ import { exportChartAsImage, shareCard } from '../../../utils/export';
 jest.mock('recharts', () => ({
   LineChart: ({ children }) => <div data-testid="line-chart">{children}</div>,
   Line: ({ name, dataKey, connectNulls }) => (
-    <div 
-      data-testid={`line-${dataKey}`} 
-      data-name={name} 
+    <div
+      data-testid={`line-${dataKey}`}
+      data-name={name}
       data-connect-nulls={connectNulls}
     >
       {name}
@@ -105,18 +105,18 @@ describe('PositionChart', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Default mock implementations
     prepareChartData.mockImplementation(data => data || []);
-    groupChartData.mockImplementation((data, period) => 
-      data && data.length > 0 
+    groupChartData.mockImplementation((data, period) =>
+      data && data.length > 0
         ? data.map(item => ({
-            ...item,
-            totalYield: (item.yield || 0) + (item.compounded || 0)
-          }))
+          ...item,
+          totalYield: (item.yield || 0) + (item.compounded || 0),
+        }))
         : []
     );
-    
+
     // Mock element getBoundingClientRect
     Element.prototype.getBoundingClientRect = jest.fn(() => ({
       top: 0,
@@ -126,7 +126,7 @@ describe('PositionChart', () => {
       width: 100,
       height: 100,
     }));
-    
+
     // Mock window methods for export/share
     global.URL.createObjectURL = jest.fn(() => 'mocked-url');
     global.URL.revokeObjectURL = jest.fn();
@@ -134,13 +134,13 @@ describe('PositionChart', () => {
 
   it('returns null when positionHistory is null', () => {
     const { container } = render(
-      <PositionChart 
-        position={mockPosition} 
-        positionHistory={null} 
-        onClose={mockOnClose} 
+      <PositionChart
+        position={mockPosition}
+        positionHistory={null}
+        onClose={mockOnClose}
       />
     );
-    
+
     // Component should return null
     expect(container.firstChild).toBeNull();
   });
@@ -157,7 +157,7 @@ describe('PositionChart', () => {
     // Check chart utility functions were called
     expect(prepareChartData).toHaveBeenCalledWith(mockHistoryData);
     expect(groupChartData).toHaveBeenCalled();
-    
+
     // Get the main chart container (the one not inside exportWrapper)
     const mainChartContainer = screen.getByTestId('portal-container').querySelector(':scope > .chartOverlay > .chartContainer');
     expect(mainChartContainer).toBeInTheDocument();
@@ -185,7 +185,7 @@ describe('PositionChart', () => {
   it('renders the NoChartData component when position history is empty', () => {
     prepareChartData.mockReturnValue([]);
     groupChartData.mockReturnValue([]);
-    
+
     render(
       <PositionChart
         position={mockPosition}
@@ -193,7 +193,7 @@ describe('PositionChart', () => {
         onClose={mockOnClose}
       />
     );
-    
+
     // Check no data message is shown
     expect(screen.queryAllByText(/No displayable data available/i)[0]).toBeInTheDocument();
   });
@@ -206,53 +206,53 @@ describe('PositionChart', () => {
         onClose={mockOnClose}
       />
     );
-    
+
     // Find period select dropdown
     const periodSelect = screen.getByLabelText('Select time period');
-    
+
     // Change period to 1h
     fireEvent.change(periodSelect, { target: { value: '1h' } });
-    
+
     // Check if groupChartData was called with new period
     expect(groupChartData).toHaveBeenCalledWith(expect.anything(), '1h');
-    
+
     // Change period to 1d
     fireEvent.change(periodSelect, { target: { value: '1d' } });
-    
+
     // Check if groupChartData was called with new period
     expect(groupChartData).toHaveBeenCalledWith(expect.anything(), '1d');
   });
 
   it('closes when clicking the close button', () => {
     render(
-      <PositionChart 
-        position={mockPosition} 
-        positionHistory={mockHistoryData} 
-        onClose={mockOnClose} 
+      <PositionChart
+        position={mockPosition}
+        positionHistory={mockHistoryData}
+        onClose={mockOnClose}
       />
     );
-    
+
     // Find the close button by its aria-label
     const closeButton = screen.getByLabelText('Close chart');
     fireEvent.click(closeButton);
-    
+
     // Check if onClose was called
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
   it('exports the chart as an image when clicking export button', async () => {
     render(
-      <PositionChart 
-        position={mockPosition} 
+      <PositionChart
+        position={mockPosition}
         positionHistory={mockHistoryData}
-        onClose={mockOnClose} 
+        onClose={mockOnClose}
       />
     );
-    
+
     // Find the export button by its aria-label
     const exportButton = screen.getByLabelText('Download ETH/USDC chart as PNG');
     fireEvent.click(exportButton);
-    
+
     // Check if exportChartAsImage was called
     await waitFor(() => {
       expect(exportChartAsImage).toHaveBeenCalledTimes(1);
@@ -261,26 +261,26 @@ describe('PositionChart', () => {
 
   it('shares the chart when clicking share button', async () => {
     render(
-      <PositionChart 
-        position={mockPosition} 
+      <PositionChart
+        position={mockPosition}
         positionHistory={mockHistoryData}
-        onClose={mockOnClose} 
+        onClose={mockOnClose}
       />
     );
-    
+
     // Find the share button by its aria-label
     const shareButton = screen.getByLabelText('Share ETH/USDC chart');
     fireEvent.click(shareButton);
-    
+
     // Check if shareCard was called
     await waitFor(() => {
       expect(shareCard).toHaveBeenCalledTimes(1);
     });
   });
-  
+
   it('gracefully handles invalid history data', () => {
     console.error = jest.fn(); // Mock console.error to prevent test output noise
-    
+
     render(
       <PositionChart
         position={mockPosition}
@@ -288,7 +288,7 @@ describe('PositionChart', () => {
         onClose={mockOnClose}
       />
     );
-    
+
     // Should display the no data message when processing fails
     expect(screen.queryAllByText(/No displayable data available/i)[0]).toBeInTheDocument();
   });
@@ -298,7 +298,7 @@ describe('PositionChart', () => {
       ...mockPosition,
       pairDisplay: 'Ethereum/USDC', // Custom display name
     };
-    
+
     render(
       <PositionChart
         position={mockPositionWithPairDisplay}
@@ -306,7 +306,7 @@ describe('PositionChart', () => {
         onClose={mockOnClose}
       />
     );
-    
+
     // Should use the pairDisplay instead of pair
     expect(screen.queryAllByText(/Ethereum\/USDC History/i)[0]).toBeInTheDocument();
   });
@@ -316,17 +316,17 @@ describe('PositionChart', () => {
     prepareChartData.mockReturnValue(mockNegativePnLData);
     groupChartData.mockReturnValue(mockNegativePnLData.map(item => ({
       ...item,
-      totalYield: (item.yield || 0) + (item.compounded || 0)
+      totalYield: (item.yield || 0) + (item.compounded || 0),
     })));
-    
+
     render(
       <PositionChart
-        position={{...mockPosition, pnl: { usd: -1000 }}}
+        position={{ ...mockPosition, pnl: { usd: -1000 } }}
         positionHistory={mockNegativePnLData}
         onClose={mockOnClose}
       />
     );
-    
+
     // Check that chart components are rendered
     expect(screen.queryAllByTestId('responsive-container')[0]).toBeInTheDocument();
     expect(screen.queryAllByTestId('line-pnl')[0]).toBeInTheDocument();
@@ -341,13 +341,13 @@ describe('PositionChart', () => {
         onClose={mockOnClose}
       />
     );
-    
+
     // Find info icon
     const infoIcon = screen.getByTestId('info-icon');
-    
+
     // Info tooltip container should exist and have content about historical data
     const tooltipContainer = screen.getByTestId('tooltip-container');
     expect(tooltipContainer).toBeInTheDocument();
     expect(tooltipContainer.getAttribute('data-content')).toContain('Historical data is stored locally');
   });
-}); 
+});

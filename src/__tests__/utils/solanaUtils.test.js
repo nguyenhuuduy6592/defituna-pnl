@@ -84,4 +84,4 @@ describe('getFirstTransactionTimestamp', () => {
     const ts = await getFirstTransactionTimestamp(address);
     expect(ts).toBeNull();
   });
-}); 
+});

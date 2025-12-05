@@ -4,7 +4,7 @@ import {
   formatValue,
   formatDuration,
   formatWalletAddress,
-  formatFee
+  formatFee,
 } from '../../utils/formatters';
 
 describe('formatNumber', () => {
@@ -153,4 +153,4 @@ describe('formatFee', () => {
     expect(formatFee(1234, false)).toBe('$1,234.00');
     expect(formatFee(1234567, false)).toBe('$1,234,567.00');
   });
-}); 
+});

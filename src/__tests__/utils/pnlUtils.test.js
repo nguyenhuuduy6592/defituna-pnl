@@ -1,7 +1,7 @@
 import { fetchWalletPnL } from '../../utils/pnlUtils';
 import {
   addWalletAddressToPositions,
-  decodePositions
+  decodePositions,
 } from '../../utils/positionUtils';
 
 // Mock the dependencies from positionUtils
@@ -33,42 +33,42 @@ describe('fetchWalletPnL utility', () => {
 
   it('should fetch, process, and return data on successful API call', async () => {
     const mockRawData = {
-        t_pnl: 1234.50, // Raw decimal total PnL
-        positions: [
-            { id: 'pos1', /* other fields */ },
-            { id: 'pos2', /* other fields */ },
-        ],
+      t_pnl: 1234.50, // Raw decimal total PnL
+      positions: [
+        { id: 'pos1' /* other fields */ },
+        { id: 'pos2' /* other fields */ },
+      ],
     };
     const expectedProcessedData = {
-        totalPnL: 1234.50,
-        positions: [
-            { id: 'pos1', walletAddress: mockWalletAddress },
-            { id: 'pos2', walletAddress: mockWalletAddress },
-        ],
+      totalPnL: 1234.50,
+      positions: [
+        { id: 'pos1', walletAddress: mockWalletAddress },
+        { id: 'pos2', walletAddress: mockWalletAddress },
+      ],
     };
 
     // Create a shallow copy of mockRawData
     const mockDataCopy = { ...mockRawData };
 
     fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockDataCopy, // Use the copy here
+      ok: true,
+      json: async () => mockDataCopy, // Use the copy here
     });
 
     const result = await fetchWalletPnL(mockWalletAddress);
 
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith('/api/fetch-pnl', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ walletAddress: mockWalletAddress }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ walletAddress: mockWalletAddress }),
     });
     expect(decodePositions).toHaveBeenCalledTimes(1);
     expect(decodePositions).toHaveBeenCalledWith(mockRawData.positions);
     expect(addWalletAddressToPositions).toHaveBeenCalledTimes(1);
     expect(addWalletAddressToPositions).toHaveBeenCalledWith(mockRawData.positions, mockWalletAddress);
     expect(result).toEqual(expectedProcessedData);
-});
+  });
 
   it('should handle API error (non-ok response) and return error object', async () => {
     const mockError = { error: 'Failed to fetch from chain' };
@@ -98,11 +98,11 @@ describe('fetchWalletPnL utility', () => {
   });
 
   it('should correctly handle data without t_pnl field', async () => {
-    const mockRawData = { 
-        // No t_pnl field
-        positions: [{ id: 'pos1' }] 
+    const mockRawData = {
+      // No t_pnl field
+      positions: [{ id: 'pos1' }],
     };
-     const expectedProcessedData = {
+    const expectedProcessedData = {
       positions: [{ id: 'pos1', walletAddress: mockWalletAddress }],
     };
 
@@ -114,7 +114,7 @@ describe('fetchWalletPnL utility', () => {
     expect(result).toEqual(expectedProcessedData);
   });
 
-   it('should correctly handle data without positions field', async () => {
+  it('should correctly handle data without positions field', async () => {
     const mockRawData = { t_pnl: 50.00 }; // No positions
     const expectedProcessedData = { totalPnL: 50.00 };
 
@@ -125,4 +125,4 @@ describe('fetchWalletPnL utility', () => {
     expect(addWalletAddressToPositions).not.toHaveBeenCalled();
     expect(result).toEqual(expectedProcessedData);
   });
-}); 
+});

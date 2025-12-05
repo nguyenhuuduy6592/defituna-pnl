@@ -20,9 +20,9 @@ describe('HistoryConfirmationModal Component', () => {
   describe('Enable mode', () => {
     beforeEach(() => {
       render(
-        <HistoryConfirmationModal 
-          onConfirm={mockOnConfirm} 
-          onCancel={mockOnCancel} 
+        <HistoryConfirmationModal
+          onConfirm={mockOnConfirm}
+          onCancel={mockOnCancel}
           isEnabling={true}
         />
       );
@@ -57,9 +57,9 @@ describe('HistoryConfirmationModal Component', () => {
   describe('Disable mode', () => {
     beforeEach(() => {
       render(
-        <HistoryConfirmationModal 
-          onConfirm={mockOnConfirm} 
-          onCancel={mockOnCancel} 
+        <HistoryConfirmationModal
+          onConfirm={mockOnConfirm}
+          onCancel={mockOnCancel}
           isEnabling={false}
         />
       );
@@ -94,13 +94,13 @@ describe('HistoryConfirmationModal Component', () => {
 
   it('calls onCancel when cancel button is clicked', () => {
     render(
-      <HistoryConfirmationModal 
-        onConfirm={mockOnConfirm} 
-        onCancel={mockOnCancel} 
+      <HistoryConfirmationModal
+        onConfirm={mockOnConfirm}
+        onCancel={mockOnCancel}
         isEnabling={true}
       />
     );
-    
+
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
     fireEvent.click(cancelButton);
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
@@ -108,58 +108,58 @@ describe('HistoryConfirmationModal Component', () => {
 
   it('calls onCancel when close button is clicked', () => {
     render(
-      <HistoryConfirmationModal 
-        onConfirm={mockOnConfirm} 
-        onCancel={mockOnCancel} 
+      <HistoryConfirmationModal
+        onConfirm={mockOnConfirm}
+        onCancel={mockOnCancel}
         isEnabling={true}
       />
     );
-    
+
     const closeButton = screen.getByRole('button', { name: /Close/i });
     fireEvent.click(closeButton);
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
-  
+
   it('calls onCancel when Escape key is pressed', () => {
     render(
-      <HistoryConfirmationModal 
-        onConfirm={mockOnConfirm} 
-        onCancel={mockOnCancel} 
+      <HistoryConfirmationModal
+        onConfirm={mockOnConfirm}
+        onCancel={mockOnCancel}
         isEnabling={true}
       />
     );
-    
+
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
   it('calls onCancel when clicking on the overlay', () => {
     render(
-      <HistoryConfirmationModal 
-        onConfirm={mockOnConfirm} 
-        onCancel={mockOnCancel} 
+      <HistoryConfirmationModal
+        onConfirm={mockOnConfirm}
+        onCancel={mockOnCancel}
         isEnabling={true}
       />
     );
-    
+
     const overlay = screen.getByRole('dialog');
     // Click the overlay itself (not its children)
     fireEvent.click(overlay);
-    
+
     expect(mockOnCancel).toHaveBeenCalledTimes(1);
   });
 
   it('has proper accessibility attributes', () => {
     render(
-      <HistoryConfirmationModal 
-        onConfirm={mockOnConfirm} 
-        onCancel={mockOnCancel} 
+      <HistoryConfirmationModal
+        onConfirm={mockOnConfirm}
+        onCancel={mockOnCancel}
         isEnabling={true}
       />
     );
-    
+
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
     expect(dialog).toHaveAttribute('aria-labelledby', 'modal-title');
   });
-}); 
+});

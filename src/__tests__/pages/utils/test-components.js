@@ -1,12 +1,10 @@
 /**
  * Mock Components for Page Testing
- * 
+ *
  * This file contains a collection of mock components that are frequently used in page tests.
  * These components provide simplified versions that focus on testing key interactions
  * rather than implementation details.
  */
-
-import React from 'react';
 
 /**
  * Mock SearchInput component
@@ -112,7 +110,7 @@ export const PoolStatsCard = ({ pool, timeframe }) => (
  */
 export const PoolDropdown = ({ pools, selectedPools, onSelectPool }) => (
   <div data-testid="pool-dropdown">
-    <select 
+    <select
       data-testid="pool-select"
       onChange={(e) => onSelectPool(e.target.value)}
     >
@@ -166,4 +164,4 @@ describe('Test Components', () => {
     expect(typeof PoolPriceChart).toBe('function');
     expect(typeof PoolVolumeChart).toBe('function');
   });
-}); 
+});

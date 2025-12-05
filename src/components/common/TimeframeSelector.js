@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from '../../styles/TimeframeSelector.module.scss';
 
 /**
@@ -23,4 +22,4 @@ export default function TimeframeSelector({ timeframes = ['24h', '7d', '30d'], s
       ))}
     </div>
   );
-} 
+}

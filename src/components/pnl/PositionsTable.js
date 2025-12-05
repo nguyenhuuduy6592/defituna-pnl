@@ -9,7 +9,7 @@ import {
   getStateClass,
   invertPairString,
   copyToClipboard,
-  formatPercentage
+  formatPercentage,
 } from '../../utils';
 import { FiShare2, FiCopy } from 'react-icons/fi';
 import styles from './PositionsTable.module.scss';
@@ -23,23 +23,23 @@ import { KNOWN_TOKENS } from '../../utils/constants';
 const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => {
   // Helper function to get the appropriate sort icon
   const getSortIcon = useCallback((field) => {
-    if (positionsCount <= 1) return null;
-    if (field !== sortState.field) return '↕';
+    if (positionsCount <= 1) {return null;}
+    if (field !== sortState.field) {return '↕';}
     return sortState.direction === 'asc' ? '↑' : '↓';
   }, [positionsCount, sortState]);
 
   // Determine if header is sortable
   const isSortable = positionsCount > 1;
-  
+
   // Handler for header click
   const handleHeaderClick = useCallback((field) => {
-    if (isSortable) onSort(field);
+    if (isSortable) {onSort(field);}
   }, [isSortable, onSort]);
-  
+
   return (
     <thead>
       <tr>
-        <th 
+        <th
           className={isSortable ? styles.sortable : ''}
           onClick={() => handleHeaderClick('pair')}
           tabIndex={isSortable ? 0 : -1}
@@ -49,7 +49,7 @@ const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => 
           Pair {getSortIcon('pair')}
         </th>
         {showWallet && (
-          <th 
+          <th
             className={isSortable ? styles.sortable : ''}
             onClick={() => handleHeaderClick('walletAddress')}
             tabIndex={isSortable ? 0 : -1}
@@ -59,7 +59,7 @@ const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => 
             Wallet {getSortIcon('walletAddress')}
           </th>
         )}
-        <th 
+        <th
           className={isSortable ? styles.sortable : ''}
           onClick={() => handleHeaderClick('status')}
           tabIndex={isSortable ? 0 : -1}
@@ -68,7 +68,7 @@ const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => 
         >
           Status {getSortIcon('status')}
         </th>
-        <th 
+        <th
           className={isSortable ? styles.sortable : ''}
           onClick={() => handleHeaderClick('age')}
           tabIndex={isSortable ? 0 : -1}
@@ -77,7 +77,7 @@ const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => 
         >
           Age {getSortIcon('age')}
         </th>
-        <th 
+        <th
           className={isSortable ? styles.sortable : ''}
           onClick={() => handleHeaderClick('pnl')}
           tabIndex={isSortable ? 0 : -1}
@@ -86,7 +86,7 @@ const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => 
         >
           PnL {getSortIcon('pnl')}
         </th>
-        <th 
+        <th
           className={isSortable ? styles.sortable : ''}
           onClick={() => handleHeaderClick('yield')}
           tabIndex={isSortable ? 0 : -1}
@@ -95,7 +95,7 @@ const TableHeader = memo(({ showWallet, positionsCount, sortState, onSort }) => 
         >
           Yield (Compounded) {getSortIcon('yield')}
         </th>
-        <th 
+        <th
           className={isSortable ? styles.sortable : ''}
           onClick={() => handleHeaderClick('size')}
           tabIndex={isSortable ? 0 : -1}
@@ -123,15 +123,15 @@ const PairCell = memo(({ pair, isInverted, leverage, onPairInversion }) => {
   const handleClick = useCallback(() => {
     onPairInversion(pair);
   }, [pair, onPairInversion]);
-  
+
   const displayPair = isInverted ? invertPairString(pair) : pair;
-  const formattedLeverage = leverage == 1 ? null : 
+  const formattedLeverage = leverage == 1 ? null :
     <>({formatNumber(leverage)}x<span className={styles.hideOnMobile}></span>)</>;
   const invertTooltip = `Click to ${isInverted ? 'restore' : 'invert'} token order`;
-  
+
   return (
     <td data-label="Pair">
-      <span 
+      <span
         className={`${styles.positionLabel} ${isInverted ? styles.invertedPair : ''}`}
         onClick={handleClick}
         title={invertTooltip}
@@ -163,19 +163,19 @@ const WalletCell = memo(({ walletAddress }) => {
   const handleCopy = useCallback(() => {
     copyToClipboard(walletAddress);
   }, [walletAddress]);
-  
+
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       copyToClipboard(walletAddress);
     }
   }, [walletAddress]);
-  
+
   const formattedAddress = formatWalletAddress(walletAddress);
-  
+
   return (
     <td className={styles.walletCell} data-label="Wallet">
-      <div 
+      <div
         className={styles.walletCellContent}
         onClick={handleCopy}
         onKeyDown={handleKeyDown}
@@ -185,7 +185,7 @@ const WalletCell = memo(({ walletAddress }) => {
         aria-label={`Copy wallet address ${formattedAddress}`}
       >
         <span>{formattedAddress}</span>
-        <FiCopy className={styles.copyIcon} /> 
+        <FiCopy className={styles.copyIcon} />
       </div>
     </td>
   );
@@ -203,14 +203,14 @@ const ActionsCell = memo(({ position, historyEnabled, onShare, onShowChart }) =>
   const handleShare = useCallback(() => {
     onShare(position);
   }, [position, onShare]);
-  
+
   const handleShowChart = useCallback(() => {
     onShowChart(position);
   }, [position, onShowChart]);
-  
+
   return (
     <td data-label="Actions">
-      <button 
+      <button
         className={styles.shareButton}
         onClick={handleShare}
         aria-label={`Share ${position.pair} position`}
@@ -220,7 +220,7 @@ const ActionsCell = memo(({ position, historyEnabled, onShare, onShowChart }) =>
         <span>Share</span>
       </button>
       {historyEnabled && (
-        <button 
+        <button
           className={styles.chartButton}
           onClick={handleShowChart}
           aria-label={`View ${position.pair} position history chart`}
@@ -273,21 +273,21 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
     }
 
     if (showInSol) {
-       if (pnlData && symbol) {
-         const tokenASymbol = symbol.a;
-         const tokenBSymbol = symbol.b;
+      if (pnlData && symbol) {
+        const tokenASymbol = symbol.a;
+        const tokenBSymbol = symbol.b;
         if (tokenASymbol === KNOWN_TOKENS.SOL.symbol) {
-           return `${formatNumber(pnlData.pnl_a.amount)} SOL`;
+          return `${formatNumber(pnlData.pnl_a.amount)} SOL`;
         } else if (tokenBSymbol === KNOWN_TOKENS.SOL.symbol) {
-           return `${formatNumber(pnlData.pnl_b.amount)} SOL`;
-         }
-       }
+          return `${formatNumber(pnlData.pnl_b.amount)} SOL`;
+        }
+      }
 
       if (value === 0) { // Explicitly check for zero USD value
         return `${formatNumber(0)} SOL`; // Or formatNumber(0, 2, true).trim()
       }
       // For non-zero USD values, solPrice is required
-      if (solPrice != null) { 
+      if (solPrice != null) {
         const solAmount = value / solPrice;
         return `${formatNumber(solAmount)} SOL`; // Assuming formatNumber handles precision for SOL
       }
@@ -299,30 +299,30 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
 
   // Percentage is always based on USD value relative to size
   const percentageString = useMemo(() => {
-     if (showInSol && pnlData && symbol) {
-       const tokenASymbol = symbol.a;
-       const tokenBSymbol = symbol.b;
+    if (showInSol && pnlData && symbol) {
+      const tokenASymbol = symbol.a;
+      const tokenBSymbol = symbol.b;
       if (tokenASymbol === KNOWN_TOKENS.SOL.symbol) {
-         return `(${formatPercentage(pnlData.pnl_a.bps / 10000)})`;
+        return `(${formatPercentage(pnlData.pnl_a.bps / 10000)})`;
       } else if (tokenBSymbol === KNOWN_TOKENS.SOL.symbol) {
-         return `(${formatPercentage(pnlData.pnl_b.bps / 10000)})`;
-       }
+        return `(${formatPercentage(pnlData.pnl_b.bps / 10000)})`;
+      }
 
-       return `(${formatPercentage(pnlData.pnl_usd.bps / 10000)})`;
-     }
+      return `(${formatPercentage(pnlData.pnl_usd.bps / 10000)})`;
+    }
 
     if (value != null && size != null && size !== 0) {
       return `(${formatPercentage(value / size)})`;
     }
     return null;
   }, [value, size, showInSol, pnlData, symbol]);
-  
+
   return (
     <td className={`${styles.valueCell} ${styles[pnlClass]}`} data-label={label}>
       <div className={styles.primaryValue}>
         {displayedValue}
         {percentageString && (
-          <span className={styles.positionPnlPercentage}> 
+          <span className={styles.positionPnlPercentage}>
             {percentageString}
           </span>
         )}
@@ -343,11 +343,11 @@ const PnlCell = memo(({ pnlData }) => {
   const percentageString = showInSol ? pnlData.percentageStringInSol : pnlData.percentageString;
 
   return (
-    <td className={`${styles.valueCell} ${styles[pnlClass]}`} data-label='PnL'>
+    <td className={`${styles.valueCell} ${styles[pnlClass]}`} data-label="PnL">
       <div className={styles.primaryValue}>
         {displayedValue}
         {percentageString && (
-          <span className={styles.positionPnlPercentage}> 
+          <span className={styles.positionPnlPercentage}>
             {percentageString}
           </span>
         )}
@@ -367,7 +367,7 @@ const YieldCell = memo(({ yieldData, compoundedData }) => {
   const yieldValue = showInSol ? yieldData.displayedValueInSol : yieldData.displayedValue;
   const compoundedValue = showInSol ? compoundedData.displayedValueInSol : compoundedData.displayedValue;
   return (
-    <td className={`${styles.valueCell} ${styles[yieldClass]}`} data-label='Yield (Compounded)'>
+    <td className={`${styles.valueCell} ${styles[yieldClass]}`} data-label="Yield (Compounded)">
       <div className={styles.primaryValue}>
         <div dangerouslySetInnerHTML={{ __html: yieldValue }} />
         <div dangerouslySetInnerHTML={{ __html: `(${compoundedValue})` }} />
@@ -380,7 +380,7 @@ YieldCell.displayName = 'YieldCell';
 
 /**
  * A table component that displays position data with sorting and interactive features
- * 
+ *
  * @param {Object} props Component props
  * @param {Array} props.positions List of position objects to display
  * @param {boolean} props.showWallet Whether to show wallet addresses
@@ -401,13 +401,13 @@ export const PositionsTable = memo(({
   isInverted,
   onPairInversion,
   onShare,
-  onShowChart
+  onShowChart,
 }) => {
   const { solPrice } = usePriceContext();
   const { showInSol } = useDisplayCurrency();
 
   return (
-    <table 
+    <table
       className={styles.positionsTable}
       aria-label="Position details"
     >
@@ -421,10 +421,10 @@ export const PositionsTable = memo(({
         {positions.map((position, index) => {
           const key = `${position.pair}-${position.positionAddress}-${index}`;
           const isPairInverted = isInverted(position.pair);
-          
+
           return (
             <tr key={key}>
-              <PairCell 
+              <PairCell
                 pair={position.pair}
                 isInverted={isPairInverted}
                 leverage={position.leverage}
@@ -461,7 +461,7 @@ export const PositionsTable = memo(({
                   isInverted={isPairInverted}
                 />
               </td>
-              <ActionsCell 
+              <ActionsCell
                 position={position}
                 historyEnabled={historyEnabled}
                 onShare={onShare}
@@ -473,4 +473,6 @@ export const PositionsTable = memo(({
       </tbody>
     </table>
   );
-}); 
+});
+
+PositionsTable.displayName = 'PositionsTable';

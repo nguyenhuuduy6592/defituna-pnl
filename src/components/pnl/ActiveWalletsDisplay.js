@@ -1,4 +1,4 @@
-import React, { useCallback, memo } from 'react';
+import { useCallback, memo } from 'react';
 import styles from './WalletForm.module.scss';
 import { formatWalletAddress, copyToClipboard } from '../../utils';
 
@@ -7,14 +7,14 @@ import { formatWalletAddress, copyToClipboard } from '../../utils';
  */
 const WalletChip = memo(({ wallet, onRemove, onKeyDown }) => {
   const formattedAddress = formatWalletAddress(wallet);
-  
+
   const handleCopy = useCallback(() => {
     copyToClipboard(wallet);
   }, [wallet]);
-  
+
   return (
     <div className={styles.walletChip}>
-      <span 
+      <span
         title="Copy to clipboard"
         onClick={handleCopy}
         role="button"
@@ -24,7 +24,7 @@ const WalletChip = memo(({ wallet, onRemove, onKeyDown }) => {
       >
         {formattedAddress}
       </span>
-      <button 
+      <button
         type="button"
         className={styles.removeChip}
         onClick={() => onRemove(wallet)}
@@ -51,7 +51,7 @@ WalletChip.displayName = 'WalletChip';
 export function ActiveWalletsDisplay({
   activeWallets,
   toggleWalletActive,
-  handleChipKeyDown
+  handleChipKeyDown,
 }) {
   if (!activeWallets || activeWallets.length === 0) {
     return null; // Don't render anything if no active wallets
@@ -62,7 +62,7 @@ export function ActiveWalletsDisplay({
       <h3>Active Wallets ({activeWallets.length})</h3>
       <div className={styles.walletChips}>
         {activeWallets.map((wallet, index) => (
-          <WalletChip 
+          <WalletChip
             key={wallet || index}
             wallet={wallet}
             onRemove={toggleWalletActive}
@@ -75,4 +75,4 @@ export function ActiveWalletsDisplay({
 }
 
 // For backwards compatibility
-export default ActiveWalletsDisplay; 
+export default ActiveWalletsDisplay;

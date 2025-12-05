@@ -7,10 +7,10 @@ import '@testing-library/jest-dom';
  */
 export function setupPageTests() {
   // Mock global fetch
-  global.fetch = jest.fn(() => 
+  global.fetch = jest.fn(() =>
     Promise.resolve({
       ok: true,
-      json: () => Promise.resolve({})
+      json: () => Promise.resolve({}),
     })
   );
 
@@ -27,12 +27,12 @@ export function setupPageTests() {
       }),
       removeItem: jest.fn(key => {
         delete store[key];
-      })
+      }),
     };
   })();
 
   Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock
+    value: localStorageMock,
   });
 
   return { localStorageMock };
@@ -60,7 +60,7 @@ export function mockNextComponents() {
     MockHead.displayName = 'MockHead';
     return {
       __esModule: true,
-      default: MockHead
+      default: MockHead,
     };
   });
 
@@ -73,9 +73,9 @@ export function mockNextComponents() {
       asPath: '/',
       events: {
         on: jest.fn(),
-        off: jest.fn()
-      }
-    }))
+        off: jest.fn(),
+      },
+    })),
   }));
 }
 
@@ -109,14 +109,14 @@ export function createMockPools() {
         '24h': {
           volume: 500000,
           fees: 250,
-          yield_over_tvl: 0.05
+          yield_over_tvl: 0.05,
         },
         '7d': {
           volume: 3500000,
           fees: 1750,
-          yield_over_tvl: 0.07
-        }
-      }
+          yield_over_tvl: 0.07,
+        },
+      },
     },
     {
       address: 'pool2',
@@ -130,15 +130,15 @@ export function createMockPools() {
         '24h': {
           volume: 250000,
           fees: 75,
-          yield_over_tvl: 0.03
+          yield_over_tvl: 0.03,
         },
         '7d': {
           volume: 1750000,
           fees: 525,
-          yield_over_tvl: 0.04
-        }
-      }
-    }
+          yield_over_tvl: 0.04,
+        },
+      },
+    },
   ];
 }
 
@@ -150,8 +150,8 @@ export function mockCommonComponents() {
     const MockTimeframeSelector = ({ timeframes, selected, onChange }) => (
       <div data-testid="timeframe-selector">
         {timeframes.map(timeframe => (
-          <button 
-            key={timeframe} 
+          <button
+            key={timeframe}
             data-testid={`timeframe-${timeframe}`}
             className={selected === timeframe ? 'active' : ''}
             onClick={() => onChange(timeframe)}
@@ -164,7 +164,7 @@ export function mockCommonComponents() {
     MockTimeframeSelector.displayName = 'MockTimeframeSelector';
     return MockTimeframeSelector;
   });
-  
+
   jest.mock('../../../components/common/LoadingOverlay', () => {
     const MockLoadingOverlay = ({ loading, children }) => (
       <div data-testid="loading-overlay" data-loading={loading}>
@@ -182,8 +182,8 @@ export function mockCommonComponents() {
 export function mockPoolComponents() {
   jest.mock('../../../components/pools/PoolCard', () => {
     const MockPoolCard = ({ pool, timeframe }) => (
-      <div 
-        data-testid="pool-card" 
+      <div
+        data-testid="pool-card"
         data-pool-address={pool.address}
         data-timeframe={timeframe}
       >
@@ -193,11 +193,11 @@ export function mockPoolComponents() {
     MockPoolCard.displayName = 'MockPoolCard';
     return MockPoolCard;
   });
-  
+
   jest.mock('../../../components/pools/PoolMetrics', () => {
     const MockPoolMetrics = ({ poolId, timeframe }) => (
-      <div 
-        data-testid="pool-metrics" 
+      <div
+        data-testid="pool-metrics"
         data-pool-id={poolId}
         data-timeframe={timeframe}
       >
@@ -207,12 +207,12 @@ export function mockPoolComponents() {
     MockPoolMetrics.displayName = 'MockPoolMetrics';
     return MockPoolMetrics;
   });
-  
+
   jest.mock('../../../components/pools/PoolFilters', () => {
     const MockPoolFilters = ({ filters, onFilterChange, filterOptions }) => (
       <div data-testid="pool-filters">
-        <button 
-          data-testid="filter-button" 
+        <button
+          data-testid="filter-button"
           onClick={() => onFilterChange({ ...filters, token: 'ETH' })}
         >
           Filter Tokens
@@ -234,8 +234,8 @@ export function mockContexts() {
       isInComparison: jest.fn(() => false),
       addPoolToComparison: jest.fn(),
       removePoolFromComparison: jest.fn(),
-      clearComparison: jest.fn()
-    }))
+      clearComparison: jest.fn(),
+    })),
   }));
 }
 
@@ -253,19 +253,19 @@ export function mockHooks() {
         sortOrder: 'desc',
         token: '',
         minTvl: 0,
-        timeframe: '24h'
+        timeframe: '24h',
       },
       filterOptions: {
         tokens: ['ETH', 'USDC', 'SOL', 'USDT'],
         tvlRanges: [
           { value: 0, label: 'Any TVL' },
           { value: 10000, label: '$10K+' },
-        ]
+        ],
       },
-      applyFilters: jest.fn()
+      applyFilters: jest.fn(),
     }));
   });
-  
+
   jest.mock('../../../hooks/usePoolData', () => ({
     usePoolData: jest.fn((poolId) => {
       const pool = createMockPools().find(p => p.address === poolId);
@@ -275,9 +275,9 @@ export function mockHooks() {
         data: pool || null,
         feeAPR: 10.5,
         volumeTVLRatio: 0.5,
-        volatility: 'Medium'
+        volatility: 'Medium',
       };
-    })
+    }),
   }));
 }
 
@@ -289,4 +289,4 @@ describe('Test Setup', () => {
     expect(typeof renderWithAct).toBe('function');
     expect(typeof createMockPools).toBe('function');
   });
-}); 
+});

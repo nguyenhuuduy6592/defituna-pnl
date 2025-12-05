@@ -16,7 +16,7 @@ jest.mock('react-dom', () => ({
 describe('Portal Component', () => {
   it('renders children content when mounted', () => {
     render(<Portal>Test content</Portal>);
-    
+
     // With our mock, the content should be rendered directly with our test ID
     expect(screen.getByTestId('mock-portal')).toBeInTheDocument();
     expect(screen.getByText('Test content')).toBeInTheDocument();
@@ -24,7 +24,7 @@ describe('Portal Component', () => {
 
   it('renders different content when provided', () => {
     render(<Portal><button>Click me</button></Portal>);
-    
+
     // Check that the new content is rendered
     expect(screen.getByRole('button')).toBeInTheDocument();
     expect(screen.getByText('Click me')).toBeInTheDocument();
@@ -35,17 +35,17 @@ describe('Portal Component', () => {
     const TestComponent = ({ show }) => {
       return show ? <Portal>Test content</Portal> : null;
     };
-    
+
     const { rerender } = render(<TestComponent show={false} />);
-    
+
     // Portal should not be rendered
     expect(screen.queryByTestId('mock-portal')).not.toBeInTheDocument();
-    
+
     // Now show the portal
     rerender(<TestComponent show={true} />);
-    
+
     // Portal should now be rendered
     expect(screen.getByTestId('mock-portal')).toBeInTheDocument();
     expect(screen.getByText('Test content')).toBeInTheDocument();
   });
-}); 
+});

@@ -34,11 +34,11 @@ describe('useCountdown Hook', () => {
     expect(result.current.isRunning).toBe(false);
   });
 
-   it('should initialize with 0 if initial value is non-numeric (NaN)', () => {
+  it('should initialize with 0 if initial value is non-numeric (NaN)', () => {
     // Note: `parseInt(undefined)` or `parseInt(null)` might be 0 or NaN depending on JS engine nuance
     // but Math.max(0, NaN) is NaN. useState(NaN) is valid. isRunning depends on initialValue > 0 which is false for NaN.
     // The hook logic handles NaN gracefully setting countdown to 0. Let's test NaN directly
-    const { result } = renderHook(() => useCountdown(NaN)); 
+    const { result } = renderHook(() => useCountdown(NaN));
     expect(result.current.countdown).toBe(NaN); // Expect NaN as Math.max(0, NaN) is NaN
     expect(result.current.isRunning).toBe(false);
   });
@@ -121,7 +121,7 @@ describe('useCountdown Hook', () => {
 
     it('should warn and not start with invalid seconds (0, negative, non-numeric)', () => {
       const { result } = renderHook(() => useCountdown());
-      
+
       act(() => { result.current.startCountdown(0); });
       expect(result.current.countdown).toBe(0);
       expect(result.current.isRunning).toBe(false);
@@ -201,7 +201,7 @@ describe('useCountdown Hook', () => {
     const { unmount } = renderHook(() => useCountdown(10));
 
     // Ensure timer was set up
-    expect(clearIntervalSpy).not.toHaveBeenCalled(); 
+    expect(clearIntervalSpy).not.toHaveBeenCalled();
 
     unmount();
 
@@ -209,4 +209,4 @@ describe('useCountdown Hook', () => {
     expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
     clearIntervalSpy.mockRestore();
   });
-}); 
+});

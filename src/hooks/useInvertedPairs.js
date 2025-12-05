@@ -31,6 +31,6 @@ export const useInvertedPairs = () => {
   return {
     invertedPairs,
     handlePairInversion,
-    isInverted
+    isInverted,
   };
-}; 
+};

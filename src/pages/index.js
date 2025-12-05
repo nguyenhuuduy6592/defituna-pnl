@@ -14,10 +14,9 @@ import { WalletForm } from '../components/pnl/WalletForm';
 import { AutoRefresh } from '../components/pnl/AutoRefresh';
 import { PnLDisplay } from '../components/pnl/PnLDisplay';
 import {
-  fetchWalletPnL
+  fetchWalletPnL,
 } from '../utils';
 import styles from './index.module.scss';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { usePriceContext } from '../contexts/PriceContext';
 import { getValueClass, formatNumber } from '@/utils';
@@ -25,7 +24,7 @@ import { getValueClass, formatNumber } from '@/utils';
 // Storage keys for collapsible sections
 const TRADING_EXPANDED_KEY = 'tradingExpanded';
 
-export default () => {
+const HomePage = () => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [aggregatedData, setAggregatedData] = useState(null);
@@ -44,14 +43,14 @@ export default () => {
     savedWallets,
     addWallet,
     removeWallet,
-    clearWallets
+    clearWallets,
   } = useWallet();
 
   const {
     enabled: historyEnabled,
     toggleHistoryEnabled,
     savePositionSnapshot,
-    getPositionHistory
+    getPositionHistory,
   } = useHistoricalData();
 
   const { updateSolPrice } = usePriceContext();
@@ -70,11 +69,11 @@ export default () => {
 
   // Aggregate PnL data from multiple wallets, filtering out errors
   const aggregatePnLData = useCallback((walletsData, solPrice) => {
-    const validData = walletsData.filter(d => d && !d.error); 
-    if (validData.length === 0) return null;
+    const validData = walletsData.filter(d => d && !d.error);
+    if (validData.length === 0) {return null;}
 
     const allPositions = validData.flatMap(d => d.positions || []);
-    
+
     const totalPnLInSol = (() => {
       const tokenTotals = allPositions.reduce((acc, position) => {
         position.pnlData.token_pnl.forEach(token => {
@@ -85,7 +84,7 @@ export default () => {
         });
         return acc;
       }, {});
-      
+
       return Object.entries(tokenTotals)
         .map(([token, amount]) => {
           const valueClass = getValueClass(amount);
@@ -103,21 +102,21 @@ export default () => {
     const totalYieldInSol = (() => {
       const tokenTotals = allPositions.reduce((acc, position) => {
         position.yieldData.tokens.forEach(token => {
-            if (!acc[token.token]) {
-              acc[token.token] = 0;
-            }
-            acc[token.token] += token.amount;
-          });
-          return acc;
-        }, {});
-        
-        return Object.entries(tokenTotals)
-          .map(([token, amount]) => {
-            const valueClass = getValueClass(amount);
-            return `<span class="${valueClass}">${formatNumber(amount)} ${token}</span>`;
-          })
-          .join('<br />');
-      })()
+          if (!acc[token.token]) {
+            acc[token.token] = 0;
+          }
+          acc[token.token] += token.amount;
+        });
+        return acc;
+      }, {});
+
+      return Object.entries(tokenTotals)
+        .map(([token, amount]) => {
+          const valueClass = getValueClass(amount);
+          return `<span class="${valueClass}">${formatNumber(amount)} ${token}</span>`;
+        })
+        .join('<br />');
+    })();
     const totalYield = (() => {
       const sumYield = allPositions.reduce((acc, position) => {
         return acc + position.yieldData.usd.amount;
@@ -128,21 +127,21 @@ export default () => {
     const totalCompoundedInSol = (() => {
       const tokenTotals = allPositions.reduce((acc, position) => {
         position.compoundedData.tokens.forEach(token => {
-            if (!acc[token.token]) {
-              acc[token.token] = 0;
-            }
-            acc[token.token] += token.amount;
-          });
-          return acc;
-        }, {});
-        
-        return Object.entries(tokenTotals)
-          .map(([token, amount]) => {
-            const valueClass = getValueClass(amount);
-            return `<span class="${valueClass}">${formatNumber(amount)} ${token}</span>`;
-          })
-          .join('<br />');
-      })()
+          if (!acc[token.token]) {
+            acc[token.token] = 0;
+          }
+          acc[token.token] += token.amount;
+        });
+        return acc;
+      }, {});
+
+      return Object.entries(tokenTotals)
+        .map(([token, amount]) => {
+          const valueClass = getValueClass(amount);
+          return `<span class="${valueClass}">${formatNumber(amount)} ${token}</span>`;
+        })
+        .join('<br />');
+    })();
     const totalCompounded = (() => {
       const sumCompounded = allPositions.reduce((acc, position) => {
         return acc + position.compoundedData.usd.amount;
@@ -177,7 +176,7 @@ export default () => {
       totalSize,
       totalSizeInSol,
       positions: allPositions,
-      walletCount: validData.length
+      walletCount: validData.length,
     };
   }, []);
 
@@ -215,19 +214,19 @@ export default () => {
           setAggregatedData(null);
         }
       } else {
-         // Clear error message on successful fetch/refresh
-         setErrorMessage('');
-         combined = aggregatePnLData(results, solPrice);
+        // Clear error message on successful fetch/refresh
+        setErrorMessage('');
+        combined = aggregatePnLData(results, solPrice);
       }
 
       if (combined) {
         setAggregatedData(combined);
-        
+
         // Handle history data if enabled
         if (historyEnabled) {
           await savePositionSnapshot(combined.positions);
         }
-        
+
         // Handle wallet form submission logic (adding wallet, clearing input)
         if (isSubmission && wallet) {
           addWallet(wallet);
@@ -245,16 +244,16 @@ export default () => {
       setLoading(false);
     }
   }, [
-    activeWallets, 
-    aggregatePnLData, 
-    historyEnabled, 
-    savePositionSnapshot, 
-    fetchWalletPnL, 
-    wallet, 
-    addWallet, 
-    setWallet, 
+    activeWallets,
+    aggregatePnLData,
+    historyEnabled,
+    savePositionSnapshot,
+    fetchWalletPnL,
+    wallet,
+    addWallet,
+    setWallet,
     debouncedExecuteFetchWalletPnL,
-    updateSolPrice
+    updateSolPrice,
   ]);
 
   const {
@@ -262,7 +261,7 @@ export default () => {
     setAutoRefresh,
     refreshInterval,
     setRefreshInterval,
-    refreshCountdown
+    refreshCountdown,
   } = useAutoRefresh(
     useCallback(() => {
       fetchPnLData(activeWallets);
@@ -284,9 +283,9 @@ export default () => {
       } else
         // Initial load logic: Fetch only if wallets are active, no data yet, not already loading, and no error shown
         if (activeWallets.length > 0 && !aggregatedData && !loading && !errorMessage) {
-        console.log(`Auto fetch data if there are active wallets on page load 1: ${activeWallets}`);
-        fetchPnLData(activeWallets, false);
-      }
+          console.log(`Auto fetch data if there are active wallets on page load 1: ${activeWallets}`);
+          fetchPnLData(activeWallets, false);
+        }
       // Clear data/error if no wallets are active
       if (activeWallets.length === 0) {
         console.log('Auto fetch data if there are active wallets on page load 2');
@@ -303,7 +302,7 @@ export default () => {
       const loadAllHistory = async () => {
         try {
           const allHistory = [];
-          
+
           for (const position of aggregatedData.positions) {
             if (position.positionAddress) {
               const history = await getPositionHistory(position.positionAddress);
@@ -312,24 +311,24 @@ export default () => {
               }
             }
           }
-          
+
           setAllPositionsHistory(allHistory);
         } catch (error) {
           console.error('Error loading historical data:', error);
         }
       };
-      
+
       loadAllHistory();
     }
   }, [historyEnabled, aggregatedData, getPositionHistory]);
 
   const handleSubmit = async e => {
     e.preventDefault();
-    const walletsToSubmit = wallet ? [wallet] : activeWallets; 
+    const walletsToSubmit = wallet ? [wallet] : activeWallets;
     if (walletsToSubmit.length > 0) {
       await fetchPnLData(walletsToSubmit, true);
     } else {
-      setErrorMessage("Please enter a wallet address or select a saved wallet.");
+      setErrorMessage('Please enter a wallet address or select a saved wallet.');
       setAggregatedData(null);
     }
   };
@@ -364,8 +363,8 @@ export default () => {
           </div>
         </Tooltip>
         <div className={styles.titleActions}>
-          <button 
-            className={styles.disclaimerButton} 
+          <button
+            className={styles.disclaimerButton}
             onClick={() => setDisclaimerOpen(true)}
             aria-label="Project disclaimer"
             title="View project disclaimer"
@@ -375,7 +374,7 @@ export default () => {
           </button>
         </div>
       </div>
-      
+
       <WalletForm
         wallet={wallet}
         onWalletChange={setWallet}
@@ -390,7 +389,7 @@ export default () => {
         showDropdown={showDropdown}
         setShowDropdown={setShowDropdown}
       />
-      
+
       {errorMessage && <div className={styles.errorMessage}>{errorMessage}</div>}
 
       {activeWallets.length > 0 && (
@@ -408,8 +407,8 @@ export default () => {
 
       {activeWallets.length > 0 && (
         <>
-          <CollapsibleSection 
-            title="Liquidity Positions" 
+          <CollapsibleSection
+            title="Liquidity Positions"
             storageKey={TRADING_EXPANDED_KEY}
             defaultExpanded={true}
             visible={aggregatedData !== null}
@@ -421,14 +420,14 @@ export default () => {
               positionsHistory={allPositionsHistory}
             />
           </CollapsibleSection>
-          
+
         </>
       )}
 
       {!loading && !errorMessage && !aggregatedData && activeWallets.length > 0 && (
-         <div className={styles.noDataMessage}>No position data found for the selected wallet(s).</div>
+        <div className={styles.noDataMessage}>No position data found for the selected wallet(s).</div>
       )}
-      
+
       <DisclaimerModal
         isOpen={disclaimerOpen}
         onClose={handleCloseDisclaimer}
@@ -437,3 +436,7 @@ export default () => {
     </div>
   );
 };
+
+HomePage.displayName = 'HomePage';
+
+export default HomePage;

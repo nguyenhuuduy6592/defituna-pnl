@@ -11,7 +11,7 @@ jest.mock('../../../components/pnl/PositionsList', () => ({
     <div data-testid="positions-list" data-positions={JSON.stringify(positions)} data-showwallet={showWallet.toString()} data-historyenabled={historyEnabled.toString()}>
       Positions List Mock
     </div>
-  )
+  ),
 }));
 
 jest.mock('../../../components/pnl/DonationFooter', () => ({
@@ -19,7 +19,7 @@ jest.mock('../../../components/pnl/DonationFooter', () => ({
     <div data-testid="donation-footer" data-visible={visible.toString()}>
       Donation Footer Mock
     </div>
-  )
+  ),
 }));
 
 jest.mock('../../../components/pnl/TotalPnLDisplay', () => ({
@@ -27,7 +27,7 @@ jest.mock('../../../components/pnl/TotalPnLDisplay', () => ({
     <div data-testid={`total-pnl-${label.replace(/\s+/g, '-').toLowerCase()}`} data-label={label} data-totalvalue={totalValue}>
       {label}: {totalValue}
     </div>
-  )
+  ),
 }));
 
 jest.mock('../../../components/common/LoadingOverlay', () => ({
@@ -35,21 +35,21 @@ jest.mock('../../../components/common/LoadingOverlay', () => ({
     <div data-testid="loading-overlay" data-loading={loading.toString()}>
       {children}
     </div>
-  )
+  ),
 }));
 
 jest.mock('../../../components/pnl/hooks/usePositionAges', () => ({
-  usePositionAges: (positions) => positions.map(pos => ({ ...pos, age: '30 days' }))
+  usePositionAges: (positions) => positions.map(pos => ({ ...pos, age: '30 days' })),
 }));
 
 // Mock styles
 jest.mock('../../../components/pnl/PnLDisplay.module.scss', () => ({
   pnlContainer: 'pnlContainer-mock',
-  cardRow: 'cardRow-mock'
+  cardRow: 'cardRow-mock',
 }));
 
 jest.mock('../../../components/common/CurrencyToggle', () => ({
-  CurrencyToggle: () => <div data-testid="currency-toggle">Currency Toggle Mock</div>
+  CurrencyToggle: () => <div data-testid="currency-toggle">Currency Toggle Mock</div>,
 }));
 
 // Clean up after each test
@@ -85,8 +85,8 @@ describe('PnLDisplay Component', () => {
           compoundedClass: 'positive',
           compoundedClassInSol: 'positive',
           displayedValue: '$50',
-          displayedValueInSol: '1 SOL'
-        }
+          displayedValueInSol: '1 SOL',
+        },
       },
       {
         id: '2',
@@ -104,11 +104,11 @@ describe('PnLDisplay Component', () => {
           compoundedClass: 'positive',
           compoundedClassInSol: 'positive',
           displayedValue: '$100',
-          displayedValueInSol: '2 SOL'
-        }
-      }
+          displayedValueInSol: '2 SOL',
+        },
+      },
     ],
-    walletCount: 2
+    walletCount: 2,
   };
 
   it('renders LoadingOverlay with loading state true', () => {
@@ -116,7 +116,7 @@ describe('PnLDisplay Component', () => {
     const loadingOverlay = screen.getByTestId('loading-overlay');
     expect(loadingOverlay).toHaveAttribute('data-loading', 'true');
   });
-  
+
   it('renders LoadingOverlay with loading state false', () => {
     renderWithProviders(<PnLDisplay data={mockData} loading={false} />);
     const loadingOverlay = screen.getByTestId('loading-overlay');
@@ -125,28 +125,28 @@ describe('PnLDisplay Component', () => {
 
   it('renders three TotalPnLDisplay components with correct data', () => {
     renderWithProviders(<PnLDisplay data={mockData} />);
-    
+
     const totalPnL = screen.getByTestId('total-pnl-total-pnl');
     const totalYield = screen.getByTestId('total-pnl-total-yield');
     const totalCompounded = screen.getByTestId('total-pnl-total-compounded');
-    
+
     expect(totalPnL).toHaveAttribute('data-label', 'Total PnL');
     expect(totalPnL).toHaveAttribute('data-totalvalue', '1000');
-    
+
     expect(totalYield).toHaveAttribute('data-label', 'Total Yield');
     expect(totalYield).toHaveAttribute('data-totalvalue', '500');
-    
+
     expect(totalCompounded).toHaveAttribute('data-label', 'Total Compounded');
     expect(totalCompounded).toHaveAttribute('data-totalvalue', '150');
   });
 
   it('renders PositionsList with correct props', () => {
     renderWithProviders(<PnLDisplay data={mockData} historyEnabled={true} />);
-    
+
     const positionsList = screen.getByTestId('positions-list');
     expect(positionsList).toHaveAttribute('data-showwallet', 'true');
     expect(positionsList).toHaveAttribute('data-historyenabled', 'true');
-    
+
     // Verify positions are passed with age data
     const passedPositions = JSON.parse(positionsList.getAttribute('data-positions'));
     expect(passedPositions).toHaveLength(2);
@@ -158,7 +158,7 @@ describe('PnLDisplay Component', () => {
     const donationFooter = screen.getByTestId('donation-footer');
     expect(donationFooter).toHaveAttribute('data-visible', 'true');
   });
-  
+
   it('renders DonationFooter with visibility false when no positions exist', () => {
     renderWithProviders(<PnLDisplay data={{ ...mockData, positions: [] }} />);
     const donationFooter = screen.getByTestId('donation-footer');
@@ -175,11 +175,11 @@ describe('PnLDisplay Component', () => {
           id: '1',
           pnlData: {
             token_pnl: [],
-            pnl_usd: { amount: 0, bps: 0 }
+            pnl_usd: { amount: 0, bps: 0 },
           },
           yieldData: {
             tokens: [],
-            usd: { amount: 200 }
+            usd: { amount: 200 },
           },
           compoundedData: {
             tokens: [],
@@ -187,18 +187,18 @@ describe('PnLDisplay Component', () => {
             compoundedClass: 'neutral',
             compoundedClassInSol: 'neutral',
             displayedValue: '$0',
-            displayedValueInSol: ''
-          }
+            displayedValueInSol: '',
+          },
         },
         {
           id: '2',
           pnlData: {
             token_pnl: [],
-            pnl_usd: { amount: 0, bps: 0 }
+            pnl_usd: { amount: 0, bps: 0 },
           },
           yieldData: {
             tokens: [],
-            usd: { amount: 0 }
+            usd: { amount: 0 },
           },
           compoundedData: {
             tokens: [{ amount: 2, token: 'SOL' }],
@@ -206,18 +206,18 @@ describe('PnLDisplay Component', () => {
             compoundedClass: 'positive',
             compoundedClassInSol: 'positive',
             displayedValue: '$100',
-            displayedValueInSol: '2 SOL'
-          }
+            displayedValueInSol: '2 SOL',
+          },
         },
         {
           id: '3',
           pnlData: {
             token_pnl: [],
-            pnl_usd: { amount: 0, bps: 0 }
+            pnl_usd: { amount: 0, bps: 0 },
           },
           yieldData: {
             tokens: [],
-            usd: { amount: 0 }
+            usd: { amount: 0 },
           },
           compoundedData: {
             tokens: [],
@@ -225,18 +225,18 @@ describe('PnLDisplay Component', () => {
             compoundedClass: 'neutral',
             compoundedClassInSol: 'neutral',
             displayedValue: '$0',
-            displayedValueInSol: ''
-          }
-        }
+            displayedValueInSol: '',
+          },
+        },
       ],
-      walletCount: 3
+      walletCount: 3,
     };
-    
+
     renderWithProviders(<PnLDisplay data={dataWithMissingValues} />);
-    
+
     const totalYield = screen.getByTestId('total-pnl-total-yield');
     const totalCompounded = screen.getByTestId('total-pnl-total-compounded');
-    
+
     expect(totalYield).toHaveAttribute('data-totalvalue', '200');
     expect(totalCompounded).toHaveAttribute('data-totalvalue', '100');
   });
@@ -245,4 +245,4 @@ describe('PnLDisplay Component', () => {
     renderWithProviders(<PnLDisplay data={mockData} />);
     expect(screen.getByTestId('currency-toggle')).toBeInTheDocument();
   });
-}); 
+});

@@ -3,7 +3,7 @@ import { calculateStatus } from '../../utils/positionUtils';
 
 // Mock positionUtils
 jest.mock('../../utils/positionUtils', () => ({
-  calculateStatus: jest.fn(position => position.status || 'active')
+  calculateStatus: jest.fn(position => position.status || 'active'),
 }));
 
 describe('SORT_FIELD_CONFIG', () => {
@@ -15,7 +15,7 @@ describe('SORT_FIELD_CONFIG', () => {
     state: 'open',
     walletAddress: '0x123',
     age: 7,
-    size: 1000
+    size: 1000,
   };
 
   it('extracts pnl value correctly', () => {
@@ -73,7 +73,7 @@ describe('sortPositions', () => {
       state: 'open',
       walletAddress: '0x123',
       age: 7,
-      size: 1000
+      size: 1000,
     },
     {
       pnl: { usd: 200 },
@@ -83,7 +83,7 @@ describe('sortPositions', () => {
       state: 'closed',
       walletAddress: '0x456',
       age: 3,
-      size: 2000
+      size: 2000,
     },
     {
       pnl: { usd: 150 },
@@ -93,8 +93,8 @@ describe('sortPositions', () => {
       state: 'liquidated',
       walletAddress: '0x789',
       age: null,
-      size: 1500
-    }
+      size: 1500,
+    },
   ];
 
   it('handles empty or single-item arrays', () => {
@@ -178,7 +178,7 @@ describe('sortPositions', () => {
       { pnl: { usd: 100 } },
       { pnl: { usd: undefined } },
       { pnl: null },
-      {}
+      {},
     ];
 
     const result = sortPositions(positionsWithMissing, 'pnl', 'asc');
@@ -190,7 +190,7 @@ describe('sortPositions', () => {
     const positionsWithNullAge = [
       { age: 1 },
       { age: null },
-      { age: 2 }
+      { age: 2 },
     ];
 
     const ascResult = sortPositions(positionsWithNullAge, 'age', 'asc');
@@ -199,4 +199,4 @@ describe('sortPositions', () => {
     const descResult = sortPositions(positionsWithNullAge, 'age', 'desc');
     expect(descResult.map(p => p.age)).toEqual([2, 1, null]);
   });
-}); 
+});

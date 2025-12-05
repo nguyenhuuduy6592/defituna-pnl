@@ -1,5 +1,5 @@
 // Learn more: https://github.com/testing-library/jest-dom
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 import { TextEncoder, TextDecoder } from 'util';
 import 'whatwg-fetch'; // Polyfill for fetch
 
@@ -30,23 +30,22 @@ jest.mock('next/router', () => ({
         emit: jest.fn(),
       },
       isFallback: false,
-    }
+    };
   },
-}))
+}));
 
 // Mock next/image
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props) => {
-    // eslint-disable-next-line jsx-a11y/alt-text
-    return <img {...props} />
+    return <img {...props} />;
   },
-}))
+}));
 
 // Reset all mocks between tests
 beforeEach(() => {
-  jest.clearAllMocks()
-})
+  jest.clearAllMocks();
+});
 
 // Polyfill for MessageChannel (needed for JSDOM environment)
 if (typeof MessageChannel === 'undefined') {
@@ -94,4 +93,4 @@ Object.defineProperty(global, 'IntersectionObserver', {
   configurable: true,
   value: IntersectionObserverMock,
 });
-*/ 
+*/

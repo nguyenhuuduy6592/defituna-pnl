@@ -12,7 +12,7 @@ const DEFAULT_CANVAS_OPTIONS = {
   scale: 2,
   useCORS: true,
   backgroundColor: null,
-  logging: false
+  logging: false,
 };
 
 /**
@@ -24,7 +24,7 @@ const generateImage = async (element) => {
   return await toPng(element, {
     quality: 1.0,
     pixelRatio: 2,
-    skipAutoScale: true
+    skipAutoScale: true,
   });
 };
 
@@ -55,7 +55,7 @@ export const exportChartAsImage = async (elementRef, fileName) => {
     link.download = fileName;
     link.href = canvas.toDataURL('image/png');
     link.click();
-    
+
     return true;
   } catch (error) {
     console.error('[exportCardAsImage] Error exporting card:', error);
@@ -87,7 +87,7 @@ export const exportCardAsImage = async (contentRef, fileName) => {
     link.download = fileName;
     link.href = dataUrl;
     link.click();
-    
+
     return true;
   } catch (error) {
     console.error('[exportCardAsImage] Error exporting card:', error);
@@ -124,17 +124,17 @@ export const shareCard = async (elementRef, fileName, title, text) => {
     }
 
     const dataUrl = await generateImage(contentElement);
-    
+
     // Convert data URL to blob
     const response = await fetch(dataUrl);
     const blob = await response.blob();
-    
+
     if (!blob) {
       throw new Error('Failed to create image blob');
     }
-    
+
     const file = new File([blob], fileName, { type: 'image/png' });
-    
+
     if (!navigator.share) {
       console.warn('[shareCard] Web Share API not supported');
       // Fallback: download the image instead
@@ -146,16 +146,16 @@ export const shareCard = async (elementRef, fileName, title, text) => {
       setTimeout(() => URL.revokeObjectURL(url), 60000);
       return true;
     }
-    
+
     await navigator.share({
       files: [file],
       title: title || 'Shared Image',
-      text: text || 'Check out this image'
+      text: text || 'Check out this image',
     });
-    
+
     return true;
   } catch (error) {
     console.error('[shareCard] Error sharing card:', error);
     return false;
   }
-}; 
+};

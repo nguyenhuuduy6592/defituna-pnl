@@ -1,7 +1,7 @@
-import '@/styles/globals.scss'
-import { useEffect } from 'react'
-import { PriceProvider } from '../contexts/PriceContext'
-import { DisplayCurrencyProvider } from '../contexts/DisplayCurrencyContext'
+import '@/styles/globals.scss';
+import { useEffect } from 'react';
+import { PriceProvider } from '../contexts/PriceContext';
+import { DisplayCurrencyProvider } from '../contexts/DisplayCurrencyContext';
 
 export default function App({ Component, pageProps }) {
   useEffect(() => {
@@ -10,11 +10,11 @@ export default function App({ Component, pageProps }) {
         navigator.serviceWorker
           .register('/service-worker.js')
           .catch(error => {
-            console.error('Service Worker registration failed:', error)
-          })
-      })
+            console.error('Service Worker registration failed:', error);
+          });
+      });
     }
-  }, [])
+  }, []);
 
   return (
     <PriceProvider>
@@ -22,5 +22,5 @@ export default function App({ Component, pageProps }) {
         <Component {...pageProps} />
       </DisplayCurrencyProvider>
     </PriceProvider>
-  )
+  );
 }

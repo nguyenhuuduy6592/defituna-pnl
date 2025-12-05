@@ -17,7 +17,7 @@ export const TIME_PERIODS = {
   HOUR_4: { value: '4hour', label: '4 hours' },
   DAY_1: { value: '1day', label: '1 day' },
   WEEK_1: { value: '1week', label: '1 week' },
-  MONTH_1: { value: '1month', label: '1 month' }
+  MONTH_1: { value: '1month', label: '1 month' },
 };
 
 /**
@@ -30,15 +30,15 @@ export const CHART_STYLES = {
     strokeDasharray: '2 4',
     vertical: true,
     horizontal: true,
-    opacity: 0.8
+    opacity: 0.8,
   },
   axis: {
     stroke: '#666666',
     fontSize: 12,
     tickLine: { stroke: '#666666' },
     axisLine: { stroke: '#666666' },
-    padding: { left: 10, right: 10 }
-  }
+    padding: { left: 10, right: 10 },
+  },
 };
 
 export const KNOWN_TOKENS = {
@@ -46,20 +46,20 @@ export const KNOWN_TOKENS = {
     address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
     symbol: 'USDC',
     decimals: 6,
-    logo: '/images/tokens/usdc.png'
+    logo: '/images/tokens/usdc.png',
   },
   USDT: {
     address: 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB',
     symbol: 'USDT',
     decimals: 6,
-    logo: '/images/tokens/usdt.png'
+    logo: '/images/tokens/usdt.png',
   },
   SOL: {
     address: 'So11111111111111111111111111111111111111112',
     symbol: 'SOL',
     decimals: 9,
-    logo: '/images/tokens/sol.png'
-  }
+    logo: '/images/tokens/sol.png',
+  },
 };
 
 export const STABLE_TOKENS = [KNOWN_TOKENS.USDC.symbol, KNOWN_TOKENS.USDT.symbol];

@@ -1,7 +1,7 @@
 import {
   invertPairString,
   invertPrice,
-  getAdjustedPosition
+  getAdjustedPosition,
 } from '../../utils/pairUtils';
 
 describe('invertPairString', () => {
@@ -32,7 +32,7 @@ describe('invertPairString', () => {
 
   it('handles errors gracefully', () => {
     const pair = {
-      toString: () => { throw new Error('Mock error'); }
+      toString: () => { throw new Error('Mock error'); },
     };
     expect(invertPairString(pair)).toBe('');
   });
@@ -69,7 +69,7 @@ describe('invertPrice', () => {
 
   it('handles errors gracefully', () => {
     const mockPrice = {
-      valueOf: () => { throw new Error('Mock error'); }
+      valueOf: () => { throw new Error('Mock error'); },
     };
     expect(invertPrice(mockPrice)).toBeNull();
   });
@@ -87,7 +87,7 @@ describe('getAdjustedPosition', () => {
       entryPrice: 1.5,
       liquidationPrice: { lower: 1, upper: 3 },
       rangePrices: { lower: 1.2, upper: 2.8 },
-      limitOrderPrices: { lower: 1.1, upper: 2.9 }
+      limitOrderPrices: { lower: 1.1, upper: 2.9 },
     };
     expect(getAdjustedPosition(position, false)).toBe(position);
   });
@@ -99,7 +99,7 @@ describe('getAdjustedPosition', () => {
       liquidationPrice: { lower: 1, upper: 3 },
       rangePrices: { lower: 1.2, upper: 2.8 },
       limitOrderPrices: { lower: 1.1, upper: 2.9 },
-      otherData: 'preserved'
+      otherData: 'preserved',
     };
 
     const expected = {
@@ -108,7 +108,7 @@ describe('getAdjustedPosition', () => {
       liquidationPrice: { lower: 1 / 3, upper: 1 },
       rangePrices: { lower: 1 / 2.8, upper: 1 / 1.2 },
       limitOrderPrices: { lower: 1 / 2.9, upper: 1 / 1.1 },
-      otherData: 'preserved'
+      otherData: 'preserved',
     };
 
     expect(getAdjustedPosition(position, true)).toEqual(expected);
@@ -117,7 +117,7 @@ describe('getAdjustedPosition', () => {
   it('handles missing nested objects', () => {
     const position = {
       currentPrice: 2,
-      entryPrice: 1.5
+      entryPrice: 1.5,
     };
 
     const expected = {
@@ -125,7 +125,7 @@ describe('getAdjustedPosition', () => {
       entryPrice: 1 / 1.5,
       liquidationPrice: { lower: null, upper: null },
       rangePrices: { lower: null, upper: null },
-      limitOrderPrices: { lower: null, upper: null }
+      limitOrderPrices: { lower: null, upper: null },
     };
 
     expect(getAdjustedPosition(position, true)).toEqual(expected);
@@ -137,7 +137,7 @@ describe('getAdjustedPosition', () => {
       entryPrice: null,
       liquidationPrice: { lower: null, upper: 3 },
       rangePrices: { lower: 1.2, upper: null },
-      limitOrderPrices: null
+      limitOrderPrices: null,
     };
 
     const expected = {
@@ -145,7 +145,7 @@ describe('getAdjustedPosition', () => {
       entryPrice: null,
       liquidationPrice: { lower: 1 / 3, upper: null },
       rangePrices: { lower: null, upper: 1 / 1.2 },
-      limitOrderPrices: { lower: null, upper: null }
+      limitOrderPrices: { lower: null, upper: null },
     };
 
     expect(getAdjustedPosition(position, true)).toEqual(expected);
@@ -157,7 +157,7 @@ describe('getAdjustedPosition', () => {
       entryPrice: {},
       liquidationPrice: 'not an object',
       rangePrices: null,
-      limitOrderPrices: []
+      limitOrderPrices: [],
     };
 
     const expected = {
@@ -165,7 +165,7 @@ describe('getAdjustedPosition', () => {
       entryPrice: null,
       liquidationPrice: { lower: null, upper: null },
       rangePrices: { lower: null, upper: null },
-      limitOrderPrices: { lower: null, upper: null }
+      limitOrderPrices: { lower: null, upper: null },
     };
 
     expect(getAdjustedPosition(position, true)).toEqual(expected);
@@ -173,7 +173,7 @@ describe('getAdjustedPosition', () => {
 
   it('handles errors gracefully', () => {
     const position = {
-      get currentPrice() { throw new Error('Mock error'); }
+      get currentPrice() { throw new Error('Mock error'); },
     };
     expect(getAdjustedPosition(position, true)).toBe(position);
   });

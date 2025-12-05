@@ -17,7 +17,7 @@ jest.mock('../../../components/common/Tooltip.module.scss', () => ({
   'top-center': 'top-center',
   'bottom-center': 'bottom-center',
   'right-center': 'right-center',
-  'left-center': 'left-center'
+  'left-center': 'left-center',
 }));
 
 describe('Tooltip Component', () => {
@@ -64,7 +64,7 @@ describe('Tooltip Component', () => {
     );
 
     const trigger = screen.getByText('Toggle me');
-    
+
     // First click - show tooltip
     fireEvent.click(trigger);
     let tooltip = screen.getByText('Tooltip content').closest('.tooltip');
@@ -85,7 +85,7 @@ describe('Tooltip Component', () => {
 
     // Click to show tooltip
     fireEvent.click(screen.getByText('Trigger'));
-    
+
     // Check for top position class
     let tooltip = screen.getByText('Content').closest('.tooltip');
     expect(tooltip).toHaveClass('top');
@@ -99,7 +99,7 @@ describe('Tooltip Component', () => {
 
     // Click to show tooltip
     fireEvent.click(screen.getByText('Trigger'));
-    
+
     // Check for bottom position class
     tooltip = screen.getByText('Content').closest('.tooltip');
     expect(tooltip).toHaveClass('bottom');
@@ -114,7 +114,7 @@ describe('Tooltip Component', () => {
 
     // Click to show tooltip
     fireEvent.click(screen.getByText('Trigger'));
-    
+
     // Should default to bottom
     const tooltip = screen.getByText('Content').closest('.tooltip');
     expect(tooltip).toHaveClass('bottom');
@@ -129,14 +129,14 @@ describe('Tooltip Component', () => {
 
     // Get trigger element
     const trigger = screen.getByText('Accessibility').closest('.tooltipTrigger');
-    
+
     // Initial state
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    
+
     // After click
     fireEvent.click(trigger);
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    
+
     // Tooltip should have correct role
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
   });
@@ -150,7 +150,7 @@ describe('Tooltip Component', () => {
 
     // Click to show tooltip
     fireEvent.click(screen.getByText('Click me'));
-    
+
     // Document event listeners should be added when tooltip is visible
     expect(document.addEventListener).toHaveBeenCalledWith('mousedown', expect.any(Function));
     expect(document.addEventListener).toHaveBeenCalledWith('touchstart', expect.any(Function));
@@ -165,12 +165,12 @@ describe('Tooltip Component', () => {
 
     // Click to show tooltip
     fireEvent.click(screen.getByText('Click me'));
-    
+
     // Click again to hide tooltip
     fireEvent.click(screen.getByText('Click me'));
-    
+
     // Document event listeners should be removed
     expect(document.removeEventListener).toHaveBeenCalledWith('mousedown', expect.any(Function));
     expect(document.removeEventListener).toHaveBeenCalledWith('touchstart', expect.any(Function));
   });
-}); 
+});

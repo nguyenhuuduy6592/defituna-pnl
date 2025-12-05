@@ -10,11 +10,11 @@ import styles from './TooltipPortal.module.scss';
  * @param {boolean} props.show Whether to show the tooltip
  * @param {'top'|'bottom'} props.position Position of the tooltip relative to the target element
  */
-export const TooltipPortal = ({ 
-  children, 
-  targetRef, 
-  show, 
-  position = 'top' 
+export const TooltipPortal = ({
+  children,
+  targetRef,
+  show,
+  position = 'top',
 }) => {
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const [portalContainer] = useState(() => document.createElement('div'));
@@ -29,7 +29,7 @@ export const TooltipPortal = ({
 
   // Calculate and update tooltip position
   const updatePosition = useCallback(() => {
-    if (!targetRef.current) return;
+    if (!targetRef.current) {return;}
 
     const rect = targetRef.current.getBoundingClientRect();
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -50,8 +50,8 @@ export const TooltipPortal = ({
 
   // Handle position updates
   useEffect(() => {
-    if (!show) return;
-    
+    if (!show) {return;}
+
     updatePosition();
     window.addEventListener('scroll', updatePosition);
     window.addEventListener('resize', updatePosition);
@@ -62,7 +62,7 @@ export const TooltipPortal = ({
     };
   }, [show, updatePosition]);
 
-  if (!show) return null;
+  if (!show) {return null;}
 
   // Get transform style based on position
   const getTransformStyle = () => {
@@ -70,13 +70,13 @@ export const TooltipPortal = ({
   };
 
   return createPortal(
-    <div 
+    <div
       className={styles.tooltipContainer}
       style={{
         position: 'absolute',
         top: `${tooltipPosition.top}px`,
         left: `${tooltipPosition.left}px`,
-        transform: getTransformStyle()
+        transform: getTransformStyle(),
       }}
       role="tooltip"
       aria-live="polite"
@@ -87,4 +87,4 @@ export const TooltipPortal = ({
     </div>,
     portalContainer
   );
-}; 
+};

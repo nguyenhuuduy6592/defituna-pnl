@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 /**
  * Custom hook for managing wallet addresses
  * Handles wallet input state, active wallets, saved wallets, and local storage persistence
- * 
+ *
  * @returns {Object} Wallet management methods and state
  * @returns {string} returns.wallet - Current wallet input value
  * @returns {Function} returns.setWallet - Function to update wallet input value
@@ -29,11 +29,11 @@ export const useWallet = () => {
       // Load saved wallets
       const savedWalletsData = JSON.parse(localStorage.getItem('wallets')) || [];
       setSavedWallets(savedWalletsData);
-      
+
       // Load active wallets with fallback for backward compatibility
       const lastActiveWallets = localStorage.getItem('activeWallets');
       const parsedActiveWallets = lastActiveWallets ? JSON.parse(lastActiveWallets) : [];
-      
+
       if (parsedActiveWallets.length > 0) {
         setActiveWallets(parsedActiveWallets);
       } else {
@@ -59,7 +59,7 @@ export const useWallet = () => {
     try {
       localStorage.setItem('wallets', JSON.stringify(savedWallets));
       localStorage.setItem('activeWallets', JSON.stringify(activeWallets));
-      
+
       if (wallet) {
         localStorage.setItem('lastWallet', wallet);
       } else {
@@ -83,13 +83,13 @@ export const useWallet = () => {
    * If the wallet is active, it will be deactivated
    * If the wallet is not active, it will be activated
    * Also updates the primary wallet
-   * 
+   *
    * @param {string} walletAddress - Wallet address to toggle
    */
   const toggleWalletActive = useCallback((walletAddress) => {
     setActiveWallets(prevActiveWallets => {
       let updatedActiveWallets;
-      
+
       if (prevActiveWallets.includes(walletAddress)) {
         // Remove if already active
         updatedActiveWallets = prevActiveWallets.filter(w => w !== walletAddress);
@@ -97,14 +97,14 @@ export const useWallet = () => {
         // Add if not active
         updatedActiveWallets = [...prevActiveWallets, walletAddress];
       }
-      
+
       // Keep the most recently activated wallet as the primary wallet
       if (updatedActiveWallets.length > 0) {
         setWallet(updatedActiveWallets[updatedActiveWallets.length - 1]);
       } else {
         setWallet('');
       }
-      
+
       return updatedActiveWallets;
     });
   }, []);
@@ -122,17 +122,17 @@ export const useWallet = () => {
   /**
    * Removes a wallet from saved wallets and active wallets if present
    * Also updates the primary wallet if removed wallet was the primary
-   * 
+   *
    * @param {string} walletToRemove - Wallet address to remove
    */
   const removeWallet = useCallback((walletToRemove) => {
     setSavedWallets(prev => prev.filter(w => w !== walletToRemove));
-    
+
     // If removing an active wallet, remove it from active wallets too
     setActiveWallets(prevActiveWallets => {
       if (prevActiveWallets.includes(walletToRemove)) {
         const updatedActiveWallets = prevActiveWallets.filter(w => w !== walletToRemove);
-        
+
         // Update primary wallet if needed
         if (walletToRemove === wallet) {
           if (updatedActiveWallets.length > 0) {
@@ -141,10 +141,10 @@ export const useWallet = () => {
             setWallet('');
           }
         }
-        
+
         return updatedActiveWallets;
       }
-      
+
       return prevActiveWallets;
     });
   }, [wallet]);
@@ -167,6 +167,6 @@ export const useWallet = () => {
     savedWallets,
     addWallet,
     removeWallet,
-    clearWallets
+    clearWallets,
   };
 };

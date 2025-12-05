@@ -4,7 +4,7 @@ import styles from './CollapsibleSection.module.scss';
 
 /**
  * A collapsible section with a header that can be expanded or collapsed
- * 
+ *
  * @param {Object} props Component props
  * @param {string} props.title The title to display in the section header
  * @param {ReactNode} props.children The content to display when expanded
@@ -18,7 +18,7 @@ export const CollapsibleSection = ({
   children,
   defaultExpanded = true,
   storageKey,
-  visible = true
+  visible = true,
 }) => {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
@@ -31,29 +31,29 @@ export const CollapsibleSection = ({
       }
     }
   }, [storageKey]);
-  
+
   // Save state to localStorage when it changes
   useEffect(() => {
     if (storageKey) {
       localStorage.setItem(storageKey, String(isExpanded));
     }
   }, [isExpanded, storageKey]);
-  
+
   // Toggle expanded state
   const toggleExpanded = () => {
     setIsExpanded(prev => !prev);
   };
-  
-  if (!visible) return null;
-  
+
+  if (!visible) {return null;}
+
   return (
     <div className={styles.sectionContainer}>
       <div className={styles.sectionHeader} onClick={toggleExpanded}>
         <div className={styles.sectionTitle}>
           {title}
         </div>
-        <FiChevronDown 
-          className={`${styles.collapseIcon} ${isExpanded ? styles.expanded : ''}`} 
+        <FiChevronDown
+          className={`${styles.collapseIcon} ${isExpanded ? styles.expanded : ''}`}
         />
       </div>
       <div className={`${styles.sectionContent} ${isExpanded ? styles.expanded : ''}`}>
@@ -61,4 +61,4 @@ export const CollapsibleSection = ({
       </div>
     </div>
   );
-}; 
+};

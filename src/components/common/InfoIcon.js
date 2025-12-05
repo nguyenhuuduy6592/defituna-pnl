@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './InfoIcon.module.scss';
 import EnhancedTooltip from './EnhancedTooltip';
 
@@ -11,7 +10,7 @@ import EnhancedTooltip from './EnhancedTooltip';
  */
 const InfoIcon = ({ content, position = 'top', size = 'small' }) => {
   const sizeClass = styles[size] || styles.small;
-  
+
   return (
     <EnhancedTooltip content={content} position={position}>
       <span className={`${styles.infoIcon} ${sizeClass}`} aria-label="Information">
@@ -21,4 +20,4 @@ const InfoIcon = ({ content, position = 'top', size = 'small' }) => {
   );
 };
 
-export default InfoIcon; 
+export default InfoIcon;

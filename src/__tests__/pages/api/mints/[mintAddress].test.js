@@ -84,4 +84,4 @@ describe('API Route: /api/mints/[mintAddress]', () => {
     expect(res._getStatusCode()).toBe(500);
     expect(JSON.parse(res._getData())).toMatchObject({ message: expect.any(String), error: 'Network error' });
   });
-}); 
+});

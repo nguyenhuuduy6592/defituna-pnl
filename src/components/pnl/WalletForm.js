@@ -9,12 +9,12 @@ import ActiveWalletsDisplay from './ActiveWalletsDisplay';
  * Submit button component that shows different states based on loading
  */
 const SubmitButton = memo(({ loading }) => (
-  <button 
-    type="submit" 
-    className={styles.button} 
+  <button
+    type="submit"
+    className={styles.button}
     disabled={loading}
-    aria-label={loading ? "Loading..." : "Fetch Data"}
-    title={loading ? "Loading data..." : "Fetch position data"}
+    aria-label={loading ? 'Loading...' : 'Fetch Data'}
+    title={loading ? 'Loading data...' : 'Fetch position data'}
   >
     {loading ? 'Loading...' : 'Fetch Data'}
   </button>
@@ -25,18 +25,18 @@ SubmitButton.displayName = 'SubmitButton';
 /**
  * Input field component with dropdown functionality
  */
-const WalletInput = memo(({ 
-  inputRef, 
-  wallet, 
-  onWalletChange, 
-  setShowDropdown, 
-  loading, 
+const WalletInput = memo(({
+  inputRef,
+  wallet,
+  onWalletChange,
+  setShowDropdown,
+  loading,
   showDropdown,
   uniqueSavedWallets,
   activeWallets,
   toggleWalletActive,
   onRemoveWallet,
-  onClearWallets
+  onClearWallets,
 }) => (
   <div className={styles.inputContainer}>
     <input
@@ -52,7 +52,7 @@ const WalletInput = memo(({
       aria-label="Wallet address input"
       title="Enter a Solana wallet address"
     />
-    
+
     {showDropdown && uniqueSavedWallets.length > 0 && (
       <SavedWalletsDropdown
         uniqueSavedWallets={uniqueSavedWallets}
@@ -99,10 +99,10 @@ const WalletForm = memo(function WalletForm({
   showDropdown,
   setShowDropdown,
   onRemoveWallet,
-  onClearWallets
+  onClearWallets,
 }) {
   const inputRef = useRef(null);
-  
+
   // Filter out duplicate wallets
   const uniqueSavedWallets = useMemo(() => {
     return [...new Set(savedWallets)];
@@ -127,16 +127,16 @@ const WalletForm = memo(function WalletForm({
 
     // If there's input, validate it.
     if (trimmedWallet) {
-        if (!isValidWalletAddress(trimmedWallet)) {
-          showNotification('Invalid Solana wallet address format', 'error');
-          return;
-        }
-        // Add the new valid wallet to active wallets
-        const newActiveWallets = [...new Set([...activeWallets, trimmedWallet])];
-        // Only update if the list actually changed
-        if (newActiveWallets.length > activeWallets.length) {
-             setActiveWallets(newActiveWallets);
-        }
+      if (!isValidWalletAddress(trimmedWallet)) {
+        showNotification('Invalid Solana wallet address format', 'error');
+        return;
+      }
+      // Add the new valid wallet to active wallets
+      const newActiveWallets = [...new Set([...activeWallets, trimmedWallet])];
+      // Only update if the list actually changed
+      if (newActiveWallets.length > activeWallets.length) {
+        setActiveWallets(newActiveWallets);
+      }
     }
 
     // If we have input OR pre-existing active wallets, proceed with submission
@@ -149,7 +149,7 @@ const WalletForm = memo(function WalletForm({
   /**
    * Handles keydown events on wallet chip spans for accessibility.
    */
-   const handleChipKeyDown = useCallback((e, walletAddress) => {
+  const handleChipKeyDown = useCallback((e, walletAddress) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault(); // Prevent scrolling on spacebar
       copyToClipboard(walletAddress);
@@ -172,11 +172,11 @@ const WalletForm = memo(function WalletForm({
           onRemoveWallet={onRemoveWallet}
           onClearWallets={onClearWallets}
         />
-        
+
         <SubmitButton loading={loading} />
       </form>
-      
-      <ActiveWalletsDisplay 
+
+      <ActiveWalletsDisplay
         activeWallets={activeWallets}
         toggleWalletActive={toggleWalletActive}
         handleChipKeyDown={handleChipKeyDown}

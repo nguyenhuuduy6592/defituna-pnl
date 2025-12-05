@@ -6,7 +6,7 @@ describe('validation utilities', () => {
       const validAddresses = [
         '5KtPn1KN8GWvBVwgkQHGHhH8YzwGZgQQDXS6fdKD7VQF',
         '7YttLkHGczovZ8VGvxTP3va3TLWtUmhLcWGZ5hpd4Ljg',
-        'DfiGBi6GhpUvhkQDQxqfqFSxeGJJqHPg5K7zeqD4qVjw'
+        'DfiGBi6GhpUvhkQDQxqfqFSxeGJJqHPg5K7zeqD4qVjw',
       ];
 
       validAddresses.forEach(address => {
@@ -23,7 +23,7 @@ describe('validation utilities', () => {
           {},
           [],
           true,
-          false
+          false,
         ];
 
         nonStringInputs.forEach(input => {
@@ -37,7 +37,7 @@ describe('validation utilities', () => {
           ' ',
           '   ',
           '\t',
-          '\n'
+          '\n',
         ];
 
         emptyInputs.forEach(input => {
@@ -83,4 +83,4 @@ describe('validation utilities', () => {
       expect(isValidWalletAddress(`\n${validAddress}\n`)).toBe(true);
     });
   });
-}); 
+});

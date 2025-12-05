@@ -2,18 +2,18 @@
  * Common utility functions and mocks for page testing
  */
 
-import React from 'react';
-
 /**
  * Creates a mock for the Next.js Link component
  * @returns {Function} Mock Link component
  */
 export const createLinkMock = () => {
-  return ({ children, href }) => (
+  const MockLink = ({ children, href }) => (
     <a href={href} data-testid="next-link">
       {children}
     </a>
   );
+  MockLink.displayName = 'MockLink';
+  return MockLink;
 };
 
 /**
@@ -21,9 +21,11 @@ export const createLinkMock = () => {
  * @returns {Function} Mock Head component
  */
 export const createHeadMock = () => {
+  const MockHead = ({ children }) => <div data-testid="head">{children}</div>;
+  MockHead.displayName = 'MockHead';
   return {
     __esModule: true,
-    default: ({ children }) => <div data-testid="head">{children}</div>,
+    default: MockHead,
   };
 };
 
@@ -40,7 +42,7 @@ export const createRouterMock = ({
   query = {},
   isReady = true,
   pathname = '/',
-  push = jest.fn()
+  push = jest.fn(),
 } = {}) => {
   return {
     query,
@@ -50,8 +52,8 @@ export const createRouterMock = ({
     asPath: pathname,
     events: {
       on: jest.fn(),
-      off: jest.fn()
-    }
+      off: jest.fn(),
+    },
   };
 };
 
@@ -72,7 +74,7 @@ export const createLocalStorageMock = () => {
     removeItem: jest.fn(key => {
       delete store[key];
     }),
-    getAllItems: () => store
+    getAllItems: () => store,
   };
 };
 
@@ -81,12 +83,12 @@ export const createLocalStorageMock = () => {
  * @returns {Function} Mock TimeframeSelector component
  */
 export const createTimeframeSelectorMock = () => {
-  return function MockTimeframeSelector({ timeframes, selected, onChange }) {
+  function MockTimeframeSelector({ timeframes, selected, onChange }) {
     return (
       <div data-testid="timeframe-selector">
         {timeframes.map(timeframe => (
-          <button 
-            key={timeframe} 
+          <button
+            key={timeframe}
             data-testid={`timeframe-${timeframe}`}
             className={selected === timeframe ? 'active' : ''}
             onClick={() => onChange(timeframe)}
@@ -96,7 +98,9 @@ export const createTimeframeSelectorMock = () => {
         ))}
       </div>
     );
-  };
+  }
+  MockTimeframeSelector.displayName = 'MockTimeframeSelector';
+  return MockTimeframeSelector;
 };
 
 /**
@@ -107,23 +111,23 @@ export const createTimeframeSelectorMock = () => {
 export const createFetchMock = (responseMap = {}) => {
   return jest.fn((url) => {
     const matchedPath = Object.keys(responseMap).find(path => url.includes(path));
-    
+
     if (matchedPath) {
       const response = responseMap[matchedPath];
       if (response instanceof Error) {
         return Promise.reject(response);
       }
-      
+
       return Promise.resolve({
         ok: true,
-        json: () => Promise.resolve(response)
+        json: () => Promise.resolve(response),
       });
     }
-    
+
     return Promise.resolve({
       ok: false,
       status: 404,
-      json: () => Promise.resolve({ error: 'Not found' })
+      json: () => Promise.resolve({ error: 'Not found' }),
     });
   });
 };
@@ -136,21 +140,21 @@ export const setupPageTest = (options = {}) => {
   // Mock Next.js components
   jest.mock('next/link', () => createLinkMock());
   jest.mock('next/head', () => createHeadMock());
-  
+
   // Setup localStorage mock
   const localStorageMock = createLocalStorageMock();
   Object.defineProperty(window, 'localStorage', {
-    value: localStorageMock
+    value: localStorageMock,
   });
-  
+
   // Setup fetch mock if provided in options
   if (options.fetchResponses) {
     global.fetch = createFetchMock(options.fetchResponses);
   }
-  
+
   // Return any mocks that might need to be accessed in tests
   return {
-    localStorage: localStorageMock
+    localStorage: localStorageMock,
   };
 };
 
@@ -170,14 +174,14 @@ export const mockPoolsData = [
       '24h': {
         volume: 500000,
         fees: 250,
-        yield_over_tvl: 0.05
+        yield_over_tvl: 0.05,
       },
       '7d': {
         volume: 3500000,
         fees: 1750,
-        yield_over_tvl: 0.07
-      }
-    }
+        yield_over_tvl: 0.07,
+      },
+    },
   },
   {
     address: 'pool2',
@@ -191,15 +195,15 @@ export const mockPoolsData = [
       '24h': {
         volume: 250000,
         fees: 75,
-        yield_over_tvl: 0.03
+        yield_over_tvl: 0.03,
       },
       '7d': {
         volume: 1750000,
         fees: 525,
-        yield_over_tvl: 0.04
-      }
-    }
-  }
+        yield_over_tvl: 0.04,
+      },
+    },
+  },
 ];
 
 // Add a simple test to prevent the "no tests" error
@@ -214,4 +218,4 @@ describe('Page Test Utils', () => {
     expect(typeof setupPageTest).toBe('function');
     expect(Array.isArray(mockPoolsData)).toBe(true);
   });
-}); 
+});

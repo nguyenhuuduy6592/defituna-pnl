@@ -4,7 +4,7 @@ import {
   calculateStatus,
   addWalletAddressToPositions,
   decodePosition,
-  decodePositions
+  decodePositions,
 } from '../../utils/positionUtils';
 
 describe('positionUtils', () => {
@@ -50,10 +50,10 @@ describe('positionUtils', () => {
 
     it('handles open state with missing price data', () => {
       expect(calculateStatus({ state: 'open' })).toBe('Open (Unknown Range)');
-      expect(calculateStatus({ 
+      expect(calculateStatus({
         state: 'open',
         currentPrice: 100,
-        rangePrices: { lower: null, upper: 200 }
+        rangePrices: { lower: null, upper: 200 },
       })).toBe('Open (Unknown Range)');
     });
 
@@ -61,7 +61,7 @@ describe('positionUtils', () => {
       const position = {
         state: 'open',
         currentPrice: 150,
-        rangePrices: { lower: 100, upper: 200 }
+        rangePrices: { lower: 100, upper: 200 },
       };
       expect(calculateStatus(position)).toBe('In range');
 
@@ -83,7 +83,7 @@ describe('positionUtils', () => {
     it('adds wallet address to positions', () => {
       const positions = [
         { id: 1, data: 'test1' },
-        { id: 2, data: 'test2' }
+        { id: 2, data: 'test2' },
       ];
       const walletAddress = '0x123';
       const result = addWalletAddressToPositions(positions, walletAddress);
@@ -120,7 +120,7 @@ describe('positionUtils', () => {
         col: { u: 200 },
         dbt: { u: 100 },
         int: { u: 5 },
-        opened_at: '2023-01-01'
+        opened_at: '2023-01-01',
       };
 
       const decoded = decodePosition(position);
@@ -143,7 +143,7 @@ describe('positionUtils', () => {
         debt: { usd: 100 },
         interest: { usd: 5 },
         opened_at: '2023-01-01',
-        displayStatus: 'In range'
+        displayStatus: 'In range',
       });
     });
 
@@ -151,7 +151,7 @@ describe('positionUtils', () => {
       const position = {
         p_addr: '0x123',
         state: 'open',
-        pair: 'ETH/USD'
+        pair: 'ETH/USD',
       };
 
       const decoded = decodePosition(position);
@@ -177,15 +177,15 @@ describe('positionUtils', () => {
           state: 'open',
           pair: 'ETH/USD',
           c_price: 1.00,
-          pnl: { u: 50, b: 1000 }
+          pnl: { u: 50, b: 1000 },
         },
         {
           p_addr: '0x456',
           state: 'closed',
           pair: 'BTC/USD',
           c_price: 2.00,
-          pnl: { u: -30, b: -500 }
-        }
+          pnl: { u: -30, b: -500 },
+        },
       ];
 
       const decoded = decodePositions(positions);

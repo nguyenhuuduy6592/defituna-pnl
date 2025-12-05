@@ -7,7 +7,7 @@ import { formatNumber } from '../../utils';
  * Renders a bar segment with a specific width
  */
 const BarSegment = ({ percentage, index, label }) => (
-  <div 
+  <div
     className={`${styles.barSegment} ${styles[`segment${index}`]}`}
     style={{ width: `${percentage}%` }}
     aria-label={`${label}: ${percentage.toFixed(1)}%`}
@@ -37,18 +37,18 @@ const TooltipRow = ({ label, value, formatDisplayValue }) => (
  * @param {boolean} props.showInSol - Whether to display values in SOL.
  * @param {number | null} props.solPrice - The current price of SOL in USD.
  */
-export const ClusterBar = ({ 
+export const ClusterBar = ({
   size = 0,
   collateral = { usd: 0 },
   debt = { usd: 0 },
   interest = { usd: 0 },
   formatValue = (val) => val.toLocaleString(),
   showInSol = false,
-  solPrice = null
+  solPrice = null,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const containerRef = useRef(null);
-  
+
   // Internal formatting function based on currency preference
   const formatDisplayValue = useCallback((usdValue) => {
     if (usdValue == null) {
@@ -69,11 +69,11 @@ export const ClusterBar = ({
   }, [showInSol, solPrice, formatValue]);
 
   // Memoize calculations for composition percentages
-  const { 
-    total, 
-    collateralPercentage, 
-    debtPercentage, 
-    interestPercentage 
+  const {
+    total,
+    collateralPercentage,
+    debtPercentage,
+    interestPercentage,
   } = useMemo(() => {
     const totalSize = Math.abs(size);
     const collUsd = Math.abs(collateral?.usd ?? 0);
@@ -89,7 +89,7 @@ export const ClusterBar = ({
     const collPerc = (collUsd / totalSize) * 100;
     const debtPerc = (debtUsd / totalSize) * 100;
     const intPerc = (intUsd / totalSize) * 100;
-    
+
     return {
       total: totalSize,
       collateralPercentage: collPerc,
@@ -102,7 +102,7 @@ export const ClusterBar = ({
   const handleMouseEnter = useCallback(() => {
     setShowTooltip(true);
   }, []);
-  
+
   const handleMouseLeave = useCallback(() => {
     setShowTooltip(false);
   }, []);
@@ -111,22 +111,22 @@ export const ClusterBar = ({
   const segments = useMemo(() => [
     { percentage: collateralPercentage, label: 'Collateral' },
     { percentage: debtPercentage, label: 'Debt' },
-    { percentage: interestPercentage, label: 'Interest' }
+    { percentage: interestPercentage, label: 'Interest' },
   ], [collateralPercentage, debtPercentage, interestPercentage]);
-  
+
   // Tooltip data now just holds the USD values; formatting happens in TooltipRow
   const tooltipData = useMemo(() => [
     { label: 'Total Size', value: size },
     { label: 'Collateral', value: collateral?.usd ?? 0 },
     { label: 'Debt', value: debt?.usd ?? 0 },
-    { label: 'Interest', value: interest?.usd ?? 0 }
+    { label: 'Interest', value: interest?.usd ?? 0 },
   ], [size, collateral, debt, interest]);
 
   // Tooltip content now passes formatDisplayValue to TooltipRow
   const tooltipContent = useMemo(() => (
     <div className={styles.tooltipContent}>
       {tooltipData.map((item, index) => (
-        <TooltipRow 
+        <TooltipRow
           key={index}
           label={item.label}
           value={item.value}
@@ -137,18 +137,18 @@ export const ClusterBar = ({
   ), [tooltipData, formatDisplayValue]);
 
   return (
-    <div 
+    <div
       className={styles.clusterBarContainer}
       aria-label="Position composition breakdown"
     >
-      <div 
+      <div
         className={styles.barContainer}
         ref={containerRef}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         {segments.map((segment, index) => (
-          <BarSegment 
+          <BarSegment
             key={index}
             percentage={segment.percentage}
             index={index}
@@ -170,4 +170,4 @@ export const ClusterBar = ({
       )}
     </div>
   );
-}; 
+};

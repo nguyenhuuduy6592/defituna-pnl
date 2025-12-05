@@ -9,7 +9,7 @@ jest.mock('next/document', () => ({
   ...jest.requireActual('next/document'), // Use actual implementation for others
   Html: ({ children }) => <html lang="en">{children}</html>,
   Head: ({ children }) => <head>{children}</head>,
-  Main: () => <main data-testid="mock-main" />, 
+  Main: () => <main data-testid="mock-main" />,
   NextScript: () => <script data-testid="mock-next-script" />,
 }));
 
@@ -31,7 +31,7 @@ describe('Custom Document (_document.js)', () => {
   it('includes essential meta tags in the Head', () => {
     // Use renderToStaticMarkup for easier checking of Head contents
     const markup = renderToStaticMarkup(<Document />);
-    
+
     expect(markup).toContain('<meta name="application-name" content="DeFi Tuna PnL"/>');
     expect(markup).toContain('<meta name="description" content="Track your DeFi positions and PnL"/>');
     expect(markup).toContain('<meta name="theme-color" content="#0A1928"/>');
@@ -48,4 +48,4 @@ describe('Custom Document (_document.js)', () => {
     expect(markup).toContain('<link rel="manifest" href="/manifest.json"/>');
     expect(markup).toContain('<link rel="icon" type="image/png" href="/favicon.svg"/>');
   });
-}); 
+});

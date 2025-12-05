@@ -15,18 +15,18 @@ export const invertPairString = (pair) => {
       console.warn('[invertPairString] Invalid pair provided:', pair);
       return '';
     }
-    
+
     if (!pair.includes('/')) {
       console.warn('[invertPairString] Invalid pair format (missing separator):', pair);
       return pair;
     }
-    
+
     const parts = pair.split('/');
     if (parts.length !== 2 || !parts[0] || !parts[1]) {
       console.warn('[invertPairString] Malformed pair format:', pair);
       return pair;
     }
-    
+
     const [tokenA, tokenB] = parts;
     return `${tokenB}/${tokenA}`;
   } catch (error) {
@@ -45,15 +45,15 @@ export const invertPrice = (price) => {
     if (price === null || price === undefined || isNaN(price)) {
       return null;
     }
-    
+
     if (price === Infinity || price === Number.POSITIVE_INFINITY) {
       return 0;
     }
-    
+
     if (price === 0 || price === -0) {
       return 0;
     }
-    
+
     return 1 / price;
   } catch (error) {
     console.error('[invertPrice] Error inverting price:', error);
@@ -72,9 +72,9 @@ export const getAdjustedPosition = (position, isInverted) => {
     console.warn('[getAdjustedPosition] Invalid position provided');
     return {};
   }
-  
-  if (!isInverted) return position;
-  
+
+  if (!isInverted) {return position;}
+
   try {
     return {
       ...position,
@@ -82,16 +82,16 @@ export const getAdjustedPosition = (position, isInverted) => {
       entryPrice: invertPrice(position.entryPrice),
       liquidationPrice: {
         lower: invertPrice(position.liquidationPrice?.upper),
-        upper: invertPrice(position.liquidationPrice?.lower)
+        upper: invertPrice(position.liquidationPrice?.lower),
       },
       rangePrices: {
         lower: invertPrice(position.rangePrices?.upper),
-        upper: invertPrice(position.rangePrices?.lower)
+        upper: invertPrice(position.rangePrices?.lower),
       },
       limitOrderPrices: {
         lower: invertPrice(position.limitOrderPrices?.upper),
-        upper: invertPrice(position.limitOrderPrices?.lower)
-      }
+        upper: invertPrice(position.limitOrderPrices?.lower),
+      },
     };
   } catch (error) {
     console.error('[getAdjustedPosition] Error adjusting position for inversion:', error);

@@ -18,7 +18,7 @@ const INVALID_CHARS_REGEX = /[0IOl]/;
  */
 export const isValidWalletAddress = (address) => {
   // Check for null, undefined, or non-string types
-  if (!address || typeof address !== 'string') return false;
+  if (!address || typeof address !== 'string') {return false;}
 
   // Trim whitespace
   const trimmed = address.trim();

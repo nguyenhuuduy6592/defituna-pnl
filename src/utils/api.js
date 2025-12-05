@@ -12,7 +12,7 @@ export async function fetchWithTimeout(url, options = {}, timeout = 10000) {
   try {
     const response = await fetch(url, {
       ...options,
-      signal: controller.signal
+      signal: controller.signal,
     });
     clearTimeout(id);
     return response;
@@ -23,4 +23,4 @@ export async function fetchWithTimeout(url, options = {}, timeout = 10000) {
     }
     throw error;
   }
-} 
+}

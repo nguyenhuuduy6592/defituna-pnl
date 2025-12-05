@@ -14,7 +14,7 @@ import { HistoryConfirmationModal } from './HistoryConfirmationModal';
 export const HistoryToggle = ({ enabled, onToggle, setAutoRefresh }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [pendingAction, setPendingAction] = useState(null);
-  
+
   const handleToggle = useCallback((e) => {
     const newEnabled = e.target.checked;
     setPendingAction(newEnabled);
@@ -23,11 +23,11 @@ export const HistoryToggle = ({ enabled, onToggle, setAutoRefresh }) => {
 
   const handleConfirm = useCallback(() => {
     setShowConfirmation(false);
-    
+
     if (pendingAction) {
       setAutoRefresh(true); // Enable auto-refresh when enabling history
     }
-    
+
     onToggle(pendingAction);
     setPendingAction(null);
   }, [pendingAction, onToggle, setAutoRefresh]);
@@ -39,12 +39,12 @@ export const HistoryToggle = ({ enabled, onToggle, setAutoRefresh }) => {
 
   return (
     <>
-      <label 
+      <label
         className={styles.toggle}
         title="Store position history for charting and tracking performance over time"
       >
-        <input 
-          type="checkbox" 
+        <input
+          type="checkbox"
           checked={enabled}
           onChange={handleToggle}
           aria-label="Enable historical data storage"

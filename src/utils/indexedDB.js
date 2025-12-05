@@ -9,7 +9,7 @@ export const DEFAULT_RETENTION_DAYS = 30;
 /**
  * Initialize IndexedDB database for storing position history
  * Creates necessary object stores and indexes if they don't exist
- * 
+ *
  * @returns {Promise<IDBDatabase|null>} Database instance or null on failure
  */
 export const initializeDB = async () => {
@@ -18,16 +18,16 @@ export const initializeDB = async () => {
       upgrade(db) {
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           const store = db.createObjectStore(STORE_NAME, {
-            keyPath: ['id', 'timestamp']
+            keyPath: ['id', 'timestamp'],
           });
           // Create indexes for efficient queries
           store.createIndex('timestamp', 'timestamp');
           store.createIndex('pair', 'pair');
           store.createIndex('walletAddress', 'walletAddress');
         }
-      }
+      },
     });
-    
+
     return db;
   } catch (error) {
     console.error('Failed to initialize IndexedDB:', error);
@@ -38,14 +38,14 @@ export const initializeDB = async () => {
 /**
  * Save a snapshot of the current positions to the database
  * Each position is stored with the current timestamp
- * 
+ *
  * @param {IDBDatabase} db - Database instance
  * @param {Array} positions - Array of position objects to save
  * @param {number} timestamp - Optional timestamp (defaults to current time)
  * @returns {Promise<boolean>} Success status
  */
 export const savePositionSnapshot = async (db, positions, timestamp = Date.now()) => {
-  if (!db || !Array.isArray(positions)) return false;
+  if (!db || !Array.isArray(positions)) {return false;}
 
   try {
     const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -56,12 +56,12 @@ export const savePositionSnapshot = async (db, positions, timestamp = Date.now()
       if (!position || !position.pair || !position.positionAddress) {
         return Promise.resolve(); // Skip invalid positions
       }
-      
+
       const id = `${position.pair}-${position.positionAddress}`;
       return store.add({
         ...position,
         id,
-        timestamp
+        timestamp,
       });
     }));
 
@@ -75,14 +75,14 @@ export const savePositionSnapshot = async (db, positions, timestamp = Date.now()
 
 /**
  * Retrieve historical data for a specific position
- * 
+ *
  * @param {IDBDatabase} db - Database instance
  * @param {string} positionId - ID of the position to retrieve history for
  * @param {number} timeRange - Optional time range in milliseconds (from now)
  * @returns {Promise<Array>} Array of historical position records
  */
 export const getPositionHistory = async (db, positionId, timeRange) => {
-  if (!db) return [];
+  if (!db) {return [];}
 
   try {
     const tx = db.transaction(STORE_NAME, 'readonly');
@@ -103,13 +103,13 @@ export const getPositionHistory = async (db, positionId, timeRange) => {
 
 /**
  * Clean up historical data older than the specified retention period
- * 
+ *
  * @param {IDBDatabase} db - Database instance
  * @param {number} retentionDays - Number of days to retain data for
  * @returns {Promise<boolean>} Success status
  */
 export const cleanupOldData = async (db, retentionDays = DEFAULT_RETENTION_DAYS) => {
-  if (!db) return false;
+  if (!db) {return false;}
 
   try {
     const tx = db.transaction(STORE_NAME, 'readwrite');
@@ -133,4 +133,4 @@ export const cleanupOldData = async (db, retentionDays = DEFAULT_RETENTION_DAYS)
     console.error('Failed to cleanup old data:', error);
     return false;
   }
-}; 
+};

@@ -21,7 +21,7 @@ describe('usePositionAges Hook', () => {
     const { result } = renderHook(() => usePositionAges([]));
     expect(result.current).toEqual([]);
   });
-  
+
   it('should handle non-array input gracefully', () => {
     const { result } = renderHook(() => usePositionAges(null));
     expect(result.current).toEqual([]);
@@ -37,7 +37,7 @@ describe('usePositionAges Hook', () => {
 
     const openedAt = new Date(baseTime - 60 * 1000); // Opened 1 minute ago (11:59:00)
     const positions = [{ id: 1, opened_at: openedAt.toISOString() }];
-    
+
     const { result } = renderHook(() => usePositionAges(positions));
 
     expect(result.current).toHaveLength(1);
@@ -75,21 +75,21 @@ describe('usePositionAges Hook', () => {
 
     const positions = [{ id: 1, opened_at: 'invalid-date-format' }];
     const { result } = renderHook(() => usePositionAges(positions));
-    
+
     expect(result.current).toHaveLength(1);
     expect(result.current[0]).toEqual({ id: 1, opened_at: 'invalid-date-format', age: null });
 
     consoleWarnSpy.mockRestore(); // Restore original console.warn
   });
-  
+
   it('should handle null or undefined entries in the positions array', () => {
     const baseTime = new Date('2023-01-01T12:00:00.000Z').getTime();
     jest.setSystemTime(baseTime);
-    const openedAt = new Date(baseTime - 60 * 1000); 
-    
+    const openedAt = new Date(baseTime - 60 * 1000);
+
     const positions = [
       { id: 1, opened_at: openedAt.toISOString() },
-      null, 
+      null,
       undefined,
       { id: 2, opened_at: new Date(baseTime - 120 * 1000).toISOString() },
     ];
@@ -101,4 +101,4 @@ describe('usePositionAges Hook', () => {
     expect(result.current[2]).toEqual({ age: null }); // Handles undefined entry
     expect(result.current[3]).toEqual(expect.objectContaining({ id: 2, age: 120 }));
   });
-}); 
+});

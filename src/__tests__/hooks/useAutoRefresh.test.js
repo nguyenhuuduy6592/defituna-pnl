@@ -21,7 +21,7 @@ beforeEach(() => {
   setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
   consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  
+
   mockOnRefresh = jest.fn();
 });
 
@@ -53,12 +53,12 @@ describe('useAutoRefresh Hook', () => {
     });
 
     it('should initialize with provided initialInterval', () => {
-       const customInterval = 60;
-       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, customInterval));
+      const customInterval = 60;
+      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, customInterval));
 
-       expect(result.current.refreshInterval).toBe(customInterval);
-       expect(result.current.refreshCountdown).toBe(customInterval);
-       expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(customInterval));
+      expect(result.current.refreshInterval).toBe(customInterval);
+      expect(result.current.refreshCountdown).toBe(customInterval);
+      expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(customInterval));
     });
 
     it('should load valid settings from localStorage', () => {
@@ -66,8 +66,8 @@ describe('useAutoRefresh Hook', () => {
       localStorage.setItem(REFRESH_INTERVAL_KEY, '15');
       // Mock getItem to return these values
       getItemSpy.mockImplementation((key) => {
-        if (key === AUTO_REFRESH_KEY) return 'true';
-        if (key === REFRESH_INTERVAL_KEY) return '15';
+        if (key === AUTO_REFRESH_KEY) {return 'true';}
+        if (key === REFRESH_INTERVAL_KEY) {return '15';}
         return null;
       });
 
@@ -82,12 +82,12 @@ describe('useAutoRefresh Hook', () => {
       expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, '15');
     });
 
-     it('should handle invalid interval in localStorage (use default)', () => {
+    it('should handle invalid interval in localStorage (use default)', () => {
       localStorage.setItem(AUTO_REFRESH_KEY, 'true');
       localStorage.setItem(REFRESH_INTERVAL_KEY, '-10'); // Invalid interval
       getItemSpy.mockImplementation((key) => {
-        if (key === AUTO_REFRESH_KEY) return 'true';
-        if (key === REFRESH_INTERVAL_KEY) return '-10';
+        if (key === AUTO_REFRESH_KEY) {return 'true';}
+        if (key === REFRESH_INTERVAL_KEY) {return '-10';}
         return null;
       });
 
@@ -96,15 +96,15 @@ describe('useAutoRefresh Hook', () => {
       expect(result.current.autoRefresh).toBe(true); // Still loads autoRefresh correctly
       expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL); // Falls back to default
       expect(result.current.refreshCountdown).toBe(DEFAULT_INTERVAL); // Uses default
-      expect(result.current.error).toBeNull(); 
-       // Saves default interval back
+      expect(result.current.error).toBeNull();
+      // Saves default interval back
       expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(DEFAULT_INTERVAL));
     });
 
-     it('should handle non-numeric interval in localStorage (use default)', () => {
-      localStorage.setItem(REFRESH_INTERVAL_KEY, 'abc'); 
+    it('should handle non-numeric interval in localStorage (use default)', () => {
+      localStorage.setItem(REFRESH_INTERVAL_KEY, 'abc');
       getItemSpy.mockImplementation((key) => {
-        if (key === REFRESH_INTERVAL_KEY) return 'abc';
+        if (key === REFRESH_INTERVAL_KEY) {return 'abc';}
         return null;
       });
 
@@ -124,7 +124,7 @@ describe('useAutoRefresh Hook', () => {
       expect(result.current.autoRefresh).toBe(false); // Defaults
       expect(result.current.refreshInterval).toBe(DEFAULT_INTERVAL);
       // Error gets overwritten by subsequent successful save effect
-      expect(result.current.error).toBeNull(); 
+      expect(result.current.error).toBeNull();
       expect(consoleErrorSpy).toHaveBeenCalledWith('Error loading auto-refresh settings:', loadError);
     });
   });
@@ -135,7 +135,7 @@ describe('useAutoRefresh Hook', () => {
       // Expect initial saves
       expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'false');
       expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, String(DEFAULT_INTERVAL));
-      const initialSaveCount = setItemSpy.mock.calls.length; 
+      const initialSaveCount = setItemSpy.mock.calls.length;
 
       act(() => { result.current.setAutoRefresh(true); });
       expect(result.current.autoRefresh).toBe(true);
@@ -150,7 +150,7 @@ describe('useAutoRefresh Hook', () => {
       expect(setItemSpy).toHaveBeenCalledTimes(initialSaveCount + 4);
     });
 
-     it('should handle truthy/falsy values for setAutoRefresh', () => {
+    it('should handle truthy/falsy values for setAutoRefresh', () => {
       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh));
       setItemSpy.mockClear();
 
@@ -158,7 +158,7 @@ describe('useAutoRefresh Hook', () => {
       expect(result.current.autoRefresh).toBe(true);
       expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'true');
 
-       act(() => { result.current.setAutoRefresh(0); }); // Falsy
+      act(() => { result.current.setAutoRefresh(0); }); // Falsy
       expect(result.current.autoRefresh).toBe(false);
       expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'false');
     });
@@ -172,14 +172,14 @@ describe('useAutoRefresh Hook', () => {
       // Save effect saves both autoRefresh and refreshInterval
       expect(setItemSpy).toHaveBeenCalledWith(REFRESH_INTERVAL_KEY, '10');
       expect(setItemSpy).toHaveBeenCalledWith(AUTO_REFRESH_KEY, 'false'); // Assuming default autoRefresh
-      expect(setItemSpy).toHaveBeenCalledTimes(2); 
+      expect(setItemSpy).toHaveBeenCalledTimes(2);
     });
 
-     it('should reset countdown when refreshInterval changes while autoRefresh is true', () => {
+    it('should reset countdown when refreshInterval changes while autoRefresh is true', () => {
       localStorage.setItem(AUTO_REFRESH_KEY, 'true');
       getItemSpy.mockImplementation((key) => key === AUTO_REFRESH_KEY ? 'true' : null);
       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 60));
-      
+
       expect(result.current.autoRefresh).toBe(true);
       expect(result.current.refreshInterval).toBe(60);
       expect(result.current.refreshCountdown).toBe(60);
@@ -194,7 +194,7 @@ describe('useAutoRefresh Hook', () => {
       expect(result.current.refreshCountdown).toBe(15); // Countdown should reset
     });
 
-     it('should NOT reset countdown when refreshInterval changes while autoRefresh is false', () => {
+    it('should NOT reset countdown when refreshInterval changes while autoRefresh is false', () => {
       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 60));
       expect(result.current.autoRefresh).toBe(false);
       expect(result.current.refreshInterval).toBe(60);
@@ -207,14 +207,14 @@ describe('useAutoRefresh Hook', () => {
     });
 
     it('should reset countdown when autoRefresh is enabled', () => {
-       const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 45));
-       expect(result.current.autoRefresh).toBe(false);
-       expect(result.current.refreshCountdown).toBe(45);
+      const { result } = renderHook(() => useAutoRefresh(mockOnRefresh, 45));
+      expect(result.current.autoRefresh).toBe(false);
+      expect(result.current.refreshCountdown).toBe(45);
 
-       // Enable auto-refresh
-       act(() => { result.current.setAutoRefresh(true); });
-       expect(result.current.autoRefresh).toBe(true);
-       expect(result.current.refreshCountdown).toBe(45); // Resets to current interval
+      // Enable auto-refresh
+      act(() => { result.current.setAutoRefresh(true); });
+      expect(result.current.autoRefresh).toBe(true);
+      expect(result.current.refreshCountdown).toBe(45); // Resets to current interval
     });
 
     it('should handle invalid values for setRefreshInterval (warn and use default)', () => {
@@ -253,7 +253,7 @@ describe('useAutoRefresh Hook', () => {
       consoleWarnSpy.mockRestore();
     });
 
-     it('should handle localStorage.setItem error during save', () => {
+    it('should handle localStorage.setItem error during save', () => {
       const saveError = new Error('LocalStorage Write Failed');
       setItemSpy.mockImplementation(() => { throw saveError; });
 
@@ -335,4 +335,4 @@ describe('useAutoRefresh Hook', () => {
       expect(result.current.error).toBe('Error occurred during auto-refresh'); // Error state might persist until next successful cycle or manual clear
     });
   });
-}); 
+});

@@ -88,7 +88,7 @@ describe('Chart Utils', () => {
       ];
       // Expect the function call within the arrow function to throw the specific error
       expect(() => prepareChartData(historyWithNull)).toThrow(TypeError);
-      expect(() => prepareChartData(historyWithNull)).toThrow("Cannot read properties of null (reading 'timestamp')");
+      expect(() => prepareChartData(historyWithNull)).toThrow('Cannot read properties of null (reading \'timestamp\')');
     });
 
     it('should correctly sum yield_a and yield_b when yield is zero or missing', () => {
@@ -238,9 +238,9 @@ describe('Chart Utils', () => {
     });
 
     it('should use 5min default if period is unrecognized', () => {
-       const resultUnrecognized = groupChartData(sampleData, 'invalid-period');
-       const resultDefault = groupChartData(sampleData, '5min');
-       expect(resultUnrecognized).toEqual(resultDefault);
+      const resultUnrecognized = groupChartData(sampleData, 'invalid-period');
+      const resultDefault = groupChartData(sampleData, '5min');
+      expect(resultUnrecognized).toEqual(resultDefault);
     });
   });
 

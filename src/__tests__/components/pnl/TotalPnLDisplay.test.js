@@ -8,7 +8,7 @@ jest.mock('../../../components/pnl/TotalPnLDisplay.module.scss', () => ({
   pnlHeader: 'pnlHeader',
   pnlGrid: 'pnlGrid',
   pnlItem: 'pnlItem',
-  label: 'label'
+  label: 'label',
 }));
 
 const renderWithProviders = (ui) => render(ui);
@@ -31,4 +31,4 @@ describe('TotalPnLDisplay Component', () => {
     // Should still render the label, but no value text
     expect(screen.getByText('Total PnL')).toBeInTheDocument();
   });
-}); 
+});

@@ -5,7 +5,7 @@ import { debouncePromise } from '../utils/debounce';
  * Custom hook for debounced API calls.
  * This hook creates a debounced version of the provided API call function and
  * manages the loading and error states automatically.
- * 
+ *
  * @param {Function} apiCall - The API call function to debounce
  * @param {number} delay - The debounce delay in milliseconds (default: 500ms)
  * @param {any} initialData - Initial data to use before the first API call (default: null)
@@ -20,10 +20,10 @@ export function useDebounceApi(apiCall, delay = 500, initialData = null) {
   const [data, setData] = useState(initialData);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // Keep track of the latest call to avoid race conditions
   const latestCallIdRef = useRef(0);
-  
+
   // Create a debounced version of the API call
   const debouncedApiCall = useRef(
     debouncePromise(async (...args) => {
@@ -50,7 +50,7 @@ export function useDebounceApi(apiCall, delay = 500, initialData = null) {
       }
     }, delay)
   ).current;
-  
+
   // Execute function that can be called from components
   const execute = useCallback(async (...args) => {
     setLoading(true);
@@ -60,7 +60,7 @@ export function useDebounceApi(apiCall, delay = 500, initialData = null) {
       return Promise.reject(err);
     }
   }, [debouncedApiCall]);
-  
+
   // Reset function to clear states
   const reset = useCallback(() => {
     setData(initialData);
@@ -68,21 +68,21 @@ export function useDebounceApi(apiCall, delay = 500, initialData = null) {
     setError(null);
     latestCallIdRef.current++;
   }, [initialData]);
-  
+
   // Clean up on unmount
   useEffect(() => {
     return () => {
       latestCallIdRef.current++;
     };
   }, []);
-  
+
   return { data, loading, error, execute, reset };
 }
 
 /**
  * Hook that creates a debounced wrapper for any function, particularly useful for form inputs
  * that trigger API calls when value changes.
- * 
+ *
  * @param {Function} fn - Function to debounce
  * @param {number} delay - Debounce delay in milliseconds
  * @returns {Function} - Debounced function
@@ -92,4 +92,4 @@ export function useDebounce(fn, delay = 300) {
     debouncePromise(fn, delay),
     [fn, delay]
   );
-} 
+}

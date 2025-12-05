@@ -28,4 +28,4 @@ describe('CurrencyToggle', () => {
     expect(button).toHaveAttribute('title');
     expect(button).toHaveAttribute('data-tooltip');
   });
-}); 
+});

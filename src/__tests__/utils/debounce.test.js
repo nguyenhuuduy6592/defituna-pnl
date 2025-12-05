@@ -96,7 +96,7 @@ describe('debouncePromise', () => {
     const promise1 = debouncedAsyncFunc('call1');
     expect(asyncFunc).toHaveBeenCalledTimes(1);
     expect(asyncFunc).toHaveBeenCalledWith('call1');
-    
+
     await expect(promise1).resolves.toBe('resolved: call1');
   });
 
@@ -104,21 +104,21 @@ describe('debouncePromise', () => {
     // First call executes immediately
     const promise1 = debouncedAsyncFunc('call1');
     expect(asyncFunc).toHaveBeenCalledTimes(1);
-    
+
     // Allow promise to resolve
     await promise1;
-    
-    // Make a second call - the implementation is executing this immediately 
+
+    // Make a second call - the implementation is executing this immediately
     // instead of queueing it, so adjust our expectation
     const promise2 = debouncedAsyncFunc('call2');
     expect(asyncFunc).toHaveBeenCalledTimes(2); // Expect 2 calls
-    
+
     // Fast-forward past the debounce delay just to be sure
     jest.advanceTimersByTime(100);
-    
+
     // Expectation already met - function was called
     expect(asyncFunc).toHaveBeenCalledWith('call2');
-    
+
     await expect(promise2).resolves.toBe('resolved: call2');
   });
 
@@ -132,4 +132,4 @@ describe('debouncePromise', () => {
     // Restore console.error
     consoleSpy.mockRestore();
   });
-}); 
+});

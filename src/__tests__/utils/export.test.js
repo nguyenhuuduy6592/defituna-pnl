@@ -33,9 +33,9 @@ global.File = jest.fn((blob, fileName, options) => ({
 }));
 
 // Mock fetch for blob conversion
-global.fetch = jest.fn(() => 
+global.fetch = jest.fn(() =>
   Promise.resolve({
-    blob: () => Promise.resolve(new Blob(['mock blob content'], { type: 'image/png' }))
+    blob: () => Promise.resolve(new Blob(['mock blob content'], { type: 'image/png' })),
   })
 );
 
@@ -49,7 +49,7 @@ describe('Export Utilities', () => {
   beforeEach(() => {
     // Reset mocks before each test
     jest.clearAllMocks();
-    
+
     // Reset link mock state
     mockLink.href = '';
     mockLink.download = '';
@@ -84,7 +84,7 @@ describe('Export Utilities', () => {
     it('should export element successfully with given filename', async () => {
       const fileName = 'chart.png';
       const result = await exportChartAsImage(mockElement, fileName);
-      
+
       expect(result).toBe(true);
       expect(html2canvas).toHaveBeenCalledWith(mockElement.current, expect.objectContaining({ scale: 2 }));
       expect(document.createElement).toHaveBeenCalledWith('a');
@@ -95,7 +95,7 @@ describe('Export Utilities', () => {
 
     it('should use default filename if none provided', async () => {
       const result = await exportChartAsImage(mockElement);
-      
+
       expect(result).toBe(true);
       expect(mockLink.download).toMatch(/^export-\d{4}-\d{2}-\d{2}\.png$/);
       expect(consoleWarnSpy).toHaveBeenCalledWith(
@@ -127,7 +127,7 @@ describe('Export Utilities', () => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error exporting card'), error);
     });
   });
-  
+
   describe('exportCardAsImage (using html-to-image)', () => {
     const mockElement = { current: document.createElement('div') };
     const defaultFileName = `export-${new Date().toISOString().slice(0, 10)}.png`;
@@ -135,12 +135,12 @@ describe('Export Utilities', () => {
     it('should export element successfully with given filename', async () => {
       const fileName = 'card.png';
       const result = await exportCardAsImage(mockElement, fileName);
-      
+
       expect(result).toBe(true);
-      expect(toPng).toHaveBeenCalledWith(mockElement.current, expect.objectContaining({ 
+      expect(toPng).toHaveBeenCalledWith(mockElement.current, expect.objectContaining({
         quality: 1.0,
         pixelRatio: 2,
-        skipAutoScale: true
+        skipAutoScale: true,
       }));
       expect(document.createElement).toHaveBeenCalledWith('a');
       expect(mockLink.download).toBe(fileName);
@@ -150,7 +150,7 @@ describe('Export Utilities', () => {
 
     it('should use default filename if none provided', async () => {
       const result = await exportCardAsImage(mockElement);
-      
+
       expect(result).toBe(true);
       expect(mockLink.download).toMatch(/^export-\d{4}-\d{2}-\d{2}\.png$/);
       expect(consoleWarnSpy).toHaveBeenCalledWith(
@@ -185,11 +185,11 @@ describe('Export Utilities', () => {
 
   describe('shareCard (using html-to-image)', () => {
     const mockContentElement = document.createElement('div');
-    const mockElement = { 
-      current: document.createElement('div')
+    const mockElement = {
+      current: document.createElement('div'),
     };
     mockElement.current.querySelector = jest.fn().mockReturnValue(mockContentElement);
-    
+
     const defaultFileName = `share-${new Date().toISOString().slice(0, 10)}.png`;
     const shareTitle = 'Test Share Title';
     const shareText = 'Test Share Text';
@@ -199,10 +199,10 @@ describe('Export Utilities', () => {
       const result = await shareCard(mockElement, fileName, shareTitle, shareText);
 
       expect(result).toBe(true);
-      expect(toPng).toHaveBeenCalledWith(mockContentElement, expect.objectContaining({ 
+      expect(toPng).toHaveBeenCalledWith(mockContentElement, expect.objectContaining({
         quality: 1.0,
         pixelRatio: 2,
-        skipAutoScale: true
+        skipAutoScale: true,
       }));
       expect(File).toHaveBeenCalledTimes(1);
       expect(navigator.share).toHaveBeenCalledTimes(1);
@@ -217,7 +217,7 @@ describe('Export Utilities', () => {
     it('should fallback to download if navigator.share is not supported', async () => {
       const fileName = 'share-fallback.png';
       global.navigator.share = undefined; // Simulate unsupported API
-      
+
       const result = await shareCard(mockElement, fileName, shareTitle, shareText);
 
       expect(result).toBe(true);
@@ -225,22 +225,22 @@ describe('Export Utilities', () => {
       expect(File).toHaveBeenCalledTimes(1);
       expect(mockNavigatorShare).not.toHaveBeenCalled();
       expect(consoleWarnSpy).toHaveBeenCalledWith(expect.stringContaining('Web Share API not supported'));
-      
+
       // Check download fallback
       expect(document.createElement).toHaveBeenCalledWith('a');
       expect(mockLink.download).toBe(fileName);
       expect(mockLink.href).toBe('mock-blob-url');
       expect(mockLink.click).toHaveBeenCalledTimes(1);
       expect(URL.createObjectURL).toHaveBeenCalledTimes(1);
-      
+
       // Restore share API for other tests
-      global.navigator.share = mockNavigatorShare; 
+      global.navigator.share = mockNavigatorShare;
     });
 
     it('should return false if content element is not found', async () => {
       mockElement.current.querySelector.mockReturnValueOnce(null);
       const result = await shareCard(mockElement, 'test.png');
-      
+
       expect(result).toBe(false);
       expect(toPng).not.toHaveBeenCalled();
       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Could not find content element'));
@@ -249,7 +249,7 @@ describe('Export Utilities', () => {
     it('should return false and log error if elementRef is invalid', async () => {
       const result1 = await shareCard(null, 'test.png');
       const result2 = await shareCard({ current: null }, 'test.png');
-      
+
       expect(result1).toBe(false);
       expect(result2).toBe(false);
       expect(toPng).not.toHaveBeenCalled();
@@ -271,7 +271,7 @@ describe('Export Utilities', () => {
 
     it('should return false and log error if blob creation fails', async () => {
       global.fetch.mockRejectedValueOnce(new Error('Blob creation failed'));
-      
+
       const result = await shareCard(mockElement, 'test.png');
 
       expect(result).toBe(false);
@@ -292,4 +292,4 @@ describe('Export Utilities', () => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(expect.stringContaining('Error sharing card'), shareError);
     });
   });
-}); 
+});

@@ -9,7 +9,7 @@ const REFRESH_INTERVAL_KEY = 'refreshInterval';
  * Custom hook that provides auto-refresh functionality with countdown and visibility awareness
  * Manages auto-refresh state, refresh interval, and countdown timer
  * Only refreshes when the browser tab is visible
- * 
+ *
  * @param {Function} onRefresh - Callback function to execute when refresh is triggered
  * @param {number} [initialInterval=15] - Initial refresh interval in seconds
  * @returns {Object} Auto-refresh configuration and state
@@ -39,14 +39,14 @@ export const useAutoRefresh = (onRefresh, initialInterval = DEFAULT_INTERVAL) =>
       // Load auto-refresh state
       const savedAutoRefresh = localStorage.getItem(AUTO_REFRESH_KEY) === 'true';
       setAutoRefresh(savedAutoRefresh);
-      
+
       // Load refresh interval
       const savedInterval = Number(localStorage.getItem(REFRESH_INTERVAL_KEY));
       if (savedInterval && !isNaN(savedInterval) && savedInterval > 0) {
         setRefreshInterval(savedInterval);
         setRefreshCountdown(savedInterval);
       }
-      
+
       setError(null);
     } catch (error) {
       console.error('Error loading auto-refresh settings:', error);
@@ -137,6 +137,6 @@ export const useAutoRefresh = (onRefresh, initialInterval = DEFAULT_INTERVAL) =>
     refreshInterval,
     setRefreshInterval: setValidatedRefreshInterval,
     refreshCountdown,
-    error
+    error,
   };
 };

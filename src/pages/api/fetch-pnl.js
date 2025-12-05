@@ -15,7 +15,7 @@ async function fetchPnL(wallet) {
     return {
       t_pnl: 0, // Encode field name - totalPnL becomes t_pnl
       positions: [],
-      message: 'No positions found for this wallet'
+      message: 'No positions found for this wallet',
     };
   }
 
@@ -44,9 +44,9 @@ export default async function handler(req, res) {
     const { walletAddress } = req.body;
 
     if (!isValidWalletAddress(walletAddress)) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Invalid wallet address format',
-        details: 'Please provide a valid Solana wallet address'
+        details: 'Please provide a valid Solana wallet address',
       });
     }
 
@@ -54,9 +54,9 @@ export default async function handler(req, res) {
     res.status(200).json(result);
   } catch (error) {
     console.error('Error in fetch-pnl:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: error.message || 'Failed to fetch data',
-      details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
     });
   }
 }

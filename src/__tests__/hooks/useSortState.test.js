@@ -43,7 +43,7 @@ describe('useSortState Hook', () => {
       expect(result.current.sortState).toEqual({ field: 'age', direction: 'desc' });
     });
 
-     it('should handle multiple sorts correctly', () => {
+    it('should handle multiple sorts correctly', () => {
       const { result } = renderHook(() => useSortState('age', 'desc'));
 
       // Sort by new field 'tvl' -> { field: 'tvl', direction: 'desc' }
@@ -58,7 +58,7 @@ describe('useSortState Hook', () => {
       });
       expect(result.current.sortState).toEqual({ field: 'tvl', direction: 'asc' });
 
-       // Sort by new field 'fee' -> { field: 'fee', direction: 'asc' }
+      // Sort by new field 'fee' -> { field: 'fee', direction: 'asc' }
       act(() => {
         result.current.handleSort('fee');
       });
@@ -88,7 +88,7 @@ describe('useSortState Hook', () => {
       expect(result.current.getSortIcon('age')).toBe('↑');
     });
 
-     it('should update icon after sorting', () => {
+    it('should update icon after sorting', () => {
       const { result } = renderHook(() => useSortState('age', 'desc'));
 
       expect(result.current.getSortIcon('age')).toBe('↓'); // Initial
@@ -103,10 +103,10 @@ describe('useSortState Hook', () => {
       expect(result.current.getSortIcon('tvl')).toBe('↓'); // TVL is sorted desc
 
       // Sort by tvl again (toggle direction)
-       act(() => {
+      act(() => {
         result.current.handleSort('tvl');
       });
-       expect(result.current.getSortIcon('tvl')).toBe('↑'); // TVL is sorted asc
+      expect(result.current.getSortIcon('tvl')).toBe('↑'); // TVL is sorted asc
     });
   });
-}); 
+});

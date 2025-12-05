@@ -1,6 +1,5 @@
-import React from 'react';
 import { render, act } from '@testing-library/react';
-import App from '../../pages/_app'; 
+import App from '../../pages/_app';
 
 // Mock navigator.serviceWorker
 global.navigator.serviceWorker = {
@@ -8,9 +7,9 @@ global.navigator.serviceWorker = {
 };
 
 global.console = {
-  log: jest.fn(), 
-  error: jest.fn(), 
-  warn: jest.fn(), 
+  log: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
 };
 
 describe('App Component (_app.js)', () => {
@@ -22,12 +21,12 @@ describe('App Component (_app.js)', () => {
     // Clear mocks before each test
     jest.clearAllMocks();
     // Set to production to test service worker registration
-    process.env.NODE_ENV = 'production'; 
+    process.env.NODE_ENV = 'production';
   });
-  
+
   afterEach(() => {
     // Restore NODE_ENV if needed, though usually tests run isolated
-    process.env.NODE_ENV = 'test'; 
+    process.env.NODE_ENV = 'test';
   });
 
   it('renders the Component passed via props', () => {
@@ -41,8 +40,8 @@ describe('App Component (_app.js)', () => {
     // This test is more conceptual or would require a more complex setup to verify.
     // For now, we trust React's rendering process.
     // A more involved test could involve MockComponent using the props.
-    const { getByText } = render(<App Component={({prop1}) => <div>{prop1}</div>} pageProps={mockPageProps} />);
-    expect(getByText('test')).toBeInTheDocument(); 
+    const { getByText } = render(<App Component={({ prop1 }) => <div>{prop1}</div>} pageProps={mockPageProps} />);
+    expect(getByText('test')).toBeInTheDocument();
   });
 
   it('attempts to register service worker in production', () => {
@@ -56,7 +55,7 @@ describe('App Component (_app.js)', () => {
 
     // Simulate the window load event
     act(() => {
-       map.load();
+      map.load();
     });
 
     expect(navigator.serviceWorker.register).toHaveBeenCalledWith('/service-worker.js');
@@ -75,16 +74,16 @@ describe('App Component (_app.js)', () => {
 
     // Simulate window load event
     act(() => {
-       if (map.load) map.load();
+      if (map.load) {map.load();}
     });
 
     expect(navigator.serviceWorker.register).not.toHaveBeenCalled();
   });
-  
+
   it('logs an error if service worker registration fails', async () => {
     const registrationError = new Error('Registration Failed');
     navigator.serviceWorker.register.mockImplementationOnce(() => Promise.reject(registrationError));
-    
+
     // Fake window.addEventListener
     const map = {};
     window.addEventListener = jest.fn((event, cb) => {
@@ -95,9 +94,9 @@ describe('App Component (_app.js)', () => {
 
     // Simulate window load event
     act(() => {
-       map.load();
+      map.load();
     });
-    
+
     // Wait for the promise rejection to be handled
     await act(async () => {
       await Promise.resolve(); // Allow microtasks to run
@@ -105,4 +104,4 @@ describe('App Component (_app.js)', () => {
 
     expect(console.error).toHaveBeenCalledWith('Service Worker registration failed:', registrationError);
   });
-}); 
+});

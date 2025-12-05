@@ -13,7 +13,7 @@ const COLORS = {
   success: 'rgba(16, 185, 129, 0.95)',
   error: 'rgba(239, 68, 68, 0.95)',
   warning: 'rgba(245, 158, 11, 0.95)',
-  info: 'rgba(59, 130, 246, 0.95)'
+  info: 'rgba(59, 130, 246, 0.95)',
 };
 
 /**
@@ -29,19 +29,19 @@ export const showNotification = (message, type = 'success') => {
       console.warn('[showNotification] Empty message provided');
       message = 'Notification';
     }
-    
+
     if (!COLORS[type]) {
       console.warn(`[showNotification] Invalid notification type: ${type}, defaulting to success`);
       type = 'success';
     }
-    
+
     // Create notification element
     const notification = document.createElement('div');
-    
+
     // Set attributes for accessibility
     notification.setAttribute('role', 'alert');
     notification.setAttribute('aria-live', 'polite');
-    
+
     notification.style.cssText = `
       position: fixed;
       bottom: 20px;
@@ -65,7 +65,7 @@ export const showNotification = (message, type = 'success') => {
 
     // Add to DOM
     document.body.appendChild(notification);
-    
+
     // Trigger reflow for animation
     notification.offsetHeight;
     notification.style.opacity = '1';
@@ -79,7 +79,7 @@ export const showNotification = (message, type = 'success') => {
         }
       }, NOTIFICATION_FADE_OUT);
     }, NOTIFICATION_DURATION);
-    
+
     return notification;
   } catch (error) {
     console.error('[showNotification] Error showing notification:', error);
@@ -100,7 +100,7 @@ export const copyToClipboard = async (text) => {
       showNotification('Nothing to copy', 'error');
       return false;
     }
-    
+
     // Try using the Clipboard API first
     if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(text);
@@ -108,27 +108,27 @@ export const copyToClipboard = async (text) => {
       // Fallback for iOS and other browsers
       const textArea = document.createElement('textarea');
       textArea.value = text;
-      
+
       // Make the textarea invisible but accessible to screen readers
       textArea.style.position = 'fixed';
       textArea.style.left = '-999999px';
       textArea.style.top = '-999999px';
       textArea.setAttribute('aria-hidden', 'true');
       document.body.appendChild(textArea);
-      
+
       // Select and copy the text
       textArea.focus();
       textArea.select();
-      
+
       const successful = document.execCommand('copy');
       if (!successful) {
         throw new Error('execCommand copy failed');
       }
-      
+
       // Clean up
       textArea.remove();
     }
-    
+
     showNotification('Copied to clipboard!', 'success');
     return true;
   } catch (error) {

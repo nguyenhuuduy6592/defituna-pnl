@@ -8,11 +8,11 @@ export const SORT_FIELD_CONFIG = {
   state: position => String(position?.state || ''),
   walletAddress: position => String(position?.walletAddress || ''),
   age: position => position?.age,
-  size: position => Number(position?.size || 0)
+  size: position => Number(position?.size || 0),
 };
 
 export const sortPositions = (positions, sortField, sortDirection) => {
-  if (!positions || positions.length <= 1) return positions;
+  if (!positions || positions.length <= 1) {return positions;}
 
   return [...positions].sort((a, b) => {
     const getValue = SORT_FIELD_CONFIG[sortField];
@@ -28,7 +28,7 @@ export const sortPositions = (positions, sortField, sortDirection) => {
 
     // String comparison
     if (['pair', 'state', 'walletAddress', 'status'].includes(sortField)) {
-      return sortDirection === 'asc' 
+      return sortDirection === 'asc'
         ? String(aValue).localeCompare(String(bValue))
         : String(bValue).localeCompare(String(aValue));
     }
@@ -38,4 +38,4 @@ export const sortPositions = (positions, sortField, sortDirection) => {
     bValue = Number(bValue || 0);
     return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
   });
-}; 
+};

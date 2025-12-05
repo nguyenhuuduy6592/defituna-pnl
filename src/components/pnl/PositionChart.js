@@ -8,7 +8,7 @@ import {
   Tooltip as RechartsTooltip,
   Legend,
   ResponsiveContainer,
-  ReferenceLine
+  ReferenceLine,
 } from 'recharts';
 import { Portal } from '../common/Portal';
 import { Tooltip } from '../common/Tooltip';
@@ -26,8 +26,8 @@ const Y_AXIS_DOMAIN_PADDING_FACTOR = 0.1;
  */
 const ChartHeader = memo(({ position, activePeriod, setActivePeriod, onClose, onExport, onShare, forExport = false }) => {
   // Use position.pairDisplay if available, otherwise fall back to position.pair
-  const displayPair = position?.pairDisplay || position?.pair || "Position";
-  
+  const displayPair = position?.pairDisplay || position?.pair || 'Position';
+
   return (
     <div className={styles.chartHeader}>
       <h3 className={styles.title}>
@@ -45,7 +45,7 @@ const ChartHeader = memo(({ position, activePeriod, setActivePeriod, onClose, on
       </h3>
       {!forExport && (
         <div className={styles.controls}>
-          <select 
+          <select
             value={activePeriod}
             onChange={(e) => setActivePeriod(e.target.value)}
             className={styles.periodSelect}
@@ -56,8 +56,8 @@ const ChartHeader = memo(({ position, activePeriod, setActivePeriod, onClose, on
               <option key={key} value={value}>{label}</option>
             ))}
           </select>
-          
-          <button 
+
+          <button
             className={styles.exportButton}
             onClick={onExport}
             aria-label={`Download ${displayPair} chart as PNG`}
@@ -65,8 +65,8 @@ const ChartHeader = memo(({ position, activePeriod, setActivePeriod, onClose, on
           >
             <HiDownload className={styles.buttonIcon} />
           </button>
-          
-          <button 
+
+          <button
             className={styles.shareButton}
             onClick={onShare}
             aria-label={`Share ${displayPair} chart`}
@@ -74,8 +74,8 @@ const ChartHeader = memo(({ position, activePeriod, setActivePeriod, onClose, on
           >
             <HiShare className={styles.buttonIcon} />
           </button>
-          
-          <button 
+
+          <button
             className={styles.closeButton}
             onClick={onClose}
             aria-label="Close chart"
@@ -109,11 +109,11 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
   if (chartData.length === 0) {
     return <NoChartData />;
   }
-  
+
   // Get the last PnL value to determine the line color
   const lastPnL = chartData[chartData.length - 1]?.pnl || 0;
   const pnlColor = lastPnL >= 0 ? 'var(--chart-positive)' : 'var(--chart-negative)';
-  
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
@@ -139,53 +139,53 @@ const ChartContent = memo(({ chartData, activeMetrics, activePeriod }) => {
               const minWithZero = Math.min(0, dataMin);
               const padding = Math.abs(dataMin) * Y_AXIS_DOMAIN_PADDING_FACTOR;
               return minWithZero - padding;
-            }, 
+            },
             dataMax => {
               // Ensure we include 0 and add padding above the max value
               const maxWithZero = Math.max(0, dataMax);
               const padding = Math.abs(dataMax) * Y_AXIS_DOMAIN_PADDING_FACTOR;
               return maxWithZero + padding;
-            }
+            },
           ]}
           allowDataOverflow={false}
         />
-        <ReferenceLine 
-          y={0} 
-          stroke="var(--chart-neutral)" 
+        <ReferenceLine
+          y={0}
+          stroke="var(--chart-neutral)"
           strokeWidth={1.5}
           strokeDasharray="3 3"
           ifOverflow="extendDomain"
           label={{
-            value: "Break-even ($0)",
-            position: "insideBottomRight",
-            fill: "var(--chart-neutral)",
+            value: 'Break-even ($0)',
+            position: 'insideBottomRight',
+            fill: 'var(--chart-neutral)',
             fontSize: 11,
-            fontWeight: "500"
+            fontWeight: '500',
           }}
         />
-        <RechartsTooltip 
+        <RechartsTooltip
           content={<CustomChartTooltip />}
           isAnimationActive={false}
         />
-        <Legend 
-          verticalAlign="top" 
+        <Legend
+          verticalAlign="top"
           height={30}
           wrapperStyle={{ paddingTop: '5px' }}
         />
         {activeMetrics.pnl && (
-          <Line 
-            type="monotone" 
-            dataKey="pnl" 
+          <Line
+            type="monotone"
+            dataKey="pnl"
             stroke={pnlColor}
             strokeWidth={2}
-            dot={false} 
+            dot={false}
             activeDot={{ r: 6 }}
             name="PnL ($)"
             connectNulls={true}
           />
         )}
         {activeMetrics.totalYield && (
-          <Line 
+          <Line
             type="monotone"
             dataKey="totalYield"
             stroke="var(--chart-primary)"
@@ -205,7 +205,7 @@ ChartContent.displayName = 'ChartContent';
 
 /**
  * A modal component displaying a historical performance chart for a position.
- * 
+ *
  * @param {object} props - Component props.
  * @param {object} props.position - The position data with pair name.
  * @param {Array<object>} props.positionHistory - Array of historical data points for the position.
@@ -217,9 +217,9 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
   const [activePeriod, setActivePeriod] = useState(TIME_PERIODS.MINUTE_5.value);
   const [activeMetrics, setActiveMetrics] = useState({
     pnl: true,
-    totalYield: true
+    totalYield: true,
   });
-  
+
   const chartContainerRef = useRef(null);
   const chartContentRef = useRef(null);
   const exportWrapperRef = useRef(null);
@@ -235,26 +235,26 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
     try {
       const preparedData = prepareChartData(positionHistory);
       const groupedData = groupChartData(preparedData, activePeriod);
-      
+
       // Keep valid items OR items explicitly added as null gaps
-      const validData = groupedData.filter(item => 
+      const validData = groupedData.filter(item =>
         item &&
-        typeof item.timestamp === 'number' && 
+        typeof item.timestamp === 'number' &&
         !isNaN(item.timestamp) &&
         // Keep if it's a null gap (pnl is null) OR if original values are non-trivial
         (item.pnl === null || Math.abs(item.pnl) > 1e-9 || Math.abs(item.yield) > 1e-9 || Math.abs(item.compounded) > 1e-9)
       ).map(item => ({
         ...item,
         // Calculate totalYield, preserving null if yield or compounded is null
-        totalYield: (item.yield === null || item.compounded === null) 
-                      ? null 
-                      : (item.yield || 0) + (item.compounded || 0)
+        totalYield: (item.yield === null || item.compounded === null)
+          ? null
+          : (item.yield || 0) + (item.compounded || 0),
       }));
-      
+
       // Remove logs added for debugging
       // console.log("[PositionChart useEffect] Final chartData length:", validData.length);
       // console.log("[PositionChart useEffect] Final chartData sample (incl. nulls?):", validData.slice(0, 20));
-      
+
       setChartData(validData);
     } catch (error) {
       console.error('Error processing chart data in useEffect:', error);
@@ -268,7 +268,7 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
       onClose();
     }
   }, [onClose]);
-  
+
   // Handle export button click
   const handleExport = useCallback(() => {
     exportChartAsImage(exportWrapperRef, `${displayPair}-chart-${Date.now()}.png`);
@@ -284,13 +284,13 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
     );
   }, [position]);
 
-  if (!positionHistory) return null;
+  if (!positionHistory) {return null;}
 
   return (
     <Portal>
       <div className={styles.chartOverlay} onClick={handleOverlayClick}>
         <div className={styles.chartContainer} onClick={e => e.stopPropagation()} ref={chartContainerRef}>
-          <ChartHeader 
+          <ChartHeader
             position={position}
             activePeriod={activePeriod}
             setActivePeriod={setActivePeriod}
@@ -300,23 +300,23 @@ const PositionChart = memo(function PositionChart({ position, positionHistory, o
           />
 
           <div className={styles.chartContent} ref={chartContentRef}>
-            <ChartContent 
+            <ChartContent
               chartData={chartData}
               activeMetrics={activeMetrics}
               activePeriod={activePeriod}
             />
           </div>
-          
+
           {/* Hidden wrapper for export that includes pair title */}
           <div className={styles.exportWrapper} ref={exportWrapperRef} data-export-content>
-            <ChartHeader 
+            <ChartHeader
               position={position}
               activePeriod={activePeriod}
               setActivePeriod={setActivePeriod}
               forExport={true}
             />
             <div className={styles.chartExportContent}>
-              <ChartContent 
+              <ChartContent
                 chartData={chartData}
                 activeMetrics={activeMetrics}
                 activePeriod={activePeriod}

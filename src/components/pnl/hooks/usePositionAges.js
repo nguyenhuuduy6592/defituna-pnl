@@ -21,15 +21,15 @@ export const usePositionAges = (positions = []) => {
 
   // Add ages to positions, calculating duration on the fly from opened_at
   const positionsWithAge = useMemo(() => {
-    if (safePositions.length === 0) return [];
-    
+    if (safePositions.length === 0) {return [];}
+
     const nowSeconds = Math.floor(currentTime / 1000);
-    
+
     return safePositions.map(pos => {
-      if (!pos) return { age: null };
-      
-      let ageSeconds = null; 
-      
+      if (!pos) {return { age: null };}
+
+      let ageSeconds = null;
+
       // Use opened_at from the API
       if (pos.opened_at) {
         try {
@@ -42,13 +42,13 @@ export const usePositionAges = (positions = []) => {
           console.warn('Error parsing opened_at date:', e);
         }
       }
-      
+
       return {
         ...pos,
-        age: ageSeconds // Pass calculated duration (or null)
+        age: ageSeconds, // Pass calculated duration (or null)
       };
     });
   }, [safePositions, currentTime]);
 
   return positionsWithAge;
-}; 
+};

@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 /**
  * Custom hook that provides a countdown timer functionality
  * Creates a timer that counts down from a given value to zero
- * 
+ *
  * @param {number} initialValue - Initial countdown value in seconds
  * @returns {Object} Countdown state and controls
  * @returns {number} returns.countdown - Current countdown value in seconds
@@ -18,7 +18,7 @@ export const useCountdown = (initialValue = 0) => {
   // Countdown timer effect
   useEffect(() => {
     let timerId;
-    
+
     if (isRunning && countdown > 0) {
       timerId = setInterval(() => {
         setCountdown(prev => {
@@ -31,9 +31,9 @@ export const useCountdown = (initialValue = 0) => {
         });
       }, 1000);
     }
-    
+
     return () => {
-      if (timerId) clearInterval(timerId);
+      if (timerId) {clearInterval(timerId);}
     };
   }, [countdown, isRunning]);
 
@@ -43,12 +43,12 @@ export const useCountdown = (initialValue = 0) => {
    */
   const startCountdown = useCallback((seconds) => {
     const validSeconds = parseInt(seconds, 10);
-    
+
     if (isNaN(validSeconds) || validSeconds <= 0) {
       console.warn('Invalid countdown value provided, must be a positive number');
       return;
     }
-    
+
     setCountdown(validSeconds);
     setIsRunning(true);
   }, []);
@@ -73,6 +73,6 @@ export const useCountdown = (initialValue = 0) => {
     startCountdown,
     stopCountdown,
     resetCountdown,
-    isRunning
+    isRunning,
   };
 };
