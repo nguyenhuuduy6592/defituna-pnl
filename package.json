@@ -2,6 +2,11 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "browserslist": [
+    ">0.3%",
+    "not ie 11",
+    "not dead"
+  ],
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",

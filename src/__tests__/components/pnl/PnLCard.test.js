@@ -2,8 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { PnLCard } from '../../../components/pnl/PnLCard';
 import { exportCardAsImage, shareCard } from '../../../utils/export';
-import { getValueClass } from '../../../utils/styles';
-import { getStateClass } from '../../../utils/positionUtils';
+import { getStateClass, getValueClass } from '../../../utils/positionUtils';
 import { PriceProvider } from '../../../contexts/PriceContext';
 import { DisplayCurrencyProvider } from '../../../contexts/DisplayCurrencyContext';
 
@@ -17,11 +16,8 @@ jest.mock('../../../utils/export', () => ({
   shareCard: jest.fn()
 }));
 
-jest.mock('../../../utils/styles', () => ({
-  getValueClass: jest.fn().mockReturnValue('positive')
-}));
-
 jest.mock('../../../utils/positionUtils', () => ({
+  getValueClass: jest.fn().mockReturnValue('positive'),
   getStateClass: jest.fn().mockReturnValue('active')
 }));
 

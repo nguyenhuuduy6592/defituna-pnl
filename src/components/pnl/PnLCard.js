@@ -10,8 +10,7 @@ import {
 import { Portal } from '../common/Portal';
 import styles from './PnLCard.module.scss';
 import { formatNumber, formatDuration, formatPercentage } from '../../utils/formatters';
-import { getValueClass } from '../../utils/styles';
-import { getStateClass } from '../../utils/positionUtils';
+import { getStateClass, getValueClass } from '../../utils/positionUtils';
 import { exportCardAsImage, shareCard } from '../../utils/export';
 import { usePriceContext } from '../../contexts/PriceContext';
 import { useDisplayCurrency } from '../../contexts/DisplayCurrencyContext';
