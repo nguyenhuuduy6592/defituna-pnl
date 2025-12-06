@@ -18,19 +18,10 @@ import { useState, useEffect, useCallback } from 'react';
 export const useWallet = () => {
   // State for current wallet input, active wallets, and saved wallets
   const [wallet, setWallet] = useState('');
-  const [activeWallets, setActiveWallets] = useState([]);
-  const [savedWallets, setSavedWallets] = useState([]);
 
-  /**
-   * Load saved wallets and active wallets from localStorage on initialization
-   */
-  useEffect(() => {
+  // Initialize active wallets from localStorage using lazy initialization
+  const [activeWallets, setActiveWallets] = useState(() => {
     try {
-      // Load saved wallets
-      const savedWalletsData =
-        JSON.parse(localStorage.getItem('wallets')) || [];
-      setSavedWallets(savedWalletsData);
-
       // Load active wallets with fallback for backward compatibility
       const lastActiveWallets = localStorage.getItem('activeWallets');
       const parsedActiveWallets = lastActiveWallets
@@ -38,22 +29,33 @@ export const useWallet = () => {
         : [];
 
       if (parsedActiveWallets.length > 0) {
-        setActiveWallets(parsedActiveWallets);
+        return parsedActiveWallets;
       } else {
         // For backward compatibility, but still don't set the input field
         const lastWallet = localStorage.getItem('lastWallet');
         if (lastWallet) {
-          setActiveWallets([lastWallet]);
+          return [lastWallet];
         }
       }
+      return [];
     } catch (error) {
       console.error('Error loading wallet data from localStorage:', error);
-      // Reset to defaults on error
-      setSavedWallets([]);
-      setActiveWallets([]);
-      setWallet('');
+      return [];
     }
-  }, []); // Only run once on mount
+  });
+
+  // Initialize saved wallets from localStorage using lazy initialization
+  const [savedWallets, setSavedWallets] = useState(() => {
+    try {
+      // Load saved wallets
+      const savedWalletsData =
+        JSON.parse(localStorage.getItem('wallets')) || [];
+      return savedWalletsData;
+    } catch (error) {
+      console.error('Error loading wallet data from localStorage:', error);
+      return [];
+    }
+  });
 
   /**
    * Save settings to localStorage whenever they change

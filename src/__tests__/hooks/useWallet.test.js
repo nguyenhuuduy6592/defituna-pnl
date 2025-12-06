@@ -83,7 +83,7 @@ describe('useWallet Hook', () => {
 
       expect(console.error).toHaveBeenCalledTimes(1);
       expect(result.current.savedWallets).toEqual([]); // Should reset to default
-      expect(result.current.activeWallets).toEqual([]); // Should reset to default
+      expect(result.current.activeWallets).toEqual(['0x111']); // Should still load valid activeWallets
       expect(result.current.wallet).toBe(''); // Should reset to default
     });
 
@@ -94,7 +94,7 @@ describe('useWallet Hook', () => {
       const { result } = renderHook(() => useWallet());
 
       expect(console.error).toHaveBeenCalledTimes(1);
-      expect(result.current.savedWallets).toEqual([]); // Reset
+      expect(result.current.savedWallets).toEqual(['0x222']); // Should still load valid savedWallets
       expect(result.current.activeWallets).toEqual([]); // Reset
       expect(result.current.wallet).toBe(''); // Reset
     });

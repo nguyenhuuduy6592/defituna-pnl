@@ -20,17 +20,16 @@ export const CollapsibleSection = ({
   storageKey,
   visible = true,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-
-  // Load saved state from localStorage on mount
-  useEffect(() => {
+  // Initialize state from localStorage if available, otherwise use defaultExpanded
+  const [isExpanded, setIsExpanded] = useState(() => {
     if (storageKey) {
       const savedState = localStorage.getItem(storageKey);
       if (savedState !== null) {
-        setIsExpanded(savedState === 'true');
+        return savedState === 'true';
       }
     }
-  }, [storageKey]);
+    return defaultExpanded;
+  });
 
   // Save state to localStorage when it changes
   useEffect(() => {

@@ -8,12 +8,7 @@ import { createPortal } from 'react-dom';
  * @param {React.ReactNode} props.children Content to render in the portal
  */
 export const Portal = ({ children }) => {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    return () => setMounted(false);
-  }, []);
-
-  return mounted ? createPortal(children, document.body) : null;
+  // For portal components, we can often render directly without mounted state
+  // The createPortal function handles DOM access appropriately
+  return createPortal(children, document.body);
 };

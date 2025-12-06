@@ -34,7 +34,7 @@ describe('Portal Component', () => {
     expect(screen.getByText('Click me')).toBeInTheDocument();
   });
 
-  it('does not render anything when not mounted', () => {
+  it('does not render anything when conditionally not rendered', () => {
     // We create a component that conditionally renders a Portal
     const TestComponent = ({ show }) => {
       return show ? <Portal>Test content</Portal> : null;
