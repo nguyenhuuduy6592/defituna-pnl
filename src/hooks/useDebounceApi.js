@@ -1,4 +1,4 @@
-import { useCallback, useState, useRef, useEffect } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { debouncePromise } from '../utils/debounce';
 
 /**
@@ -72,13 +72,6 @@ export function useDebounceApi(apiCall, delay = 500, initialData = null) {
     latestCallIdRef.current++;
   }, [initialData]);
 
-  // Clean up on unmount
-  useEffect(() => {
-    return () => {
-      latestCallIdRef.current++;
-    };
-  }, []);
-
   return { data, loading, error, execute, reset };
 }
 
@@ -91,5 +84,5 @@ export function useDebounceApi(apiCall, delay = 500, initialData = null) {
  * @returns {Function} - Debounced function
  */
 export function useDebounce(fn, delay = 300) {
-  return useCallback(debouncePromise(fn, delay), [fn, delay]);
+  return useCallback(() => debouncePromise(fn, delay), [fn, delay]);
 }

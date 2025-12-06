@@ -66,7 +66,7 @@ export const useHistoricalData = () => {
         handleError(error, 'Failed to save position history data');
       }
     },
-    [enabled, dbInstance]
+    [enabled, dbInstance, handleError]
   );
 
   const getPositionHistory = useCallback(
@@ -83,7 +83,7 @@ export const useHistoricalData = () => {
         return [];
       }
     },
-    [dbInstance]
+    [dbInstance, handleError]
   );
 
   const toggleHistoryEnabled = useCallback(
@@ -102,7 +102,7 @@ export const useHistoricalData = () => {
         handleError(error, 'Failed to toggle history collection feature');
       }
     },
-    [dbInstance, initializeDB]
+    [dbInstance, initializeDB, handleError]
   );
 
   // Initialize database if enabled
@@ -144,7 +144,7 @@ export const useHistoricalData = () => {
       const interval = setInterval(cleanup, 24 * 60 * 60 * 1000);
       return () => clearInterval(interval);
     }
-  }, [enabled, dbInstance]);
+  }, [enabled, dbInstance, handleError]);
 
   return {
     enabled,

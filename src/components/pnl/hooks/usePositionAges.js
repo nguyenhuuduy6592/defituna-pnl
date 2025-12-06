@@ -8,9 +8,6 @@ import { useState, useEffect, useMemo } from 'react';
 export const usePositionAges = (positions = []) => {
   const [currentTime, setCurrentTime] = useState(() => Date.now());
 
-  // Ensure positions is an array
-  const safePositions = Array.isArray(positions) ? positions : [];
-
   // Update current time every second for live age calculation
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -21,6 +18,9 @@ export const usePositionAges = (positions = []) => {
 
   // Add ages to positions, calculating duration on the fly from opened_at
   const positionsWithAge = useMemo(() => {
+    // Ensure positions is an array
+    const safePositions = Array.isArray(positions) ? positions : [];
+
     if (safePositions.length === 0) {
       return [];
     }
@@ -52,7 +52,7 @@ export const usePositionAges = (positions = []) => {
         age: ageSeconds, // Pass calculated duration (or null)
       };
     });
-  }, [safePositions, currentTime]);
+  }, [positions, currentTime]);
 
   return positionsWithAge;
 };

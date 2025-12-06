@@ -246,7 +246,6 @@ const HomePage = () => {
           setErrorMessage('No position data found for the provided wallet(s).');
         }
       } catch (err) {
-        console.error('Error in fetchPnLData:', err);
         setErrorMessage(
           err.message || 'An unexpected error occurred while fetching data.'
         );
@@ -256,16 +255,14 @@ const HomePage = () => {
       }
     },
     [
-      activeWallets,
       aggregatePnLData,
       historyEnabled,
       savePositionSnapshot,
-      fetchWalletPnL,
+      debouncedExecuteFetchWalletPnL,
+      updateSolPrice,
       wallet,
       addWallet,
       setWallet,
-      debouncedExecuteFetchWalletPnL,
-      updateSolPrice,
     ]
   );
 
@@ -291,7 +288,6 @@ const HomePage = () => {
           .map((w) => w.trim())
           .filter((w) => w);
         if (wallets.length > 0) {
-          console.log(`Handle wallet query parameter: ${wallets}`);
           setActiveWallets(wallets);
           fetchPnLData(wallets, false);
         }
@@ -302,16 +298,10 @@ const HomePage = () => {
         !errorMessage
       ) {
         // Initial load logic: Fetch only if wallets are active, no data yet, not already loading, and no error shown
-        console.log(
-          `Auto fetch data if there are active wallets on page load 1: ${activeWallets}`
-        );
         fetchPnLData(activeWallets, false);
       }
       // Clear data/error if no wallets are active
       if (activeWallets.length === 0) {
-        console.log(
-          'Auto fetch data if there are active wallets on page load 2'
-        );
         setAggregatedData(null);
         setErrorMessage('');
       }
@@ -347,8 +337,8 @@ const HomePage = () => {
           }
 
           setAllPositionsHistory(allHistory);
-        } catch (error) {
-          console.error('Error loading historical data:', error);
+        } catch {
+          // Error is handled by not setting history, no need to log
         }
       };
 

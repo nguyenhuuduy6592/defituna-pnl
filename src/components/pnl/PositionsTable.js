@@ -301,7 +301,7 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
     }
 
     return getValueClass(numericValueForColoring);
-  }, [value, solPrice, showInSol, pnlData, symbol]);
+  }, [value, showInSol, pnlData, symbol]);
 
   const displayedValue = useMemo(() => {
     if (value === null) {

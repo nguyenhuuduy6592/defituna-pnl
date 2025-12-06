@@ -305,7 +305,7 @@ const PositionChart = memo(function PositionChart({
       exportWrapperRef,
       `${displayPair}-chart-${Date.now()}.png`
     );
-  }, [position, displayPair]);
+  }, [displayPair]);
 
   // Handle share button click
   const handleShare = useCallback(() => {
@@ -315,7 +315,7 @@ const PositionChart = memo(function PositionChart({
       `${displayPair} Performance Chart`,
       `Check out my ${displayPair} position performance on DeFiTuna!`
     );
-  }, [position, displayPair]);
+  }, [displayPair]);
 
   if (!positionHistory) {
     return null;
