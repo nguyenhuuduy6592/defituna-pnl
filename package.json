@@ -17,8 +17,8 @@
     "prepare": "husky",
     "lint": "eslint . --ext .js,.jsx --fix",
     "lint:check": "eslint . --ext .js,.jsx",
-    "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check ."
   },
   "dependencies": {
     "@orca-so/whirlpools-core": "^2.0.0",
