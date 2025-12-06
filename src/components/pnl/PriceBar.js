@@ -235,7 +235,7 @@ export const PriceBar = ({
           aria-label={`Current price: ${currentPricePoint.originalValue}`}
         />
       </div>
-      {showTooltip && containerRef.current && (
+      {showTooltip && (
         <TooltipPortal
           targetRef={containerRef}
           show={showTooltip}
