@@ -23,9 +23,42 @@ export const useAutoRefresh = (
   onRefresh,
   initialInterval = DEFAULT_INTERVAL
 ) => {
-  const [autoRefresh, setAutoRefresh] = useState(false);
-  const [refreshInterval, setRefreshInterval] = useState(initialInterval);
-  const [refreshCountdown, setRefreshCountdown] = useState(initialInterval);
+  const [autoRefresh, setAutoRefresh] = useState(() => {
+    // Initialize autoRefresh state from localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        return localStorage.getItem(AUTO_REFRESH_KEY) === 'true';
+      } catch (error) {
+        console.error('Error reading autoRefresh from localStorage:', error);
+        return false;
+      }
+    }
+    return false;
+  });
+
+  const [refreshInterval, setRefreshInterval] = useState(() => {
+    // Initialize refreshInterval state from localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        const savedInterval = Number(
+          localStorage.getItem(REFRESH_INTERVAL_KEY)
+        );
+        if (savedInterval && !isNaN(savedInterval) && savedInterval > 0) {
+          return savedInterval;
+        }
+      } catch (error) {
+        console.error(
+          'Error reading refreshInterval from localStorage:',
+          error
+        );
+      }
+    }
+    return initialInterval;
+  });
+
+  const [refreshCountdown, setRefreshCountdown] = useState(
+    () => refreshInterval
+  );
   const [error, setError] = useState(null);
   const onRefreshRef = useRef(onRefresh); // Store callback in ref to avoid dependency changes
 
@@ -34,29 +67,10 @@ export const useAutoRefresh = (
     onRefreshRef.current = onRefresh;
   }, [onRefresh]);
 
-  /**
-   * Load saved settings from localStorage on initial mount
-   */
+  // Initialize refreshCountdown when refreshInterval is first set
   useEffect(() => {
-    try {
-      // Load auto-refresh state
-      const savedAutoRefresh =
-        localStorage.getItem(AUTO_REFRESH_KEY) === 'true';
-      setAutoRefresh(savedAutoRefresh);
-
-      // Load refresh interval
-      const savedInterval = Number(localStorage.getItem(REFRESH_INTERVAL_KEY));
-      if (savedInterval && !isNaN(savedInterval) && savedInterval > 0) {
-        setRefreshInterval(savedInterval);
-        setRefreshCountdown(savedInterval);
-      }
-
-      setError(null);
-    } catch (error) {
-      console.error('Error loading auto-refresh settings:', error);
-      setError('Failed to load auto-refresh settings');
-    }
-  }, []);
+    setRefreshCountdown(refreshInterval);
+  }, [refreshInterval]);
 
   /**
    * Save settings to localStorage whenever they change
@@ -65,7 +79,6 @@ export const useAutoRefresh = (
     try {
       localStorage.setItem(AUTO_REFRESH_KEY, String(autoRefresh));
       localStorage.setItem(REFRESH_INTERVAL_KEY, String(refreshInterval));
-      setError(null);
     } catch (error) {
       console.error('Error saving auto-refresh settings:', error);
       setError('Failed to save auto-refresh settings');
@@ -76,10 +89,10 @@ export const useAutoRefresh = (
    * Reset countdown when interval changes or auto-refresh is enabled
    */
   useEffect(() => {
-    if (autoRefresh) {
+    if (autoRefresh && refreshCountdown !== refreshInterval) {
       setRefreshCountdown(refreshInterval);
     }
-  }, [refreshInterval, autoRefresh]);
+  }, [refreshInterval, autoRefresh, refreshCountdown]);
 
   /**
    * Handle countdown timer and trigger refresh when needed

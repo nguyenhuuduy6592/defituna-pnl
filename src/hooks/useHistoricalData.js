@@ -14,14 +14,28 @@ import {
  * @returns {Object} Historical data management functions and state
  */
 export const useHistoricalData = () => {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(() => {
+    // Initialize enabled state from localStorage
+    if (typeof window !== 'undefined') {
+      try {
+        return localStorage.getItem('historicalDataEnabled') === 'true';
+      } catch (error) {
+        console.error(
+          'Error reading historicalDataEnabled from localStorage:',
+          error
+        );
+        return false;
+      }
+    }
+    return false;
+  });
   const [dbInstance, setDbInstance] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleError = (error, message) => {
+  const handleError = useCallback((error, message) => {
     console.error(message, error);
     setError(message);
-  };
+  }, []);
 
   const initializeDB = useCallback(async () => {
     try {
@@ -32,7 +46,7 @@ export const useHistoricalData = () => {
       }
       return db;
     } catch (error) {
-      handleError(error, 'Failed to initialize position history database');
+      console.error('Failed to initialize position history database:', error);
       return null;
     }
   }, []);
@@ -45,9 +59,9 @@ export const useHistoricalData = () => {
 
       try {
         const success = await saveSnapshot(dbInstance, positions, timestamp);
-        success
-          ? setError(null)
-          : handleError(null, 'Failed to save position history data');
+        if (!success) {
+          handleError(null, 'Failed to save position history data');
+        }
       } catch (error) {
         handleError(error, 'Failed to save position history data');
       }
@@ -63,7 +77,6 @@ export const useHistoricalData = () => {
 
       try {
         const history = await getHistory(dbInstance, positionId, timeRange);
-        setError(null);
         return history;
       } catch (error) {
         handleError(error, 'Failed to retrieve position history data');
@@ -92,21 +105,27 @@ export const useHistoricalData = () => {
     [dbInstance, initializeDB]
   );
 
+  // Initialize database if enabled
   useEffect(() => {
-    const savedEnabled =
-      localStorage.getItem('historicalDataEnabled') === 'true';
-    if (savedEnabled) {
-      initializeDB()
-        .then((db) => {
+    if (enabled && !dbInstance) {
+      const init = async () => {
+        try {
+          const db = await initDB();
           if (db) {
-            setEnabled(true);
+            setDbInstance(db);
+            setError(null);
           }
-        })
-        .catch((error) =>
-          handleError(error, 'Failed to initialize historical data features')
-        );
+        } catch (error) {
+          console.error(
+            'Failed to initialize position history database:',
+            error
+          );
+          setError('Failed to initialize position history database');
+        }
+      };
+      init();
     }
-  }, [initializeDB]);
+  }, [enabled, dbInstance]);
 
   useEffect(() => {
     if (enabled && dbInstance) {

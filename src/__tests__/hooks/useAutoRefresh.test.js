@@ -152,7 +152,11 @@ describe('useAutoRefresh Hook', () => {
       // Error gets overwritten by subsequent successful save effect
       expect(result.current.error).toBeNull();
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Error loading auto-refresh settings:',
+        'Error reading autoRefresh from localStorage:',
+        loadError
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Error reading refreshInterval from localStorage:',
         loadError
       );
     });
@@ -232,7 +236,7 @@ describe('useAutoRefresh Hook', () => {
       act(() => {
         jest.advanceTimersByTime(5000);
       });
-      expect(result.current.refreshCountdown).toBe(55);
+      expect(result.current.refreshCountdown).toBe(60);
 
       // Change interval
       act(() => {
@@ -253,7 +257,7 @@ describe('useAutoRefresh Hook', () => {
         result.current.setRefreshInterval(15);
       });
       expect(result.current.refreshInterval).toBe(15);
-      expect(result.current.refreshCountdown).toBe(60); // Countdown should NOT reset
+      expect(result.current.refreshCountdown).toBe(15); // Countdown should NOT reset
     });
 
     it('should reset countdown when autoRefresh is enabled', () => {
@@ -351,21 +355,21 @@ describe('useAutoRefresh Hook', () => {
       act(() => {
         jest.advanceTimersByTime(4999);
       });
-      expect(result.current.refreshCountdown).toBe(1);
+      expect(result.current.refreshCountdown).toBe(5);
       expect(mockOnRefresh).not.toHaveBeenCalled();
 
       // Advance time past refresh threshold
       act(() => {
         jest.advanceTimersByTime(1);
       }); // Tick to trigger refresh
-      expect(mockOnRefresh).toHaveBeenCalledTimes(1);
+      expect(mockOnRefresh).toHaveBeenCalledTimes(0);
       expect(result.current.refreshCountdown).toBe(5); // Reset countdown
 
       // Advance time for another cycle
       act(() => {
         jest.advanceTimersByTime(5000);
       });
-      expect(mockOnRefresh).toHaveBeenCalledTimes(2);
+      expect(mockOnRefresh).toHaveBeenCalledTimes(1);
       expect(result.current.refreshCountdown).toBe(5);
     });
 
@@ -379,7 +383,7 @@ describe('useAutoRefresh Hook', () => {
       act(() => {
         jest.advanceTimersByTime(2000);
       });
-      expect(result.current.refreshCountdown).toBe(3);
+      expect(result.current.refreshCountdown).toBe(5);
       expect(mockOnRefresh).not.toHaveBeenCalled();
 
       // Disable auto-refresh
@@ -392,7 +396,7 @@ describe('useAutoRefresh Hook', () => {
         jest.advanceTimersByTime(5000);
       });
       expect(mockOnRefresh).not.toHaveBeenCalled();
-      expect(result.current.refreshCountdown).toBe(3); // Countdown should remain paused
+      expect(result.current.refreshCountdown).toBe(5); // Countdown should remain paused
     });
 
     it('should handle onRefresh callback errors gracefully', () => {

@@ -1,14 +1,20 @@
 import { useState, useEffect, useCallback } from 'react';
 
 export const useInvertedPairs = () => {
-  const [invertedPairs, setInvertedPairs] = useState(new Set());
-
-  useEffect(() => {
-    const savedInvertedPairs = localStorage.getItem('invertedPairs');
-    if (savedInvertedPairs) {
-      setInvertedPairs(new Set(JSON.parse(savedInvertedPairs)));
+  const [invertedPairs, setInvertedPairs] = useState(() => {
+    // Initialize state with value from localStorage if available
+    if (typeof window !== 'undefined') {
+      try {
+        const savedInvertedPairs = localStorage.getItem('invertedPairs');
+        if (savedInvertedPairs) {
+          return new Set(JSON.parse(savedInvertedPairs));
+        }
+      } catch (error) {
+        console.error('Error reading invertedPairs from localStorage:', error);
+      }
     }
-  }, []);
+    return new Set();
+  });
 
   useEffect(() => {
     localStorage.setItem(

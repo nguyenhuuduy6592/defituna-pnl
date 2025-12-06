@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo, useRef } from 'react';
+import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -240,7 +240,6 @@ const PositionChart = memo(function PositionChart({
   positionHistory,
   onClose,
 }) {
-  const [chartData, setChartData] = useState([]);
   const [activePeriod, setActivePeriod] = useState(TIME_PERIODS.MINUTE_5.value);
   const [activeMetrics, setActiveMetrics] = useState({
     pnl: true,
@@ -254,17 +253,17 @@ const PositionChart = memo(function PositionChart({
   // Use position.pairDisplay if available, otherwise fall back to position.pair
   const displayPair = (position.pairDisplay || position.pair).trim();
 
-  useEffect(() => {
+  // Calculate chart data during render instead of in useEffect
+  const chartData = useMemo(() => {
     if (!positionHistory || positionHistory.length === 0) {
-      setChartData([]);
-      return;
+      return [];
     }
     try {
       const preparedData = prepareChartData(positionHistory);
       const groupedData = groupChartData(preparedData, activePeriod);
 
       // Keep valid items OR items explicitly added as null gaps
-      const validData = groupedData
+      return groupedData
         .filter(
           (item) =>
             item &&
@@ -284,15 +283,9 @@ const PositionChart = memo(function PositionChart({
               ? null
               : (item.yield || 0) + (item.compounded || 0),
         }));
-
-      // Remove logs added for debugging
-      // console.log("[PositionChart useEffect] Final chartData length:", validData.length);
-      // console.log("[PositionChart useEffect] Final chartData sample (incl. nulls?):", validData.slice(0, 20));
-
-      setChartData(validData);
     } catch (error) {
-      console.error('Error processing chart data in useEffect:', error);
-      setChartData([]);
+      console.error('Error processing chart data:', error);
+      return [];
     }
   }, [positionHistory, activePeriod]);
 
@@ -312,7 +305,7 @@ const PositionChart = memo(function PositionChart({
       exportWrapperRef,
       `${displayPair}-chart-${Date.now()}.png`
     );
-  }, [position]);
+  }, [position, displayPair]);
 
   // Handle share button click
   const handleShare = useCallback(() => {
@@ -322,7 +315,7 @@ const PositionChart = memo(function PositionChart({
       `${displayPair} Performance Chart`,
       `Check out my ${displayPair} position performance on DeFiTuna!`
     );
-  }, [position]);
+  }, [position, displayPair]);
 
   if (!positionHistory) {
     return null;
