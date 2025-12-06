@@ -34,8 +34,19 @@ afterEach(() => {
 describe('useWallet Hook', () => {
   describe('Initialization', () => {
     it('should initialize with default empty values when localStorage is empty', () => {
-      const { result } = renderHook(() => useWallet());
+      const { result, waitForNextUpdate } = renderHook(() => useWallet());
 
+      // Initial state should be empty arrays
+      expect(result.current.wallet).toBe('');
+      expect(result.current.activeWallets).toEqual([]);
+      expect(result.current.savedWallets).toEqual([]);
+
+      // Wait for the useEffect to load data from localStorage
+      act(() => {
+        // This will trigger the useEffect
+      });
+
+      // After initialization, state should still be empty since localStorage is empty
       expect(result.current.wallet).toBe('');
       expect(result.current.activeWallets).toEqual([]);
       expect(result.current.savedWallets).toEqual([]);
@@ -112,7 +123,7 @@ describe('useWallet Hook', () => {
 
       expect(console.error).toHaveBeenCalledTimes(1);
       expect(console.error).toHaveBeenCalledWith(
-        'Error loading wallet data from localStorage:',
+        'Error accessing localStorage for key "wallets":',
         expect.any(Error)
       );
       expect(result.current.savedWallets).toEqual([]);
@@ -504,14 +515,19 @@ describe('useWallet Hook', () => {
       // Assert state updated correctly despite save error
       expect(result.current.savedWallets).toEqual([walletToAdd]);
 
-      // Assert console.error was called exactly once *for this action*
-      expect(console.error).toHaveBeenCalledTimes(1);
+      // Assert console.error was called exactly twice *for this action*
+      // (once from safeSetLocalStorage, once from the useEffect try-catch)
+      expect(console.error).toHaveBeenCalledTimes(2);
       expect(console.error).toHaveBeenCalledWith(
-        'Error saving wallet data to localStorage:',
+        'Error setting localStorage for key "wallets":',
         setItemError
       );
-      // Assert the failing call to setItem happened once (it throws on the first attempt)
-      expect(setItemMock).toHaveBeenCalledTimes(1);
+      expect(console.error).toHaveBeenCalledWith(
+        'Error setting localStorage for key "activeWallets":',
+        setItemError
+      );
+      // Assert the failing call to setItem happened twice (once for wallets, once for activeWallets)
+      expect(setItemMock).toHaveBeenCalledTimes(2);
     });
   });
 });

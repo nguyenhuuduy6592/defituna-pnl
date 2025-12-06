@@ -1,8 +1,75 @@
 import { useState, useEffect, useCallback } from 'react';
 
 /**
+ * Safely access localStorage with SSR compatibility
+ *
+ * This function prevents "ReferenceError: localStorage is not defined" errors
+ * that occur during server-side rendering in Next.js. In SSR environments,
+ * the window object (and thus localStorage) is undefined.
+ *
+ * @param {string} key - The key to get from localStorage
+ * @returns {string|null} The value from localStorage or null
+ */
+const safeGetLocalStorage = (key) => {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    console.error(`Error accessing localStorage for key "${key}":`, error);
+    return null;
+  }
+};
+
+/**
+ * Safely set localStorage with SSR compatibility
+ *
+ * This function prevents "ReferenceError: localStorage is not defined" errors
+ * that occur during server-side rendering in Next.js. In SSR environments,
+ * the window object (and thus localStorage) is undefined.
+ *
+ * @param {string} key - The key to set in localStorage
+ * @param {string} value - The value to set
+ */
+const safeSetLocalStorage = (key, value) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  try {
+    localStorage.setItem(key, value);
+  } catch (error) {
+    console.error(`Error setting localStorage for key "${key}":`, error);
+  }
+};
+
+/**
+ * Safely remove item from localStorage with SSR compatibility
+ *
+ * This function prevents "ReferenceError: localStorage is not defined" errors
+ * that occur during server-side rendering in Next.js. In SSR environments,
+ * the window object (and thus localStorage) is undefined.
+ *
+ * @param {string} key - The key to remove from localStorage
+ */
+const safeRemoveLocalStorage = (key) => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  try {
+    localStorage.removeItem(key);
+  } catch (error) {
+    console.error(`Error removing localStorage item for key "${key}":`, error);
+  }
+};
+
+/**
  * Custom hook for managing wallet addresses
- * Handles wallet input state, active wallets, saved wallets, and local storage persistence
+ *
+ * This hook is SSR-compatible and handles wallet input state, active wallets,
+ * saved wallets, and local storage persistence. It uses safe localStorage
+ * access functions that prevent "ReferenceError: localStorage is not defined"
+ * errors during server-side rendering in Next.js.
  *
  * @returns {Object} Wallet management methods and state
  * @returns {string} returns.wallet - Current wallet input value
@@ -18,57 +85,78 @@ import { useState, useEffect, useCallback } from 'react';
 export const useWallet = () => {
   // State for current wallet input, active wallets, and saved wallets
   const [wallet, setWallet] = useState('');
+  const [activeWallets, setActiveWallets] = useState([]);
+  const [savedWallets, setSavedWallets] = useState([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Initialize active wallets from localStorage using lazy initialization
-  const [activeWallets, setActiveWallets] = useState(() => {
+  // Load data from localStorage on client side only (after hydration)
+  useEffect(() => {
+    if (isInitialized) {
+      return;
+    }
+
     try {
       // Load active wallets with fallback for backward compatibility
-      const lastActiveWallets = localStorage.getItem('activeWallets');
-      const parsedActiveWallets = lastActiveWallets
-        ? JSON.parse(lastActiveWallets)
-        : [];
+      let parsedActiveWallets = [];
+      try {
+        const lastActiveWallets = safeGetLocalStorage('activeWallets');
+        parsedActiveWallets = lastActiveWallets
+          ? JSON.parse(lastActiveWallets)
+          : [];
+      } catch (error) {
+        console.error('Error parsing activeWallets from localStorage:', error);
+        parsedActiveWallets = [];
+      }
 
-      if (parsedActiveWallets.length > 0) {
-        return parsedActiveWallets;
-      } else {
-        // For backward compatibility, but still don't set the input field
-        const lastWallet = localStorage.getItem('lastWallet');
-        if (lastWallet) {
-          return [lastWallet];
+      // Load saved wallets
+      let savedWalletsData = [];
+      try {
+        const walletsData = safeGetLocalStorage('wallets');
+        savedWalletsData = walletsData ? JSON.parse(walletsData) : [];
+      } catch (error) {
+        console.error('Error parsing wallets from localStorage:', error);
+        savedWalletsData = [];
+      }
+
+      // Handle backward compatibility - check lastWallet if no active wallets
+      if (parsedActiveWallets.length === 0) {
+        try {
+          const lastWallet = safeGetLocalStorage('lastWallet');
+          if (lastWallet) {
+            parsedActiveWallets = [lastWallet];
+          }
+        } catch (error) {
+          console.error('Error loading lastWallet from localStorage:', error);
         }
       }
-      return [];
-    } catch (error) {
-      console.error('Error loading wallet data from localStorage:', error);
-      return [];
-    }
-  });
 
-  // Initialize saved wallets from localStorage using lazy initialization
-  const [savedWallets, setSavedWallets] = useState(() => {
-    try {
-      // Load saved wallets
-      const savedWalletsData =
-        JSON.parse(localStorage.getItem('wallets')) || [];
-      return savedWalletsData;
+      // Set the loaded data in a single batch to avoid cascading renders
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveWallets(
+        parsedActiveWallets.length > 0 ? parsedActiveWallets : []
+      );
+
+      setSavedWallets(savedWalletsData);
+
+      setIsInitialized(true);
     } catch (error) {
       console.error('Error loading wallet data from localStorage:', error);
-      return [];
+      setIsInitialized(true);
     }
-  });
+  }, [isInitialized]);
 
   /**
    * Save settings to localStorage whenever they change
    */
   useEffect(() => {
     try {
-      localStorage.setItem('wallets', JSON.stringify(savedWallets));
-      localStorage.setItem('activeWallets', JSON.stringify(activeWallets));
+      safeSetLocalStorage('wallets', JSON.stringify(savedWallets));
+      safeSetLocalStorage('activeWallets', JSON.stringify(activeWallets));
 
       if (wallet) {
-        localStorage.setItem('lastWallet', wallet);
+        safeSetLocalStorage('lastWallet', wallet);
       } else {
-        localStorage.removeItem('lastWallet');
+        safeRemoveLocalStorage('lastWallet');
       }
     } catch (error) {
       console.error('Error saving wallet data to localStorage:', error);
