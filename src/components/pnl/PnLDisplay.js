@@ -127,7 +127,7 @@ export const PnLDisplay = ({
       positions: formattedPositions,
       walletCount: typeof data.walletCount === 'number' ? data.walletCount : 0,
     };
-  }, [data, showInSol]);
+  }, [data]);
 
   const positionsWithAge = usePositionAges(displayData.positions);
 
