@@ -87,12 +87,16 @@ export const useAutoRefresh = (
 
   /**
    * Reset countdown when interval changes or auto-refresh is enabled
+   * Only reset when autoRefresh becomes true or when refreshInterval changes
    */
   useEffect(() => {
+    // Only reset countdown when autoRefresh is enabled and interval changes
+    // OR when autoRefresh is first enabled
     if (autoRefresh && refreshCountdown !== refreshInterval) {
       setRefreshCountdown(refreshInterval);
     }
-  }, [refreshInterval, autoRefresh, refreshCountdown]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshInterval, autoRefresh]); // refreshCountdown intentionally omitted to prevent infinite loop
 
   /**
    * Handle countdown timer and trigger refresh when needed
@@ -102,12 +106,15 @@ export const useAutoRefresh = (
       return;
     }
 
+    // Reset countdown to interval when effect runs
+    setRefreshCountdown(refreshInterval);
+
     const countdownTick = () => {
       setRefreshCountdown((prev) => {
         if (prev <= 1) {
           try {
-            // Only refresh if tab is visible - Removing visibility check
-            if (onRefreshRef.current) {
+            // Only refresh if tab is visible
+            if (onRefreshRef.current && !document.hidden) {
               onRefreshRef.current();
             }
           } catch (error) {
