@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { HiX } from 'react-icons/hi';
 import { HiDownload, HiShare } from 'react-icons/hi';
 import { BsCurrencyDollar, BsClock } from 'react-icons/bs';
@@ -229,26 +229,13 @@ export const PnLCard = ({ position, onClose }) => {
   );
 
   // Memoized display values
-  const pnlForDisplay = useMemo(
-    () => formatDisplayValue(position.pnl.usd),
-    [position.pnl.usd, formatDisplayValue]
+  const pnlForDisplay = formatDisplayValue(position.pnl.usd);
+  const pnlPercentageForDisplay = formatPercentage(
+    position.pnl.usd / position.collateral?.usd
   );
-  const pnlPercentageForDisplay = useMemo(
-    () => formatPercentage(position.pnl.usd / position.collateral?.usd),
-    [position.pnl.usd, position.collateral?.usd, formatPercentage]
-  );
-  const collateralForDisplay = useMemo(
-    () => formatDisplayValue(position.collateral?.usd),
-    [position.collateral?.usd, formatDisplayValue]
-  );
-  const feesEarnedForDisplay = useMemo(
-    () => formatDisplayValue(position.yield?.usd),
-    [position.yield?.usd, formatDisplayValue]
-  );
-  const compoundedForDisplay = useMemo(
-    () => formatDisplayValue(position.compounded?.usd),
-    [position.compounded?.usd, formatDisplayValue]
-  );
+  const collateralForDisplay = formatDisplayValue(position.collateral?.usd);
+  const feesEarnedForDisplay = formatDisplayValue(position.yield?.usd);
+  const compoundedForDisplay = formatDisplayValue(position.compounded?.usd);
 
   return (
     <Portal>
