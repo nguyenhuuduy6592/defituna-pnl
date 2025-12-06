@@ -156,7 +156,7 @@ const PairCell = memo(({ pair, isInverted, leverage, onPairInversion }) => {
 
   const displayPair = isInverted ? invertPairString(pair) : pair;
   const formattedLeverage =
-    leverage == 1 ? null : (
+    leverage === 1 ? null : (
       <>
         ({formatNumber(leverage)}x<span className={styles.hideOnMobile}></span>)
       </>
@@ -294,17 +294,17 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
       } else if (tokenBSymbol === KNOWN_TOKENS.SOL.symbol) {
         numericValueForColoring = pnlData.pnl_b.amount;
       } else {
-        numericValueForColoring = value == null ? 0 : value; // USD display mode
+        numericValueForColoring = value === null ? 0 : value; // USD display mode
       }
     } else {
-      numericValueForColoring = value == null ? 0 : value; // USD display mode
+      numericValueForColoring = value === null ? 0 : value; // USD display mode
     }
 
     return getValueClass(numericValueForColoring);
   }, [value, solPrice, showInSol, pnlData, symbol]);
 
   const displayedValue = useMemo(() => {
-    if (value == null) {
+    if (value === null) {
       // Handle null or undefined USD value first
       return showInSol ? 'N/A SOL' : 'N/A USD';
     }
@@ -325,7 +325,7 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
         return `${formatNumber(0)} SOL`; // Or formatNumber(0, 2, true).trim()
       }
       // For non-zero USD values, solPrice is required
-      if (solPrice != null) {
+      if (solPrice !== null) {
         const solAmount = value / solPrice;
         return `${formatNumber(solAmount)} SOL`; // Assuming formatNumber handles precision for SOL
       }
@@ -349,7 +349,7 @@ const ValueCell = memo(({ value, size, label, pnlData, symbol }) => {
       return `(${formatPercentage(pnlData.pnl_usd.bps / 10000)})`;
     }
 
-    if (value != null && size != null && size !== 0) {
+    if (value !== null && size !== null && size !== 0) {
       return `(${formatPercentage(value / size)})`;
     }
     return null;

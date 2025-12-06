@@ -45,7 +45,7 @@ const StatRow = ({ icon: Icon, label, value, valueClass }) => (
  */
 const PnLDisplay = ({ value, valueClass, displayPnlPercentage }) => {
   const percentageDisplay =
-    displayPnlPercentage != null ? (
+    displayPnlPercentage !== null ? (
       <span className={styles.percentage}>({displayPnlPercentage}%)</span>
     ) : null;
 
@@ -166,8 +166,8 @@ export const PnLCard = ({ position, onClose }) => {
   // Format price range for display if available
   let priceRangeDisplay = 'Unknown';
   if (
-    position.rangePrices?.lower != null &&
-    position.rangePrices?.upper != null
+    position.rangePrices?.lower !== null &&
+    position.rangePrices?.upper !== null
   ) {
     priceRangeDisplay = `$${formatNumber(position.rangePrices.lower)} - $${formatNumber(position.rangePrices.upper)}`;
   }
@@ -175,9 +175,9 @@ export const PnLCard = ({ position, onClose }) => {
   // Determine if position is in range
   let inRangeStatus = 'Unknown';
   if (
-    position.currentPrice != null &&
-    position.rangePrices?.lower != null &&
-    position.rangePrices?.upper != null
+    position.currentPrice !== null &&
+    position.rangePrices?.lower !== null &&
+    position.rangePrices?.upper !== null
   ) {
     const isInRange =
       position.currentPrice >= position.rangePrices.lower &&
@@ -187,7 +187,7 @@ export const PnLCard = ({ position, onClose }) => {
 
   // Format liquidation price range
   const formatLiqPrice = (price) => {
-    if (position.closedAt || price == null || price === 0) {
+    if (position.closedAt || price === null || price === 0) {
       return '-';
     }
     return `$${formatNumber(price)}`;
@@ -197,22 +197,22 @@ export const PnLCard = ({ position, onClose }) => {
   const liqPriceDisplay = `${liqLower} / ${liqUpper}`;
   const showLiqPrice =
     !position.closedAt &&
-    (position.liquidationPrice?.lower != null ||
-      position.liquidationPrice?.upper != null);
+    (position.liquidationPrice?.lower !== null ||
+      position.liquidationPrice?.upper !== null);
 
   // Format limit order prices
   const formatLimitPrice = (price) =>
-    price != null ? `$${formatNumber(price)}` : '-';
+    price !== null ? `$${formatNumber(price)}` : '-';
   const limitLower = formatLimitPrice(position.limitOrderPrices?.lower);
   const limitUpper = formatLimitPrice(position.limitOrderPrices?.upper);
   const showLimits =
-    position.limitOrderPrices?.lower != null ||
-    position.limitOrderPrices?.upper != null;
+    position.limitOrderPrices?.lower !== null ||
+    position.limitOrderPrices?.upper !== null;
 
   // Updated helper to format value based on current currency preference
   const formatDisplayValue = useCallback(
     (usdValue) => {
-      if (usdValue == null) {
+      if (usdValue === null) {
         return 'N/A';
       }
 
@@ -220,7 +220,7 @@ export const PnLCard = ({ position, onClose }) => {
         if (usdValue === 0) {
           return `${formatNumber(0, 2, true).trim()} SOL`;
         }
-        if (solPrice != null) {
+        if (solPrice !== null) {
           const valueInSol = usdValue / solPrice;
           return `${formatNumber(valueInSol, 2, true).trim()} SOL`;
         }

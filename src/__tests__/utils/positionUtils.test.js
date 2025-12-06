@@ -155,21 +155,25 @@ describe('positionUtils', () => {
         p_addr: '0x123',
         state: 'open',
         pair: 'ETH/USD',
+        c_price: 100,
+        r_prices: { l: null, u: null },
+        liq_price: { l: null, u: null },
+        lim_prices: { l: null, u: null },
       };
 
       const decoded = decodePosition(position);
 
       expect(decoded.rangePrices).toEqual({
-        lower: undefined,
-        upper: undefined,
+        lower: null,
+        upper: null,
       });
       expect(decoded.liquidationPrice).toEqual({
-        lower: undefined,
-        upper: undefined,
+        lower: null,
+        upper: null,
       });
       expect(decoded.limitOrderPrices).toEqual({
-        lower: undefined,
-        upper: undefined,
+        lower: null,
+        upper: null,
       });
       expect(decoded.displayStatus).toBe('Open (Unknown Range)');
     });

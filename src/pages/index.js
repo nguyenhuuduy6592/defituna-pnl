@@ -162,7 +162,7 @@ const HomePage = () => {
       if (totalSize === 0) {
         return `${formatNumber(0)} SOL`;
       }
-      if (solPrice != null && solPrice > 0) {
+      if (solPrice !== null && solPrice > 0) {
         const solAmount = totalSize / solPrice;
         return `${formatNumber(solAmount)} SOL`;
       }

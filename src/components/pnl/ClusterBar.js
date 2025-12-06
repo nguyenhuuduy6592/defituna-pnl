@@ -52,14 +52,14 @@ export const ClusterBar = ({
   // Internal formatting function based on currency preference
   const formatDisplayValue = useCallback(
     (usdValue) => {
-      if (usdValue == null) {
+      if (usdValue === null) {
         return showInSol ? 'N/A SOL' : 'N/A USD';
       }
       if (showInSol) {
         if (usdValue === 0) {
           return `${formatNumber(0)} SOL`;
         }
-        if (solPrice != null && solPrice > 0) {
+        if (solPrice !== null && solPrice > 0) {
           const solAmount = usdValue / solPrice;
           return `${formatNumber(solAmount)} SOL`;
         }

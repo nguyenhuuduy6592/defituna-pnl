@@ -72,10 +72,10 @@ export const calculateStatus = (position) => {
 
   // For 'open' state, check price availability
   if (
-    position.currentPrice == null ||
+    position.currentPrice === null ||
     !position.rangePrices ||
-    position.rangePrices.lower == null ||
-    position.rangePrices.upper == null
+    position.rangePrices.lower === null ||
+    position.rangePrices.upper === null
   ) {
     return 'Open (Unknown Range)';
   }

@@ -246,7 +246,7 @@ export function processTunaPosition(
       tokenBDecimals
     );
     const lowerLimitOrderPrice =
-      position.tick_stop_loss_index == -2147483648
+      position.tick_stop_loss_index === -2147483648
         ? 0
         : tickIndexToPrice(
             position.tick_stop_loss_index,
@@ -254,7 +254,7 @@ export function processTunaPosition(
             tokenBDecimals
           );
     const upperLimitOrderPrice =
-      position.tick_take_profit_index == 2147483647
+      position.tick_take_profit_index === 2147483647
         ? 0
         : tickIndexToPrice(
             position.tick_take_profit_index,
@@ -304,7 +304,7 @@ export function processTunaPosition(
 
     // Calculate liquidation prices
     let liquidationPrices;
-    if (leverage == 1) {
+    if (leverage === 1) {
       liquidationPrices = {
         lowerLiquidationPrice: 0,
         upperLiquidationPrice: 0,

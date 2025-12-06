@@ -224,6 +224,7 @@ describe('PnLCard', () => {
       yield: { usd: 0 },
       compounded: { usd: 0 },
       collateral: { usd: 10 },
+      rangePrices: { lower: null, upper: null },
     };
 
     renderWithProviders(
@@ -371,7 +372,7 @@ describe('PnLCard', () => {
   it('handles position with missing price range data', () => {
     const positionWithoutRanges = {
       ...defaultPosition,
-      rangePrices: null,
+      rangePrices: { lower: null, upper: null },
     };
 
     renderWithProviders(
@@ -425,7 +426,7 @@ describe('PnLCard', () => {
   it('handles position with no collateral data', () => {
     const positionWithoutCollateral = {
       ...defaultPosition,
-      collateral: null,
+      collateral: { usd: null },
     };
 
     renderWithProviders(
