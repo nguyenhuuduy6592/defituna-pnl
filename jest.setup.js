@@ -38,8 +38,17 @@ jest.mock('next/router', () => ({
 jest.mock('next/image', () => ({
   __esModule: true,
   default: (props) => {
-    const { alt = '', ...restProps } = props;
-    return <img {...restProps} alt={alt} />;
+    const { src, alt = '', width, height, ...restProps } = props;
+    return (
+      <div
+        data-testid="mock-next-image"
+        data-src={src}
+        data-alt={alt}
+        data-width={width}
+        data-height={height}
+        {...restProps}
+      />
+    );
   },
 }));
 
