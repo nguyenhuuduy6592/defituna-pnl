@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
+import { useState, useCallback, memo, useRef, useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -241,7 +241,7 @@ const PositionChart = memo(function PositionChart({
   onClose,
 }) {
   const [activePeriod, setActivePeriod] = useState(TIME_PERIODS.MINUTE_5.value);
-  const [activeMetrics, setActiveMetrics] = useState({
+  const [activeMetrics] = useState({
     pnl: true,
     totalYield: true,
   });

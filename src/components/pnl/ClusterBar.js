@@ -72,7 +72,7 @@ export const ClusterBar = ({
   );
 
   // Memoize calculations for composition percentages
-  const { total, collateralPercentage, debtPercentage, interestPercentage } =
+  const { collateralPercentage, debtPercentage, interestPercentage } =
     useMemo(() => {
       const totalSize = Math.abs(size);
       const collUsd = Math.abs(collateral?.usd ?? 0);
@@ -82,7 +82,6 @@ export const ClusterBar = ({
       // Prevent division by zero
       if (totalSize === 0) {
         return {
-          total: 0,
           collateralPercentage: 0,
           debtPercentage: 0,
           interestPercentage: 0,
@@ -95,7 +94,6 @@ export const ClusterBar = ({
       const intPerc = (intUsd / totalSize) * 100;
 
       return {
-        total: totalSize,
         collateralPercentage: collPerc,
         debtPercentage: debtPerc,
         interestPercentage: intPerc,

@@ -6,9 +6,7 @@ import {
   FaBalanceScale,
   FaCoins,
   FaSyncAlt,
-  FaWallet,
   FaArrowsAltH,
-  FaInfoCircle,
   FaCalendarCheck,
   FaExclamationTriangle,
   FaArrowsAltV,
@@ -173,16 +171,14 @@ export const PnLCard = ({ position, onClose }) => {
   }
 
   // Determine if position is in range
-  let inRangeStatus = 'Unknown';
   if (
     position.currentPrice !== null &&
     position.rangePrices?.lower !== null &&
     position.rangePrices?.upper !== null
   ) {
-    const isInRange =
-      position.currentPrice >= position.rangePrices.lower &&
+    // Check if position is in range
+    position.currentPrice >= position.rangePrices.lower &&
       position.currentPrice <= position.rangePrices.upper;
-    inRangeStatus = isInRange ? 'In range' : 'Out of range';
   }
 
   // Format liquidation price range

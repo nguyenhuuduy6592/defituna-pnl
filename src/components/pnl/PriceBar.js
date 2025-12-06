@@ -41,109 +41,105 @@ export const PriceBar = ({
   const containerRef = useRef(null);
 
   // Process all price points for tooltip and calculate display info
-  const { pricePoints, minPrice, maxPrice, range, currentPricePoint } =
-    useMemo(() => {
-      // Define all possible price points for tooltip
-      const allPoints = [
-        {
-          value: liquidationPrice.lower,
-          label: 'Liq. Lower',
-          color: '#FF2D55',
-          shape: 'triangle-up',
-        },
-        {
-          value: liquidationPrice.upper,
-          label: 'Liq. Upper',
-          color: '#FF2D55',
-          shape: 'triangle-down',
-        },
-        {
-          value: entryPrice,
-          label: 'Entry',
-          color: '#007AFF',
-          shape: 'diamond',
-        },
-        {
-          value: currentPrice,
-          label: 'Current',
-          color: '#FFCC00',
-          shape: 'circle',
-        },
-        {
-          value: rangePrices.lower,
-          label: 'Range Lower',
-          color: '#34C759',
-          shape: 'square',
-        },
-        {
-          value: rangePrices.upper,
-          label: 'Range Upper',
-          color: '#34C759',
-          shape: 'square',
-        },
-        {
-          value: limitOrderPrices.lower,
-          label: 'Stop Loss',
-          color: '#FF9500',
-          shape: 'triangle-up',
-        },
-        {
-          value: limitOrderPrices.upper,
-          label: 'Take Profit',
-          color: '#FF9500',
-          shape: 'triangle-down',
-        },
-      ];
+  const { pricePoints, minPrice, range, currentPricePoint } = useMemo(() => {
+    // Define all possible price points for tooltip
+    const allPoints = [
+      {
+        value: liquidationPrice.lower,
+        label: 'Liq. Lower',
+        color: '#FF2D55',
+        shape: 'triangle-up',
+      },
+      {
+        value: liquidationPrice.upper,
+        label: 'Liq. Upper',
+        color: '#FF2D55',
+        shape: 'triangle-down',
+      },
+      {
+        value: entryPrice,
+        label: 'Entry',
+        color: '#007AFF',
+        shape: 'diamond',
+      },
+      {
+        value: currentPrice,
+        label: 'Current',
+        color: '#FFCC00',
+        shape: 'circle',
+      },
+      {
+        value: rangePrices.lower,
+        label: 'Range Lower',
+        color: '#34C759',
+        shape: 'square',
+      },
+      {
+        value: rangePrices.upper,
+        label: 'Range Upper',
+        color: '#34C759',
+        shape: 'square',
+      },
+      {
+        value: limitOrderPrices.lower,
+        label: 'Stop Loss',
+        color: '#FF9500',
+        shape: 'triangle-up',
+      },
+      {
+        value: limitOrderPrices.upper,
+        label: 'Take Profit',
+        color: '#FF9500',
+        shape: 'triangle-down',
+      },
+    ];
 
-      // Filter out invalid price points
-      const validPoints = allPoints
-        .filter(
-          (point) =>
-            point.value !== Infinity &&
-            point.value !== null &&
-            point.value !== 0
-        )
-        .sort((a, b) => b.value - a.value);
+    // Filter out invalid price points
+    const validPoints = allPoints
+      .filter(
+        (point) =>
+          point.value !== Infinity && point.value !== null && point.value !== 0
+      )
+      .sort((a, b) => b.value - a.value);
 
-      // Define overall bar min/max based on rangePrices with a padding for grace areas
-      const graceAmount = (rangePrices.upper - rangePrices.lower) * 0.15; // 15% grace
-      const finalMinPrice = rangePrices.lower - graceAmount;
-      const finalMaxPrice = rangePrices.upper + graceAmount;
-      const calculatedRange = finalMaxPrice - finalMinPrice;
+    // Define overall bar min/max based on rangePrices with a padding for grace areas
+    const graceAmount = (rangePrices.upper - rangePrices.lower) * 0.15; // 15% grace
+    const finalMinPrice = rangePrices.lower - graceAmount;
+    const finalMaxPrice = rangePrices.upper + graceAmount;
+    const calculatedRange = finalMaxPrice - finalMinPrice;
 
-      // Determine current price point color and position
-      let displayCurrentPriceValue = currentPrice;
-      let displayCurrentPriceColor = '#FFCC00'; // Yellow for in-range
+    // Determine current price point color and position
+    let displayCurrentPriceValue = currentPrice;
+    let displayCurrentPriceColor = '#FFCC00'; // Yellow for in-range
 
-      if (currentPrice < rangePrices.lower) {
-        displayCurrentPriceValue = finalMinPrice; // Clamp to lower bound
-        displayCurrentPriceColor = '#FF2D55'; // Red
-      } else if (currentPrice > rangePrices.upper) {
-        displayCurrentPriceValue = finalMaxPrice; // Clamp to upper bound
-        displayCurrentPriceColor = '#FF2D55'; // Red
-      }
+    if (currentPrice < rangePrices.lower) {
+      displayCurrentPriceValue = finalMinPrice; // Clamp to lower bound
+      displayCurrentPriceColor = '#FF2D55'; // Red
+    } else if (currentPrice > rangePrices.upper) {
+      displayCurrentPriceValue = finalMaxPrice; // Clamp to upper bound
+      displayCurrentPriceColor = '#FF2D55'; // Red
+    }
 
-      return {
-        pricePoints: validPoints,
-        minPrice: finalMinPrice,
-        maxPrice: finalMaxPrice,
-        range: calculatedRange,
-        currentPricePoint: {
-          value: displayCurrentPriceValue,
-          originalValue: currentPrice,
-          color: displayCurrentPriceColor,
-        },
-      };
-    }, [
-      currentPrice,
-      entryPrice,
-      liquidationPrice.lower,
-      liquidationPrice.upper,
-      rangePrices.lower,
-      rangePrices.upper,
-      limitOrderPrices.lower,
-      limitOrderPrices.upper,
-    ]);
+    return {
+      pricePoints: validPoints,
+      minPrice: finalMinPrice,
+      range: calculatedRange,
+      currentPricePoint: {
+        value: displayCurrentPriceValue,
+        originalValue: currentPrice,
+        color: displayCurrentPriceColor,
+      },
+    };
+  }, [
+    currentPrice,
+    entryPrice,
+    liquidationPrice.lower,
+    liquidationPrice.upper,
+    rangePrices.lower,
+    rangePrices.upper,
+    limitOrderPrices.lower,
+    limitOrderPrices.upper,
+  ]);
 
   const getPosition = useCallback(
     (price) => {
