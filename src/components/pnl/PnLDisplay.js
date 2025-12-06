@@ -41,60 +41,79 @@ export const PnLDisplay = ({
     const positions = Array.isArray(data.positions) ? data.positions : [];
 
     // for each position, add the pnlClass, displayedValue, and percentageString
-    for (const position of positions) {
+    const formattedPositions = positions.map((position) => {
+      // Create new objects to avoid mutating props
+      const newPosition = {
+        ...position,
+        pnlData: {
+          ...position.pnlData,
+          token_pnl: [...position.pnlData.token_pnl],
+        },
+        yieldData: {
+          ...position.yieldData,
+          tokens: [...position.yieldData.tokens],
+        },
+        compoundedData: {
+          ...position.compoundedData,
+          tokens: [...position.compoundedData.tokens],
+        },
+      };
+
       // ----- START: PNL formatting -----
-      const pnlTokenValue = position.pnlData.token_pnl.reduce(
+      const pnlTokenValue = newPosition.pnlData.token_pnl.reduce(
         (sum, token) => sum + token.amount,
         0
       );
-      const pnlUsdValue = position.pnlData.pnl_usd.amount;
-      position.pnlData.pnlClass = getValueClass(pnlUsdValue);
-      position.pnlData.pnlClassInSol = getValueClass(pnlTokenValue);
+      const pnlUsdValue = newPosition.pnlData.pnl_usd.amount;
+      newPosition.pnlData.pnlClass = getValueClass(pnlUsdValue);
+      newPosition.pnlData.pnlClassInSol = getValueClass(pnlTokenValue);
 
-      position.pnlData.displayedValue = `$${formatNumber(position.pnlData.pnl_usd.amount)}`;
-      position.pnlData.displayedValueInSol = position.pnlData.token_pnl
+      newPosition.pnlData.displayedValue = `$${formatNumber(newPosition.pnlData.pnl_usd.amount)}`;
+      newPosition.pnlData.displayedValueInSol = newPosition.pnlData.token_pnl
         .map((token) => `${formatNumber(token.amount)} ${token.token}`)
         .join(', ');
 
-      position.pnlData.percentageString = `(${formatPercentage(position.pnlData.pnl_usd.bps / 10000)})`;
-      position.pnlData.percentageStringInSol = position.pnlData.token_pnl
+      newPosition.pnlData.percentageString = `(${formatPercentage(newPosition.pnlData.pnl_usd.bps / 10000)})`;
+      newPosition.pnlData.percentageStringInSol = newPosition.pnlData.token_pnl
         .map((token) => `(${formatPercentage(token.bps / 10000)})`)
         .join(', ');
       // ----- END: PNL formatting -----
 
       // ----- START: YIELD formatting -----
-      const yieldTokenValue = position.yieldData.tokens.reduce(
+      const yieldTokenValue = newPosition.yieldData.tokens.reduce(
         (sum, token) => sum + token.amount,
         0
       );
-      const yieldUsdValue = position.yieldData.usd.amount;
-      position.yieldData.yieldClass = getValueClass(yieldUsdValue);
-      position.yieldData.yieldClassInSol = getValueClass(yieldTokenValue);
+      const yieldUsdValue = newPosition.yieldData.usd.amount;
+      newPosition.yieldData.yieldClass = getValueClass(yieldUsdValue);
+      newPosition.yieldData.yieldClassInSol = getValueClass(yieldTokenValue);
 
-      position.yieldData.displayedValue = `$${formatNumber(position.yieldData.usd.amount)}`;
-      position.yieldData.displayedValueInSol = position.yieldData.tokens
+      newPosition.yieldData.displayedValue = `$${formatNumber(newPosition.yieldData.usd.amount)}`;
+      newPosition.yieldData.displayedValueInSol = newPosition.yieldData.tokens
         .map((token) => `${formatNumber(token.amount)} ${token.token}`)
         .join('<br />');
       // ----- END: YIELD formatting -----
 
       // ----- START: COMPOUNDED formatting -----
-      const compoundedTokenValue = position.compoundedData.tokens.reduce(
+      const compoundedTokenValue = newPosition.compoundedData.tokens.reduce(
         (sum, token) => sum + token.amount,
         0
       );
-      const compoundedUsdValue = position.compoundedData.usd.amount;
-      position.compoundedData.compoundedClass =
+      const compoundedUsdValue = newPosition.compoundedData.usd.amount;
+      newPosition.compoundedData.compoundedClass =
         getValueClass(compoundedUsdValue);
-      position.compoundedData.compoundedClassInSol =
+      newPosition.compoundedData.compoundedClassInSol =
         getValueClass(compoundedTokenValue);
 
-      position.compoundedData.displayedValue = `$${formatNumber(position.compoundedData.usd.amount)}`;
-      position.compoundedData.displayedValueInSol =
-        position.compoundedData.tokens
+      newPosition.compoundedData.displayedValue = `$${formatNumber(newPosition.compoundedData.usd.amount)}`;
+      newPosition.compoundedData.displayedValueInSol =
+        newPosition.compoundedData.tokens
           .map((token) => `${formatNumber(token.amount)} ${token.token}`)
           .join('<br />');
       // ----- END: COMPOUNDED formatting -----
-    }
+
+      return newPosition;
+    });
 
     return {
       totalPnL: data.totalPnL,
@@ -105,7 +124,7 @@ export const PnLDisplay = ({
       totalCompoundedInSol: data.totalCompoundedInSol,
       totalSize: data.totalSize,
       totalSizeInSol: data.totalSizeInSol,
-      positions,
+      positions: formattedPositions,
       walletCount: typeof data.walletCount === 'number' ? data.walletCount : 0,
     };
   }, [data, showInSol]);
