@@ -91,6 +91,9 @@ module.exports = [
       'no-console': 'off',
       'react-hooks/rules-of-hooks': 'off',
       'react-hooks/exhaustive-deps': 'off',
+      // Disable conflicting style rules for test files to avoid circular fixes
+      quotes: 'off',
+      'jsx-quotes': 'off',
     },
   },
   // Prettier configuration - should be last to override other configs

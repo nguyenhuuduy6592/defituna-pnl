@@ -8,7 +8,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 jest.mock('next/document', () => ({
   ...jest.requireActual('next/document'), // Use actual implementation for others
   Html: ({ children }) => <html lang="en">{children}</html>,
-  Head: ({ children }) => <head>{children}</head>,
+  Head: ({ children }) => <Head>{children}</Head>,
   Main: () => <main data-testid="mock-main" />,
   NextScript: () => <script data-testid="mock-next-script" />,
 }));
