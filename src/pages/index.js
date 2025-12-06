@@ -280,9 +280,11 @@ const HomePage = () => {
 
   // Handle initial load and wallet query parameter
   useEffect(() => {
-    if (router.isReady && !initialFetched.current) {
+    if (router.isReady) {
       const walletParam = router.query.wallet;
-      if (walletParam) {
+
+      // Handle wallet parameter from URL
+      if (walletParam && !initialFetched.current) {
         const wallets = walletParam
           .split(',')
           .map((w) => w.trim())
@@ -291,7 +293,11 @@ const HomePage = () => {
           setActiveWallets(wallets);
           fetchPnLData(wallets, false);
         }
-      } else if (
+        initialFetched.current = true;
+      }
+
+      // Handle saved wallets (separate from wallet parameter logic)
+      if (
         activeWallets.length > 0 &&
         !aggregatedData &&
         !loading &&
@@ -300,12 +306,12 @@ const HomePage = () => {
         // Initial load logic: Fetch only if wallets are active, no data yet, not already loading, and no error shown
         fetchPnLData(activeWallets, false);
       }
+
       // Clear data/error if no wallets are active
       if (activeWallets.length === 0) {
         setAggregatedData(null);
         setErrorMessage('');
       }
-      initialFetched.current = true;
     }
   }, [
     router.isReady,
